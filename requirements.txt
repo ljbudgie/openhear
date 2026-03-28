@@ -23,3 +23,7 @@ matplotlib>=3.8.0
 
 # USB HID (Noahlink Wireless 2)
 hid>=1.0.6
+
+# Lossless audio file loading (FLAC support for voice/reference.py)
+# Optional: only needed if you load FLAC reference files.
+soundfile>=0.12.1

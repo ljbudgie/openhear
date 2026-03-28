@@ -20,6 +20,9 @@ env/
 *.png
 *.pdf
 
+# Allow audiogram data files (sovereign data belongs in the repo)
+!audiogram/data/*.json
+
 # IDE / OS
 .idea/
 .vscode/

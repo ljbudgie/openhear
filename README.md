@@ -1,10 +1,16 @@
 # OpenHear 🦻
 
-### Your hearing. Your data. Your algorithms.
+### The first open hearing system that is sweat-proof, feedback-free, and 100% yours.
 
 > *The hearing aid industry charges £3,000–£8,000 for hardware, then locks you out of it.*
 > *Your audiogram is a measurement of your body. It belongs to you.*
 > *OpenHear gives it back.*
+
+---
+
+## Why OpenHear in 2026
+
+Commercial aids from Phonak, Signia, and Starkey still ship with proprietary AI that mangles your own voice, whistles during hugs, and dies in sweat. Replacements cost £3,000–£8,000 and lock you into manufacturer fitting software. OpenHear is the sovereign alternative: an open-source DSP pipeline with adaptive feedback cancellation, own-voice bypass, and sweat-proof 3D-printed ITE shells you manufacture at home. Every algorithm is inspectable. Every parameter is yours. No cloud. No subscription. No lock-in. MIT licensed.
 
 ---
 
@@ -87,11 +93,31 @@ See `SOVEREIGN_AUDIO.md` for the full framework.
 
 ---
 
-## Getting started
+## Getting started — three paths
 
-### Step 1 — Kill the factory AI
+### Path 1 — Quick start (phone + existing aids)
+1. Install the OpenHear mobile app (Android) from `/mobile/` — see [mobile README](mobile/README.md)
+2. Load your audiogram JSON (export from your audiologist or create one using `audiogram/data/FORMAT.md`)
+3. Pair your aids via Bluetooth Classic or ASHA
+4. Tap ▶ — the sovereign DSP pipeline runs on your phone in real time
 
-Before writing a line of code, set your aids to linear mode. This alone will transform your sound.
+### Path 2 — Desktop pipeline (Windows + Noahlink Wireless 2)
+1. Set your aids to linear mode (kill the factory AI — see instructions below)
+2. `pip install -r requirements.txt`
+3. `python -m core.read_fitting` — reads your current fitting data
+4. `python -m dsp.pipeline` — starts the real-time audio processor
+5. Edit `dsp/config.py` to tune compression, noise floor, and voice clarity
+
+### Path 3 — Full sovereign build (phone + photogrammetry + resin printer)
+1. Scan your ear using Polycam/Scaniverse photogrammetry (see [workflow](hardware/ite-shells/workflow.md))
+2. Customise the parametric shell in OpenSCAD (see [parametric_shell.scad](hardware/ite-shells/parametric_shell.scad))
+3. Print on Elegoo Saturn 4 / Anycubic (see [print settings](hardware/ite-shells/print_settings.md))
+4. Apply nano-coating for sweat-proofing (see [sweatproof guide](hardware/ite-shells/sweatproof.md))
+5. Assemble with OpenHear electronics, load the mobile app, and own your sound
+
+### Kill the factory AI
+
+Before using Path 2 or 3, set your aids to linear mode. This alone will transform your sound.
 
 **Phonak Naída (Marvel/Paradise/Lumity):**
 1. Install [Phonak Target](https://www.phonakpro.com/com/en/resources/software-and-firmware/phonak-target.html) on Windows
@@ -107,36 +133,25 @@ Before writing a line of code, set your aids to linear mode. This alone will tra
 4. Disable Own Voice Processing auto-switching
 5. Save and close
 
-### Step 2 — Install the DSP pipeline
-```bash
-git clone https://github.com/ljbudgie/openhear
-cd openhear
-pip install -r requirements.txt
-python core/read_fitting.py   # reads your current fitting data
-python dsp/pipeline.py        # starts the real-time audio processor
-```
-
-### Step 3 — Tune to yourself
-```python
-# dsp/config.py — your personal sound profile
-COMPRESSION_RATIO = 2.5       # adjust until voices sound natural
-NOISE_FLOOR_DB = -40          # raise if background noise bleeds through
-VOICE_BOOST_HZ = [1000, 4000] # frequency range to emphasise for speech
-BEAM_WIDTH_DEG = 60           # directional focus in degrees
-```
-
 ---
 
 ## Roadmap
 
 - [x] Hardware identification and compatibility testing
 - [x] Noahlink Wireless 2 bridge protocol research
-- [ ] `core/` — fitting data reader (JSON export)
-- [ ] `dsp/` — real-time Python pipeline (PyAudio + NumPy)
-- [ ] `stream/` — Bluetooth audio output module
-- [ ] `audiogram/` — threshold reader and visualiser
-- [ ] `learn/` — preference learning engine
+- [x] `core/` — fitting data reader (JSON export)
+- [x] `dsp/` — real-time Python pipeline (PyAudio + NumPy)
+- [x] `stream/` — Bluetooth audio output module
+- [x] `audiogram/` — threshold reader and visualiser
+- [x] `hardware/ite-shells/` — parametric ITE shell design + sweat-proofing
+- [x] `dsp/feedback_canceller` — adaptive feedback cancellation (LMS)
+- [x] `dsp/own_voice_bypass` — own-voice detection and DSP bypass
+- [ ] `mobile/` — Android real-time DSP app (Kotlin + Oboe)
+- [ ] `learn/` — on-device preference learning engine
 - [ ] `ui/` — desktop GUI (the OSCAR moment)
+- [ ] iOS version of mobile app
+- [ ] Community scan library
+- [ ] tinyML Learn module v2
 
 ---
 
@@ -157,6 +172,14 @@ OpenHear does not modify, reverse-engineer, or redistribute any proprietary firm
 Your audiogram is yours. Your fitting data is yours. This software helps you access both.
 
 MIT Licensed.
+
+---
+
+## Safety & Disclaimer
+
+> **⚠️ EXPERIMENTAL PROJECT — NOT A MEDICAL DEVICE**
+>
+> OpenHear is an experimental open-source project. It has not been evaluated, approved, or cleared by any regulatory body (FDA, MHRA, CE/UKCA, or equivalent). It is not a medical device. Consult a qualified audiologist before making any changes to your hearing aid configuration. Use at your own risk.
 
 ---
 

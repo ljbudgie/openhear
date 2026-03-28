@@ -249,7 +249,7 @@ private:
     float mNoiseFloorDb           = -50.0f;
     float mVoiceEmphasisGainDb    = 3.0f;
     float mFeedbackCancelStrength = 0.01f;
-    float mOwnVoiceThreshold     = 0.5f;
+    float mOwnVoiceThreshold      = 0.5f;
 
     // Oboe streams
     std::shared_ptr<oboe::AudioStream> mInputStream;

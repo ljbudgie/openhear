@@ -22,11 +22,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -92,6 +94,14 @@ fun OpenHearApp(engine: OboeEngine) {
     var currentScreen by remember { mutableStateOf("home") }
     var isRunning by remember { mutableStateOf(false) }
     var latencyMs by remember { mutableFloatStateOf(0f) }
+
+    // Poll latency every 500 ms while the engine is running.
+    LaunchedEffect(isRunning) {
+        while (isRunning) {
+            latencyMs = engine.latencyMs()
+            delay(500L)
+        }
+    }
 
     Scaffold(
         topBar = {

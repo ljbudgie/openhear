@@ -1,0 +1,45 @@
+{
+  "subject": "Lewis Burgess",
+  "source": "Dorothy Thomson Hearing Services, 12 Southend Ave, Darlington, DL3 7HL",
+  "date": "2021-10-20",
+  "notes": "Most recent verified clinical audiogram. ISQ (no significant change) from prior tests dating back to 2017-01-19.",
+  "format_version": "openhear-audiogram-v1",
+  "right_ear": {
+    "symbol": "O",
+    "thresholds": [
+      {"freq_hz": 125, "db_hl": 30},
+      {"freq_hz": 250, "db_hl": 35},
+      {"freq_hz": 500, "db_hl": 50},
+      {"freq_hz": 1000, "db_hl": 75},
+      {"freq_hz": 1500, "db_hl": 78},
+      {"freq_hz": 2000, "db_hl": 80},
+      {"freq_hz": 3000, "db_hl": 80},
+      {"freq_hz": 4000, "db_hl": 85},
+      {"freq_hz": 6000, "db_hl": 90},
+      {"freq_hz": 8000, "db_hl": 95}
+    ]
+  },
+  "left_ear": {
+    "symbol": "X",
+    "thresholds": [
+      {"freq_hz": 125, "db_hl": 35},
+      {"freq_hz": 250, "db_hl": 45},
+      {"freq_hz": 500, "db_hl": 55},
+      {"freq_hz": 1000, "db_hl": 75},
+      {"freq_hz": 1500, "db_hl": 75},
+      {"freq_hz": 2000, "db_hl": 80},
+      {"freq_hz": 3000, "db_hl": 80},
+      {"freq_hz": 4000, "db_hl": 85},
+      {"freq_hz": 6000, "db_hl": 95},
+      {"freq_hz": 8000, "db_hl": 100}
+    ]
+  },
+  "classification": {
+    "type": "sensorineural",
+    "pattern": "high-frequency sloping",
+    "right_pta": 68,
+    "left_pta": 70,
+    "right_range": "mild-to-profound",
+    "left_range": "mild-to-profound"
+  }
+}

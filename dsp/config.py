@@ -113,6 +113,61 @@ VOICE_CLARITY_HIGH_HZ: float = 4000.0
 VOICE_CLARITY_GAIN: float = 1.6
 
 
+# ── Feedback Cancellation (LMS Adaptive Filter) ────────────────────────────
+
+# Enable / disable adaptive feedback cancellation.
+FEEDBACK_CANCELLATION_ENABLED: bool = True
+
+# Length of the LMS adaptive filter in samples.
+# Longer filters model longer feedback paths but require more CPU.
+# Typical range: 64 – 256 samples.
+FEEDBACK_FILTER_LENGTH: int = 128
+
+# LMS step size (learning rate).
+# Smaller = more stable but slower adaptation; larger = faster but risk divergence.
+# Typical range: 0.001 – 0.05.
+FEEDBACK_MU: float = 0.01
+
+# Additional gain reduction (dB) applied in the feedback frequency region.
+# Reduces loop gain to prevent oscillation.  0 = no extra attenuation.
+ANTI_FEEDBACK_GAIN_DB: float = -6.0
+
+
+# ── Own-Voice Detection & Bypass ────────────────────────────────────────────
+
+# Enable / disable own-voice detection bypass.
+OWN_VOICE_BYPASS_ENABLED: bool = True
+
+# Fundamental frequency range for own-voice detection (Hz).
+# Human speech fundamental typically falls within 80–300 Hz.
+OWN_VOICE_F0_LOW_HZ: float = 80.0
+OWN_VOICE_F0_HIGH_HZ: float = 300.0
+
+# RMS energy threshold (dBFS) above which the signal may be classified as own voice.
+# Own voice is typically louder than external sounds due to bone conduction.
+OWN_VOICE_ENERGY_THRESHOLD_DBFS: float = -20.0
+
+# Gain multiplier applied to DSP output when own voice is detected.
+# 1.0 = no change; 0.5 = halve the DSP effect (more natural own voice).
+OWN_VOICE_BYPASS_GAIN: float = 0.5
+
+
+# ── Occlusion Reduction ────────────────────────────────────────────────────
+
+# Enable / disable occlusion reduction (low-frequency attenuation for ITE shells).
+OCCLUSION_REDUCTION_ENABLED: bool = False
+
+# High-pass corner frequency (Hz) for occlusion reduction.
+# Reduces the boomy low-frequency buildup caused by a sealed ear canal.
+# Typical range: 200 – 500 Hz.
+OCCLUSION_REDUCTION_CORNER_HZ: float = 300.0
+
+# Attenuation slope (dB/octave) below the corner frequency.
+# Steeper = more aggressive occlusion reduction.
+# Typical range: 6 – 18 dB/octave.
+OCCLUSION_REDUCTION_SLOPE_DB_OCT: float = 12.0
+
+
 # ── Logging ─────────────────────────────────────────────────────────────────
 
 # Python logging level for the DSP pipeline.

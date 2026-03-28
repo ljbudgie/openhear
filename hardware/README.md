@@ -46,6 +46,7 @@ OpenHear hardware has three build tiers. Start wherever you are comfortable. Eve
 |--------|-------------|
 | [tympan/](tympan/README.md) | Tympan integration: audiogram-to-Arduino bridge, sketch generation, platform docs |
 | [shell/](shell/README.md) | 3D printing guide for custom ear moulds: impressions, scanning, printing, fitting |
+| [ite-shells/](ite-shells/README.md) | Custom In-The-Ear (ITE) shells: materials, sweat-proofing, full build workflow |
 | [safety/](safety/README.md) | **Mandatory.** MPO limiters, calibration procedures, risk register, safety circuits |
 | [assembly/](assembly/README.md) | Step-by-step build guide for all three tiers, assuming zero electronics experience |
 | [BOM.md](BOM.md) | Complete bill of materials with suppliers, costs, and substitution notes |

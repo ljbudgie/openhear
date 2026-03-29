@@ -81,7 +81,63 @@ This is the method used by professional hearing aid labs and is recommended for 
    | Creality CR-Scan Raptor | 0.02mm | ~£500 | Good quality, large scanning volume |
    | Revopoint RANGE 2 | 0.1mm | ~£700 | Higher range but lower resolution — adequate for ear impressions |
 
-### Option C: OpenScan DIY Photogrammetry Rig (Budget-Friendly)
+### Option C: Photogrammetry Replication from Existing Shell Photos (No Impression Needed)
+
+If you already have a well-fitting hearing aid shell (commercial or custom), you can replicate it using photogrammetry without taking a new ear impression.
+
+**Requirements:** Any smartphone (iOS or Android), your existing well-fitting shell, good lighting
+
+**Why this works:** Your existing shell already represents a validated fit. Replicating its geometry gives you a starting point that you know is comfortable, which you can then modify in CAD.
+
+**Exact 100+ Photo Technique:**
+
+1. **Prepare the shell**
+   - Clean the shell thoroughly with IPA
+   - Place it on a contrasting surface (dark mat for light shell, white paper for dark shell)
+   - Mark 3–4 small reference dots on the shell with a fine-tip marker (helps photogrammetry alignment)
+   - Ensure soft, diffuse lighting — no harsh shadows (overcast daylight or a ring light works well)
+
+2. **Capture sequence** (aim for 100–120 photos minimum)
+
+   | Ring | Angle from horizontal | Number of photos | Spacing |
+   |------|----------------------|------------------|---------|
+   | Ring 1 (top) | 70–80° (nearly overhead) | 12–16 | Every 22–30° around the shell |
+   | Ring 2 (high) | 50–60° | 16–20 | Every 18–22° |
+   | Ring 3 (mid) | 30–40° | 20–24 | Every 15–18° |
+   | Ring 4 (low) | 10–20° | 20–24 | Every 15–18° |
+   | Ring 5 (level) | 0° (eye level) | 16–20 | Every 18–22° |
+   | Close-ups | Various | 16–20 | Focus on canal tip, vent, mic ports, faceplate edge |
+
+   - Move around the shell in each ring, keeping the shell centred in frame
+   - Overlap each photo by 60–70% with its neighbours
+   - Keep the phone at the same distance within each ring (~15cm for close rings, ~25cm for wider rings)
+   - Do NOT move the shell between photos — move yourself
+
+3. **Process with photogrammetry software**
+
+   | Software | Platform | Cost | Notes |
+   |----------|----------|------|-------|
+   | [Polycam](https://poly.cam/) | iOS / Android | Free tier | Photo mode — upload all photos, process on device or cloud |
+   | [Scaniverse](https://scaniverse.com/) | iOS | Free | Good mesh quality from photos |
+   | [Kiri Engine](https://www.kiriengine.com/) | iOS / Android | Free tier | Cloud-processed, good detail |
+   | [Meshroom](https://alicevision.org/#meshroom) | Desktop (Win/Linux) | Free, open-source | Best quality. Process on your PC with GPU |
+   | [COLMAP](https://colmap.github.io/) | Desktop | Free, open-source | Research-grade. Requires more setup |
+
+4. **Post-processing the scan**
+   - Import the mesh into Meshmixer or Blender
+   - Clean up noise, fill holes, smooth artefacts
+   - Scale-calibrate: measure your original shell with callipers and scale the mesh to match (critical for fit accuracy)
+   - The result is a watertight STL that replicates your existing shell geometry
+
+5. **Modify and improve**
+   - Open the replicated shell in your CAD tool
+   - Adjust wall thickness, vent size, mic port positions using the parametric approach (see [parametric_shell.scad](parametric_shell.scad))
+   - Add features from the OpenHear design that your commercial shell lacks (better venting, lotus-effect microstructures, etc.)
+   - Print and iterate
+
+> **Tip:** This method is especially useful if your commercial shell fits well but you want to add OpenHear-specific features (better venting, sweat-proofing microstructures, custom faceplate) without starting from scratch.
+
+### Option D: OpenScan DIY Photogrammetry Rig (Budget-Friendly)
 
 **Requirements:** Raspberry Pi, Pi Camera, 3D printed turntable
 

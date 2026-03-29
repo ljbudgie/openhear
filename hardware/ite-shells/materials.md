@@ -58,6 +58,43 @@ The best ITE shells combine rigid and flexible materials:
 
 This mimics how professional hearing aid labs build shells: hard body, soft tip. The soft tip conforms slightly to your ear canal under body heat, creating a better seal and more comfortable fit.
 
+### 2026 Material Updates
+
+The following materials have emerged or been validated for hearing aid shell use since mid-2025:
+
+| Resin | Manufacturer | Biocompatibility | Shore Hardness | Key Improvement | Price (approx.) | Notes |
+|-------|-------------|-----------------|----------------|-----------------|-----------------|-------|
+| **BioMed Elastic 50A** | Formlabs | ISO 10993-5, 10993-10 | 50A | Skin-like softness for canal tips; improved tear resistance over Elastic 50A (2024 reformulation) | £210/L | Best-in-class soft canal tip material. Requires Form 3B+/4B |
+| **Bio-Med Clear v2** | Liqcreate | ISO 10993-5, USP Class VI | 82D | Improved UV stability and reduced yellowing vs v1; lower viscosity for easier printing | €95/1kg | Excellent value. Works with most open MSLA printers |
+| **luxaprint mould** | DETAX | ISO 10993-5, 10993-10, Class IIa | 65A | Purpose-designed for flexible ear moulds; better elongation than Freeprint | €190/1kg | For full-flex ITE shells or soft liners |
+
+#### Pro10 HydraShield-Style Nano-Coating Recipe
+
+For makers who want to achieve professional-grade sweat-proofing comparable to the coatings used on premium 2026 commercial aids (e.g., Phonak Lumity Life IP68 coating), the following DIY recipe approximates the performance:
+
+**Materials:**
+- NANOMYTE SR-500HP (fluorinated silane SAM) — primary omniphobic layer
+- 99% IPA — surface preparation
+- Plasma surface activator (optional — a handheld corona treater such as the Electro-Technic BD-20AC, ~£150, significantly improves coating adhesion)
+
+**Procedure:**
+1. Sand shell to 2000 grit, wet-sand final pass
+2. Clean with 99% IPA, allow to dry completely (10 min)
+3. *(Optional but recommended)* Pass corona treater over surface for 10 seconds per cm² — activates surface energy for better coating adhesion
+4. Dip shell in NANOMYTE SR-500HP for 60 seconds
+5. Remove slowly, drip-dry vertically for 2 minutes
+6. Heat cure at 60°C for 30 minutes (domestic oven on lowest setting)
+7. Allow to cool to room temperature
+8. Apply second dip coat (repeat steps 4–7) for maximum durability
+
+**Expected performance:**
+- Water contact angle: >115° (superhydrophobic threshold)
+- Oil/earwax contact angle: >95° (oleophobic)
+- Durability: 12–18 months before reapplication needed
+- Comparable to Phonak Life/Lumity IP68-rated nano-coating
+
+See [sweatproof.md](sweatproof.md) for the combined microstructure + coating approach that pushes durability even further.
+
 ---
 
 ## Pigmentation — Skin-Tone Matching

@@ -595,6 +595,10 @@ The Burgess Principle binary test applies to every OpenHear decision: does this 
 - The Acoustic Profile Store follows the same principles as the codebase: open, forkable, community-governed, and not controlled by a central authority.
 - The open-source licence is part of the technical architecture. No future owner gets to close the sovereignty path.
 
+### Burgess Principle extension point
+
+The sovereign philosophy has an explicit API surface in `advocacy/`. It is a minimal, offline, dependency-free extension point that lets a companion advocacy tool (for example [Iris](https://github.com/ljbudgie/Iris), the reference Burgess Principle implementation) consume OpenHear records — audiograms, fitting profiles, MPO safety calculations — without OpenHear ever importing the companion or phoning home to it. The package produces SHA‑256 commitments over sovereign records, tags returning receipts as `SOVEREIGN` or `NULL`, and emits offline export bundles carrying both the OpenHear "experimental, not a medical device" disclaimer and an "advisory only, not legal advice" disclaimer. Raw environmental audio is refused at the adapter boundary by design. See [`docs/ADVOCACY_INTEGRATION.md`](docs/ADVOCACY_INTEGRATION.md) for the full contract. A full advocacy workflow (tribunal-ready bundles, draft challenge language, shared vault formats) is scoped for post-v1.0.0 work with Iris.
+
 
 ---
 

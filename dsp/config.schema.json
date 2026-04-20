@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openhear.org/schemas/config.schema.json",
+  "title": "OpenHear user configuration",
+  "description": "Validates the YAML/JSON config file consumed by dsp.user_config.load_config.  All sections are optional; omitted values fall back to the dataclass defaults defined in dsp/user_config.py.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "audiogram_path": {
+      "description": "Path to the user's audiogram JSON file.  May contain ~ for the home directory.  null = no audiogram-driven gain prescription.",
+      "type": ["string", "null"]
+    },
+    "compression": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ratio": {"type": "number", "minimum": 1.0, "maximum": 10.0, "default": 2.5},
+        "knee_db": {"type": "number", "minimum": -120.0, "maximum": 0.0, "default": -40.0},
+        "attack_ms": {"type": "number", "minimum": 0.1, "maximum": 1000.0, "default": 5.0},
+        "release_ms": {"type": "number", "minimum": 1.0, "maximum": 10000.0, "default": 50.0}
+      }
+    },
+    "noise": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "floor_db": {"type": "number", "minimum": -120.0, "maximum": 0.0, "default": -45.0},
+        "reduction_strength": {"type": "number", "minimum": 0.0, "maximum": 1.0, "default": 0.6},
+        "gate_enabled": {"type": "boolean", "default": true}
+      }
+    },
+    "voice": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "boost_hz": {
+          "type": "array",
+          "items": {"type": "number", "minimum": 20, "maximum": 20000},
+          "minItems": 2,
+          "maxItems": 2,
+          "default": [1000, 4000]
+        },
+        "boost_db": {"type": "number", "minimum": -24.0, "maximum": 24.0, "default": 6.0}
+      }
+    },
+    "beamforming": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {"type": "boolean", "default": false},
+        "width_deg": {"type": "number", "minimum": 1.0, "maximum": 360.0, "default": 60.0},
+        "direction_deg": {"type": "number", "minimum": -180.0, "maximum": 180.0, "default": 0.0}
+      }
+    },
+    "system": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sample_rate": {"type": "integer", "minimum": 8000, "maximum": 192000, "default": 16000},
+        "buffer_size": {"type": "integer", "minimum": 16, "maximum": 8192, "default": 256},
+        "input_device": {"type": ["integer", "null"], "default": null},
+        "output_device": {"type": ["integer", "null"], "default": null}
+      }
+    }
+  }
+}

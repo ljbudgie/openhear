@@ -22,6 +22,9 @@ env/
 
 # Allow audiogram data files (sovereign data belongs in the repo)
 !audiogram/data/*.json
+# Allow bundled examples and schemas
+!examples/*.json
+!dsp/*.schema.json
 
 # IDE / OS
 .idea/

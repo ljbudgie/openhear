@@ -378,20 +378,29 @@ See `SOVEREIGN_AUDIO.md` for the full framework.
 
 ### Path 2.5 — Wristband prototype (Windows + micro:bit v2)
 1. Export or copy the patient's audiogram JSON
-2. Flash the micro:bit with [`hardware/wristband/firmware.py`](hardware/wristband/firmware.py) using the Windows editor workflow in [`HARDWARE.md`](HARDWARE.md#firmware-flashing-windows)
+2. Flash the micro:bit with [`wristband/openhear_firmware.py`](wristband/openhear_firmware.py) using the Windows editor workflow in [`HARDWARE.md`](HARDWARE.md#firmware-flashing-windows)
 3. Wire the two-motor transistor stage exactly as described in [`HARDWARE.md`](HARDWARE.md#exact-motor-driver-wiring-tested-values)
 4. Install Python dependencies with `pip install -r requirements.txt`
-5. For a BLE-only smoke test, run:
-   - `python -m stream.wristband_runtime --audiogram PATIENT.json --manual-sound alarm`
-6. For live classification, add a local YAMNet `.tflite` model and use the bundled official label CSV:
+5. For a dry packet check, run:
+   - `python -m haptic_commander --audiogram PATIENT.json --sound-class alarm --dry-run`
+6. For a BLE-only smoke test, run:
+   - `python -m haptic_commander --audiogram PATIENT.json --sound-class alarm`
+7. For live classification, add a local YAMNet `.tflite` model and use the bundled official label CSV:
    - `python -m stream.wristband_runtime --audiogram PATIENT.json --model yamnet.tflite --labels stream/data/yamnet_class_map.csv`
-7. If Windows BLE pairing or discovery fails, use the debugging checklist in [`HARDWARE.md`](HARDWARE.md#windows-ble-debugging-checklist)
+8. To validate the classifier without BLE, run:
+   - `python -m yamnet_classifier --model yamnet.tflite --labels stream/data/yamnet_class_map.csv --limit 10`
+9. If Windows BLE pairing or discovery fails, use the debugging checklist in [`HARDWARE.md`](HARDWARE.md#windows-ble-debugging-checklist) and the release notes in [`wristband/README.md`](wristband/README.md)
 
 The wristband runtime currently supports:
 - 7 sound classes (`voice`, `doorbell`, `alarm`, `dog`, `traffic`, `media`, `silence`)
 - audiogram-weighted intensity scaling from either the current v1 format or the legacy OpenHear v0.1.0 JSON export
 - BLE UART transport to a micro:bit advertising as `OpenHear`
 - patient safety defaults that bias toward the **worst** ear when one intensity byte must represent both ears
+
+The v1.0.0 clinic prototype keeps Noahlink extraction on a separate hardening
+track: the wristband already accepts audiogram JSON, while direct parsing in
+`core/read_fitting.py` and `audiogram/reader.py` still contains placeholder
+frame parsing that needs real-device confirmation.
 
 To keep a running development memory inside the repository, use:
 

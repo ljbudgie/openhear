@@ -190,6 +190,8 @@ def _load_labels(labels_path: str) -> list[str]:
 
     labels: list[str] = []
     for row in rows:
+        # Fallback for non-official CSVs that still store the label in the
+        # rightmost populated column.
         for column in reversed(row):
             label = column.strip()
             if label:

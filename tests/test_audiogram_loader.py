@@ -212,7 +212,8 @@ class TestBundledSample:
         data = load_audiogram(burgess_audiogram_path)
         # Right: 50 + 75 + 80 + 85 = 290 / 4 = 72.5
         assert get_pta(data, "right") == 72.5
-        # Left:  55 + 75 + 80 + 85 = 295 / 4 = 73.75 (rounded to 73.8).
+        # Left:  55 + 75 + 80 + 85 = 295 / 4 = 73.75; Python's banker's
+        # rounding in round(73.75, 1) yields 73.8.
         assert get_pta(data, "left") == 73.8
 
     def test_severity_matches_expected(self, burgess_audiogram_path):

@@ -10,7 +10,14 @@ import pytest
 
 
 def _stub_pyaudio() -> None:
-    """Install a minimal pyaudio stub so dsp.pipeline can import."""
+    """Install a minimal pyaudio stub so ``dsp.pipeline`` can be imported.
+
+    The test environment does not have PyAudio installed (and we do not
+    exercise real audio I/O in unit tests).  This stub provides just
+    enough of the module surface for the ``import pyaudio`` statement
+    at the top of ``dsp.pipeline`` to succeed; no actual device access
+    is enabled.
+    """
     if "pyaudio" in sys.modules:
         return
     mod = types.ModuleType("pyaudio")

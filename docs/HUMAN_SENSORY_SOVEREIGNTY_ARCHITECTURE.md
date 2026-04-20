@@ -1,725 +1,611 @@
 # OpenHear Human Sensory Sovereignty Architecture
 
-### The user decides what they hear, when they hear it, how they hear it, and what their acoustic environment does to their body and mind.
+### Your senses. Your data. Your world.
 
-This document is the full north-star architecture for OpenHear as a **human sensory sovereignty platform**. It extends the existing sovereign audio pipeline, the wristband concept, and the aids-free architecture into a single buildable system spanning eight pillars:
+This document is the full technical architecture for OpenHear as a human sensory sovereignty platform. It is written so an open-source engineering community can begin contributing immediately across all nine pillars, from the current sovereign DSP pipeline to the future wrist-native, aids-free sensory system.
 
-1. Peak hearing for all users
-2. Selective acoustic sovereignty
-3. Therapeutic frequency delivery
-4. Native iOS and Android integration
-5. Emotional and cognitive acoustic intelligence
-6. Social acoustic layer
-7. Beyond biological hearing
-8. Sovereign philosophy enforced at every layer
+## The nine pillars
 
-This is written for contributors who want to start shipping modules now: DSP engineers, embedded developers, mobile engineers, haptics researchers, clinicians, hardware builders, machine-learning contributors, accessibility designers, and users.
+1. The OpenHear Wristband — active environmental intelligence
+2. Aids-free architecture — the wristband as the complete hearing system
+3. Peak hearing for all users
+4. Selective acoustic sovereignty
+5. Therapeutic frequency delivery — 30 to 300 Hz
+6. iOS and Android native integration
+7. Emotional and cognitive acoustic intelligence
+8. Social acoustic layer
+9. Beyond biological hearing
 
 ---
 
 ## 0. Non-negotiables
 
-1. **The user is sovereign.** No hidden policy engine decides what matters in the user's environment.
-2. **Everything important works on-device.** Classification, adaptation, focus switching, haptic rendering, and therapeutic scheduling remain local.
-3. **Open formats, open interfaces, open hardware.** JSON, Parquet, ONNX, WAV, KiCad, OpenSCAD, Verilog/SystemVerilog, MIT/Apache/CERN-OHL-S where appropriate.
-4. **Companion first, replacement second, augmentation always.** OpenHear can start beside current hearing aids and progress toward a wrist-native sensory system.
-5. **Biology is the baseline, not the ceiling.** The target is not merely to imitate adult hearing. The target is to restore peak hearing and then exceed it.
-6. **The Burgess Principle is a technical requirement.** If a design treats the user as a unit inside somebody else's system, redesign it.
+1. **The user is sovereign.** No hidden policy engine gets final authority over the user's senses.
+2. **Everything critical works locally.** Capture, classification, profile switching, haptic rendering, and biometric correlation must function on-device.
+3. **Open formats at every layer.** JSON, ONNX, Parquet, WAV, KiCad, OpenSCAD, FreeCAD, Verilog/SystemVerilog, Rust, Kotlin, Swift.
+4. **Companion first, replacement second, augmentation always.** The platform starts beside today's aids and progresses toward a wrist-native sensory stack.
+5. **Biology is a baseline, not a ceiling.** OpenHear restores what has been lost and then goes beyond it.
+6. **The Burgess Principle is an engineering requirement.** Any layer that recentralises control fails architecture review.
 
 ---
 
 ## 1. System overview
 
-OpenHear is a layered stack. Each layer can be built independently and still compose cleanly with the rest.
+OpenHear is a layered system with clear module boundaries.
 
 ```text
 Environment
   ↓
 Perception layer
-  • Ear microphones / wrist microphones / phone microphones
-  • IMU, UWB, GPS, watch biometrics, sleep stages
+  • Wrist microphones
+  • Ear microphones / existing aid microphones
+  • Phone microphones
+  • IMU / compass / UWB / GPS
+  • Watch biometrics / sleep stages
   • Optional ultrasonic / infrasonic sensors
   ↓
-OpenHear Sovereignty Kernel
-  • Audiogram model
-  • Scene graph
-  • User profile + focus modes
-  • Policy engine chosen by the user
-  • Health correlation engine
+OpenHear sovereignty kernel
+  • Audiogram profile
+  • Peak-hearing target model
+  • Acoustic scene graph
+  • Focus policy engine
+  • Therapeutic protocol engine
+  • Emotional state correlation model
+  • Privacy and retention policy
   ↓
 Real-time engines
   • DSP pipeline
-  • Classifier + source separator
+  • Sound classifier
+  • Source separator
   • Spatial mapper
   • Haptic renderer
   • Therapeutic scheduler
+  • Anomaly detector
   ↓
 Outputs
-  • Hearing aids / open-fit earbuds / bone conduction receiver
-  • Wrist haptic lattice / Apple Watch / Wear OS
-  • Local insights, automations, community profile sync
+  • Existing hearing aids
+  • Open-fit earbuds / bone-conduction receiver
+  • Wrist haptic lattice
+  • Apple Watch / Wear OS secondary haptics
+  • Local analytics and community profile bundles
   ↓
 User-owned storage
-  • Local files
-  • HealthKit / Health Connect
-  • OpenHear profile store mirrors
+  • Local encrypted files
+  • HealthKit / Health Connect summaries
+  • Optional local-first profile-store mirrors
 ```
 
 ### 1.1 Deployment modes
 
-| Mode | What ships first | Role |
+| Mode | Hardware | Primary value |
 |---|---|---|
-| **Pipeline mode** | Existing phone/desktop DSP + hearing aids | Immediate sovereignty over amplification, own voice, feedback, and streaming |
-| **Companion wristband mode** | Wristband + existing aids | Environmental intelligence, haptic awareness, selective focus, therapeutic delivery |
-| **Aids-light mode** | Wristband + minimal receiver | Wrist owns capture and processing; ear device only delivers |
-| **Aids-free mode** | Wristband only | Full sensory substitution and augmentation through haptics |
+| Pipeline mode | Phone/desktop + existing aids | Sovereign DSP, audiogram ownership, real-time streaming |
+| Companion wristband mode | Wristband + existing aids | Environmental intelligence, haptics, selective focus |
+| Aids-light mode | Wristband + minimal receiver | Wrist owns intelligence; ear only delivers |
+| Aids-free mode | Wristband only | Somatosensory hearing substitution and augmentation |
 
-### 1.2 Core runtime abstractions
+### 1.2 Required repository boundaries
 
-- `AudiogramProfile` — thresholds, recruitment curves, dead-band mask, childhood-peak target curve
-- `AcousticSceneGraph` — sources, classes, directions, confidence, motion vectors
-- `FocusPolicy` — what to amplify, attenuate, isolate, mask, log, or ignore
-- `TherapeuticProtocol` — frequencies, duty cycle, timing, contraindication gates
-- `StateCorrelationModel` — links acoustic conditions with HRV, heart rate, sleep, workload, and user actions
-- `SocialPatternPack` — shared haptic phrases, group modes, acoustic annotations
-- `PrivacyPolicy` — microphone retention, null zones, profile sharing, local-only restrictions
+Contributors should be able to work on isolated subsystems with stable interfaces.
 
-These abstractions should exist as versioned schemas before the full hardware exists. That lets the repo accept contributions now.
+- `core/` — audiogram, fitting, and user profile schemas
+- `dsp/` — real-time audio transforms, compression, feedback cancellation, source conditioning
+- `stream/` — Bluetooth LE Audio / classic Bluetooth control and output paths
+- `mobile/` — Kotlin/Swift front ends, profile switching, health integration, training protocols
+- `hardware/wristband/` — KiCad, BOM, power tree, antenna, mechanics, strap geometry
+- `hardware/npu/` — FPGA validation path, RISC-V subsystem, accelerator RTL
+- `dsp/haptic/` — band mapping, tacton rendering, spatial illusions, safety limits
+- `models/` — classifier, separator, on-device fine-tuning manifests, quantised runtimes
+- `training/protocol/` — calibration, adaptation tasks, metrics capture, replay tools
+- `profiles/` — focus modes, profession packs, therapeutic protocols, social haptic packs
+- `docs/` — architecture, evidence, governance, funding, field notes
 
----
+### 1.3 Core runtime abstractions
 
-## 2. Pillar 1 — Peak hearing for all users
+These schemas should exist early and remain versioned.
 
-The target is the best auditory access a human nervous system can plausibly use: the frequency resolution, sensitivity, and learning agility associated with childhood hearing, extended by haptic substitution where biological hearing is absent or degraded.
+- `AudiogramProfile` — thresholds, discomfort levels, recruitment, dead regions, preferred compensation
+- `PeakTargetProfile` — childhood-reference sensitivity model plus user comfort modifiers
+- `RestorationGap` — per-band difference between current accessible perception and target perception
+- `AcousticSceneGraph` — source class, identity, confidence, direction, motion, privacy class, anomaly score
+- `FocusPolicy` — preserve, suppress, isolate, duplicate-to-haptics, exception rules, exit conditions
+- `TherapeuticProtocol` — frequency set, amplitude envelope, duty cycle, schedule, contraindications
+- `StateCorrelationModel` — relationships between acoustics, physiology, user corrections, and outcomes
+- `HapticPhrasePack` — named social haptic patterns and confirmation rules
+- `PrivacyPolicy` — retention, redaction, profile-sharing, microphone null zones, export rights
 
-### 2.1 Functional target
-
-- Restore access to the equivalent of **20 Hz–20 kHz** perception for users with partial or severe loss.
-- Preserve and extend hearing users' access to high-frequency and spatial cues lost with age.
-- Use biological hearing where it exists and haptic substitution where it does not.
-
-### 2.2 Haptic array specification
-
-OpenHear should support three actuator tiers:
-
-| Tier | Array | Use |
-|---|---|---|
-| **MVP** | 24 actuators, single-ring or 2×12 | Environmental awareness, basic speech cues, onboarding |
-| **v1** | 64 actuators, 4 rings × 16 columns | Speech intelligibility, direction, therapeutic patterns, limited extended spectrum |
-| **v2** | 96–128 actuators, wrist + proximal forearm lattice | Dense speech cues, spatial elevation, ultrasonic/infrasonic overlays, professional use |
-
-Recommended rendering split:
-
-- **24 bark-like audio bands** for baseline speech/environment mapping
-- **8 transient bands** for consonant edges, alerts, and warnings
-- **4 spatial channels** for elevation/distance refinement
-- **4 therapeutic carriers** in the 30–300 Hz wellness window
-- **2 reserved channels** for social/haptic language overlays
-
-### 2.3 Peak hearing model
-
-Each user gets two curves:
-
-1. **Current profile** — what they hear now
-2. **Peak target profile** — a childhood-reference sensitivity model normalised for comfort and training stage
-
-The system computes a `RestorationGap` per frequency band:
+### 1.4 Open file contract
 
 ```text
-RestorationGap = PeakTargetSensitivity - CurrentAccessibleSensitivity
+~/.openhear/
+  audiogram.json
+  peak_target.json
+  profile.json
+  focus_modes/*.json
+  therapeutic/*.json
+  model_manifest.json
+  models/base.onnx
+  models/personal_delta.bin
+  training/*.parquet
+  health/correlation_state.json
+  phrasepacks/*.json
 ```
 
-That gap determines whether a band is:
-
-- amplified acoustically,
-- represented haptically,
-- duplicated for training,
-- or suppressed to avoid overload.
-
-### 2.4 AI training protocol
-
-Training is progressive, explicit, and measurable.
-
-1. **Calibration** — motor thresholds, comfort ceilings, temporal acuity, two-point discrimination, audiogram import
-2. **Symbol grounding** — phonemes, music intervals, alarms, named environmental sounds
-3. **Mixed reality exposure** — biological hearing + haptic substitution together
-4. **Gap filling** — present only the frequencies the user lacks
-5. **Extended spectrum** — ultrasonic, infrasonic, and predictive anomaly cues
-
-The training app logs:
-
-- phoneme discrimination,
-- speech-in-noise performance,
-- direction finding,
-- recall of haptic phrases,
-- adaptation speed by band,
-- self-reported fatigue and clarity.
-
-### 2.5 Personalisation
-
-OpenHear must never bluntly duplicate the whole spectrum to every output. It should:
-
-- fill the user's absent or weak bands first,
-- let partially-hearing users keep biological low-latency cues,
-- move dead bands onto higher-information haptic positions,
-- and expose all mappings in editable profile files.
-
-### 2.6 Child development track
-
-OpenHear should maintain a dedicated paediatric configuration:
-
-- lower-intensity safe defaults,
-- developmentally tuned training games,
-- speech and language milestone tracking,
-- optional parent/clinician shared reports exported from the child's device,
-- early-warning comparisons against age-expected detection curves.
-
-This is not only for diagnosed deafness. It is also for **early drift detection** before formal diagnosis.
+No critical user state should require a proprietary container or a remote service.
 
 ---
 
-## 3. Pillar 2 — Selective acoustic sovereignty
+## 2. Pillar 1 — The OpenHear Wristband: active environmental intelligence
 
-OpenHear does not just amplify. It lets the user author the rules of the acoustic world around them.
+The wristband is the first new hardware surface. Its job is to sense the environment continuously, classify it locally, and render useful environmental information as haptics in real time.
 
-### 3.1 Acoustic scene graph
+### 2.1 Hardware baseline
 
-The real-time engine should maintain a scene graph with:
+- 4- to 8-microphone array distributed across the band or clasp for usable azimuth estimation
+- 24-actuator MVP, 64-actuator v1, 96–128 actuator v2 lattice
+- 9-axis IMU for orientation compensation and gesture input
+- BLE Audio + BLE GATT control plane, with optional UWB for precise spatial alignment in later revisions
+- 12–24 hour battery target with magnetic charging and sealed sweat-resistant enclosure
+- Skin-safe strap materials and modular actuator cartridges for serviceability
 
-- source class (`speech`, `crowd`, `traffic`, `child_cry`, `ATC`, `instrument_cello`, `monitor_beep`)
-- source identity when available (`coach`, `teammate`, `my_child`, `my_own_instrument`)
-- location (azimuth, elevation, distance, motion)
-- relevance score per active profile
-- privacy class (`private`, `public`, `sensitive`, `unknown`)
+### 2.2 On-device pipeline
 
-This graph is the substrate for all focus modes.
+```text
+Mic array → ADC → front-end DSP → sound classifier → scene graph update
+         ↘ beamformer ↗                 ↘ haptic mapper → motor drivers
+```
 
-### 3.2 Focus mode architecture
+Required first-pass sound classes:
 
-Each focus mode is a versioned `FocusPolicy` bundle:
+- speech
+- my name
+- child cry
+- doorbell / knock
+- alarm / siren
+- traffic / bicycle / approaching vehicle
+- appliance / machinery anomaly
+- crowd
+- music / performance
+- user-defined custom class
+
+### 2.3 Contributor entry points
+
+- microphone-array geometry simulation
+- low-power keyword / event detector models
+- haptic pattern authoring tools
+- BLE profile definition for control and telemetry-free pairing
+- waterproofing and mechanical service design
+
+### 2.4 Immediate build targets
+
+1. Benchtop 24-motor development ring
+2. Raspberry Pi / Android tethered classifier demo
+3. Wrist orientation compensation layer
+4. Local sound library enrolment flow
+5. Battery and thermal profiling under continuous wear
+
+---
+
+## 3. Pillar 2 — Aids-free architecture: the wristband as the complete hearing system
+
+OpenHear progresses from companion wristband to full hearing system by moving intelligence onto the wrist and reducing the ear-worn hardware to zero or near-zero.
+
+### 3.1 Architecture states
+
+| State | Capture | Processing | Delivery |
+|---|---|---|---|
+| Companion | Existing aids + wristband | Phone/wrist | Aids + haptics |
+| Aids-light | Wristband | Wrist NPU | Bone-conduction puck or open earbud |
+| Aids-free | Wristband | Wrist NPU | Wrist haptic lattice only |
+
+### 3.2 Hearing-specific NPU
+
+The wrist processor is not a general-purpose AI chip with hearing as an afterthought.
+
+Target blocks:
+
+- RISC-V control core
+- fixed-function filterbank and beamforming front-end
+- quantised MAC array for classification and source separation
+- single-cycle audiogram and profile lookup
+- deterministic haptic scheduler
+- SRAM-resident model store with no DRAM dependency in the real-time path
+
+Latency budget:
+
+| Stage | Target |
+|---|---|
+| Mic capture + ADC | 0.3 ms |
+| Front-end DSP | 0.7 ms |
+| Filterbank + audiogram weighting | 0.6 ms |
+| Classification / separation | 1.5 ms |
+| Haptic render | 0.6 ms |
+| Driver + actuator onset | 1.3 ms |
+| **End-to-end target** | **≤ 5.0 ms** |
+
+### 3.3 Somatosensory substitution protocol
+
+The skin is the output surface and the brain is the decoder.
+
+Phases:
+
+1. Calibration — thresholds, comfort ceilings, temporal acuity, spatial confusion matrix
+2. Phoneme sandbox — consonant and vowel contrasts mapped to stable tactons
+3. Word and environment grounding — names, alarms, traffic, key household sounds
+4. Open conversation — continuous wear with periodic active recall checks
+5. Extended spectrum — ultrasound, infrasound, anomaly cues, full spatial overlays
+
+### 3.4 Minimal receiver path
+
+For early clinical and user validation, OpenHear supports a minimal ear-worn receiver:
+
+- coin-sized bone-conduction driver
+- wireless receive-only path
+- no microphones and no hidden DSP
+- commodity replaceable transducer
+- open hardware reference design
+
+### 3.5 Hardware roadmap
+
+1. CM4 / Edge TPU prototype for adaptation experiments
+2. RISC-V SBC + quantised runtime for lower-latency validation
+3. FPGA validation on ECP5 or equivalent open toolchain path
+4. Open ASIC exploration once the model/data path is stable
+
+---
+
+## 4. Pillar 3 — Peak hearing for all users
+
+Peak hearing is not defined as “normal adult hearing.” It is a personalised target based on childhood-range sensitivity and high-resolution access to acoustic structure.
+
+### 4.1 Functional goals
+
+- restore access to 20 Hz–20 kHz where possible through mixed acoustic and haptic delivery
+- extend high-frequency and spatial access for hearing adults experiencing age-related loss
+- create child-development pathways for earlier intervention and training
+- deliver profession-specific acuity modes for sport, music, medicine, engineering, and safety-critical work
+
+### 4.2 Restoration-gap model
+
+```text
+RestorationGap = PeakTargetProfile - CurrentAccessibleProfile
+```
+
+Each band can be handled in one of four ways:
+
+- preserve biologically
+- amplify acoustically
+- duplicate to haptics for training
+- substitute entirely via haptics
+
+### 4.3 Training and metrics
+
+Required metrics:
+
+- phoneme discrimination
+- speech-in-noise performance
+- localisation accuracy
+- reaction time in alert tasks
+- fatigue and clarity self-report
+- child-development milestone alignment where relevant
+
+### 4.4 Contributor entry points
+
+- paediatric-safe training flows
+- hearing-age reference datasets
+- mixed acoustic/haptic fitting logic
+- adaptation visualisation dashboards
+
+---
+
+## 5. Pillar 4 — Selective acoustic sovereignty
+
+This pillar turns OpenHear from “better hearing” into “authorable hearing.”
+
+### 5.1 Acoustic scene graph
+
+Every 10–50 ms frame updates a scene graph containing:
+
+- source class
+- source identity where enrolled
+- azimuth, elevation, and motion
+- relevance per active focus policy
+- privacy class
+- confidence and anomaly state
+
+### 5.2 Focus policy model
 
 ```json
 {
-  "id": "deep-focus-office-v1",
-  "targets": ["foreground_speech"],
-  "suppressed_classes": ["office_hvac", "keyboard", "crowd", "coffee_machine"],
-  "priority_exceptions": ["fire_alarm", "my_name", "calendar_alert"],
-  "spatial_bias": "front_60_deg",
-  "therapeutic_overlay": null,
-  "auto_exit_conditions": ["conversation_ended", "heart_rate_spike"]
+  "id": "crowd-filter-athletics-v1",
+  "targets": ["coach", "teammate", "referee", "starter_pistol"],
+  "suppressed_classes": ["crowd"],
+  "fallback_haptics": ["siren", "collision_warning"],
+  "auto_enter": ["stadium_geofence"],
+  "auto_exit": ["event_end"],
+  "therapeutic_overlay": null
 }
 ```
 
-Required first-party modes:
+### 5.3 First-party modes
 
-- **Crowd filter**
-- **Concert mode**
-- **Deep focus**
-- **Situational awareness**
-- **Sleep mode**
-- **Performance mode**
-- **Privacy mode**
+- crowd filter
+- concert mode
+- deep focus
+- situational awareness
+- sleep mode
+- performance mode
+- privacy mode
 
-### 3.3 Required signal-processing blocks
+### 5.4 Required engine blocks
 
-- low-latency speaker separation
-- class-conditioned noise suppression
+- class-conditioned source separation
 - directional beam steering
-- own-voice and known-voice matching
-- wake-sound exceptions
-- per-class compression profiles
-- haptic fallback if acoustic isolation would hide safety-critical sound
+- known-voice preservation
+- wake-sound exception handling
+- per-class compression / attenuation
+- haptic safety fallback for hidden critical cues
 
-### 3.4 Profession packs
+### 5.5 Acoustic Profile Store
 
-Professional packs are just specialised focus policies plus tuned models. Initial packs:
+The store behaves like a code forge:
 
-- surgery
-- aviation
-- firefighting / dispatch
-- orchestral strings
-- field sports
-- endurance athletics
-- emergency response sleep alerting
-
-Each pack includes:
-
-- ontology of relevant sounds,
-- default attenuation rules,
-- training corpus needs,
-- validation scenarios,
-- sharable haptic patterns.
-
-### 3.5 Acoustic Profile Store
-
-The Profile Store should work more like Git than an app store:
-
-- signed profile bundles
-- forks, diffs, merge requests
-- ratings and field notes
+- signed bundles
+- forks and diffs
+- semantic versioning
+- local mirrors
+- community ratings and field notes
 - no central approval gate for publication
-- optional local mirrors for offline use
-- trust metadata rather than censorship
 
-Minimum bundle contents:
+### 5.6 Privacy mode requirements
 
-- `focus_policy.json`
-- `profile_card.md`
-- `model_manifest.json`
-- `validation_notes.md`
-- `license`
-
-### 3.6 Privacy mode
-
-Privacy is a first-class acoustic mode, not a settings page.
-
-Hardware and software requirements:
-
-- directional microphone null zones for private sectors
-- on-device redaction of saved audio by default
-- acoustic fingerprint masking for exported samples
-- zero-retention mode for sensitive contexts
-- clear hardware indicator when any capture buffer exists
-- user-auditable logs of what was retained and why
-
-The user also decides what **not** to be heard doing: meetings, counselling, legal consultations, parenting, prayer, recovery, rest.
+- directional null zones
+- raw-audio retention off by default
+- acoustic fingerprint masking for exports
+- visible hardware indicator if capture buffers exist
+- auditable retention log controlled by the user
 
 ---
 
-## 4. Pillar 3 — Therapeutic frequency delivery (30–300 Hz)
+## 6. Pillar 5 — Therapeutic frequency delivery: 30 to 300 Hz
 
-OpenHear's therapeutic layer is a programmable haptic frequency-delivery system linked to sleep, recovery, stress, and focus.
+The wristband doubles as a programmable therapeutic frequency-delivery system with a strong bias toward evidence-led protocols and user-owned outcomes.
 
-### 4.1 Delivery model
+### 6.1 Protocol families
 
-Therapeutic outputs run on the same actuator lattice, with separate scheduling and safety gates.
+- 40 Hz gamma-aligned entrainment experiments
+- 30–80 Hz relaxation and regulation protocols
+- 80–150 Hz circulation / muscle-activation exploration
+- 150–300 Hz tissue-response and athletic-recovery research
 
-Modes:
+### 6.2 Runtime constraints
 
-- **background regulation** — low-amplitude patterns during work or travel
-- **active session** — deliberate 5–30 minute protocols
-- **sleep-coupled delivery** — REM/deep-sleep timed sessions
-- **recovery mode** — post-exercise or post-stress intervention
+- therapeutic sessions must never interfere with critical alerts
+- amplitudes remain below skin safety and comfort ceilings established during calibration
+- contraindication gates are explicit in protocol files
+- sleep-coupled delivery must respect sleep stage and user override
 
-### 4.2 Initial evidence-led protocol library
+### 6.3 Data model
 
-Initial protocol families:
+`TherapeuticProtocol` should include:
 
-- **40 Hz gamma support**
-- **low-frequency relaxation bands** (30–80 Hz)
-- **mid-band stimulation for circulation/muscle activation** (80–150 Hz)
-- **higher-band mechanostimulation for tissue response exploration** (150–300 Hz)
+- `frequencies`
+- `carrier_shape`
+- `duty_cycle`
+- `session_length`
+- `evidence_grade`
+- `contraindications`
+- `target_outcomes`
+- `washout_period`
+- `allowed_sleep_stages`
 
-Every protocol must include:
+### 6.4 Contributor entry points
 
-- evidence grade,
-- target outcome,
-- contraindications,
-- session length ceiling,
-- washout period,
-- user-reported effects form.
-
-### 4.3 Sleep architecture
-
-Sleep mode combines:
-
-- Apple Watch / Wear OS sleep stage input,
-- environmental attenuation policy,
-- selective exception detection,
-- therapeutic protocol scheduler.
-
-Example policy:
-
-- deep sleep: strong attenuation, child cry + emergency alert exceptions, no therapeutic pattern unless explicitly enabled
-- REM: optional gentle 40 Hz or user-selected protocol
-- awakening window: taper-in environmental awareness instead of abrupt alarm
-
-### 4.4 Health data integration
-
-HealthKit / Health Connect should store:
-
-- session timestamps,
-- protocol IDs,
-- HRV before/during/after,
-- sleep stage adjacency,
-- perceived stress,
-- workout recovery status,
-- adverse-effect flags.
-
-OpenHear writes summaries to the user's health record and keeps the higher-resolution model state locally.
-
-### 4.5 Wellness and research architecture
-
-To preserve the open-source path:
-
-- protocol library ships as **wellness support**, not clinical treatment claims,
-- research mode is opt-in,
-- community evidence is versioned and public,
-- higher-claim protocols remain clearly marked as exploratory until evidence matures.
+- evidence registry tooling
+- n-of-1 outcome dashboards
+- sleep-stage integration
+- skin-comfort and actuation safety benchmarking
 
 ---
 
-## 5. Pillar 4 — Native iOS and Android integration
+## 7. Pillar 6 — iOS and Android native integration
 
-The phone and watch stack already contains most of the non-custom compute OpenHear needs.
+The mobile stack is both the first shipping runtime and the control surface for the wristband.
 
-### 5.1 Native role split
+### 7.1 Platform responsibilities
 
-| Layer | iOS / watchOS | Android / Wear OS |
+| Capability | Apple stack | Android stack |
 |---|---|---|
-| Real-time DSP companion | Core Audio, AVAudioEngine, Metal / Neural Engine paths | Oboe/AAudio, TensorFlow Lite / NNAPI |
-| Haptics | Core Haptics, WatchKit haptics | VibratorManager, RichTap/vendor haptic APIs |
-| Health | HealthKit | Health Connect |
-| Automation | Shortcuts, Focus Filters, Background Tasks | App Actions, WorkManager, Automation apps |
-| Maps/context | Core Location, Maps, geofences | Fused Location Provider, Maps SDK, geofences |
+| DSP companion | Core Audio, AVAudioEngine, Metal / Neural Engine | Oboe, AAudio, NNAPI, TensorFlow Lite |
+| Haptics | Core Haptics, WatchKit | VibratorManager, OEM rich haptics |
+| Health | HealthKit, Apple Watch | Health Connect, Wear OS |
+| Context | Core Location, Maps, ARKit, Shortcuts | Maps SDK, geofences, sensors, automation |
+| Model runtime | Core ML / ONNX Runtime | TFLite / ONNX Runtime Mobile |
 
-### 5.2 Latency architecture
+### 7.2 Integration rules
 
-Real-time path targets:
+- location-triggered profile switching is always optional and locally evaluated
+- HealthKit / Health Connect store summaries, not raw audio
+- third-party SDK access never implies third-party server access
+- manual override must beat automation immediately
 
-- wrist-local haptic decisions: **≤ 5 ms**
-- phone-assisted hearing-aid pipeline: **≤ 20 ms**
-- BLE control-plane updates: **≤ 50 ms**
-- profile-switch trigger response: **< 250 ms**
+### 7.3 Required mobile surfaces
 
-Bluetooth split:
+- profile editor
+- live scene graph inspector
+- training app
+- therapeutic scheduler
+- profession pack installer
+- community annotation client
 
-- **hearing path**: local on wrist or phone, avoiding round trips where possible
-- **control path**: BLE / LE Audio metadata / profile updates
-- **high-bandwidth sync**: optional Wi-Fi/local export for model or profile transfers
+### 7.4 Contributor entry points
 
-### 5.3 Data model
-
-Suggested shared entities:
-
-- `OpenHearProfile`
-- `OpenHearFocusEvent`
-- `OpenHearTherapySession`
-- `OpenHearStressCorrelation`
-- `OpenHearAcousticAnnotation`
-- `OpenHearChildDevelopmentSnapshot`
-
-Store boundaries:
-
-- HealthKit / Health Connect: summaries, outcomes, correlations, consented metadata
-- local encrypted storage: raw model features, per-source confidence histories, optional captured audio
-
-### 5.4 Location-triggered profiles
-
-Geofenced or semantic triggers:
-
-- stadium → crowd filter or athlete mode
-- concert venue → concert mode
-- school pickup → situational awareness + child voice priority
-- hospital theatre → surgery pack
-- office calendar event → deep focus
-- home bedtime window → sleep mode
-
-Location rules are editable and always overridable by the user.
-
-### 5.5 Open SDK
-
-Third-party SDK priorities:
-
-- read and write focus policies
-- trigger mode switches
-- register sound classes and profession packs
-- receive privacy-preserving state callbacks
-- annotate venues and acoustic environments
-- import/export profile store bundles
-
-No SDK method should expose user data to third-party servers by default.
+- Swift profile editor and Core Haptics runtime
+- Kotlin Oboe pipeline integration
+- watchOS and Wear OS haptic companion apps
+- open SDK and local automation bindings
 
 ---
 
-## 6. Pillar 5 — Emotional and cognitive acoustic intelligence
+## 8. Pillar 7 — Emotional and cognitive acoustic intelligence
 
-OpenHear should learn how the user's nervous system reacts to sound, then act before overload arrives.
+OpenHear learns how the user's body responds to sound and uses that model to reduce overload without taking control away.
 
-### 6.1 Input signals
+### 8.1 Signals
 
 - HRV
-- resting and active heart rate
-- respiratory rate where available
+- heart rate and slope
 - blood oxygen where available
-- skin temperature / electrodermal proxy where available
+- skin temperature / conductance proxies
 - sleep debt
-- recent workout load
-- calendar context
-- current acoustic scene
+- workload and movement context
+- current acoustic scene and active focus policy
+- direct user corrections
 
-### 6.2 Personal state model
+### 8.2 State model outputs
 
-The state model is personal, local, and longitudinal.
+- calm
+- focused
+- positively aroused
+- overloaded
+- fatigued
+- sleep fragile
 
-Outputs:
+### 8.3 Decision model requirements
 
-- `calm`
-- `focused`
-- `positively_aroused`
-- `overloaded`
-- `fatigued`
-- `sleep_fragile`
+- explain every automatic action in plain language
+- allow one-tap reversal and local retraining
+- distinguish positive arousal from stress using multimodal context
+- operate without exporting physiological data off-device
 
-The system should bias toward transparency:
+### 8.4 Contributor entry points
 
-- show the user why a state was inferred,
-- show what changed,
-- allow one-tap correction,
-- retrain from those corrections locally.
-
-### 6.3 Automatic adaptation logic
-
-Examples:
-
-- HRV drops + crowd class rises + approach to station geofence → offer or auto-enable crowd filter
-- high workload calendar block + repeated keyboard/HVAC exposure + rising fatigue score → enter deep focus with periodic safety check-ins
-- concert venue + elevated heart rate + stable HRV + manual positive feedback → preserve energy instead of suppressing it
-- poor sleep score + child monitor exception armed → keep sleep mode conservative and prevent aggressive therapeutic overlays
-
-### 6.4 Notification architecture
-
-Notifications should be:
-
-- sparse,
-- explainable,
-- reversible,
-- and available as haptic-only, silent, or visual.
-
-Required insight types:
-
-- “This environment usually lowers your HRV.”
-- “You focus better when keyboard and HVAC are suppressed.”
-- “Your sleep improved on nights when child-voice filtering was enabled.”
-- “This concert profile raised arousal without increasing stress.”
-
-### 6.5 Privacy guarantees
-
-- no cloud model training required
-- HealthKit / Health Connect remain the external system of record for outcome summaries
-- user can delete the correlation model without deleting health data
-- model export uses open formats
+- wearable biometrics adapters
+- explainability UI
+- correction-driven local fine-tuning
+- longitudinal outcome analysis tooling
 
 ---
 
-## 7. Pillar 6 — Social acoustic layer
+## 9. Pillar 8 — Social acoustic layer
 
-OpenHear users should be able to share acoustic meaning, not just settings.
+OpenHear users should be able to exchange acoustic meaning and community knowledge while preserving privacy.
 
-### 7.1 Shared acoustic presence
+### 9.1 Shared acoustic presence
 
-Users can join a shared session where:
+Shared sessions allow:
 
-- one user's profile is mirrored to another,
-- live venue annotations are shared,
-- the same performance or environmental stream is rendered through each user's preferred outputs,
-- guardians and family members can mirror alerts without giving up privacy.
+- mirrored focus policies for trusted contacts
+- shared live annotations during events or travel
+- guardian / child alert mirroring without exposing raw audio
+- collaborative training sessions
 
-### 7.2 Haptic language
+### 9.2 Haptic communication
 
-OpenHear should support a user-owned haptic phrasebook:
+A phrase pack contains:
 
-- `presence`
-- `look-left`
-- `danger`
-- `slow-down`
-- `I'm here`
-- `this matters`
-- `I love this moment`
+- pattern waveform and actuator sequence
+- semantic label
+- urgency class
+- acknowledgement expectation
+- optional cultural / group namespace
 
-Phrase packs are:
+### 9.3 Community acoustic mapping
 
-- editable,
-- culture- and family-specific,
-- sharable like profiles,
-- layered on top of the acoustic engine rather than replacing speech or sign.
+Contributions should include:
 
-### 7.3 Community acoustic mapping
+- coarse location tile
+- acoustic accessibility rating
+- structured notes
+- relevant profile bundle link
+- confidence / consensus state
 
-Contributors should be able to publish:
+Raw audio upload is not required for mapping contributions.
 
-- venue acoustic notes,
-- dangerous masking zones,
-- quiet therapeutic spaces,
-- child-friendly sound environments,
-- profession-specific acoustic hazards.
+### 9.4 Contributor entry points
 
-Each record should support:
-
-- anonymous or attributed posting,
-- community verification,
-- timestamped updates,
-- machine-readable tags for automatic profile suggestions.
-
-### 7.4 Acoustic accessibility ratings
-
-Map overlays should expose:
-
-- hearing-loop availability,
-- quiet-room availability,
-- reverb severity,
-- crowd masking severity,
-- alert audibility,
-- child-cry / parent monitoring suitability,
-- first-responder acoustic load.
-
-This turns acoustic accessibility into infrastructure, not anecdote.
+- phrase-pack schema design
+- privacy-preserving venue annotations
+- trust / consensus algorithms
+- maps integration clients
 
 ---
 
-## 8. Pillar 7 — Beyond biological hearing
+## 10. Pillar 9 — Beyond biological hearing
 
-OpenHear's augmentation layer begins once the user controls the base spectrum.
+Once the system is built around an editable sensory pipeline, new senses become a straightforward extension of the same architecture.
 
-### 8.1 Extended-spectrum sensing
+### 10.1 Augmentation channels
 
-Required hardware roadmap:
+- ultrasonic capture for machinery, leak detection, specialised instruments, and animal activity
+- infrasonic capture for structural resonance, weather-adjacent cues, and seismic signatures
+- vertical and behind-wall spatial cues through multi-sensor fusion
+- anomaly detection against learned local baselines
 
-- standard MEMS mic array for 20 Hz–20 kHz
-- optional ultrasonic MEMS path up to ~96 kHz
-- low-frequency vibration / pressure sensing for sub-20 Hz events
-- IMU and spatial fusion for full-sphere mapping
+### 10.2 Rendering model
 
-### 8.2 Rendering strategy
+Extended-spectrum cues must not overload the base hearing map. They are overlaid as:
 
-Extended-spectrum content should not drown ordinary perception. It should be translated into:
+- reserved actuator regions
+- distinct carrier patterns
+- user-selectable urgency tiers
+- opt-in profession packs and augmentation modes
 
-- reserved haptic lanes,
-- specific temporal motifs,
-- or profile-controlled overlays.
+### 10.3 Professional augmentation examples
 
-Examples:
+- structural engineer hearing stress signatures in a bridge
+- clinician hearing extended-spectrum information through an OpenHear-enhanced stethoscope pipeline
+- musician perceiving harmonic overtones and room anomalies beyond unaided human access
 
-- ultrasonic leak signature → fast localised shimmer
-- infrasonic structural resonance → slow pulsed warning band
-- anomaly detection → distinct “this does not fit” pattern
+### 10.4 Contributor entry points
 
-### 8.3 Predictive environmental awareness
-
-The anomaly engine compares current acoustic fingerprints with expected local patterns.
-
-Potential uses:
-
-- unusual traffic approach from a blind corner,
-- unusual machinery tone in a workshop,
-- missing expected alarm in a monitored environment,
-- structural resonance drift,
-- unusual crowd dynamics in a public venue.
-
-### 8.4 Sports and professional augmentation
-
-Build domain packs that surface cues humans already use implicitly:
-
-- ball spin
-- bat/ball seam or impact signature
-- instrument harmonic isolation
-- stethoscope overtones
-- bridge or airframe stress harmonics
-- dispatch-radio intelligibility prioritisation
-
-This is where OpenHear stops being only assistive and becomes performance infrastructure.
+- ultrasonic / infrasonic sensor evaluation
+- anomaly-detection models
+- profession-pack authoring
+- cross-modal rendering experiments
 
 ---
 
-## 9. Pillar 8 — Sovereign philosophy enforced at every layer
+## 11. Cross-cutting technical standards
 
-Sovereignty must survive contact with code, hardware, law, and partnership pressure.
+### 11.1 Safety
 
-### 9.1 Technical enforcement
+- hard ceilings for haptic intensity and duty cycle
+- explicit comfort calibration
+- fail-open alert paths for critical sounds
+- visible state when any recording buffer exists
+- reversible automation at all times
 
-- user-held firmware signing keys
-- no mandatory account
-- no mandatory cloud relay
-- no opaque model files in critical path
-- exportable schemas for every important state object
-- local-first profile store mirrors
-- user-readable audit log for profile changes, automations, and retention events
+### 11.2 Security and privacy
 
-### 9.2 Governance
+- no mandatory cloud
+- optional encrypted local backups with user-held keys
+- signed bundles, user-signable firmware, and reproducible builds
+- per-feature retention settings in open config files
 
-OpenHear should maintain:
+### 11.3 Validation harnesses
 
-- public RFCs for architecture changes
-- explicit “Burgess Principle review” on major design proposals
-- separate safety review for anything touching therapeutic output or high-SPL audio
-- public benchmark datasets where consent allows
-- transparent deprecation policies for profile formats and SDK APIs
+Every major subsystem needs a bench harness:
 
-### 9.3 Licensing strategy
-
-- software: MIT or Apache-2.0
-- hardware design and RTL: CERN-OHL-S
-- documentation and protocol documents: CC-BY-SA where appropriate
-- community profile bundles: permissive by default, user-selectable
-
-### 9.4 Threat model
-
-OpenHear should explicitly defend against:
-
-- vendor capture,
-- cloud dependence,
-- coercive telemetry,
-- inaccessible profile formats,
-- profile censorship by a central operator,
-- silent therapeutic/autonomic changes the user did not request,
-- “AI convenience” features that hide decisions from the user.
+- latency harness
+- actuator distinctness harness
+- battery and thermal harness
+- speech-in-noise harness
+- localisation harness
+- therapeutic session logging harness
+- profile-switch automation harness
 
 ---
 
-## 10. Immediate engineering workstreams
+## 12. Execution sequence
 
-The architecture is broad. The contribution entry points are not.
+1. Stabilise schemas and local file contracts
+2. Ship mobile and desktop profile editors against current pipeline mode
+3. Build 24-actuator benchtop wrist rig and classifier demo
+4. Implement scene graph, focus policy engine, and profile bundles
+5. Add HealthKit / Health Connect summaries and local state correlation
+6. Publish training protocol and adaptation metrics tooling
+7. Validate aids-light hardware path and sub-5 ms latency stack
+8. Expand to community mapping, phrase packs, and augmentation modes
 
-### 10.1 Schemas and core libraries
-
-Ship first:
-
-- `schemas/openhear_profile.schema.json`
-- `schemas/focus_policy.schema.json`
-- `schemas/therapy_protocol.schema.json`
-- `schemas/acoustic_annotation.schema.json`
-- `schemas/state_correlation.schema.json`
-
-### 10.2 Runtime modules
-
-Open repo targets:
-
-- `dsp/haptic/`
-- `models/classifier/`
-- `models/separator/`
-- `training/protocol/`
-- `sdk/ios/`
-- `sdk/android/`
-- `profiles/`
-- `docs/regulatory/`
-
-### 10.3 Hardware tracks
-
-- wristband actuator test rig
-- microphone-array geometry validation
-- latency instrumentation rig
-- watch + wristband cooperative haptics
-- battery and thermal safety validation
-
-### 10.4 Research tracks
-
-- psychophysics of wrist bandwidth
-- therapeutic protocol evidence registry
-- biometrics-to-acoustic-state modelling
-- child development adaptation studies
-- privacy-preserving community acoustic maps
-
----
-
-## 11. Success criteria
-
-OpenHear is succeeding when all of the following are true:
-
-1. A user can import their audiogram and own profile without asking permission.
-2. A user can decide which sounds matter in a stadium, an office, a ward, a cockpit, or a bedroom.
-3. A user's stress and sleep data help them shape their acoustic environment without leaving their device.
-4. Two users can share haptic meaning without surrendering privacy.
-5. The system delivers information beyond ordinary biological hearing.
-6. Every important layer is forkable.
-
-If a feature weakens any of those, it does not belong here.
+OpenHear moves forward by publishing interfaces early, proving each layer in public, and never surrendering the sovereignty path to a closed dependency.

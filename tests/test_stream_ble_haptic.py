@@ -9,6 +9,8 @@ import pytest
 from stream.ble_haptic import (
     HapticPacket,
     OpenHearBLEClient,
+    PACKET_FIELDS,
+    PACKET_LENGTH,
     encode_packet,
 )
 
@@ -42,6 +44,11 @@ class _FakeClient:
 
 def test_encode_packet():
     assert encode_packet(3, 255, 1) == b"\x03\xff\x01"
+
+
+def test_packet_contract_constants():
+    assert PACKET_FIELDS == ("sound_class_id", "intensity", "pattern_id")
+    assert PACKET_LENGTH == 3
 
 
 def test_encode_packet_rejects_invalid_values():

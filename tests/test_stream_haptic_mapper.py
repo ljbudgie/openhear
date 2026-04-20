@@ -7,7 +7,13 @@ from pathlib import Path
 
 import pytest
 
-from stream.haptic_mapper import HapticMapper, SOUND_PROFILES, threshold_to_scale
+from stream.haptic_mapper import (
+    PATTERN_IDS,
+    SOUND_CLASS_IDS,
+    HapticMapper,
+    SOUND_PROFILES,
+    threshold_to_scale,
+)
 
 
 @pytest.fixture
@@ -38,6 +44,18 @@ class TestThresholdToScale:
 
 
 class TestHapticMapper:
+    def test_stable_sound_and_pattern_ids(self):
+        assert SOUND_CLASS_IDS == {
+            "silence": 0,
+            "voice": 1,
+            "doorbell": 2,
+            "alarm": 3,
+            "dog": 4,
+            "traffic": 5,
+            "media": 6,
+        }
+        assert PATTERN_IDS == SOUND_CLASS_IDS
+
     def test_legacy_audiogram_is_supported(self, legacy_audiogram_path: str):
         mapper = HapticMapper(legacy_audiogram_path)
         sound_class_id, intensity, pattern_id = mapper.build_command("alarm")

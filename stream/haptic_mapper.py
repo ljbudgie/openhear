@@ -40,6 +40,14 @@ SOUND_PROFILES: dict[str, SoundProfile] = {
     "media": SoundProfile(6, 6, 1000, "Both motors slow 500/500 ms pulse x2."),
 }
 
+SUPPORTED_SOUND_CLASSES: tuple[str, ...] = tuple(SOUND_PROFILES)
+SOUND_CLASS_IDS: dict[str, int] = {
+    sound_key: profile.sound_class_id for sound_key, profile in SOUND_PROFILES.items()
+}
+PATTERN_IDS: dict[str, int] = {
+    sound_key: profile.pattern_id for sound_key, profile in SOUND_PROFILES.items()
+}
+
 
 def clamp_uint8(value: float) -> int:
     """Clamp *value* to the 0–255 byte range."""

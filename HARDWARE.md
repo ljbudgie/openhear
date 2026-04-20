@@ -190,7 +190,7 @@ micro:bit Python Editor or Mu Editor:
 1. Install the **micro:bit Python Editor** or **Mu Editor** on Windows 11.
 2. Connect the micro:bit v2 over USB and wait for the `MICROBIT` drive to
    appear in File Explorer.
-3. Open `hardware/wristband/firmware.py` in the editor.
+3. Open `wristband/openhear_firmware.py` in the editor.
 4. Click **Flash**. The editor packages the script into a MicroPython image
    and copies it to the board.
 5. Wait for the yellow status LED on the micro:bit to stop flashing and for
@@ -208,8 +208,10 @@ If flashing fails on Windows:
 
 ### Firmware
 
-- Flash `hardware/wristband/firmware.py` to the micro:bit using a BLE-capable
+- Flash `wristband/openhear_firmware.py` to the micro:bit using a BLE-capable
   MicroPython build.
+- `hardware/wristband/firmware.py` remains in the repo as a legacy mirror of
+  the same seven-pattern prototype.
 - The firmware listens for BLE UART packets and renders these patterns:
   - `voice` → both motors, gentle pulse
   - `doorbell` → two sharp pulses

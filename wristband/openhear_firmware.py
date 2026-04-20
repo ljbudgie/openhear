@@ -1,8 +1,5 @@
 """
-Legacy mirror of the canonical OpenHear micro:bit v2 wristband firmware.
-
-Canonical release path:
-    wristband/openhear_firmware.py
+Canonical OpenHear micro:bit v2 firmware entry point for the v1.0.0 wristband.
 
 Expects 3-byte BLE UART packets:
 
@@ -11,9 +8,6 @@ Expects 3-byte BLE UART packets:
 Pins:
   - Left motor driver  -> P0
   - Right motor driver -> P1
-
-Flash this file to a BBC micro:bit v2 running a BLE-capable MicroPython
-build.  The device advertises as ``OpenHear`` where supported.
 """
 
 from microbit import display, pin0, pin1, sleep

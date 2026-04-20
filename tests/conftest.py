@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import sys
+import types
 from pathlib import Path
 
 import pytest
@@ -12,6 +13,42 @@ import pytest
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
+
+
+# Provide a minimal stub for the optional `hid` USB library so modules that
+# import it at module load time (core.read_fitting, audiogram.reader) can be
+# imported and unit-tested in environments without the native hidapi library.
+def _install_hid_stub() -> None:
+    try:
+        import hid as _real_hid  # noqa: F401
+        if hasattr(_real_hid, "device"):
+            return
+    except Exception:  # pragma: no cover - defensive: covers ImportError + load failures
+        pass
+
+    stub = types.ModuleType("hid")
+
+    class _StubDevice:  # pragma: no cover - replaced by tests as needed
+        def open(self, vendor_id, product_id):
+            raise OSError("stub hid.device cannot open real hardware")
+
+        def set_nonblocking(self, value):
+            pass
+
+        def write(self, data):
+            return len(data)
+
+        def read(self, length, timeout_ms=0):
+            return []
+
+        def close(self):
+            pass
+
+    stub.device = _StubDevice
+    sys.modules["hid"] = stub
+
+
+_install_hid_stub()
 
 
 @pytest.fixture

@@ -2,15 +2,18 @@
 pipeline.py – real-time audio processing loop for OpenHear.
 
 Reads audio from the system microphone, passes it through the DSP chain
-(noise reduction → WDRC compression → voice clarity emphasis), and writes
-the processed audio to the system output device (which should be mapped to
-the Bluetooth audio streamer by the OS).
+(noise reduction → WDRC compression → voice clarity emphasis → feedback
+cancellation → own-voice bypass), and writes the processed audio to the
+system output device (which should be mapped to the Bluetooth audio
+streamer by the OS).
 
-Processing chain (all stages optional via dsp/config.py):
-    Microphone input
+    Processing chain (all stages optional via dsp/config.py):
+        Microphone input
         → SpectralSubtractor  (noise_reduction.py)
         → WDRCompressor       (compression.py)
         → VoiceClarityEnhancer (voice_clarity.py)
+        → FeedbackCanceller   (feedback_canceller.py)
+        → OwnVoiceBypass      (own_voice_bypass.py)
         → Bluetooth output
 
 Latency budget:
@@ -32,7 +35,9 @@ import pyaudio
 
 from dsp import config
 from dsp.compression import WDRCompressor
+from dsp.feedback_canceller import FeedbackCanceller
 from dsp.noise_reduction import SpectralSubtractor
+from dsp.own_voice_bypass import OwnVoiceBypass
 from dsp.voice_clarity import VoiceClarityEnhancer
 
 logging.basicConfig(
@@ -100,6 +105,36 @@ def build_dsp_chain() -> list:
         logger.info("Stage added: VoiceClarityEnhancer (%.0f–%.0f Hz, gain=%.2f)",
                     config.VOICE_CLARITY_LOW_HZ, config.VOICE_CLARITY_HIGH_HZ,
                     config.VOICE_CLARITY_GAIN)
+
+    if config.FEEDBACK_CANCELLATION_ENABLED:
+        chain.append(FeedbackCanceller(
+            filter_length=config.FEEDBACK_FILTER_LENGTH,
+            mu=config.FEEDBACK_MU,
+            sample_rate=config.SAMPLE_RATE,
+            anti_feedback_gain_db=config.ANTI_FEEDBACK_GAIN_DB,
+        ))
+        logger.info(
+            "Stage added: FeedbackCanceller (length=%d, mu=%.4f, gain=%.1f dB)",
+            config.FEEDBACK_FILTER_LENGTH,
+            config.FEEDBACK_MU,
+            config.ANTI_FEEDBACK_GAIN_DB,
+        )
+
+    if config.OWN_VOICE_BYPASS_ENABLED:
+        chain.append(OwnVoiceBypass(
+            sample_rate=config.SAMPLE_RATE,
+            f0_low_hz=config.OWN_VOICE_F0_LOW_HZ,
+            f0_high_hz=config.OWN_VOICE_F0_HIGH_HZ,
+            energy_threshold_dbfs=config.OWN_VOICE_ENERGY_THRESHOLD_DBFS,
+            bypass_gain=config.OWN_VOICE_BYPASS_GAIN,
+        ))
+        logger.info(
+            "Stage added: OwnVoiceBypass (F0 %.0f–%.0f Hz, threshold=%.1f dBFS, gain=%.2f)",
+            config.OWN_VOICE_F0_LOW_HZ,
+            config.OWN_VOICE_F0_HIGH_HZ,
+            config.OWN_VOICE_ENERGY_THRESHOLD_DBFS,
+            config.OWN_VOICE_BYPASS_GAIN,
+        )
 
     if not chain:
         logger.warning("All DSP stages disabled – audio will be passed through unchanged.")

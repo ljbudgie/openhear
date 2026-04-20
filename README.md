@@ -2,6 +2,11 @@
 
 ### Your senses. Your data. Your world.
 
+> **⚠️ EXPERIMENTAL — NOT A MEDICAL DEVICE**
+> OpenHear is a research platform and public build log, not a certified hearing aid.
+> Start at low volume, validate every configuration on your own hardware, and do
+> not treat any module in this repository as a substitute for clinical care.
+
 ### OpenHear is a human sensory sovereignty platform — not a hearing aid, not a wellness device, not a consumer gadget. It is an open-source sovereign audio pipeline, haptic environment engine, therapeutic delivery layer, and future aids-free sensory system.
 
 ### North star: human sensory sovereignty. The user decides what they hear, when they hear it, how they hear it, and what their acoustic environment does to their body and mind. The long-term configuration is still direct: no hearing aid, no behind-the-ear receiver, no bone conduction implant, no ear canal device of any kind. The wristband IS the hearing system. See **[Vision — Aids-Free Hearing](#openhear-vision-2--aids-free-hearing-the-wristband-is-the-hearing-system)** below, the full eight-pillar platform architecture in [`docs/HUMAN_SENSORY_SOVEREIGNTY_ARCHITECTURE.md`](docs/HUMAN_SENSORY_SOVEREIGNTY_ARCHITECTURE.md), and the aids-free subsystem document in [`docs/AIDS_FREE_ARCHITECTURE.md`](docs/AIDS_FREE_ARCHITECTURE.md).
@@ -311,9 +316,9 @@ The fastest credible path: bench validation in months → single-user adaptation
 
 ### Open hardware path
 
-- Schematics: KiCad 8 in `/hardware/wristband/` (planned).
-- RTL: Verilog/SystemVerilog under CERN-OHL-S in `/hardware/npu/` (planned).
-- Mechanical: FreeCAD/OpenSCAD parametric models in `/hardware/wristband/mech/` (planned).
+- Schematics: KiCad 8 wristband package planned for a future `hardware/wristband/` directory; not yet committed in this repo.
+- RTL: Verilog/SystemVerilog Hearing NPU package planned for a future `hardware/npu/` directory; not yet committed in this repo.
+- Mechanical: FreeCAD/OpenSCAD wristband CAD planned for a future `hardware/wristband/mech/` directory; not yet committed in this repo.
 - BOM: globally-available distributors only; no single-source critical parts.
 - Targeting OSHWA certification at v0 and a Hackaday Prize / Open Hardware Summit submission.
 
@@ -359,15 +364,15 @@ See `SOVEREIGN_AUDIO.md` for the full framework.
 ## Getting started — three paths
 
 ### Path 1 — Quick start (phone + existing aids)
-1. Install the OpenHear mobile app (Android) from `/mobile/` — see [mobile README](mobile/README.md)
+1. Install the experimental OpenHear Android scaffold from `/mobile/` — see [mobile README](mobile/README.md) for the current skeleton-only status
 2. Load your audiogram JSON (export from your audiologist or create one using `audiogram/data/FORMAT.md`)
 3. Pair your aids via Bluetooth Classic or ASHA
-4. Tap ▶ — the sovereign DSP pipeline runs on your phone in real time
+4. Tap ▶ once you have verified the current mobile build supports the stages you need on your device; the Android app is an active public prototype, not a finished clinical tool
 
 ### Path 2 — Desktop pipeline (Windows + Noahlink Wireless 2)
 1. Set your aids to linear mode (kill the factory AI — see instructions below)
 2. `pip install -r requirements.txt`
-3. `python -m core.read_fitting` — reads your current fitting data
+3. `python -m core.read_fitting` — exports the current raw Noahlink payload to JSON; typed field parsing remains pending confirmed HIMSA frame definitions
 4. `python -m dsp.pipeline` — starts the real-time audio processor
 5. Edit `dsp/config.py` to tune compression, noise floor, and voice clarity
 
@@ -409,7 +414,8 @@ Before using Path 2 or 3, set your aids to linear mode. This alone will transfor
 - [x] `hardware/ite-shells/` — parametric ITE shell design + sweat-proofing
 - [x] `dsp/feedback_canceller` — adaptive feedback cancellation (LMS)
 - [x] `dsp/own_voice_bypass` — own-voice detection and DSP bypass
-- [ ] `mobile/` — Android real-time DSP app (Kotlin + Oboe)
+- [x] `mobile/` — Android scaffold (Compose UI + Oboe/JNI audio engine skeleton)
+- [ ] `mobile/` — production-ready Android DSP + hearing-aid streaming
 - [ ] `learn/` — on-device preference learning engine
 - [ ] `ui/` — desktop GUI (the OSCAR moment)
 - [ ] iOS version of mobile app
@@ -424,8 +430,8 @@ Before using Path 2 or 3, set your aids to linear mode. This alone will transfor
 - [x] Prior art and engagement list — [`docs/PRIOR_ART.md`](docs/PRIOR_ART.md)
 - [x] Go-to-market, mission, and showcase applications — [`docs/GO_TO_MARKET.md`](docs/GO_TO_MARKET.md)
 - [x] Funding and partnership strategy — [`docs/FUNDING_AND_PARTNERSHIPS.md`](docs/FUNDING_AND_PARTNERSHIPS.md)
-- [ ] `hardware/wristband/` — KiCad schematics, mechanical CAD, BOM
-- [ ] `hardware/npu/` — open RTL for the Hearing NPU (RISC-V + custom accelerator, CERN-OHL-S)
+- [ ] `hardware/wristband/` — KiCad schematics, mechanical CAD, BOM (planned; directory not yet committed)
+- [ ] `hardware/npu/` — open RTL for the Hearing NPU (RISC-V + custom accelerator, CERN-OHL-S; planned, directory not yet committed)
 - [ ] `firmware/npu/`, `firmware/mcu/` — bare-metal Rust runtime
 - [ ] `dsp/haptic/` — frequency→position mapping, illusion library, audiogram weighting
 - [ ] `models/` — base classifier, separator, and personal-LoRA scaffold

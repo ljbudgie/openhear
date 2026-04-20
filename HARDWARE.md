@@ -100,7 +100,9 @@ Native Windows MFi support is planned for a future phase.
 | NOAH 4       | HIMSA          | HIMSA protocol | No           |
 
 OpenHear does **not** depend on any of the above tools at runtime.  The
-`core/read_fitting.py` module reads fitting data directly via USB HID.
+`core/read_fitting.py` module reads fitting data directly via USB HID and
+currently exports the raw fitting payload to JSON; typed field parsing remains
+pending confirmed HIMSA frame definitions.
 
 ---
 

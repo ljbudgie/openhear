@@ -12,6 +12,11 @@ Real-time hearing assistance on Android. Captures mic input, processes it
 through a sovereign DSP pipeline (no cloud, no telemetry), and streams the
 result to Bluetooth hearing devices or earbuds.
 
+**Current repo status:** the Android app is a public scaffold. The Compose UI,
+audio engine wiring, and audiogram loader exist, but most DSP and Bluetooth
+features below are still skeleton implementations rather than production-ready
+hearing-aid processing.
+
 ## Features
 
 | Category | Feature | Status |
@@ -75,7 +80,7 @@ result to Bluetooth hearing devices or earbuds.
 
 ```bash
 # Clone and open in Android Studio
-git clone https://github.com/your-org/openhear.git
+git clone https://github.com/ljbudgie/openhear.git
 cd openhear/mobile
 # Open this directory in Android Studio — Gradle sync will pull Oboe and Compose.
 ```
@@ -113,8 +118,8 @@ hearing-assistance tool. Incorrect settings can damage hearing.
 
 - Always start at low volume.
 - Consult a licensed audiologist before relying on any hearing device.
-- The safety limiter hard-clips at 0 dBFS, but this does **not** guarantee
-  safe output levels for every listener.
+- The planned safety limiter stage does **not** guarantee safe output levels
+  for every listener; validate the full output chain on your own hardware.
 
 ## License
 

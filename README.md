@@ -1,6 +1,6 @@
 # OpenHear 🦻
 
-### The first open hearing system that is sweat-proof, feedback-free, and 100% yours.
+### The first open hearing system that is sweat-proof, feedback-free, and 100% yours — a sovereign audio pipeline and active environmental intelligence platform for hearing aid users.
 
 > *The hearing aid industry charges £3,000–£8,000 for hardware, then locks you out of it.*
 > *Your audiogram is a measurement of your body. It belongs to you.*
@@ -20,6 +20,8 @@ OpenHear is an open-source sovereign audio pipeline for people who wear commerci
 
 It works with aids you already own. It runs on hardware you already have. It does not require an audiologist appointment to change a setting.
 
+OpenHear is now both a software pipeline and a hardware concept. The pipeline gives you control over how your aids process sound. The hardware — the OpenHear Wristband (in development) — extends that control outwards into the environment itself, scanning for sounds your aids may not pick up and translating them into haptic awareness on the wrist. Software and hardware are unified by a single principle: the hearing aid user should have full sovereignty over how they perceive their acoustic environment.
+
 **Tested on:**
 - Phonak Naída M70-SP (Marvel platform)
 - Signia Insio 7AX (Augmented Xperience platform)
@@ -28,6 +30,7 @@ It works with aids you already own. It runs on hardware you already have. It doe
 - Noahlink Wireless 2 (~£80 on eBay)
 - Windows laptop (for fitting software)
 - iPhone or Android (for streaming)
+- OpenHear Wristband *(in development)* — continuous-wear haptic frequency scanner, pairs over Bluetooth with the rest of the pipeline. See the OpenHear Wristband section below.
 
 ---
 
@@ -64,6 +67,52 @@ World → Microphone → Custom DSP Engine → Bluetooth Stream → Your Aids �
 **Audiogram module** — reads, visualises, and exports your hearing thresholds in open formats. The data your audiologist has been keeping in a system you can't access.
 
 **Learn module** *(phase 3)* — a preference engine that adjusts to your own corrections over time. Your hearing profile improves every day, not once every two years.
+
+---
+
+## OpenHear Wristband — Active Environmental Intelligence
+
+The pipeline above improves the sound that already reaches your aids. The wristband does something different: it scans the environment in parallel, on the wrist, and tells you about sounds your aids never delivered — or sounds you weren't oriented toward.
+
+It is a continuous-wear device designed to work *alongside* hearing aids, not replace them. Passive amplification becomes active environmental intelligence.
+
+```
+World → Wrist Microphone Array → On-device AI Classifier → Haptic Motor Array → Your Wrist
+                                          ↕
+                                     Bluetooth
+                                          ↕
+                                Aids · Phone · Pipeline
+```
+
+**Edge AI sound classification** — low-latency on-device inference identifies environmental sounds in real time. Nothing is sent to a cloud. Your environment is your data and it stays on the wrist. The same sovereignty principle that governs your audiogram governs every sample the wristband hears.
+
+**Multi-motor haptic feedback** — an array of small motors arranged around the wrist creates a spatial sound field through haptic patterns. Different sound classes, directions, and frequency bands have distinct haptic signatures. You build a physical sense of your acoustic surroundings without relying solely on what your aids decide to amplify.
+
+**Directional awareness through haptic mapping** — the wristband communicates not just *what* a sound is but *where* it is coming from. Motor positions map to compass points around the wrist, so a siren behind you, a voice to your left, and a doorbell in front feel distinctly different. This is spatial awareness for sounds the aids may not be picking up or that you simply aren't oriented toward.
+
+**Bluetooth connectivity** — pairs with hearing aids, smartphones, and smart home systems. Speaks the same protocols as the rest of the OpenHear pipeline so the wristband, the aids, and the DSP module act as one unified system rather than three separate devices.
+
+**Personalised AI models** — the classifier adapts to the user's specific environment over time. A user in a barbershop has different priority sounds to a user in an office; the model learns the difference and adjusts haptic responses accordingly, with no manual configuration. Adaptation happens locally on the device.
+
+**Proactive frequency-specific scanning** — instead of reacting after a sound has occurred, the wristband actively scans the frequency spectrum and alerts you to sounds approaching your detection threshold *before* they become relevant. Environmental sonar, not environmental amplification.
+
+### How it relates to existing devices
+
+The collaboration enquiry that prompted this work came from Sharp Hearing, a UK audiology clinic that already features the [Neosensory Buzz](https://neosensory.com/) on their site — a basic haptic wristband that converts sound into vibration patterns. The OpenHear Wristband goes significantly further:
+
+| Capability | Neosensory Buzz | OpenHear Wristband |
+|---|---|---|
+| Sound → vibration | ✓ | ✓ |
+| On-device AI sound classification | — | ✓ |
+| Directional haptic mapping (compass points on the wrist) | — | ✓ |
+| Proactive frequency-specific scanning | — | ✓ |
+| Personalised models that adapt to your environment | — | ✓ |
+| Pairs into a sovereign open-source DSP pipeline | — | ✓ |
+| Local-only — no cloud, no telemetry | partial | ✓ |
+
+### Why this fits OpenHear
+
+The developer wears Phonak Naída and Signia aids. The gap the wristband fills is one lived every day: aids amplify what reaches the microphones in front of your ears, in the direction you happen to be facing, within the frequency response the manufacturer chose. Everything outside that envelope is silence. The wristband closes that gap on the wrist, under the user's control, with the same data-sovereignty guarantees as the rest of the project.
 
 ---
 

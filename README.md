@@ -1,5 +1,7 @@
 # OpenHear 🦻
 
+### Your senses. Your data. Your world.
+
 ### OpenHear is a human sensory sovereignty platform — not a hearing aid, not a wellness device, not a consumer gadget. It is an open-source sovereign audio pipeline, haptic environment engine, therapeutic delivery layer, and future aids-free sensory system.
 
 ### North star: human sensory sovereignty. The user decides what they hear, when they hear it, how they hear it, and what their acoustic environment does to their body and mind. The long-term configuration is still direct: no hearing aid, no behind-the-ear receiver, no bone conduction implant, no ear canal device of any kind. The wristband IS the hearing system. See **[Vision — Aids-Free Hearing](#openhear-vision-2--aids-free-hearing-the-wristband-is-the-hearing-system)** below, the full eight-pillar platform architecture in [`docs/HUMAN_SENSORY_SOVEREIGNTY_ARCHITECTURE.md`](docs/HUMAN_SENSORY_SOVEREIGNTY_ARCHITECTURE.md), and the aids-free subsystem document in [`docs/AIDS_FREE_ARCHITECTURE.md`](docs/AIDS_FREE_ARCHITECTURE.md).
@@ -433,6 +435,125 @@ Before using Path 2 or 3, set your aids to linear mode. This alone will transfor
 - [ ] v1 FPGA validation on Lattice ECP5
 - [ ] FDA Q-Sub and MHRA Innovation Office pre-submission
 - [ ] Multi-user adaptation pilot (n≈20) with a UK academic audiology partner
+
+## OpenHear expansion — nine pillars
+
+The pipeline, hardware work, and roadmap above remain in force exactly as written. What follows is the expansion: OpenHear as a human sensory sovereignty platform spanning nine explicit pillars.
+
+## Pillar 1 — The OpenHear Wristband: Active Environmental Intelligence
+
+The OpenHear Wristband is a continuous-wear frequency scanner designed to work alongside existing hearing aids now and make them unnecessary later. It converts passive amplification into active environmental intelligence.
+
+- **Edge AI sound classification** — low-latency on-device AI identifies and classifies environmental sounds in real time, entirely locally. No cloud. No telemetry. No data leaving the wrist.
+- **Multi-motor haptic array** — an array of motors creates a spatial sound field through distinct haptic patterns. Different sounds, directions, and frequencies become different signatures on the skin.
+- **Directional awareness through haptic mapping** — the wristband tells the user not just what a sound is but where it is coming from, using compass-point mapping around the wrist.
+- **Bluetooth LE Audio connectivity** — the wristband pairs with existing hearing aids, smartphones, Apple Watch, and smart home systems, integrating directly with the OpenHear DSP pipeline.
+- **Personalised adaptive AI models** — the classifier learns the user's actual environment over time. A barbershop, a stadium, a concert hall, a surgery, and a nursery do not sound the same and should not be treated the same.
+- **Proactive frequency scanning** — the wristband actively scans the spectrum and warns about sounds approaching detection threshold before they become relevant. Environmental sonar, not environmental amplification.
+
+The first formal US industry contact for this direction is **Sharp Hearing** on **20 April 2026**, exploring collaboration from an audiology context already adjacent to Neosensory Buzz. OpenHear goes significantly further.
+
+## Pillar 2 — Aids-Free Architecture: The Wristband as the Complete Hearing System
+
+The wristband is not permanently a companion to hearing aids. It is the first step toward a full system in which no hearing aid, no behind-the-ear receiver, and no ear canal device of any kind is required.
+
+- The wristband captures environmental sound via microphones, runs edge AI classification, and processes the full signal on-device.
+- A dedicated **hearing-specific neural processing unit** is designed from first principles for this task, targeting sub-5 ms end-to-end latency from environmental sound capture to haptic output.
+- **Somatosensory substitution** becomes the delivery path: the skin carries structured auditory information and the brain learns to read it.
+- Where a minimal early receiver is useful, the system supports a coin-sized bone-conduction transducer behind the ear, driven wirelessly from the wristband, with no ear canal blockage and no clinic-gated fitting lock.
+- The hardware stack is open from chip level upward: **RISC-V**, custom FPGA validation, and community-contributed hardware designs.
+- The regulatory path starts as a companion device beside existing aids and builds toward standalone replacement as evidence accumulates, with the UK MDR 2002 Class IIa pathway in view for the standalone device.
+
+## Pillar 3 — Peak Hearing for All Users
+
+OpenHear is not only for people with hearing loss. It treats peak childhood hearing as the baseline reference and rejects progressive acoustic decline as an unchangeable fact of adult life.
+
+- **Hearing users** get restoration and extension of sensitivity lost over time.
+- **Deaf users** get full sensory access for the first time through open, trainable substitution pathways.
+- **Children** get support for peak auditory development and earlier drift detection before conventional diagnosis.
+- **Athletes and performers** get acoustic acuity beyond what biological hearing and training alone can deliver.
+
+The training protocol, adaptation timelines, onboarding flows, and community training programmes are open source and user-owned.
+
+## Pillar 4 — Selective Acoustic Sovereignty
+
+OpenHear does not just help the user hear more. It gives the user complete control over what enters consciousness. The acoustic environment is no longer something that happens to the user; it is something the user configures.
+
+**Required focus modes**
+
+- **Crowd filter** — preserve coach, teammate, referee, or foreground conversation while the crowd drops away.
+- **Concert mode** — keep the performance, attenuate chatter, bar noise, and venue distortion, and reconstruct the optimal listening position regardless of where the user is standing.
+- **Deep focus** — maximise clarity for one voice or one task while reducing environmental load and tracking cognitive benefit through HRV correlation.
+- **Situational awareness** — maximise environmental intelligence, classification, and spatial mapping for cyclists, runners, parents, and public-space safety.
+- **Sleep mode** — attenuate traffic, neighbours, and irrelevant noise while preserving the user's child, their alarm, or a specific critical alert tone.
+- **Performance mode** — profession-specific acoustic profiles for surgeons, pilots, musicians, athletes, dispatchers, and anyone whose work depends on hearing specific cues.
+- **Privacy mode** — directional microphone nulling, acoustic fingerprint masking, and environmental sound signature anonymisation so the user controls not only what they hear but what the environment reveals about them.
+
+The **Acoustic Profile Store** is an open community repository of acoustic profiles: forkable, shareable, reviewable, and governed like code rather than an app store.
+
+## Pillar 5 — Therapeutic Frequency Delivery: 30 to 300 Hz
+
+OpenHear uses the same wristband as a programmable therapeutic delivery surface across the 30-300 Hz range, either alongside hearing substitution or independently of it.
+
+- **40 Hz gamma stimulation** — anchor protocol for cognitive and neural-entrainment research.
+- **Whole-body vibration adjacency** — lower-frequency recovery and regulation patterns translated into a wrist-safe, continuous-wear format.
+- **Skin and connective tissue stimulation** — 30-100 Hz protocols for collagen, elasticity, and dermal repair research.
+- **Athletic recovery** — post-exercise delivery windows for muscle repair and inflammation management.
+- **Personal evidence building** — HealthKit and Android Health Connect log HRV, sleep quality, activity, and skin conductance so the user builds their own evidence base locally.
+
+Therapeutic scheduling integrates with Apple Watch and Wear OS sleep-stage detection so timing is phase-aware, measurable, and user-owned.
+
+## Pillar 6 — iOS and Android Native Integration
+
+Apple and Android devices are not a bolt-on companion. They are the first infrastructure layer for OpenHear's mobile runtime.
+
+- **Apple stack** — Neural Engine, Core Haptics, Core Audio, HealthKit, Core Location, Maps, Spatial Audio, Apple Watch, ARKit, Shortcuts, and Automation.
+- **Android stack** — TensorFlow Lite, NNAPI, Oboe, Health Connect, advanced haptic APIs, Google Maps Platform, Wear OS, and assistant integrations where the user wants them.
+- **Location-triggered profile switching** — entering a barbershop, stadium, nursery, theatre, office, or concert hall automatically activates the right acoustic profile.
+- **Open SDK** — third-party developers can build OpenHear-compatible applications without routing user data through a central company server.
+
+All health data stays on-device and inside the user's own health record. There is no platform lock-in and no mandatory vendor cloud.
+
+## Pillar 7 — Emotional and Cognitive Acoustic Intelligence
+
+OpenHear learns how sound affects this specific user, not a statistical average of other people. Apple Watch and Android wearables provide the biometric substrate; OpenHear keeps the model local and the decisions explainable.
+
+- Detect dropping HRV and automatically shift acoustic profile to attenuate stressors and optionally introduce therapeutic frequencies.
+- Learn that crowd noise, transport hubs, or certain venues are physiologically stressful for this user and intervene before overload arrives.
+- Distinguish positive arousal from negative arousal so a concert high is not treated like commuting stress.
+- Keep all correlation data on-device in the user's HealthKit or Health Connect record plus local model storage the user can inspect, export, or delete.
+
+## Pillar 8 — Social Acoustic Layer
+
+OpenHear users should be able to share acoustic meaning, not just settings.
+
+- **Shared acoustic presence** — two users in different places experience the same acoustic profile simultaneously.
+- **Haptic communication** — a new non-verbal channel built from user-owned haptic vocabulary. A squeeze can mean “I am here.” A rhythm can mean “pay attention.” A burst can mean “I love this moment.”
+- **Community acoustic mapping** — venues, transport hubs, parks, streets, and public spaces become annotatable for acoustic accessibility, safety, and therapeutic quality.
+- **Accessibility ratings surfaced through maps** — contributed anonymously, verified by community consensus, and never dependent on uploading raw audio.
+
+## Pillar 9 — Beyond Biological Hearing
+
+With peak childhood hearing as the baseline, OpenHear moves into augmentation.
+
+- **Ultrasonic detection** — 20 kHz to 100 kHz translated into haptic patterns for machinery signatures, structural monitoring, and signals no unaided human has ever perceived.
+- **Infrasonic detection** — below 20 Hz for seismic activity, large-system resonance, infrasonic animal communication, and weather-adjacent environmental change.
+- **360° plus spatial awareness** — horizontal, vertical, overhead, around-corner, and behind-wall cues rendered as trainable haptic information.
+- **Predictive environmental awareness** — anomalies against the learned baseline of a place trigger distinct alerts.
+- **Professional augmentation** — engineers hearing stress frequencies in a bridge, clinicians extending auscultation beyond biological limits, musicians hearing harmonic detail beyond the unaided ear.
+
+## Sovereign Philosophy — Enforced at Every Layer
+
+The Burgess Principle binary test applies to every OpenHear decision: does this feature treat the user as a sovereign individual with complete control over their own senses, or does it process them as a unit inside someone else's system. If the answer is the latter, it is redesigned until the answer is the former.
+
+- No proprietary algorithms at any layer.
+- No locked firmware.
+- No platform gatekeeping.
+- No company server receiving user data.
+- The user's audiogram, haptic preference profile, acoustic focus modes, therapeutic schedule, trained AI model, neural adaptation data, biometric correlations, and health outcomes belong exclusively and irrevocably to them.
+- The Acoustic Profile Store follows the same principles as the codebase: open, forkable, community-governed, and not controlled by a central authority.
+- The open-source licence is part of the technical architecture. No future owner gets to close the sovereignty path.
+
 
 ---
 

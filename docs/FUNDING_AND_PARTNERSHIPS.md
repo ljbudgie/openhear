@@ -1,219 +1,217 @@
 # OpenHear Funding and Partnership Strategy
 
-This strategy is organised around the eight pillars and the three geographies that matter most in the first build phase: UK, US, and EU.
-
-The rule is simple: fund the platform without surrendering sovereignty. OpenHear takes money, partnerships, and lab access that accelerate the build. It does not take terms that centralise user data, close critical layers, or convert the platform into a managed service.
+This strategy is organised around the nine pillars and the funding geographies that matter most in the first build phase: UK, US, and EU. The rule is simple: take capital, grants, and partnerships that accelerate the build without surrendering the sovereignty path.
 
 ---
 
 ## 1. Pillar-by-pillar strategy
 
-| Pillar | Primary funders | Academic partners | Strategic commercial partners |
-|---|---|---|---|
-| Peak hearing for all users | NIHR i4i, Innovate UK, NIH/NIDCD, Horizon Europe Cluster 1 | UCL Ear Institute, ManCAD, Purdue, Stanford/Eagleman orbit | Sharp Hearing, Tympan, actuator vendors |
-| Selective acoustic sovereignty | Innovate UK Smart, UKRI EPSRC, NSF SBIR/STTR, EIC Pathfinder/Transition | audio ML labs, HCI labs, audiology partners | Apple accessibility ecosystem, Android OEM/accessibility partners |
-| Therapeutic frequency delivery | NIHR, NIH/NCCIH, NIH/NIBIB, Horizon health calls | MIT Picower orbit, vibroacoustic therapy researchers, sleep labs | wellness-device manufacturers, recovery-tech partners |
-| Native iOS/Android integration | Innovate UK, private angel/impact capital, platform grants where available | mobile health and accessibility labs | Apple, Google/Android, Bluetooth LE Audio ecosystem vendors |
-| Emotional/cognitive intelligence | NIH, NSF, UKRI, Wellcome Trust, Horizon | affective computing labs, digital phenotyping groups | wearable sensor companies, watch accessory partners |
-| Social acoustic layer | Innovate UK, Nesta / challenge funds, Horizon social inclusion calls | participatory sensing and accessibility mapping labs | mapping platforms, community accessibility organisations |
-| Beyond biological hearing | ARIA UK, DARPA/DIU-style US pathways where accessible, EIC Pathfinder | robotics, sensing, haptics, structural monitoring labs | industrial sensing firms, sports-tech companies |
-| Sovereign philosophy at every layer | Open Source Collective, Sovereign Tech Fund, NLnet, Prototype Fund-style open infra programmes | digital rights and public-interest tech groups | OSHWA, FOSSi, open-hardware manufacturing partners |
+| Pillar | UK funding | US funding | EU funding | Academic partners | Strategic commercial partners |
+|---|---|---|---|---|---|
+| Wristband / environmental intelligence | Innovate UK Smart Grants, EPSRC, NIHR i4i | NSF SBIR/STTR, NIH NIBIB, NIDILRR | Horizon Europe Cluster 4, Eurostars | Purdue Haptics, UCL Ear Institute | Sharp Hearing, Tympan, microphone and actuator vendors |
+| Aids-free architecture / hearing NPU | ARIA, EPSRC, Innovate UK | ARPA-H where fit, NSF, NIH NIDCD | EIC Pathfinder/Transition, Horizon Cluster 4 | OpenHW-aligned labs, ManCAD, sensory-substitution labs | OpenHW ecosystem, Lattice/FOSSi, bone-conduction vendors |
+| Peak hearing for all users | NIHR i4i, Wellcome, hearing charities | NIH NIDCD, NIDILRR | Horizon Europe Cluster 1 | UCL, ManCAD, paediatric audiology partners | independent audiology clinics, education and child-development partners |
+| Selective acoustic sovereignty | Innovate UK, EPSRC | NSF, NIH NIDCD | Horizon Cluster 4, EIC Transition | audio ML labs, HCI labs | Apple accessibility ecosystem, Android OEM and accessibility partners |
+| Therapeutic 30-300 Hz delivery | NIHR, Wellcome | NIH NCCIH, NIBIB | Horizon Cluster 1, EIT Health | MIT Picower orbit, sleep labs, vibroacoustic researchers | recovery-tech, sleep-tech, haptics vendors |
+| iOS / Android integration | Innovate UK, angel / impact capital | SBIR/STTR, platform grants where available | Eurostars, Horizon Cluster 4 | mobile health and accessibility labs | Apple, Google, Bluetooth LE Audio ecosystem vendors |
+| Emotional / cognitive acoustic intelligence | Wellcome, UKRI, EPSRC | NIH, NSF | Horizon Cluster 1 | affective-computing and digital-phenotyping groups | wearable sensor companies, watch accessory partners |
+| Social acoustic layer | Nesta-style challenge funds, Innovate UK | NIDILRR, NSF civic-tech tracks | Horizon social inclusion calls, NGI/NLnet | participatory sensing and accessibility mapping labs | mapping platforms, civic accessibility organisations |
+| Beyond biological hearing | ARIA, EPSRC | ARPA-H, NSF, mission-aligned defense-adjacent research where appropriate | EIC Pathfinder, Horizon deep-tech calls | robotics, sensing, structural monitoring labs | industrial sensing firms, sports-tech companies, specialised sensor suppliers |
 
 ---
 
 ## 2. UK funding mechanisms
 
-### 2.1 Innovate UK Smart Grants
+### Innovate UK Smart Grants
 
-**Fit.** Selective hearing, companion wristband hardware, on-device AI, and commercialisable assistive or wellness prototypes.
+**Fit.** Companion wristband hardware, selective-hearing runtime, mobile integration, manufacturable prototypes.
 
-**Use.** Fund cross-functional prototype work: wristband electronics, selective-hearing DSP, field pilots, and manufacturability.
+**How to use it.** Fund the first integrated wristband prototypes, field pilots, and local AI stack.
 
-### 2.2 NIHR Invention for Innovation (i4i)
+### NIHR Invention for Innovation (i4i)
 
-**Fit.** Translational assistive technology, patient-centred medtech, early feasibility work, and evidence generation.
+**Fit.** Assistive technology, translational device work, early evidence generation, patient-centred medtech.
 
-**Use.** Fund user studies, clinical validation planning, and deployment-mode separation between companion, wellness, and substitution modes.
+**How to use it.** Fund deaf and hard-of-hearing pilots, protocol validation, and deployment-mode separation between companion, therapeutic, and aids-free claims.
 
-### 2.3 UKRI EPSRC
+### UKRI EPSRC
 
-**Fit.** Haptics, signal processing, embedded AI, wearables, open silicon, and human-computer interaction.
+**Fit.** Haptics, signal processing, open hardware, embedded AI, wearables, and human-computer interaction.
 
-**Use.** Academic collaboration on wrist bandwidth, actuator physics, selective-hearing ML, and hardware acceleration.
+**How to use it.** Fund wrist bandwidth studies, haptic rendering, open silicon, and selective-hearing research collaborations.
 
-### 2.4 ARIA
+### ARIA
 
-**Fit.** High-risk, high-upside sensory augmentation and new-human-capability work.
+**Fit.** New human capability, sensory augmentation, open hardware moonshots, hearing-specific NPU work.
 
-**Use.** Fund the beyond-biological-hearing track, open hearing NPU work, and high-ambition sensing not easily housed inside conservative assistive-tech programmes.
+**How to use it.** Fund beyond-biological-hearing research and the aids-free architecture where conventional programmes are too conservative.
 
-### 2.5 Wellcome Trust
+### Wellcome Trust
 
-**Fit.** Mental health, physiological regulation, sleep, and public-interest health technology where strong research framing exists.
+**Fit.** Sleep, physiological regulation, stress, mental state, and public-interest health technology.
 
-**Use.** Support emotional-state correlation, sleep architecture, and user-controlled therapeutic scheduling research.
+**How to use it.** Support therapeutic delivery, emotional-state correlation, and sleep architecture work.
 
-### 2.6 British Society of Audiology and UK hearing charities
+### British Society of Audiology, RNID, and related UK hearing charities
 
-**Fit.** Clinical network access, dissemination, recruitment, and advisory legitimacy rather than deep hardware funding.
+**Fit.** Recruitment, dissemination, advisory structures, and letters of clinical support.
 
-**Use.** Build clinician engagement, pilot recruitment, and user-advisory structures without ceding control.
+**How to use it.** Build user and clinician networks without ceding product control.
 
 ---
 
 ## 3. US funding mechanisms
 
-### 3.1 NIH / NIDCD
+### NIH / NIDCD
 
-**Fit.** Hearing science, assistive listening, speech perception, sensory substitution, and auditory rehabilitation.
+**Fit.** Hearing science, sensory substitution, rehabilitation, speech perception, and child-development studies.
 
-**Use.** Support peak-hearing, adaptation, selective-hearing, and child-development studies.
+**How to use it.** Fund peak-hearing research, adaptation protocols, and selective-hearing validation.
 
-### 3.2 NIH / NIBIB
+### NIH / NIBIB
 
-**Fit.** Biomedical engineering, wearable systems, sensing, and translational device platforms.
+**Fit.** Wearable biomedical engineering, device platforms, sensing, and prototyping.
 
-**Use.** Fund the wristband hardware platform and cross-modal sensing infrastructure.
+**How to use it.** Fund the wristband hardware stack and integrated sensing platform.
 
-### 3.3 NIH / NCCIH
+### NIH / NCCIH
 
-**Fit.** Non-pharmacological wellness and regulation protocols with measurable physiological outcomes.
+**Fit.** Non-pharmacological therapeutic interventions with measurable outcomes.
 
-**Use.** Support vibroacoustic and therapeutic frequency studies once initial safety and protocol structure exist.
+**How to use it.** Fund evidence-led 30-300 Hz protocol studies and local outcome tracking.
 
-### 3.4 NSF SBIR/STTR
+### NIDILRR
 
-**Fit.** Open, technically differentiated hardware/software platforms with strong research-commercial overlap.
+**Fit.** Independent living, disability technology, rehabilitation engineering, and assistive adoption.
 
-**Use.** Fund platform engineering, SDK work, and early US commercial validation.
+**How to use it.** Support field pilots with deaf and hard-of-hearing users and community deployment models.
 
-### 3.5 NIDILRR
+### NSF SBIR/STTR
 
-**Fit.** Disability, independent living, rehabilitation engineering, and assistive-technology adoption.
+**Fit.** Open hardware/software platforms with strong research-commercial overlap.
 
-**Use.** Fund user-centred design and real-world accessibility pilots.
+**How to use it.** Fund SDK work, platform engineering, manufacturing preparation, and US-facing pilots.
 
-### 3.6 Impact-aligned investors and funds
+### Impact investors and mission-aligned angels
 
-Targets should include disability-tech, neurotechnology, and public-interest hardware investors who can tolerate open business models and hardware margins. OpenHear should actively avoid investors who require data centralisation or IP enclosure as a condition of funding.
+**Fit.** Disability-tech, public-interest hardware, neurotechnology, and local-first software.
+
+**How to use it.** Use only for terms compatible with open licensing, user-owned data, and no forced cloud relay.
 
 ---
 
 ## 4. EU funding mechanisms
 
-### 4.1 Horizon Europe Cluster 1 (Health)
+### Horizon Europe Cluster 1 — Health
 
-**Fit.** Assistive technology, digital health, personalised care, and non-pharmaceutical interventions.
+**Fit.** Assistive technology, personalised care, child development, and therapeutic protocols.
 
-**Use.** Fund clinical evidence, paediatric and adult studies, and therapeutic protocol research.
+**How to use it.** Fund clinical evidence, multi-site studies, and sleep / therapeutic validation.
 
-### 4.2 Horizon Europe Cluster 4 (Digital, Industry, Space)
+### Horizon Europe Cluster 4 — Digital, Industry, and Space
 
-**Fit.** AI, embedded systems, open hardware, robotics, and advanced wearables.
+**Fit.** AI, embedded systems, wearables, open hardware, and advanced sensing.
 
-**Use.** Fund hearing NPU, embedded ML, and open hardware/toolchain development.
+**How to use it.** Fund the wristband compute stack, hearing NPU, and open toolchains.
 
-### 4.3 European Innovation Council (EIC) Pathfinder / Transition / Accelerator
+### European Innovation Council Pathfinder / Transition / Accelerator
 
-**Fit.** Deep-tech sensory platforms moving from exploratory science into deployable systems.
+**Fit.** Deep-tech sensory platforms moving from novel science to deployable systems.
 
-**Use.** Start with Pathfinder/Transition for sensory substitution and augmentation, then use Accelerator only if terms do not compromise governance.
+**How to use it.** Pathfinder for sensory substitution and augmentation, Transition for prototype-to-pilot, Accelerator only if governance remains sovereign.
 
-### 4.4 Eureka / Eurostars
+### Eureka / Eurostars
 
-**Fit.** International SME + academic collaboration on product-oriented R&D.
+**Fit.** SME plus academic collaborations with clear product-oriented R&D outcomes.
 
-**Use.** Pair OpenHear engineering with EU haptics, sensing, or clinical partners for prototype acceleration.
+**How to use it.** Pair OpenHear engineering with EU haptics, sensing, or clinical groups for prototype acceleration.
 
-### 4.5 NLnet / Sovereign Tech Fund / Prototype Fund-style open infrastructure programmes
+### NLnet, Sovereign Tech Fund, and Prototype Fund-style programmes
 
-**Fit.** Open standards, open-source infrastructure, and public-interest digital sovereignty.
+**Fit.** Open standards, local-first infrastructure, open-source SDKs, privacy-preserving community systems, and public-interest technical commons.
 
-**Use.** Fund schemas, SDKs, profile-store infrastructure, privacy-preserving mapping, and open toolchains.
-
----
-
-## 5. Open-source and public-interest foundations
-
-### 5.1 Open Source Collective / Open Collective ecosystem
-
-**Role.** Ongoing community funding for maintainership, infra, docs, and contributor support.
-
-### 5.2 Open Source Hardware Association (OSHWA)
-
-**Role.** Certification, credibility, and network effects for the open hardware side of the stack.
-
-### 5.3 FOSSi Foundation
-
-**Role.** Open silicon community, tooling, review, and collaboration around the hearing NPU and FPGA path.
-
-### 5.4 Linux Foundation / public-interest accessibility initiatives
-
-**Role.** Potential home for neutral governance if OpenHear ever needs a stronger institutional shell without closing the stack.
+**How to use it.** Fund schemas, profile-store infrastructure, mapping tools, and reproducible build/toolchain work.
 
 ---
 
-## 6. Academic partnership strategy
+## 5. Open-source foundations and public-interest infrastructure
 
-OpenHear should deliberately assemble a **triangle** rather than one institutional dependency:
-
-1. **Audiology/clinical node** — UCL Ear Institute or ManCAD
-2. **Haptics/psychophysics node** — Purdue / Hong Z. Tan or equivalent
-3. **Neuroscience / adaptation node** — Stanford/Eagleman orbit or equivalent sensory-substitution lab
-
-Additional specialised nodes:
-
-- sleep lab for REM/deep-sleep scheduling
-- affective computing lab for stress/positive-arousal separation
-- open silicon lab for the hearing NPU
-- paediatric audiology partner for child-development track
-
-Every partner should receive the same open architecture packet. No exclusive science deals.
+- **Open Source Collective / Open Collective** — ongoing maintainership, infra, and contributor support.
+- **Open Source Hardware Association (OSHWA)** — certification, network credibility, and manufacturing visibility for the hardware path.
+- **FOSSi Foundation** — open silicon community, review, and tooling support for the hearing NPU.
+- **Linux Foundation accessibility or neutral-governance routes** — a future home if the project needs stronger institutional durability without closing the stack.
 
 ---
 
-## 7. Strategic commercial partners by category
+## 6. Academic partnership structure
 
-### 7.1 Clinical and field validation
+OpenHear should build a deliberate multi-node alliance rather than depend on one institution.
 
-- **Sharp Hearing** — immediate US clinical and patient-facing feedback channel
-- UK independent audiology clinics aligned with user-owned data
+1. **Clinical audiology node** — UCL Ear Institute, ManCAD, or equivalent
+2. **Haptics and psychophysics node** — Purdue / Hong Z. Tan or equivalent
+3. **Neuroscience and adaptation node** — Stanford / Eagleman lineage or equivalent sensory-substitution lab
+4. **Therapeutic and sleep node** — MIT Picower orbit plus sleep labs
+5. **Open silicon node** — OpenHW, FOSSi, and university hardware labs
 
-### 7.2 Open hearing and prototyping hardware
+No exclusive science deals. Every partner gets the same open architecture packet.
 
-- **Tympan** — open hearing platform bridge
-- actuator suppliers and piezo driver vendors
-- low-power microphone array vendors
+---
 
-### 7.3 Mobile and platform integration
+## 7. Strategic commercial partners by pillar
 
-- Apple accessibility / HealthKit / Core Haptics ecosystem
-- Android accessibility / Health Connect / Wear OS ecosystem
-- Bluetooth LE Audio silicon vendors
+### Pillar 1 — Wristband
+- Sharp Hearing for clinical feedback and US field validation
+- microphone array vendors
+- actuator and driver vendors
 
-### 7.4 Professional and showcase verticals
+### Pillar 2 — Aids-free architecture
+- Tympan for open hearing hardware bridge work
+- bone-conduction and open-ear audio suppliers
+- open silicon ecosystem partners
 
-- orchestras, conservatoires, and musician health programmes
-- elite sport institutes and sports-tech labs
-- hospital simulation centres and surgical training environments
-- aviation training partners
+### Pillar 3 — Peak hearing for all users
+- independent audiology clinics
+- paediatric hearing and education partners
+- athlete and performer training organisations
 
-### 7.5 Mapping and civic infrastructure
+### Pillar 4 — Selective acoustic sovereignty
+- Apple accessibility ecosystem
+- Google / Android accessibility ecosystem
+- Bluetooth LE Audio vendors
 
+### Pillar 5 — Therapeutic delivery
+- recovery-tech companies
+- sleep-tech partners
+- haptics vendors with wideband capabilities
+
+### Pillar 6 — Mobile integration
+- Apple, Google, Wear OS, and audio-stack ecosystem partners
+- smartphone accessory and watch-band manufacturers
+
+### Pillar 7 — Emotional intelligence
+- wearable biometrics companies
+- health-data interoperability partners that do not centralise data
+
+### Pillar 8 — Social acoustic layer
 - OpenStreetMap-aligned communities
-- accessibility platforms
-- public-transport and venue operators willing to pilot acoustic accessibility ratings
+- accessibility organisations
+- venue and transport operators willing to pilot acoustic accessibility ratings
+
+### Pillar 9 — Beyond biological hearing
+- industrial sensing firms
+- sports technology groups
+- specialised ultrasonic and infrasonic sensor suppliers
 
 ---
 
-## 8. Partnership terms OpenHear should insist on
+## 8. Terms OpenHear should insist on
 
-1. No exclusivity over core platform layers.
+1. No exclusivity over the core platform.
 2. No mandatory cloud relay for user data.
 3. No closed fork of the critical sovereignty path.
 4. User-owned data and export rights preserved in writing.
-5. Publication rights retained for research outputs, with only narrow safety/privacy redactions.
-6. Community contributors are not structurally subordinated to a single commercial partner.
+5. Publication rights retained for research outputs, subject only to narrow privacy and safety redactions.
+6. Community contributors must not become subordinate to a single commercial actor.
 
 ---
 
@@ -221,25 +219,26 @@ Every partner should receive the same open architecture packet. No exclusive sci
 
 ### Phase 1 — build and prove
 
-Use grants, public-interest open-source funding, and small aligned angel capital to fund:
+Use grants, public-interest open-source funding, and small aligned angels for:
 
 - schemas and SDKs
-- first wrist rigs
+- benchtop haptics rigs
+- wristband MVP hardware
 - selective-hearing prototypes
-- developer-led n-of-1 studies
-- initial clinical letters of support
+- developer-led and early-user adaptation studies
 
 ### Phase 2 — pilot and validate
 
-Use translational research funding plus structured partnerships to fund:
+Use translational research funding and structured partnerships for:
 
 - multi-user pilots
-- therapeutic protocol registry
-- profile store and mapping pilots
-- first profession packs
+- therapeutic protocol registry and outcome tracking
+- profession packs
+- community mapping pilots
+- aids-light hardware validation
 
-### Phase 3 — platform scale
+### Phase 3 — scale without surrender
 
-Use larger mission-aligned capital only after the sovereignty architecture is clearly locked in and community governance is durable.
+Use larger mission-aligned capital only after the open governance, licensing, and user-data guarantees are structurally locked.
 
 OpenHear should be financed like infrastructure for human autonomy, not like a data-harvesting consumer app.

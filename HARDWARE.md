@@ -113,3 +113,69 @@ pending confirmed HIMSA frame definitions.
 - Signia professionals portal: <https://www.signia-pro.com>
 - `hid` Python package: <https://pypi.org/project/hid/>
 - PyAudio: <https://pypi.org/project/PyAudio/>
+
+---
+
+## 6. OpenHear Wristband prototype (micro:bit v2)
+
+The first OpenHear wristband prototype uses a **BBC micro:bit v2**, two coin
+vibration motors, two **2N2222** NPN transistors, two flyback diodes, and a
+LiPo supply.  The Python side runs on Windows and sends a 3-byte BLE UART
+packet to the micro:bit:
+
+```
+[sound_class_id, intensity_0_to_255, pattern_id]
+```
+
+### Pin map
+
+| Function | micro:bit pin | Notes |
+|---|---|---|
+| Left motor driver | `P0` | Through 2N2222 transistor stage |
+| Right motor driver | `P1` | Through 2N2222 transistor stage |
+| Common ground | `GND` | Must be shared between micro:bit and motor supply |
+
+### Motor driver wiring
+
+Use a low-side transistor switch for each motor:
+
+1. **Motor +** → battery **+**
+2. **Motor -** → **collector** of a 2N2222
+3. **Emitter** → common **GND**
+4. micro:bit `P0` or `P1` → **1 kΩ resistor** → transistor **base**
+5. Flyback diode across the motor:
+   - diode **cathode** to motor/battery **+**
+   - diode **anode** to the transistor collector / motor **-**
+6. Tie the micro:bit ground and motor battery ground together
+
+Do **not** drive the motors directly from the GPIO pins.  The transistor
+stage is required because the micro:bit GPIO pins are current-limited.
+
+### Firmware
+
+- Flash `/home/runner/work/openhear/openhear/hardware/wristband/firmware.py`
+  to the micro:bit using a BLE-capable MicroPython build.
+- The firmware listens for BLE UART packets and renders these patterns:
+  - `voice` → both motors, gentle pulse
+  - `doorbell` → two sharp pulses
+  - `alarm` → rapid alternating left/right
+  - `dog` → right-only pulse
+  - `traffic` → left-only pulse
+  - `media` → slow both-motor pulse
+  - `silence` → no output
+
+### Windows runtime
+
+Use the integrated wristband runtime:
+
+```bash
+python -m stream.wristband_runtime --audiogram PATIENT.json --manual-sound alarm
+python -m stream.wristband_runtime --audiogram PATIENT.json --model yamnet.tflite --labels yamnet_class_map.csv
+```
+
+The runtime:
+
+1. loads the patient's audiogram,
+2. classifies sound windows into the OpenHear wristband classes,
+3. scales the haptic intensity from the audiogram thresholds, and
+4. sends the packet over BLE to the micro:bit advertising as `OpenHear`.

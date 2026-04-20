@@ -13,6 +13,7 @@
 
 # Audio I/O
 PyAudio>=0.2.14
+sounddevice>=0.5.2
 
 # Numerical / DSP
 numpy>=1.26.0
@@ -27,3 +28,13 @@ hid>=1.0.6
 # Lossless audio file loading (FLAC support for voice/reference.py)
 # Optional: only needed if you load FLAC reference files.
 soundfile>=0.12.1
+
+# Wristband prototype transport
+bleak>=1.1.1
+
+# Wristband prototype inference backend
+# Install either:
+#   pip install tflite-runtime
+# or:
+#   pip install tensorflow
+# then download a local YAMNet .tflite model and label file.

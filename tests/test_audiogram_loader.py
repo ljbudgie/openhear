@@ -42,6 +42,23 @@ class TestLoadAudiogram:
         with pytest.raises(ValueError, match="Unsupported format version"):
             load_audiogram(str(p))
 
+    def test_loads_legacy_openhear_v010_format(self, tmp_path: Path):
+        legacy = {
+            "patient_id": "001",
+            "audiogram": {
+                "right": {"250": 20, "500": 35, "1000": 45, "2000": 60, "4000": 75, "8000": 80},
+                "left": {"250": 25, "500": 40, "1000": 50, "2000": 65, "4000": 70, "8000": 75},
+            },
+        }
+        p = tmp_path / "legacy.json"
+        p.write_text(json.dumps(legacy), encoding="utf-8")
+
+        data = load_audiogram(str(p))
+
+        assert data["subject"] == "001"
+        assert data["format_version"] == "openhear-audiogram-v1"
+        assert data["right_ear"]["thresholds"][0] == {"freq_hz": 250, "db_hl": 20}
+
     def test_missing_thresholds_array(self, tmp_path: Path, sample_audiogram_dict: dict):
         del sample_audiogram_dict["right_ear"]["thresholds"]
         sample_audiogram_dict["right_ear"]["symbol"] = "O"

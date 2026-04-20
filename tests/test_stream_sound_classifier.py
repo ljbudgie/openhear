@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 
 from stream.sound_classifier import (
+    _load_labels,
     ClassifiedSound,
     classify_scores,
     map_label_to_sound_key,
@@ -43,3 +46,20 @@ def test_classify_scores_falls_back_to_silence():
     result = classify_scores({"Unknown label": 0.99, "Music": 0.1}, min_confidence=0.2)
     assert result.sound_key == "silence"
     assert result.confidence == 0.0
+
+
+def test_load_labels_supports_plain_text(tmp_path):
+    labels_path = tmp_path / "labels.txt"
+    labels_path.write_text("Speech\nDog\n", encoding="utf-8")
+    assert _load_labels(str(labels_path)) == ["Speech", "Dog"]
+
+
+def test_load_labels_supports_official_yamnet_csv():
+    labels_path = (
+        Path(__file__).resolve().parents[1] / "stream" / "data" / "yamnet_class_map.csv"
+    )
+    labels = _load_labels(str(labels_path))
+    assert len(labels) == 521
+    assert labels[0] == "Speech"
+    assert labels[349] == "Doorbell"
+    assert labels[-1] == "Field recording"

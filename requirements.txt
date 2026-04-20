@@ -37,4 +37,5 @@ bleak>=1.1.1
 #   pip install tflite-runtime
 # or:
 #   pip install tensorflow
-# then download a local YAMNet .tflite model and label file.
+# then download a local YAMNet .tflite model; the official label CSV is
+# already included at stream/data/yamnet_class_map.csv.

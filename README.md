@@ -378,13 +378,14 @@ See `SOVEREIGN_AUDIO.md` for the full framework.
 
 ### Path 2.5 — Wristband prototype (Windows + micro:bit v2)
 1. Export or copy the patient's audiogram JSON
-2. Flash the micro:bit with [`hardware/wristband/firmware.py`](hardware/wristband/firmware.py)
-3. Wire the two-motor transistor stage exactly as described in [`HARDWARE.md`](HARDWARE.md#6-openhear-wristband-prototype-microbit-v2)
+2. Flash the micro:bit with [`hardware/wristband/firmware.py`](hardware/wristband/firmware.py) using the Windows editor workflow in [`HARDWARE.md`](HARDWARE.md#firmware-flashing-windows)
+3. Wire the two-motor transistor stage exactly as described in [`HARDWARE.md`](HARDWARE.md#exact-motor-driver-wiring-tested-values)
 4. Install Python dependencies with `pip install -r requirements.txt`
 5. For a BLE-only smoke test, run:
    - `python -m stream.wristband_runtime --audiogram PATIENT.json --manual-sound alarm`
-6. For live classification, add a local YAMNet `.tflite` model and label file, then run:
-   - `python -m stream.wristband_runtime --audiogram PATIENT.json --model yamnet.tflite --labels yamnet_class_map.csv`
+6. For live classification, add a local YAMNet `.tflite` model and use the bundled official label CSV:
+   - `python -m stream.wristband_runtime --audiogram PATIENT.json --model yamnet.tflite --labels stream/data/yamnet_class_map.csv`
+7. If Windows BLE pairing or discovery fails, use the debugging checklist in [`HARDWARE.md`](HARDWARE.md#windows-ble-debugging-checklist)
 
 The wristband runtime currently supports:
 - 7 sound classes (`voice`, `doorbell`, `alarm`, `dog`, `traffic`, `media`, `silence`)

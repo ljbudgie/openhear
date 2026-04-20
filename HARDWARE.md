@@ -151,6 +151,61 @@ Use a low-side transistor switch for each motor:
 Do **not** drive the motors directly from the GPIO pins.  The transistor
 stage is required because the micro:bit GPIO pins are current-limited.
 
+### Exact motor driver wiring (tested values)
+
+Use the same component values on both the left and right motor channels:
+
+| Position | Exact part/value | Count | Notes |
+|---|---|---:|---|
+| Q1, Q2 | 2N2222A or PN2222A NPN transistor | 2 | TO-92 package is easiest on stripboard |
+| R1, R2 | **1 kΩ**, 0.25 W, ±5% base resistor | 2 | Between `P0`/`P1` and the transistor base |
+| R3, R4 | **10 kΩ**, 0.25 W, ±5% base pulldown | 2 | Base to GND so the motors stay off during boot |
+| D1, D2 | **1N5819** Schottky flyback diode | 2 | Cathode to battery `+`, anode to collector / motor `-` |
+| M1, M2 | 3 V coin vibration motor, ≤150 mA stall current | 2 | Keep the motor supply within the motor datasheet limit |
+
+Per channel, wire it in this exact order:
+
+1. micro:bit `P0`/`P1` → **1 kΩ** resistor → transistor **base**
+2. transistor **base** → **10 kΩ** resistor → **GND**
+3. transistor **emitter** → **GND**
+4. motor **-** → transistor **collector**
+5. motor **+** → motor battery **+**
+6. **1N5819** across the motor, **cathode** to battery **+**, **anode** to collector
+7. motor battery **-** tied to micro:bit **GND**
+
+Practical limits for bench testing:
+
+- Start at one motor only and confirm the transistor stays cool at a continuous
+  `intensity=64` manual test.
+- Keep first-power-on tests below **30 seconds** at a time until you have
+  measured motor current and confirmed the wiring polarity.
+- If the motor supply exceeds **3.7 V**, or a motor stalls above **150 mA**,
+  do not use this transistor stage without redesigning the driver.
+
+### Firmware flashing (Windows)
+
+The simplest reliable Windows workflow is to flash from the official
+micro:bit Python Editor or Mu Editor:
+
+1. Install the **micro:bit Python Editor** or **Mu Editor** on Windows 11.
+2. Connect the micro:bit v2 over USB and wait for the `MICROBIT` drive to
+   appear in File Explorer.
+3. Open `hardware/wristband/firmware.py` in the editor.
+4. Click **Flash**. The editor packages the script into a MicroPython image
+   and copies it to the board.
+5. Wait for the yellow status LED on the micro:bit to stop flashing and for
+   the board to reboot.
+6. Confirm the display shows `H`; that is the wristband firmware idle marker.
+7. If the board still runs an older image, press the reset button once and
+   flash again with no other serial tools open.
+
+If flashing fails on Windows:
+
+- swap to a known data-capable USB cable,
+- plug directly into the PC instead of a hub,
+- close any serial terminal that may be holding the board,
+- re-open the editor as Administrator once, then retry.
+
 ### Firmware
 
 - Flash `hardware/wristband/firmware.py` to the micro:bit using a BLE-capable
@@ -170,7 +225,7 @@ Use the integrated wristband runtime:
 
 ```bash
 python -m stream.wristband_runtime --audiogram PATIENT.json --manual-sound alarm
-python -m stream.wristband_runtime --audiogram PATIENT.json --model yamnet.tflite --labels yamnet_class_map.csv
+python -m stream.wristband_runtime --audiogram PATIENT.json --model yamnet.tflite --labels stream/data/yamnet_class_map.csv
 ```
 
 The runtime:
@@ -179,3 +234,29 @@ The runtime:
 2. classifies sound windows into the OpenHear wristband classes,
 3. scales the haptic intensity from the audiogram thresholds, and
 4. sends the packet over BLE to the micro:bit advertising as `OpenHear`.
+
+### Windows BLE debugging checklist
+
+If the micro:bit does not appear or connect on Windows:
+
+1. Confirm the firmware is running: the micro:bit should boot to `H`.
+2. Make sure no other host is already connected to the micro:bit over BLE.
+3. In **Settings → Bluetooth & devices**, remove any stale `OpenHear` pairing,
+   then toggle Bluetooth off and back on.
+4. Verify Windows can see the advert with Bleak:
+
+   ```powershell
+   py -c "import asyncio; from bleak import BleakScanner; print([(d.name, d.address) for d in asyncio.run(BleakScanner.discover(timeout=8.0)) if d.name])"
+   ```
+
+5. If `OpenHear` is missing, power-cycle the micro:bit and rerun the scan.
+6. If `OpenHear` is present but the runtime still fails, increase the scan
+   timeout:
+
+   ```powershell
+   py -m stream.wristband_runtime --audiogram PATIENT.json --manual-sound alarm --scan-timeout 15
+   ```
+
+7. If Bleak raises a Windows backend error, confirm you are using a normal
+   64-bit Python build and that Windows has Bluetooth permission enabled for
+   desktop apps.

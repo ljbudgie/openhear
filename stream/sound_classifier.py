@@ -12,6 +12,7 @@ This module provides:
 
 from __future__ import annotations
 
+import csv
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -167,8 +168,21 @@ class YamnetClassifier:
 
 
 def _load_labels(labels_path: str) -> list[str]:
-    content = Path(labels_path).read_text(encoding="utf-8").splitlines()
-    return [line.strip() for line in content if line.strip()]
+    rows = list(csv.reader(Path(labels_path).read_text(encoding="utf-8").splitlines()))
+    if not rows:
+        return []
+
+    if len(rows[0]) == 1:
+        return [row[0].strip() for row in rows if row and row[0].strip()]
+
+    headers = [column.strip().lower() for column in rows[0]]
+    column_index = headers.index("display_name") if "display_name" in headers else len(rows[0]) - 1
+    data_rows = rows[1:] if "display_name" in headers else rows
+    return [
+        row[column_index].strip()
+        for row in data_rows
+        if len(row) > column_index and row[column_index].strip()
+    ]
 
 
 def _load_tflite_interpreter(model_path: str):

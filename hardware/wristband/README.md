@@ -35,4 +35,4 @@ The Windows runtime sends one 3-byte BLE UART packet:
 - each motor driven through a **2N2222** low-side switch
 - each motor protected with a flyback diode
 
-For the full wiring notes, see [`/home/runner/work/openhear/openhear/HARDWARE.md`](../../HARDWARE.md).
+For the full wiring notes, see [`../../HARDWARE.md`](../../HARDWARE.md).

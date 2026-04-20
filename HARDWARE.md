@@ -153,8 +153,8 @@ stage is required because the micro:bit GPIO pins are current-limited.
 
 ### Firmware
 
-- Flash `/home/runner/work/openhear/openhear/hardware/wristband/firmware.py`
-  to the micro:bit using a BLE-capable MicroPython build.
+- Flash `hardware/wristband/firmware.py` to the micro:bit using a BLE-capable
+  MicroPython build.
 - The firmware listens for BLE UART packets and renders these patterns:
   - `voice` → both motors, gentle pulse
   - `doorbell` → two sharp pulses

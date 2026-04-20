@@ -13,7 +13,7 @@ import asyncio
 
 from stream.ble_haptic import HapticPacket, OpenHearBLEClient
 from stream.haptic_mapper import HapticMapper
-from stream.sound_classifier import YamnetClassifier, classify_scores
+from stream.sound_classifier import WINDOW_SECONDS, YamnetClassifier, classify_scores
 
 
 class WristbandRuntime:
@@ -52,7 +52,7 @@ async def _run_live(args) -> None:
     classifier = YamnetClassifier(args.model, args.labels)
     client = OpenHearBLEClient()
     runtime = WristbandRuntime(mapper, client)
-    frame_samples = int(round(16_000 * 0.975))
+    frame_samples = int(round(16_000 * WINDOW_SECONDS))
 
     await client.connect(timeout=args.scan_timeout)
     try:

@@ -2,6 +2,8 @@
 
 ### The first open hearing system that is sweat-proof, feedback-free, and 100% yours — a sovereign audio pipeline and active environmental intelligence platform for hearing aid users.
 
+### North star: an aids-free hearing system. No hearing aid. No behind-the-ear receiver. No bone conduction implant. No ear canal device of any kind. The wristband IS the hearing system. See **[Vision — Aids-Free Hearing](#openhear-vision-2--aids-free-hearing-the-wristband-is-the-hearing-system)** below and the full technical architecture in [`docs/AIDS_FREE_ARCHITECTURE.md`](docs/AIDS_FREE_ARCHITECTURE.md).
+
 > *The hearing aid industry charges £3,000–£8,000 for hardware, then locks you out of it.*
 > *Your audiogram is a measurement of your body. It belongs to you.*
 > *OpenHear gives it back.*
@@ -176,6 +178,132 @@ The **Sharp Hearing collaboration enquiry of 20 April 2026** is recorded here as
 
 ---
 
+## OpenHear Vision 2 — Aids-Free Hearing: the wristband IS the hearing system
+
+The previous section described removing the £3,000–£8,000 behind-the-ear processor and keeping only a minimal ear-worn receiver. This section goes one further. **It removes the receiver too.**
+
+There is no hearing aid in this system.
+There is no behind-the-ear receiver.
+There is no bone conduction implant.
+There is no ear canal device of any kind.
+
+There is a wristband, a personal model, an audiogram, and a brain trained to read them. The user owns all four.
+
+The full technical architecture is in [`docs/AIDS_FREE_ARCHITECTURE.md`](docs/AIDS_FREE_ARCHITECTURE.md). The five most critical open research questions before MVP are in [`docs/RESEARCH_ROADMAP.md`](docs/RESEARCH_ROADMAP.md). The papers, projects and institutions to engage with immediately are in [`docs/PRIOR_ART.md`](docs/PRIOR_ART.md). What follows is the short version.
+
+### Mechanism of action — sensory substitution, not amplification
+
+OpenHear's standalone configuration is not a hearing aid by mechanism. It is a **somatosensory hearing substitution device**. Sound is captured at the wrist, classified by edge AI, weighted against the user's audiogram, and rendered as a high-resolution multi-frequency haptic field on the skin. The brain — through documented neuroplasticity, going back to Bach-y-Rita's 1969 tactile-vision substitution work — learns to read that field as auditory information.
+
+This is the same class of device as the Neosensory Buzz, but with an order of magnitude more channels, true frequency-rich spatial encoding, audiogram-weighted band synthesis, and an open silicon and open RTL stack. It is not a hearing aid. It does not claim to restore cochlear function. It substitutes for it.
+
+### Skin as the transducer
+
+The volar wrist carries Pacinian, Meissner, Merkel and Ruffini mechanoreceptors covering roughly 5 Hz – 1 kHz of perceivable mechanical drive. Audio above this band is *encoded* — into motor position, drive pattern, and temporal structure across the array — not transmitted as raw vibration. Target actuator pitch is 8–12 mm, deliberately tighter than two-point discrimination, exploiting funnelling and apparent-motion illusions to produce a perceived spatial resolution finer than the physical receptor field.
+
+- **Minimum viable**: 24 actuators in a single ring (Neosensory-class density).
+- **Target v1**: 64 actuators in a 4-ring × 16-column lattice covering the wrist.
+- **Aspirational v2**: 128 actuators extending up the forearm, enabling a 2D haptic "screen".
+
+### Neural adaptation — open protocol, user-owned data
+
+Adaptation is the design target, not raw signal fidelity. The training pipeline is published as a five-phase open protocol — calibration, phoneme sandbox, words and environment, open conversation, spatial and extended-spectrum — running on a cross-platform companion app. All data lives on the user's device as plain Parquet. There is no cloud account.
+
+```
+Phase 0  Calibration         (day 0,    ~90 min)   — perceptual mapping, motor thresholds, audiogram import
+Phase 1  Phoneme sandbox     (week 1–2, 30 min/d)  — closed-set phoneme → haptic pattern drills
+Phase 2  Word & environment  (week 3–6, 30 min/d)  — common words, alarms, name detection, traffic
+Phase 3  Open conversation   (week 7+,  passive)   — continuous wear; periodic active-recall checks
+Phase 4  Spatial & extended  (month 3+)            — direction, elevation, ultrasonic/infrasonic bands
+```
+
+### A Hearing NPU, designed from first principles
+
+A general-purpose mobile SoC running PyTorch Mobile cannot meet the latency or power budget. The Hearing NPU is designed for *one* job: continuous, personalised, low-latency hearing-as-haptics.
+
+| Stage                              | Latency budget |
+|---|---|
+| Mic capture + ADC                  | 0.3 ms    |
+| Front-end DSP (beamform, AEC, VAD) | 0.7 ms    |
+| Bark-band analysis (FFT/filterbank)| 0.5 ms    |
+| Audiogram weighting                | 0.1 ms    |
+| Classification + scene tag         | 1.5 ms    |
+| Haptic render (mapping + envelope) | 0.6 ms    |
+| Motor driver chain                 | 0.8 ms    |
+| Mechanical rise time (LRA/piezo)   | 0.5 ms    |
+| **End-to-end target**              | **≤ 5 ms**|
+
+- **ISA**: RISC-V RV32IMC + RVV 1.0 (open ISA, open implementations).
+- **Accelerator**: 8 × INT8/INT4 MAC tiles at ~2 TOPS, hardwired bark filterbank, single-cycle audiogram lookup, deterministic haptic scheduler.
+- **SRAM-only data path**: 4 MB on-die, no DRAM. The model lives entirely on chip; this is the architectural reason ≤ 5 ms is achievable.
+- **Power envelope**: 80–120 mW continuous, < 5 mW idle.
+- **Open RTL** under CERN-OHL-S. No proprietary IP in the data path.
+
+Until tape-out, the staged hardware path is: v0 on Raspberry Pi CM4 + Hailo-8L (~30 ms latency, sufficient for adaptation studies) → v0.5 on a RISC-V SBC + Coral Edge TPU (~15 ms) → v1 FPGA validation on Lattice ECP5 with the open RTL (~5 ms) → v1 ASIC at 22 nm FD-SOI.
+
+### Beyond hearing — capabilities a hearing aid cannot have
+
+Once sound is decoupled from the ear and rendered as multi-channel haptics, the system trivially extends past biological limits.
+
+- **Infrasonic** (1–20 Hz) — earthquake precursors, large-vehicle approach, HVAC faults.
+- **Ultrasonic** (20–96 kHz with appropriate MEMS) — bat activity, leak detection, dog whistles.
+- **Full-sphere spatial awareness** — azimuth via beamformer, elevation via ring index, distance via envelope decay. Above and below the wearer, which biological hearing handles poorly.
+- **Multi-source separation** — render two simultaneous speakers to two distinct regions of the wrist, allowing the wearer to "listen" to both in parallel.
+- **Persistent acoustic memory** — last 30 s ring buffer, replayable on demand to the haptic field.
+- **Contextual silencing** — known irritant classes attenuated by the classifier, not by global compression.
+
+Biological hearing is a 20 Hz – 20 kHz omnidirectional pressure sensor with poor elevation discrimination and no scene understanding. OpenHear, on the wrist, is none of those things and all of the things they cannot be. The aids-free configuration is **superior, not equivalent**.
+
+### Sovereignty enforced at the technical layer
+
+The user owns:
+
+1. **Audiogram** — `~/.openhear/audiogram.json`
+2. **Haptic preference profile** — `~/.openhear/profile.json`
+3. **Personal adaptation model** — `~/.openhear/model.bin` (LoRA delta over the open base)
+4. **Adaptation telemetry** — `~/.openhear/training/*.parquet`
+5. **Any captured audio** — opt-in only, encrypted with a key the user holds.
+
+Enforcement is not a policy promise; it is built in:
+
+- The NPU has no IP stack. There is no network egress in the hearing data path.
+- Firmware is signed, but the signing key is the user's. A user can sign and load their own firmware. (This is the inverse of the hearing aid industry's lock-down.)
+- Plain-file formats end to end — JSON, Parquet, ONNX, WAV. No proprietary container.
+- Every parameter an audiologist would set in proprietary fitting software is a writable field in `profile.json`. Audiologists are welcome collaborators; they are not a key.
+
+### Regulatory pathway — sensory substitution, not hearing aid
+
+Regulatory classification follows mechanism, not indication. The aids-free OpenHear has the same mechanism as Neosensory Buzz and BrainPort, both of which are cleared as sensory substitution devices, not hearing aids.
+
+| Jurisdiction | Likely classification                                              | Comparator predicate                                |
+|---|---|---|
+| **UK (MHRA)** | UK MDR 2002 — Class I (initial), Class IIa if claims tighten      | Neosensory Buzz                                     |
+| **US (FDA)**  | 510(k) Class II, sensory substitution                              | Neosensory Buzz, BrainPort Vision Pro              |
+| **EU (MDR)**  | Class I or IIa under MDR 2017/745                                  | Same                                                 |
+
+The fastest credible path: bench validation in months → single-user adaptation log (publicly, by the developer) → multi-user pilot (n≈20) in year 1 → controlled trial in year 2 → submission in year 3. Open data at every stage.
+
+### Open hardware path
+
+- Schematics: KiCad 8 in `/hardware/wristband/` (planned).
+- RTL: Verilog/SystemVerilog under CERN-OHL-S in `/hardware/npu/` (planned).
+- Mechanical: FreeCAD/OpenSCAD parametric models in `/hardware/wristband/mech/` (planned).
+- BOM: globally-available distributors only; no single-source critical parts.
+- Targeting OSHWA certification at v0 and a Hackaday Prize / Open Hardware Summit submission.
+
+### Specifically invited
+
+- **Mechanoreceptive psychophysicists** — for Q1 (information bandwidth of the wrist) and Q4 (calibration protocol) of the [research roadmap](docs/RESEARCH_ROADMAP.md).
+- **Sensory-substitution neuroscientists** — for Q2 (adaptation timeline) and the cortical remap evidence base.
+- **RISC-V RTL engineers** — for the Hearing NPU.
+- **Embedded DSP engineers** — for the sub-5 ms front-end and haptic renderer.
+- **UK / EU / US audiology clinicians** — for the multi-user pilot and the regulatory pre-submissions.
+- **Deaf and hard-of-hearing wearers** — the people the system exists for. Lived experience is a design input, not a marketing line.
+
+The longer this section gets, the closer the architecture is to leaving the page. The architecture document and roadmap are both in this repo. Read them; fork them; contradict them; submit a PR.
+
+---
+
 ## The three pain points this solves
 
 | Problem | Factory behaviour | OpenHear behaviour |
@@ -261,6 +389,23 @@ Before using Path 2 or 3, set your aids to linear mode. This alone will transfor
 - [ ] iOS version of mobile app
 - [ ] Community scan library
 - [ ] tinyML Learn module v2
+
+### Aids-free configuration (Vision 2)
+
+- [x] Architecture document — [`docs/AIDS_FREE_ARCHITECTURE.md`](docs/AIDS_FREE_ARCHITECTURE.md)
+- [x] Research roadmap — [`docs/RESEARCH_ROADMAP.md`](docs/RESEARCH_ROADMAP.md)
+- [x] Prior art and engagement list — [`docs/PRIOR_ART.md`](docs/PRIOR_ART.md)
+- [ ] `hardware/wristband/` — KiCad schematics, mechanical CAD, BOM
+- [ ] `hardware/npu/` — open RTL for the Hearing NPU (RISC-V + custom accelerator, CERN-OHL-S)
+- [ ] `firmware/npu/`, `firmware/mcu/` — bare-metal Rust runtime
+- [ ] `dsp/haptic/` — frequency→position mapping, illusion library, audiogram weighting
+- [ ] `models/` — base classifier, separator, and personal-LoRA scaffold
+- [ ] `training/protocol/` — Phase 0–4 training app and metrics
+- [ ] v0 prototype on Raspberry Pi CM4 + Hailo-8L + 24-LRA wrist sleeve
+- [ ] v0.5 prototype on RISC-V SBC + 64-piezo lattice
+- [ ] v1 FPGA validation on Lattice ECP5
+- [ ] FDA Q-Sub and MHRA Innovation Office pre-submission
+- [ ] Multi-user adaptation pilot (n≈20) with a UK academic audiology partner
 
 ---
 

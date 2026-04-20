@@ -376,6 +376,29 @@ See `SOVEREIGN_AUDIO.md` for the full framework.
 4. `python -m dsp.pipeline` — starts the real-time audio processor
 5. Edit `dsp/config.py` to tune compression, noise floor, and voice clarity
 
+### Path 2.5 — Wristband prototype (Windows + micro:bit v2)
+1. Export or copy the patient's audiogram JSON
+2. Flash the micro:bit with [`hardware/wristband/firmware.py`](hardware/wristband/firmware.py)
+3. Wire the two-motor transistor stage exactly as described in [`HARDWARE.md`](HARDWARE.md#6-openhear-wristband-prototype-microbit-v2)
+4. Install Python dependencies with `pip install -r requirements.txt`
+5. For a BLE-only smoke test, run:
+   - `python -m stream.wristband_runtime --audiogram PATIENT.json --manual-sound alarm`
+6. For live classification, add a local YAMNet `.tflite` model and label file, then run:
+   - `python -m stream.wristband_runtime --audiogram PATIENT.json --model yamnet.tflite --labels yamnet_class_map.csv`
+
+The wristband runtime currently supports:
+- 7 sound classes (`voice`, `doorbell`, `alarm`, `dog`, `traffic`, `media`, `silence`)
+- audiogram-weighted intensity scaling from either the current v1 format or the legacy OpenHear v0.1.0 JSON export
+- BLE UART transport to a micro:bit advertising as `OpenHear`
+- patient safety defaults that bias toward the **worst** ear when one intensity byte must represent both ears
+
+To keep a running development memory inside the repository, use:
+
+```bash
+python -m core.future_memory add --topic sharp-hearing --note "Prototype flashed and paired."
+python -m core.future_memory latest --topic sharp-hearing
+```
+
 ### Path 3 — Full sovereign build (phone + photogrammetry + resin printer)
 1. Scan your ear using Polycam/Scaniverse photogrammetry (see [workflow](hardware/ite-shells/workflow.md))
 2. Customise the parametric shell in OpenSCAD (see [parametric_shell.scad](hardware/ite-shells/parametric_shell.scad))
@@ -431,6 +454,7 @@ Before using Path 2 or 3, set your aids to linear mode. This alone will transfor
 - [x] Go-to-market, mission, and showcase applications — [`docs/GO_TO_MARKET.md`](docs/GO_TO_MARKET.md)
 - [x] Funding and partnership strategy — [`docs/FUNDING_AND_PARTNERSHIPS.md`](docs/FUNDING_AND_PARTNERSHIPS.md)
 - [ ] `hardware/wristband/` — KiCad schematics, mechanical CAD, BOM (planned; directory not yet committed)
+- [x] `hardware/wristband/` — micro:bit v2 prototype firmware and wiring guide
 - [ ] `hardware/npu/` — open RTL for the Hearing NPU (RISC-V + custom accelerator, CERN-OHL-S; planned, directory not yet committed)
 - [ ] `firmware/npu/`, `firmware/mcu/` — bare-metal Rust runtime
 - [ ] `dsp/haptic/` — frequency→position mapping, illusion library, audiogram weighting

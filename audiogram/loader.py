@@ -6,6 +6,20 @@ them, and provides functions to extract thresholds, compute the pure tone
 average (PTA), classify severity, generate a gain profile for the DSP
 pipeline, and compare audiograms over time.
 
+Also accepts the legacy OpenHear v0.1.0 wristband format used by the
+Noahlink export prototype::
+
+    {
+        "patient_id": "001",
+        "audiogram": {
+            "right": {"250": 20, "500": 35, ...},
+            "left":  {"250": 25, "500": 40, ...}
+        }
+    }
+
+Legacy files are normalised into the v1 structure on load so the rest of
+the codebase can treat both formats identically.
+
 Your audiogram is a measurement of your auditory nerve response.  This
 module treats it as sovereign data: load it, analyse it, and feed it
 directly into the processing pipeline — no intermediary required.
@@ -29,6 +43,7 @@ _NORMAL_THRESHOLD_DB = 20
 
 # Required top-level fields in an openhear-audiogram-v1 file.
 _REQUIRED_FIELDS = {"subject", "source", "date", "format_version", "right_ear", "left_ear"}
+_LEGACY_REQUIRED_FIELDS = {"patient_id", "audiogram"}
 
 
 def load_audiogram(path: str) -> dict:
@@ -47,6 +62,9 @@ def load_audiogram(path: str) -> dict:
     """
     with open(path, encoding="utf-8") as fh:
         data = json.load(fh)
+
+    if _looks_like_legacy_audiogram(data):
+        return _normalise_legacy_audiogram(data)
 
     missing = _REQUIRED_FIELDS - set(data.keys())
     if missing:
@@ -253,3 +271,56 @@ def _resolve_ear_key(ear: str) -> str:
     if ear == "left":
         return "left_ear"
     raise ValueError(f"ear must be 'right' or 'left', got {ear!r}")
+
+
+def _looks_like_legacy_audiogram(data: dict) -> bool:
+    """Return ``True`` if *data* matches the legacy OpenHear v0.1.0 shape."""
+    return _LEGACY_REQUIRED_FIELDS <= set(data.keys()) and isinstance(data.get("audiogram"), dict)
+
+
+def _normalise_legacy_audiogram(data: dict) -> dict:
+    """Convert the legacy wristband audiogram JSON into the v1 structure."""
+    audiogram = data["audiogram"]
+    missing_ears = {"left", "right"} - set(audiogram.keys())
+    if missing_ears:
+        raise ValueError(
+            "Legacy audiogram file is missing ear data for: "
+            f"{', '.join(sorted(missing_ears))}"
+        )
+
+    normalised = {
+        "subject": data["patient_id"],
+        "patient_id": data["patient_id"],
+        "source": data.get("source", "OpenHear legacy v0.1.0 import"),
+        "date": data.get("date", "unknown"),
+        "format_version": "openhear-audiogram-v1",
+        "notes": data.get("notes", "Normalised from OpenHear v0.1.0 legacy format."),
+        "right_ear": {
+            "symbol": "O",
+            "thresholds": _legacy_threshold_map_to_array(audiogram["right"], "right"),
+        },
+        "left_ear": {
+            "symbol": "X",
+            "thresholds": _legacy_threshold_map_to_array(audiogram["left"], "left"),
+        },
+    }
+    return normalised
+
+
+def _legacy_threshold_map_to_array(threshold_map: dict, ear: str) -> list[dict]:
+    """Convert ``{"500": 35, ...}`` legacy thresholds into the v1 list form."""
+    if not isinstance(threshold_map, dict) or not threshold_map:
+        raise ValueError(f"Legacy audiogram '{ear}' ear thresholds must be a non-empty object.")
+
+    thresholds: list[dict] = []
+    for freq_raw, db_raw in sorted(threshold_map.items(), key=lambda item: int(item[0])):
+        try:
+            freq_hz = int(freq_raw)
+            db_hl = int(db_raw)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                f"Legacy audiogram '{ear}' ear threshold entries must be integer-like, "
+                f"got freq={freq_raw!r}, db={db_raw!r}."
+            ) from exc
+        thresholds.append({"freq_hz": freq_hz, "db_hl": db_hl})
+    return thresholds

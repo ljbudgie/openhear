@@ -126,11 +126,72 @@ def _utc_now_iso() -> str:
     return datetime.now(tz=timezone.utc).isoformat()
 
 
+def read_session(
+    device,
+    *,
+    raw_only: bool = False,
+):
+    """Higher-level read using :mod:`core.protocol` framing.
+
+    Builds and returns a :class:`core.fitting_data.FittingSession` with
+    whatever data could be extracted.  Falls back to a raw-only session
+    (just :attr:`raw_payload_hex` populated) when the response cannot
+    be parsed or *raw_only* is set.
+
+    Args:
+        device: Either a :class:`core.noahlink.NoahlinkDevice` or any
+            object with the same ``send_and_receive`` / ``read`` /
+            ``write`` interface.
+        raw_only: When ``True``, skip the parser and return only the
+            raw payload — useful when the user wants to capture bytes
+            for offline analysis.
+
+    Returns:
+        A :class:`core.fitting_data.FittingSession`.
+    """
+    # Local imports to avoid a circular dependency at module load time.
+    from core.fitting_data import FittingSession
+    from core.protocol import MessageType, decode_session, encode_frame
+
+    request = encode_frame(MessageType.GET_FITTING, b"")
+    if hasattr(device, "send_and_receive"):
+        response = device.send_and_receive(request)
+    else:
+        # Lower-level ``hid.device``: emulate send/receive.
+        send_command(device, request)
+        response = read_response(device)
+
+    session = FittingSession(
+        captured_at=_utc_now_iso(),
+        raw_payload_hex=response.hex(),
+    )
+
+    if raw_only:
+        return session
+
+    # Best-effort parse — anything we can't decode stays in raw_payload_hex.
+    frames = list(decode_session(response))
+    if frames:
+        logger.debug("Decoded %d frame(s) from response.", len(frames))
+        # Devices typically reply DEVICE_INFO + FITTING_BLOB; only
+        # serialise the metadata we already understand.  Anything
+        # further (gain table, MPO, etc.) is a known TODO.
+        for frame in frames:
+            if frame.msg_type == MessageType.DEVICE_INFO and frame.payload:
+                # Convention (best-effort): payload is UTF-8 "serial|firmware".
+                try:
+                    text = frame.payload.decode("utf-8", errors="ignore")
+                    parts = text.split("|", 1)
+                    session.device.serial = parts[0].strip()
+                    if len(parts) > 1:
+                        session.device.firmware = parts[1].strip()
+                except Exception:  # pragma: no cover - defensive
+                    pass
+    return session
+
+
 def main() -> None:
     """CLI entry point."""
-    logging.basicConfig(level=logging.INFO,
-                        format="%(levelname)s %(name)s: %(message)s")
-
     parser = argparse.ArgumentParser(
         description="Read fitting data from Noahlink Wireless 2 and export as JSON."
     )
@@ -147,11 +208,35 @@ def main() -> None:
         "--product-id", type=lambda x: int(x, 0), default=NOAHLINK_PRODUCT_ID,
         help=f"USB product ID (default: {NOAHLINK_PRODUCT_ID:#06x}).",
     )
+    parser.add_argument(
+        "--session", action="store_true",
+        help="Use the new core.protocol parser to emit a structured "
+             "FittingSession JSON document.  Default behaviour writes "
+             "the legacy raw-payload JSON for backwards compatibility.",
+    )
+    parser.add_argument(
+        "--raw", action="store_true",
+        help="Force a raw dump even when --session is set.  Equivalent "
+             "to the legacy default.",
+    )
+    parser.add_argument(
+        "--verbose", "-v", action="store_true",
+        help="Enable verbose (DEBUG) logging.",
+    )
     args = parser.parse_args()
+
+    logging.basicConfig(
+        level=logging.DEBUG if args.verbose else logging.INFO,
+        format="%(levelname)s %(name)s: %(message)s",
+    )
 
     device = open_device(args.vendor_id, args.product_id)
     try:
-        data = read_fitting_data(device)
+        if args.session and not args.raw:
+            session = read_session(device, raw_only=False)
+            data = session.to_dict()
+        else:
+            data = read_fitting_data(device)
     finally:
         device.close()
 

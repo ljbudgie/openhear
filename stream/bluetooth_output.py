@@ -31,27 +31,120 @@ Usage:
 import argparse
 import logging
 import sys
+from typing import Iterable
 
+import numpy as np
 import pyaudio
 
 logger = logging.getLogger(__name__)
 
 
-def list_output_devices() -> None:
-    """Print all available PyAudio output devices to stdout.
+# Substrings that commonly appear in the device names of Bluetooth audio
+# devices likely to be hearing-aid streamers.  Used by
+# :func:`is_likely_bluetooth_device` and ``--list`` filtering.
+LIKELY_BLUETOOTH_NAME_HINTS: tuple[str, ...] = (
+    "bluetooth", "bt", "phonak", "signia", "oticon", "resound", "starkey",
+    "widex", "hearing", "naida", "insio", "audeo", "marvel", "ax", "sennheiser",
+)
 
-    Use this to find the device index for your Bluetooth hearing aid
-    streamer and set OUTPUT_DEVICE_INDEX in dsp/config.py.
+
+def is_likely_bluetooth_device(name: str) -> bool:
+    """Return ``True`` if *name* looks like a Bluetooth/hearing-aid device.
+
+    The check is a case-insensitive substring search against
+    :data:`LIKELY_BLUETOOTH_NAME_HINTS`.  False positives (e.g. a
+    keyboard whose name contains "BT") are acceptable because this
+    helper is only used to suggest devices to the user.
     """
-    pa = pyaudio.PyAudio()
-    count = pa.get_device_count()
-    print(f"{'Index':<6} {'Name':<50} {'Max Output Ch'}")
-    print("-" * 70)
-    for i in range(count):
-        info = pa.get_device_info_by_index(i)
-        if info["maxOutputChannels"] > 0:
-            print(f"{i:<6} {info['name'][:48]:<50} {int(info['maxOutputChannels'])}")
-    pa.terminate()
+    lower = name.lower()
+    return any(hint in lower for hint in LIKELY_BLUETOOTH_NAME_HINTS)
+
+
+def resample_to(samples: np.ndarray, src_rate: int, dst_rate: int) -> np.ndarray:
+    """Cheap linear-interpolation sample-rate converter.
+
+    Used when the user's Bluetooth output device only supports a sample
+    rate different from the pipeline's working rate (typical for
+    headsets locked to 48 kHz).  Linear interpolation is good enough for
+    speech and avoids pulling in ``scipy.signal.resample_poly`` as a
+    runtime dep.
+
+    Args:
+        samples: Mono 1-D float32 array of normalised PCM.
+        src_rate: Original sample rate in Hz.
+        dst_rate: Target sample rate in Hz.
+
+    Returns:
+        Resampled float32 1-D array at *dst_rate*.
+
+    Raises:
+        ValueError: If either rate is non-positive.
+    """
+    if src_rate <= 0 or dst_rate <= 0:
+        raise ValueError("Sample rates must be positive.")
+    x = np.asarray(samples, dtype=np.float32)
+    if src_rate == dst_rate or x.size == 0:
+        return x.astype(np.float32, copy=False)
+
+    ratio = dst_rate / src_rate
+    n_out = int(round(x.size * ratio))
+    if n_out <= 1:
+        return x[:1].astype(np.float32, copy=True)
+
+    # Index of each output sample in the input timeline.
+    src_index = np.linspace(0.0, x.size - 1, n_out, dtype=np.float64)
+    floor = np.floor(src_index).astype(np.int64)
+    frac = src_index - floor
+    ceil = np.minimum(floor + 1, x.size - 1)
+    out = (1.0 - frac) * x[floor] + frac * x[ceil]
+    return out.astype(np.float32)
+
+
+def list_output_devices(pa: pyaudio.PyAudio | None = None) -> list[dict]:
+    """Return information about every available output device.
+
+    Args:
+        pa: Optional :class:`pyaudio.PyAudio` instance to reuse.  If
+            ``None``, a fresh one is created and terminated locally.
+
+    Returns:
+        List of dicts with ``index``, ``name``, ``max_output_channels``,
+        ``default_sample_rate``, and ``likely_bluetooth`` keys.
+    """
+    owns_pa = pa is None
+    pa = pa or pyaudio.PyAudio()
+    devices: list[dict] = []
+    try:
+        count = pa.get_device_count()
+        for i in range(count):
+            info = pa.get_device_info_by_index(i)
+            if int(info.get("maxOutputChannels", 0)) <= 0:
+                continue
+            devices.append({
+                "index": i,
+                "name": str(info["name"]),
+                "max_output_channels": int(info["maxOutputChannels"]),
+                "default_sample_rate": float(info.get("defaultSampleRate", 0)),
+                "likely_bluetooth": is_likely_bluetooth_device(str(info["name"])),
+            })
+    finally:
+        if owns_pa:
+            pa.terminate()
+    return devices
+
+
+def _print_device_table(devices: Iterable[dict], bluetooth_only: bool) -> None:
+    """Render :func:`list_output_devices` output as a readable table."""
+    rows = [d for d in devices if not bluetooth_only or d["likely_bluetooth"]]
+    print(f"{'Index':<6} {'Name':<48} {'Out':>3}  {'SR (Hz)':>8}  BT?")
+    print("-" * 76)
+    for d in rows:
+        bt_marker = "✓" if d["likely_bluetooth"] else " "
+        print(
+            f"{d['index']:<6} {d['name'][:46]:<48} "
+            f"{d['max_output_channels']:>3}  "
+            f"{int(d['default_sample_rate']):>8}  {bt_marker}"
+        )
 
 
 class BluetoothAudioOutput:
@@ -165,7 +258,7 @@ class BluetoothAudioOutput:
 
 # ── CLI entry point ──────────────────────────────────────────────────────────
 
-def main() -> None:
+def main(argv: list[str] | None = None) -> int:
     """CLI helper: list available output devices or run a loopback test."""
     logging.basicConfig(level=logging.INFO,
                         format="%(levelname)s %(name)s: %(message)s")
@@ -182,26 +275,33 @@ def main() -> None:
         "--device-index", type=int, metavar="N",
         help="Open device N and play 1 second of silence as a connection test.",
     )
-    args = parser.parse_args()
+    parser.add_argument(
+        "--bluetooth-only", action="store_true",
+        help="With --list, hide non-Bluetooth-looking devices.",
+    )
+    args = parser.parse_args(argv)
 
     if args.list:
-        list_output_devices()
-    else:
-        import numpy as np
-        bt = BluetoothAudioOutput(
-            sample_rate=16_000,
-            channels=2,
-            frames_per_buffer=256,
-            device_index=args.device_index,
-        )
-        silence = np.zeros(256 * 2, dtype=np.int16).tobytes()  # 1 silent buffer
-        frames = int(16_000 / 256)  # ~1 second
-        print(f"Playing {frames} silent buffers to device {args.device_index} …")
-        with bt:
-            for _ in range(frames):
-                bt.write(silence)
-        print("Done.")
+        devices = list_output_devices()
+        _print_device_table(devices, bluetooth_only=args.bluetooth_only)
+        return 0
+
+    bt = BluetoothAudioOutput(
+        sample_rate=16_000,
+        channels=2,
+        frames_per_buffer=256,
+        device_index=args.device_index,
+    )
+    silence = np.zeros(256 * 2, dtype=np.int16).tobytes()  # 1 silent buffer
+    frames = int(16_000 / 256)  # ~1 second
+    print(f"Playing {frames} silent buffers to device {args.device_index} …")
+    with bt:
+        for _ in range(frames):
+            bt.write(silence)
+    print("Done.")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
+

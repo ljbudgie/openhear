@@ -20,15 +20,19 @@ Latency budget:
     FRAMES_PER_BUFFER = 256 samples @ 16 000 Hz ≈ 16 ms per block.
     Total target: < 20 ms (hardware I/O buffers add overhead).
 
-Usage:
-    python -m dsp.pipeline
+CLI:
+    python -m dsp.pipeline               # live processing
+    python -m dsp.pipeline --bypass      # passthrough only (for A/B)
+    python -m dsp.pipeline --test-tone   # 1 kHz tone instead of microphone
+    python -m dsp.pipeline --latency     # measure & log per-block latency
 
 Press Ctrl+C to stop.
 """
 
+import argparse
 import logging
-import struct
 import sys
+import time
 
 import numpy as np
 import pyaudio
@@ -68,6 +72,33 @@ def _float32_to_bytes(samples: np.ndarray, channels: int) -> bytes:
     if channels > 1:
         int16 = np.repeat(int16, channels)
     return int16.tobytes()
+
+
+def generate_test_tone(
+    frame_count: int,
+    sample_rate: int,
+    frequency_hz: float = 1000.0,
+    amplitude: float = 0.2,
+    phase: float = 0.0,
+) -> tuple[np.ndarray, float]:
+    """Synthesise a sine-wave test tone block.
+
+    Args:
+        frame_count: Number of samples in the block.
+        sample_rate: Sample rate in Hz.
+        frequency_hz: Tone frequency.
+        amplitude: Linear amplitude (0.0–1.0).
+        phase: Starting phase (radians).  Used so successive blocks join
+            without a discontinuity.
+
+    Returns:
+        A tuple ``(samples, next_phase)`` where ``next_phase`` should be
+        passed back in for the following block.
+    """
+    t = (np.arange(frame_count, dtype=np.float64) / sample_rate)
+    samples = amplitude * np.sin(2.0 * np.pi * frequency_hz * t + phase)
+    next_phase = (phase + 2.0 * np.pi * frequency_hz * frame_count / sample_rate) % (2.0 * np.pi)
+    return samples.astype(np.float32), float(next_phase)
 
 
 def build_dsp_chain() -> list:
@@ -142,19 +173,37 @@ def build_dsp_chain() -> list:
     return chain
 
 
-def run_pipeline() -> None:
-    """Open audio streams and run the processing loop until interrupted."""
+def run_pipeline(
+    *,
+    bypass: bool = False,
+    test_tone: bool = False,
+    measure_latency: bool = False,
+    metrics_path: str | None = None,
+) -> None:
+    """Open audio streams and run the processing loop until interrupted.
+
+    Args:
+        bypass: If ``True``, skip the DSP chain entirely (passthrough).
+        test_tone: If ``True``, replace mic input with a 1 kHz sine tone.
+        measure_latency: If ``True``, log per-block latency to the
+            standard logger every second.
+        metrics_path: If set, append per-block metrics to this CSV path
+            (see :class:`dsp.metrics.MetricsLogger`).
+    """
     pa = pyaudio.PyAudio()
 
     try:
-        input_stream = pa.open(
-            rate=config.SAMPLE_RATE,
-            channels=config.INPUT_CHANNELS,
-            format=pyaudio.paInt16,
-            input=True,
-            frames_per_buffer=config.FRAMES_PER_BUFFER,
-            input_device_index=config.INPUT_DEVICE_INDEX,
-        )
+        if not test_tone:
+            input_stream = pa.open(
+                rate=config.SAMPLE_RATE,
+                channels=config.INPUT_CHANNELS,
+                format=pyaudio.paInt16,
+                input=True,
+                frames_per_buffer=config.FRAMES_PER_BUFFER,
+                input_device_index=config.INPUT_DEVICE_INDEX,
+            )
+        else:
+            input_stream = None
         output_stream = pa.open(
             rate=config.SAMPLE_RATE,
             channels=config.OUTPUT_CHANNELS,
@@ -168,7 +217,11 @@ def run_pipeline() -> None:
         pa.terminate()
         sys.exit(1)
 
-    dsp_chain = build_dsp_chain()
+    dsp_chain = [] if bypass else build_dsp_chain()
+    if bypass:
+        logger.info("Bypass mode: DSP chain skipped.")
+    if test_tone:
+        logger.info("Test-tone mode: synthesising 1 kHz sine instead of mic input.")
     logger.info(
         "Pipeline running — %d Hz, %d frames/buffer (~%.1f ms latency). "
         "Press Ctrl+C to stop.",
@@ -177,27 +230,92 @@ def run_pipeline() -> None:
         config.FRAMES_PER_BUFFER / config.SAMPLE_RATE * 1000,
     )
 
+    metrics_logger = None
+    if metrics_path is not None:
+        from dsp.metrics import MetricsLogger
+        metrics_logger = MetricsLogger(path=metrics_path).open()
+
+    last_latency_log = time.monotonic()
+    tone_phase = 0.0
     try:
         while True:
-            raw = input_stream.read(
-                config.FRAMES_PER_BUFFER, exception_on_overflow=False
-            )
-            samples = _bytes_to_float32(raw)
+            block_start = time.perf_counter()
+            if test_tone:
+                samples, tone_phase = generate_test_tone(
+                    config.FRAMES_PER_BUFFER, config.SAMPLE_RATE, phase=tone_phase,
+                )
+            else:
+                raw = input_stream.read(
+                    config.FRAMES_PER_BUFFER, exception_on_overflow=False
+                )
+                samples = _bytes_to_float32(raw)
 
             for stage in dsp_chain:
                 samples = stage.process(samples)
 
             output_stream.write(_float32_to_bytes(samples, config.OUTPUT_CHANNELS))
+            block_seconds_processed = time.perf_counter() - block_start
+
+            if metrics_logger is not None:
+                metrics_logger.log_block(
+                    block_samples=config.FRAMES_PER_BUFFER,
+                    sample_rate=config.SAMPLE_RATE,
+                    process_seconds=block_seconds_processed,
+                    samples=samples,
+                )
+
+            if measure_latency and (time.monotonic() - last_latency_log) >= 1.0:
+                latency_ms = block_seconds_processed * 1000.0
+                logger.info(
+                    "latency=%.2f ms  (block=%.1f ms budget)",
+                    latency_ms,
+                    config.FRAMES_PER_BUFFER / config.SAMPLE_RATE * 1000.0,
+                )
+                last_latency_log = time.monotonic()
 
     except KeyboardInterrupt:
         logger.info("Pipeline stopped by user.")
     finally:
-        input_stream.stop_stream()
-        input_stream.close()
+        if input_stream is not None:
+            input_stream.stop_stream()
+            input_stream.close()
         output_stream.stop_stream()
         output_stream.close()
         pa.terminate()
+        if metrics_logger is not None:
+            metrics_logger.close()
+
+
+def _build_arg_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="Run the OpenHear real-time DSP pipeline.",
+    )
+    parser.add_argument(
+        "--bypass", action="store_true",
+        help="Skip the DSP chain (passthrough).  Useful for A/B testing.",
+    )
+    parser.add_argument(
+        "--test-tone", action="store_true",
+        help="Synthesise a 1 kHz sine wave instead of reading the mic. "
+             "Useful when no microphone is available.",
+    )
+    parser.add_argument(
+        "--latency", action="store_true",
+        help="Log per-block latency once per second.",
+    )
+    parser.add_argument(
+        "--metrics-csv", default=None,
+        help="Append per-block latency/CPU/level metrics to this CSV file.",
+    )
+    return parser
 
 
 if __name__ == "__main__":
-    run_pipeline()
+    args = _build_arg_parser().parse_args()
+    run_pipeline(
+        bypass=args.bypass,
+        test_tone=args.test_tone,
+        measure_latency=args.latency,
+        metrics_path=args.metrics_csv,
+    )
+

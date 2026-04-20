@@ -371,10 +371,11 @@ See `SOVEREIGN_AUDIO.md` for the full framework.
 
 ### Path 2 — Desktop pipeline (Windows + Noahlink Wireless 2)
 1. Set your aids to linear mode (kill the factory AI — see instructions below)
-2. `pip install -r requirements.txt`
-3. `python -m core.read_fitting` — exports the current raw Noahlink payload to JSON; typed field parsing remains pending confirmed HIMSA frame definitions
-4. `python -m dsp.pipeline` — starts the real-time audio processor
-5. Edit `dsp/config.py` to tune compression, noise floor, and voice clarity
+2. `pip install -e .` (editable install using the new `pyproject.toml`)
+   or `pip install -r requirements.txt` for the legacy flow
+3. `python -m core.read_fitting` — exports the current raw Noahlink payload to JSON; add `--session` to emit the new structured `FittingSession` format and `--verbose` for DEBUG logging
+4. `python -m dsp.pipeline` — starts the real-time audio processor. Useful flags: `--bypass` for A/B, `--test-tone` when no mic is plugged in, `--latency` for per-block latency logs, `--metrics-csv metrics.csv` to record CPU / RMS / latency
+5. Copy `examples/config.yaml` to `~/.openhear/config.yaml` and tune it (see `docs/TUNING_GUIDE.md`); `dsp/config.py` defaults still work as a fallback
 
 ### Path 2.5 — Wristband prototype (Windows + micro:bit v2)
 1. Export or copy the patient's audiogram JSON

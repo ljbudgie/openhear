@@ -1,0 +1,83 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openhear"
+version = "0.1.0"
+description = "Open, user-controlled hearing-aid signal processing, fitting and learning."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "OpenHear contributors" }]
+keywords = ["hearing-aid", "audio", "dsp", "accessibility", "noahlink"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Healthcare Industry",
+    "Topic :: Multimedia :: Sound/Audio",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    # Numerical / DSP
+    "numpy>=1.26.0",
+    "scipy>=1.12.0",
+    # USB HID (Noahlink Wireless 2)
+    "hid>=1.0.6",
+    # YAML user-config parsing
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+audio = [
+    # Real-time audio I/O — split out because PyAudio needs portaudio
+    # which is awkward on some CI runners.
+    "PyAudio>=0.2.14",
+    "sounddevice>=0.5.2",
+    "soundfile>=0.12.1",
+]
+plot = ["matplotlib>=3.8.0"]
+ble = ["bleak>=1.1.1"]
+dev = [
+    "pytest>=7.0",
+]
+
+[project.scripts]
+openhear-pipeline = "dsp.pipeline:run_pipeline"
+openhear-read-fitting = "core.read_fitting:main"
+openhear-noahlink = "core.noahlink:main"
+openhear-bluetooth = "stream.bluetooth_output:main"
+openhear-virtual-cable = "stream.virtual_cable:main"
+openhear-latency = "stream.latency:main"
+openhear-recorder = "stream.recorder:main"
+openhear-demo = "examples.demo:main"
+
+[project.urls]
+Homepage = "https://github.com/ljbudgie/openhear"
+Issues = "https://github.com/ljbudgie/openhear/issues"
+
+[tool.setuptools]
+# Ship the existing top-level package directories as installable packages.
+packages = [
+    "audiogram",
+    "core",
+    "dsp",
+    "examples",
+    "hardware",
+    "hardware.tympan",
+    "learn",
+    "stream",
+    "voice",
+    "wristband",
+]
+include-package-data = true
+
+[tool.setuptools.package-data]
+"audiogram" = ["data/*.json"]
+"dsp" = ["config.schema.json"]
+"stream" = ["data/*.csv"]

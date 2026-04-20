@@ -45,10 +45,68 @@ def _install_hid_stub() -> None:
             pass
 
     stub.device = _StubDevice
+    stub.enumerate = lambda *args, **kwargs: []
     sys.modules["hid"] = stub
 
 
 _install_hid_stub()
+
+
+def _install_pyaudio_stub() -> None:
+    """Provide a minimal stub for PyAudio.
+
+    Many ``stream/`` and ``dsp/`` modules ``import pyaudio`` at module
+    load time.  Tests never exercise real audio I/O, so a tiny stub
+    keeps imports working in CI without the native PortAudio library.
+    """
+    if "pyaudio" in sys.modules:
+        return
+    try:
+        import pyaudio as _real  # type: ignore  # noqa: F401
+        return
+    except Exception:  # pragma: no cover - defensive
+        pass
+
+    mod = types.ModuleType("pyaudio")
+    mod.paInt16 = 8
+
+    class _DummyStream:  # pragma: no cover - tests stub explicitly when needed
+        def write(self, data):
+            return None
+
+        def read(self, n, exception_on_overflow=False):
+            return b"\x00" * (n * 2)
+
+        def stop_stream(self):
+            pass
+
+        def close(self):
+            pass
+
+    class _DummyPyAudio:
+        def __init__(self):
+            self._devices = []
+
+        def open(self, *args, **kwargs):
+            return _DummyStream()
+
+        def terminate(self):
+            pass
+
+        def get_device_count(self):
+            return 0
+
+        def get_device_info_by_index(self, i):
+            return {
+                "name": "stub", "maxOutputChannels": 0,
+                "maxInputChannels": 0, "defaultSampleRate": 16_000,
+            }
+
+    mod.PyAudio = _DummyPyAudio
+    sys.modules["pyaudio"] = mod
+
+
+_install_pyaudio_stub()
 
 
 @pytest.fixture

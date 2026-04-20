@@ -32,7 +32,14 @@ The Windows runtime sends one 3-byte BLE UART packet:
 - `P0` → left motor transistor driver
 - `P1` → right motor transistor driver
 - common `GND` between the micro:bit and the motor battery
-- each motor driven through a **2N2222** low-side switch
-- each motor protected with a flyback diode
+- each motor driven through a **2N2222A / PN2222A** low-side switch
+- **1 kΩ** base resistor per transistor
+- **10 kΩ** base pulldown per transistor
+- **1N5819** flyback diode per motor
 
 For the full wiring notes, see [`../../HARDWARE.md`](../../HARDWARE.md).
+
+## Windows flashing + BLE debugging
+
+- Flashing steps: [`../../HARDWARE.md#firmware-flashing-windows`](../../HARDWARE.md#firmware-flashing-windows)
+- BLE troubleshooting: [`../../HARDWARE.md#windows-ble-debugging-checklist`](../../HARDWARE.md#windows-ble-debugging-checklist)

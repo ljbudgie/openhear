@@ -12,6 +12,7 @@ This module provides:
 
 from __future__ import annotations
 
+import csv
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -167,8 +168,36 @@ class YamnetClassifier:
 
 
 def _load_labels(labels_path: str) -> list[str]:
-    content = Path(labels_path).read_text(encoding="utf-8").splitlines()
-    return [line.strip() for line in content if line.strip()]
+    rows = [
+        row
+        for row in csv.reader(Path(labels_path).read_text(encoding="utf-8").splitlines())
+        if any(column.strip() for column in row)
+    ]
+    if not rows:
+        return []
+
+    if len(rows[0]) == 1:
+        return [row[0].strip() for row in rows if row and row[0].strip()]
+
+    headers = [column.strip().lower() for column in rows[0]]
+    if "display_name" in headers:
+        column_index = headers.index("display_name")
+        return [
+            row[column_index].strip()
+            for row in rows[1:]
+            if len(row) > column_index and row[column_index].strip()
+        ]
+
+    labels: list[str] = []
+    for row in rows:
+        # Fallback for non-official CSVs that still store the label in the
+        # rightmost populated column.
+        for column in reversed(row):
+            label = column.strip()
+            if label:
+                labels.append(label)
+                break
+    return labels
 
 
 def _load_tflite_interpreter(model_path: str):

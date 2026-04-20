@@ -180,13 +180,22 @@ def _load_labels(labels_path: str) -> list[str]:
         return [row[0].strip() for row in rows if row and row[0].strip()]
 
     headers = [column.strip().lower() for column in rows[0]]
-    column_index = headers.index("display_name") if "display_name" in headers else len(rows[0]) - 1
-    data_rows = rows[1:] if "display_name" in headers else rows
-    return [
-        row[column_index].strip()
-        for row in data_rows
-        if len(row) > column_index and row[column_index].strip()
-    ]
+    if "display_name" in headers:
+        column_index = headers.index("display_name")
+        return [
+            row[column_index].strip()
+            for row in rows[1:]
+            if len(row) > column_index and row[column_index].strip()
+        ]
+
+    labels: list[str] = []
+    for row in rows:
+        for column in reversed(row):
+            label = column.strip()
+            if label:
+                labels.append(label)
+                break
+    return labels
 
 
 def _load_tflite_interpreter(model_path: str):

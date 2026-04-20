@@ -168,7 +168,11 @@ class YamnetClassifier:
 
 
 def _load_labels(labels_path: str) -> list[str]:
-    rows = list(csv.reader(Path(labels_path).read_text(encoding="utf-8").splitlines()))
+    rows = [
+        row
+        for row in csv.reader(Path(labels_path).read_text(encoding="utf-8").splitlines())
+        if any(column.strip() for column in row)
+    ]
     if not rows:
         return []
 

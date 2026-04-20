@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+
 import pytest
 
 from stream.ble_haptic import (
@@ -47,13 +49,12 @@ def test_encode_packet_rejects_invalid_values():
         encode_packet(256, 1, 1)
 
 
-@pytest.mark.asyncio
-async def test_client_connects_and_sends():
+def test_client_connects_and_sends():
     fake_client = _FakeClient(None)
     client = OpenHearBLEClient(
         scanner=_FakeScanner,
         client_factory=lambda device: fake_client,
     )
-    await client.connect()
-    await client.send_packet(HapticPacket(1, 128, 4))
+    asyncio.run(client.connect())
+    asyncio.run(client.send_packet(HapticPacket(1, 128, 4)))
     assert fake_client.writes[0][1] == b"\x01\x80\x04"

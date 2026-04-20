@@ -392,6 +392,13 @@ The wristband runtime currently supports:
 - BLE UART transport to a micro:bit advertising as `OpenHear`
 - patient safety defaults that bias toward the **worst** ear when one intensity byte must represent both ears
 
+To keep a running development memory inside the repository, use:
+
+```bash
+python -m core.future_memory add --topic sharp-hearing --note "Prototype flashed and paired."
+python -m core.future_memory latest --topic sharp-hearing
+```
+
 ### Path 3 — Full sovereign build (phone + photogrammetry + resin printer)
 1. Scan your ear using Polycam/Scaniverse photogrammetry (see [workflow](hardware/ite-shells/workflow.md))
 2. Customise the parametric shell in OpenSCAD (see [parametric_shell.scad](hardware/ite-shells/parametric_shell.scad))

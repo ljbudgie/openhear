@@ -94,7 +94,8 @@ class OpenHearBLEClient:
 
     async def discover(self, *, timeout: float = 5.0):
         """Find the first BLE peripheral advertising as ``OpenHear``."""
-        _require_bleak()
+        if self._scanner is None:
+            _require_bleak()
         scanner = self._scanner or BleakScanner
         devices = await scanner.discover(timeout=timeout)
         for device in devices:
@@ -106,6 +107,8 @@ class OpenHearBLEClient:
     async def connect(self, *, timeout: float = 5.0):
         """Discover and connect to the wristband."""
         device = self._device or await self.discover(timeout=timeout)
+        if self._client_factory is None:
+            _require_bleak()
         client_factory = self._client_factory or BleakClient
         self._client = client_factory(device)
         await self._client.connect()

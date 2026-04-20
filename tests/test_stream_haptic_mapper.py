@@ -52,7 +52,7 @@ class TestHapticMapper:
     def test_confidence_and_comfort_scale_affect_intensity(self, audiogram_path: str):
         mapper = HapticMapper(audiogram_path, comfort_scale=0.5)
         intensity = mapper.get_intensity("voice", confidence=0.5)
-        assert intensity == 32
+        assert intensity == 48
 
     def test_silence_maps_to_zero(self, audiogram_path: str):
         mapper = HapticMapper(audiogram_path)

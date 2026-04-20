@@ -28,3 +28,9 @@ env/
 .vscode/
 *.DS_Store
 Thumbs.db
+
+# Test coverage
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/

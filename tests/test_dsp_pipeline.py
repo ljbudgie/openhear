@@ -87,22 +87,30 @@ class TestBuildDspChain:
         monkeypatch.setattr(config, "NOISE_REDUCTION_ENABLED", True)
         monkeypatch.setattr(config, "COMPRESSION_ENABLED", True)
         monkeypatch.setattr(config, "VOICE_CLARITY_ENABLED", True)
+        monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", True)
+        monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", True)
 
         chain = pipeline.build_dsp_chain()
-        assert len(chain) == 3
+        assert len(chain) == 5
 
         from dsp.compression import WDRCompressor
+        from dsp.feedback_canceller import FeedbackCanceller
         from dsp.noise_reduction import SpectralSubtractor
+        from dsp.own_voice_bypass import OwnVoiceBypass
         from dsp.voice_clarity import VoiceClarityEnhancer
 
         assert isinstance(chain[0], SpectralSubtractor)
         assert isinstance(chain[1], WDRCompressor)
         assert isinstance(chain[2], VoiceClarityEnhancer)
+        assert isinstance(chain[3], FeedbackCanceller)
+        assert isinstance(chain[4], OwnVoiceBypass)
 
     def test_all_stages_disabled(self, monkeypatch, caplog):
         monkeypatch.setattr(config, "NOISE_REDUCTION_ENABLED", False)
         monkeypatch.setattr(config, "COMPRESSION_ENABLED", False)
         monkeypatch.setattr(config, "VOICE_CLARITY_ENABLED", False)
+        monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", False)
+        monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", False)
 
         import logging
         with caplog.at_level(logging.WARNING):
@@ -114,6 +122,8 @@ class TestBuildDspChain:
         monkeypatch.setattr(config, "NOISE_REDUCTION_ENABLED", False)
         monkeypatch.setattr(config, "COMPRESSION_ENABLED", True)
         monkeypatch.setattr(config, "VOICE_CLARITY_ENABLED", False)
+        monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", False)
+        monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", False)
 
         chain = pipeline.build_dsp_chain()
         assert len(chain) == 1
@@ -122,6 +132,8 @@ class TestBuildDspChain:
         monkeypatch.setattr(config, "NOISE_REDUCTION_ENABLED", True)
         monkeypatch.setattr(config, "COMPRESSION_ENABLED", True)
         monkeypatch.setattr(config, "VOICE_CLARITY_ENABLED", True)
+        monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", True)
+        monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", True)
 
         chain = pipeline.build_dsp_chain()
         samples = np.zeros(config.FRAMES_PER_BUFFER, dtype=np.float32)

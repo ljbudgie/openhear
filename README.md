@@ -116,6 +116,66 @@ The developer wears Phonak Naída and Signia aids. The gap the wristband fills i
 
 ---
 
+## OpenHear Vision — The Wristband as the Hearing System
+
+The wristband section above describes a companion device. This section describes where the architecture is going.
+
+The long-term vision is direct: the wristband stops being a companion and becomes the hearing system. It captures the environment, classifies it, processes it against your audiogram, and transmits a finished audio signal to a minimal receiver worn at the ear. The £3,000–£8,000 behind-the-ear black box — with its proprietary firmware, locked fitting software, and audiologist-gated parameters — is no longer required. It is replaced by a piece of jewellery on the wrist and a passive driver at the ear.
+
+### The architecture — three layers, one user
+
+```
+World → Wrist Mic Array + Hearing NPU → Wireless Link → Bone Conduction Receiver / Open-Fit Earbud → Cochlea
+        [capture + classify + process]   [low-latency]   [deliver only]
+```
+
+**Layer 1 — Wrist (sensor and processor).** The wristband carries the microphone array, the hearing-specific neural processing unit, the audiogram, and the DSP pipeline. All of the intelligence of the system lives here, on the user's wrist, where it can be charged, updated, inspected, and replaced independently of anything worn at the ear.
+
+**Layer 2 — Wireless transmission.** A low-latency link between the wrist and the ear-worn receiver. Sub-5ms end-to-end is the target. Standard, open, and inspectable — no proprietary radio that locks the receiver to a single vendor.
+
+**Layer 3 — Ear (delivery only).** A minimal behind-the-ear bone conduction receiver, or an open-fit earbud, whose only job is to convert the finished signal into vibration or sound. No microphones. No classifier. No DSP. No firmware that does anything other than receive and drive a transducer. When it breaks, you replace a £30 part, not a £6,000 one.
+
+### A hearing-specific NPU — designed for this and only this
+
+The processor on the wrist is not a general-purpose AI chip with a hearing application bolted on top. It is a neural processing unit designed from first principles for one task: real-time, personalised hearing.
+
+- **Sub-5ms end-to-end latency** — capture to ear. Anything slower is felt as delay during conversation.
+- **Personalised audiogram-based DSP** — compression curves, frequency shaping, and feedback cancellation derived from *your* thresholds, not a population fit.
+- **On-device classification and beamforming** — environmental scene analysis and spatial steering run locally, at the same latency budget as the DSP itself.
+- **Performance targets that exceed current hearing aid SoCs** — at a fraction of the silicon cost, because the chip does one job extremely well rather than every job adequately.
+
+A general-purpose chip repurposed for hearing will always lose to a chip that was drawn for hearing. We intend to draw the chip.
+
+### Sovereignty extended to hardware
+
+OpenHear already gives the user sovereignty over their audiogram, their fitting data, and the DSP algorithms that act on them. The wristband-as-hearing-system extends that sovereignty down to the silicon and out to every device worn on the body.
+
+- **No proprietary firmware** at any layer of the stack — wrist, link, or receiver.
+- **No locked fitting software.** The audiogram lives on the wrist as plain JSON. Adjusting a parameter means editing a value, not booking an appointment.
+- **No audiologist gatekeeping.** Audiologists are welcome as collaborators and clinicians; they are not required as a key to your own hearing.
+- **No vendor lock between layers.** The receiver at the ear is interchangeable. The wristband is interchangeable. The link is an open standard. The user owns every layer.
+
+The hearing aid industry's business model depends on the user not being able to see inside the device. This architecture is the device with the lid removed.
+
+### Regulatory pathway
+
+The system enters the world as a **companion device** — running alongside existing hearing aids, augmenting them, doing nothing the aids themselves do. This is the position the current OpenHear pipeline and wristband already occupy and it requires no clinical claim to be made.
+
+The standalone configuration — wristband plus bone conduction receiver, replacing the hearing aid entirely — is the longer pathway. The regulatory target for the standalone device in the United Kingdom is **UK MDR 2002 Class IIa**, the same classification carried by conventional air-conduction hearing aids. Clinical evidence accumulates first; the claim follows.
+
+### Collaboration
+
+Open source hardware and open source software, end to end. Schematics, RTL, firmware, DSP, and fitting tools all under permissive licenses. Specifically invited:
+
+- **Audiologists** — clinical input on fitting protocols, validation, and the standalone regulatory pathway.
+- **Chip designers** — architects and RTL engineers interested in a hearing-specific NPU built from first principles.
+- **DSP engineers** — compression, beamforming, feedback cancellation, and own-voice detection at sub-5ms latency budgets.
+- **Hearing aid users** — the people the system exists for. Lived experience is a design input, not a marketing line.
+
+The **Sharp Hearing collaboration enquiry of 20 April 2026** is recorded here as the first formal industry contact exploring this direction. It will not be the last.
+
+---
+
 ## The three pain points this solves
 
 | Problem | Factory behaviour | OpenHear behaviour |

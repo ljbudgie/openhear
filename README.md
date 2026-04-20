@@ -1,8 +1,8 @@
 # OpenHear 🦻
 
-### The first open hearing system that is sweat-proof, feedback-free, and 100% yours — a sovereign audio pipeline and active environmental intelligence platform for hearing aid users.
+### OpenHear is a human sensory sovereignty platform — not a hearing aid, not a wellness device, not a consumer gadget. It is an open-source sovereign audio pipeline, haptic environment engine, therapeutic delivery layer, and future aids-free sensory system.
 
-### North star: an aids-free hearing system. No hearing aid. No behind-the-ear receiver. No bone conduction implant. No ear canal device of any kind. The wristband IS the hearing system. See **[Vision — Aids-Free Hearing](#openhear-vision-2--aids-free-hearing-the-wristband-is-the-hearing-system)** below and the full technical architecture in [`docs/AIDS_FREE_ARCHITECTURE.md`](docs/AIDS_FREE_ARCHITECTURE.md).
+### North star: human sensory sovereignty. The user decides what they hear, when they hear it, how they hear it, and what their acoustic environment does to their body and mind. The long-term configuration is still direct: no hearing aid, no behind-the-ear receiver, no bone conduction implant, no ear canal device of any kind. The wristband IS the hearing system. See **[Vision — Aids-Free Hearing](#openhear-vision-2--aids-free-hearing-the-wristband-is-the-hearing-system)** below, the full eight-pillar platform architecture in [`docs/HUMAN_SENSORY_SOVEREIGNTY_ARCHITECTURE.md`](docs/HUMAN_SENSORY_SOVEREIGNTY_ARCHITECTURE.md), and the aids-free subsystem document in [`docs/AIDS_FREE_ARCHITECTURE.md`](docs/AIDS_FREE_ARCHITECTURE.md).
 
 > *The hearing aid industry charges £3,000–£8,000 for hardware, then locks you out of it.*
 > *Your audiogram is a measurement of your body. It belongs to you.*
@@ -18,11 +18,35 @@ Commercial aids from Phonak, Signia, and Starkey still ship with proprietary AI 
 
 ## What this is
 
-OpenHear is an open-source sovereign audio pipeline for people who wear commercial hearing aids and are tired of factory AI making decisions about their own hearing without their consent.
+OpenHear is an open-source human sensory sovereignty platform for people who are tired of factory AI, clinic gatekeeping, and environmental noise making decisions about their own senses without their consent.
 
-It works with aids you already own. It runs on hardware you already have. It does not require an audiologist appointment to change a setting.
+It already works with aids you own and hardware you have. It is being extended into a wrist-native sensory system, a therapeutic haptic platform, a selective-hearing engine, and an acoustic privacy layer. It does not require an audiologist appointment to change a setting.
 
 OpenHear is now both a software pipeline and a hardware concept. The pipeline gives you control over how your aids process sound. The hardware — the OpenHear Wristband (in development) — extends that control outwards into the environment itself, scanning for sounds your aids may not pick up and translating them into haptic awareness on the wrist. Software and hardware are unified by a single principle: the hearing aid user should have full sovereignty over how they perceive their acoustic environment.
+
+OpenHear now has eight explicit pillars:
+
+1. Peak hearing for all users
+2. Selective acoustic sovereignty
+3. Therapeutic frequency delivery
+4. Native iOS and Android integration
+5. Emotional and cognitive acoustic intelligence
+6. Social acoustic layer
+7. Beyond biological hearing
+8. Sovereign philosophy enforced at every layer
+
+### New north-star documents
+
+- Full architecture — [`docs/HUMAN_SENSORY_SOVEREIGNTY_ARCHITECTURE.md`](docs/HUMAN_SENSORY_SOVEREIGNTY_ARCHITECTURE.md)
+- Aids-free subsystem architecture — [`docs/AIDS_FREE_ARCHITECTURE.md`](docs/AIDS_FREE_ARCHITECTURE.md)
+- Research roadmap — [`docs/RESEARCH_ROADMAP.md`](docs/RESEARCH_ROADMAP.md)
+- Immediate engagement list — [`docs/PRIOR_ART.md`](docs/PRIOR_ART.md)
+- Go-to-market, mission, and showcase applications — [`docs/GO_TO_MARKET.md`](docs/GO_TO_MARKET.md)
+- Funding and partnerships — [`docs/FUNDING_AND_PARTNERSHIPS.md`](docs/FUNDING_AND_PARTNERSHIPS.md)
+
+### Mission
+
+OpenHear gives people control over their own senses. It lets you choose what you hear, what you ignore, what your body learns from sound, and how your environment reaches you, whether you are deaf, hard of hearing, hearing, tired, stressed, training, sleeping, working, or simply wanting peace.
 
 **Tested on:**
 - Phonak Naída M70-SP (Marvel platform)
@@ -189,7 +213,7 @@ There is no ear canal device of any kind.
 
 There is a wristband, a personal model, an audiogram, and a brain trained to read them. The user owns all four.
 
-The full technical architecture is in [`docs/AIDS_FREE_ARCHITECTURE.md`](docs/AIDS_FREE_ARCHITECTURE.md). The five most critical open research questions before MVP are in [`docs/RESEARCH_ROADMAP.md`](docs/RESEARCH_ROADMAP.md). The papers, projects and institutions to engage with immediately are in [`docs/PRIOR_ART.md`](docs/PRIOR_ART.md). What follows is the short version.
+The full eight-pillar platform architecture is in [`docs/HUMAN_SENSORY_SOVEREIGNTY_ARCHITECTURE.md`](docs/HUMAN_SENSORY_SOVEREIGNTY_ARCHITECTURE.md). The aids-free subsystem architecture is in [`docs/AIDS_FREE_ARCHITECTURE.md`](docs/AIDS_FREE_ARCHITECTURE.md). The 15 most critical open research questions are in [`docs/RESEARCH_ROADMAP.md`](docs/RESEARCH_ROADMAP.md). The immediate engagement list is in [`docs/PRIOR_ART.md`](docs/PRIOR_ART.md). The audience positioning, mission, and showcase applications are in [`docs/GO_TO_MARKET.md`](docs/GO_TO_MARKET.md). The funding and partnership strategy is in [`docs/FUNDING_AND_PARTNERSHIPS.md`](docs/FUNDING_AND_PARTNERSHIPS.md). What follows is the short version.
 
 ### Mechanism of action — sensory substitution, not amplification
 
@@ -392,9 +416,12 @@ Before using Path 2 or 3, set your aids to linear mode. This alone will transfor
 
 ### Aids-free configuration (Vision 2)
 
+- [x] Human sensory sovereignty platform architecture — [`docs/HUMAN_SENSORY_SOVEREIGNTY_ARCHITECTURE.md`](docs/HUMAN_SENSORY_SOVEREIGNTY_ARCHITECTURE.md)
 - [x] Architecture document — [`docs/AIDS_FREE_ARCHITECTURE.md`](docs/AIDS_FREE_ARCHITECTURE.md)
 - [x] Research roadmap — [`docs/RESEARCH_ROADMAP.md`](docs/RESEARCH_ROADMAP.md)
 - [x] Prior art and engagement list — [`docs/PRIOR_ART.md`](docs/PRIOR_ART.md)
+- [x] Go-to-market, mission, and showcase applications — [`docs/GO_TO_MARKET.md`](docs/GO_TO_MARKET.md)
+- [x] Funding and partnership strategy — [`docs/FUNDING_AND_PARTNERSHIPS.md`](docs/FUNDING_AND_PARTNERSHIPS.md)
 - [ ] `hardware/wristband/` — KiCad schematics, mechanical CAD, BOM
 - [ ] `hardware/npu/` — open RTL for the Hearing NPU (RISC-V + custom accelerator, CERN-OHL-S)
 - [ ] `firmware/npu/`, `firmware/mcu/` — bare-metal Rust runtime

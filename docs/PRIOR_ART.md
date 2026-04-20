@@ -1,136 +1,193 @@
-# OpenHear Prior Art and Engagement List
+# OpenHear Immediate Engagement List — 20 Research, Hardware, Academic, and Commercial Targets
 
-The ten papers, projects, and institutions OpenHear should engage with immediately on the way to an aids-free, somatosensory hearing system. Each entry includes *what it is*, *why it matters to OpenHear*, and *the engagement we are seeking*.
+These are the 20 most relevant papers, projects, institutions, and partners for OpenHear to engage now. Each entry states what it is and what it brings to the project.
 
-This list is a living document. PRs to add, refute, or replace entries are welcome.
-
----
-
-## 1. Bach-y-Rita, P. — *Tactile vision substitution* (1969 onwards)
-
-**What it is.** The foundational body of work on sensory substitution. Demonstrated that congenitally blind subjects, given a 20×20 tactile grid driven by a head-mounted camera, can develop a *visual percept* — including parallax, looming, and object recognition — through skin alone.
-
-**Why it matters.** Establishes the central hypothesis OpenHear depends on: that the brain treats sensory input as substrate-independent symbols and will remap them to the appropriate cortical area given consistent input.
-
-**Engagement.** Cite as foundational. Build on the methodological lineage — particularly the calibration and training protocols from the original TVSS work (now held by the *Tactile Communication and Neurorehabilitation Laboratory*, University of Wisconsin–Madison).
-
-**Key reference.** Bach-y-Rita, P., Collins, C. C., Saunders, F. A., White, B., & Scadden, L. (1969). *Vision substitution by tactile image projection.* Nature, 221(5184), 963–964.
+This list is intentionally mixed: foundational sensory-substitution work, haptics hardware, therapeutic research, academic collaborators, standards bodies, and commercial partners that can accelerate real-world deployment.
 
 ---
 
-## 2. Neosensory (David Eagleman et al.) — *Buzz wristband, VEST*
+## 1. Paul Bach-y-Rita et al. — tactile sensory substitution
 
-**What it is.** A commercial 4-motor haptic wristband (Buzz) that converts environmental sound into vibration, with published evidence of word-recognition gains in deaf adults after weeks of training. The earlier VEST (Versatile Extra-Sensory Transducer) is the academic predecessor — a 32-motor torso vest.
+**What it is.** The foundational work proving the brain can remap structured tactile input into another sensory percept.
 
-**Why it matters.** Direct functional predecessor. Buzz is the regulatory predicate device most relevant to OpenHear's standalone configuration. Their published learning curves form the baseline OpenHear must beat.
-
-**Engagement.** Public comparison data on Q1/Q2 of the research roadmap. Open dialogue, not competitive. Sharp Hearing already lists Buzz on their site — the 20 April 2026 contact is a natural first conversation.
-
-**Key references.**
-- Novich, S. D., & Eagleman, D. M. (2015). *Using space and time to encode vibrotactile information.* Experimental Brain Research, 233, 2777–2788.
-- Perrotta, M. V., Asgeirsdottir, T., & Eagleman, D. M. (2021). *Deciphering sounds through patterns of vibration on the skin.* Neuroscience, 458, 77–86.
+**What it brings.** The conceptual and methodological basis for the aids-free OpenHear architecture, especially calibration, training, and cortical remapping claims.
 
 ---
 
-## 3. BrainPort (Wicab, Inc.) — *Tongue-based sensory substitution*
+## 2. David Eagleman / Neosensory — VEST and Buzz
 
-**What it is.** FDA-cleared (2015) sensory substitution device delivering visual or vestibular information through a 400-electrode lingual array. The cleanest contemporary regulatory precedent for a sensory substitution medical device.
+**What it is.** The most directly comparable modern auditory-to-haptic substitution platform, with published adaptation data and a shipping wrist device.
 
-**Why it matters.** BrainPort Vision Pro is the FDA 510(k) regulatory roadmap OpenHear should study line by line — same mechanism class (mechanoreceptive substitution), different sense, same agency framing.
-
-**Engagement.** Read the 510(k) summary; engage Wicab's regulatory team if possible for off-the-record route guidance.
+**What it brings.** Baseline learning curves, regulatory precedent, product-design lessons, and a benchmark OpenHear must exceed on channel density, personalisation, and sovereignty.
 
 ---
 
-## 4. Reed, C. M., Tan, H. Z., et al. — *Purdue / MIT TAGA project (Tactile Speech Communication)*
+## 3. BrainPort (Wicab)
 
-**What it is.** Long-running collaboration developing a phonemic haptic code for the forearm — *TAGA* (Tactile Acoustic Generic Alphabet). Subjects learn to recognise English phonemes delivered as multi-actuator forearm patterns, achieving sustained word recognition.
+**What it is.** A cleared sensory-substitution device that routes non-native information through a tactile surface.
 
-**Why it matters.** Direct predecessor of OpenHear's Phase 1 phoneme sandbox. Their per-phoneme encoding scheme is the strongest published candidate for a base mapping.
-
-**Engagement.** Approach the *Haptic Interface Research Laboratory* at Purdue (Hong Z. Tan) and *Sensory Communication Group* at MIT for an open-data release of the phoneme corpus and protocol.
-
-**Key reference.** Reed, C. M., Tan, H. Z., Perez, Z. D., Wilson, E. C., Severgnini, F. M., Jung, J., et al. (2019). *A phonemic-based tactile display for speech communication.* IEEE Transactions on Haptics, 12(1), 2–17.
+**What it brings.** The clearest modern regulatory and clinical precedent for mechanism-based classification as sensory substitution rather than conventional amplification.
 
 ---
 
-## 5. Eagleman Lab, Stanford — *Cortical remapping under sensory substitution*
+## 4. Reed, Tan, and colleagues — TAGA / tactile speech communication
 
-**What it is.** The academic lab behind VEST and the published fMRI evidence that long-term tactile-to-auditory substitution recruits auditory cortex.
+**What it is.** Academic work on phoneme-rich tactile encoding for speech communication on the arm.
 
-**Why it matters.** Provides the neuroscientific basis for the OpenHear adaptation claim. Without this evidence, OpenHear is an environmental-awareness device; with it, OpenHear is a hearing system.
-
-**Engagement.** Collaborator-class engagement. Offer the OpenHear cohort (Q2 of the roadmap) as a published, open-data extension of their adaptation curves.
+**What it brings.** A strong starting point for OpenHear's phoneme sandbox, symbol mapping, and speech-on-skin training protocol.
 
 ---
 
-## 6. *bHaptics* and *TanvasTouch* — open and semi-open haptic actuator stacks
+## 5. UCL Ear Institute
 
-**What they are.** Two of the most advanced multi-actuator wearable platforms on the market (TactSuit; ultrasonic-friction surface haptics). Not directly hearing-related, but the actuator and driver topology is decades ahead of typical maker-grade LRA arrays.
+**What it is.** One of the strongest UK centres for audiology, hearing science, implants, and translational hearing research.
 
-**Why they matter.** Inform v1 actuator selection for the wristband. Particularly the case for piezo / ultrasonic friction over LRA where bandwidth matters.
-
-**Engagement.** Buy and benchmark. Where APIs are open, contribute drivers; where they are not, document the gap.
+**What it brings.** UK ethics and clinical study infrastructure, cochlear-implant expertise, and a natural home partner for adaptation and selective-hearing pilots.
 
 ---
 
-## 7. *RISC-V International* and the *OpenHW Group (CORE-V family)*
+## 6. Manchester Centre for Audiology and Deafness (ManCAD)
 
-**What they are.** The open ISA and the open implementations (CV32E40P, CVA6) that form the most plausible base for the OpenHear Hearing NPU's scalar/vector control core.
+**What it is.** A leading UK audiology research centre with strong hearing-device and deafness research programmes.
 
-**Why they matter.** The aids-free architecture commits to open silicon. RISC-V + OpenHW gives a credible, license-clean route from RTL to wearable in a 2–3 year horizon, including an FPGA-validation step before tape-out.
-
-**Engagement.** Submit the Hearing NPU as a CORE-V derivative; participate in the audio/signal SIG; align our RVV usage with their roadmap.
+**What it brings.** Clinical recruitment pathways, speech-in-noise study expertise, and a second UK partner for replication rather than single-lab dependence.
 
 ---
 
-## 8. Lattice Semiconductor *ECP5* + *Project Trellis* (open FPGA toolchain)
+## 7. MIT Picower Institute / Li-Huei Tsai 40 Hz stimulation programme
 
-**What it is.** A mid-density FPGA family with a fully open synthesis toolchain (Yosys + nextpnr + Project Trellis). The most open path to a wearable-class FPGA prototype with no proprietary toolchain dependency.
+**What it is.** The best-known current body of work around 40 Hz sensory stimulation and neural effects.
 
-**Why it matters.** Q3 of the roadmap (latency-floor characterisation) needs a deterministic, open, FPGA-class compute path before tape-out is justified. ECP5 is that path.
-
-**Engagement.** Build the v1 FPGA validation board on ECP5; publish bitstreams; co-publish with the *Free and Open Source Silicon Foundation (FOSSi)*.
+**What it brings.** The strongest early evidence base and collaborator pool for OpenHear's 40 Hz therapeutic protocol design.
 
 ---
 
-## 9. UCL Ear Institute (UK) and Manchester Centre for Audiology and Deafness (UK)
+## 8. Hong Z. Tan / Purdue Haptic Interface Research Laboratory
 
-**What they are.** Two of the strongest UK academic audiology programmes, with active research in cochlear implant signal processing, plasticity, and clinical trials of sensory devices.
+**What it is.** A long-running haptics lab with direct relevance to tactile speech, tactons, and wearable haptic perception.
 
-**Why they matter.** They are the natural UK partners for the multi-user pilot in Q2/Q4 of the roadmap. UK-based aligns with the developer's location, the MHRA pathway, and the NHS context. Both have IRB-equivalent ethics infrastructure and existing relationships with the British Society of Audiology.
-
-**Engagement.** Cold approach to a named PI in each, with the architecture document and roadmap attached. Offer a co-authored protocol and open data.
+**What it brings.** Psychophysics expertise, haptic encoding design, and an academic partner for wrist-bandwidth studies.
 
 ---
 
-## 10. *Open Source Hardware Association (OSHWA)*, *CERN-OHL-S license community*, and *Hackaday Prize / Open Hardware Summit*
+## 9. Stanford / Eagleman Lab lineage
 
-**What they are.** The institutional and licensing infrastructure of the open-hardware movement — the body that defines what "open hardware" means, the license that legally protects it, and the venues that fund and showcase it.
+**What it is.** The academic environment behind VEST and cortical-remapping evidence for auditory tactile substitution.
 
-**Why they matter.** The aids-free OpenHear is an *open hardware* commitment from chip up. CERN-OHL-S is the appropriate license for the wristband schematics and the NPU RTL. OSHWA certification is a cheap, durable signal of intent. Hackaday Prize and Open Hardware Summit are the right first venues to surface a working v0.
-
-**Engagement.** Register the project for OSHWA certification at v0; prepare a Hackaday Prize entry; submit a v0 demo to the next Open Hardware Summit.
+**What it brings.** A route to stronger neuroscience validation, especially for auditory-cortex recruitment and adaptation studies.
 
 ---
 
-## Honourable mentions (not in the top ten, on the radar)
+## 10. Sharp Hearing (US-based audiology clinic)
 
-- **Cochlear Limited's published research on electric-acoustic stimulation** — for the audiogram-weighting maths.
-- **OpenEarable (KIT, Karlsruhe)** — open-source ear-worn platform; useful as a contrast (what we are *not* building).
-- **Facebook Reality Labs / Meta haptics research** — wristband EMG and haptic work; some open publications.
-- **BBC R&D audio accessibility group** — content-side partner for testing comprehension on real broadcast material.
-- **The British Society of Audiology** — clinical community access in the UK.
+**What it is.** The first formal US industry contact recorded by OpenHear, already adjacent to haptic hearing products through Neosensory Buzz.
+
+**What it brings.** Real-world US audiology distribution context, patient-facing validation, field feedback, and a live bridge between research architecture and service delivery.
 
 ---
 
-## How OpenHear engages
+## 11. Tympan
 
-A standard outreach packet exists in `/docs/outreach/` (planned). Each first-contact email includes:
+**What it is.** The strongest existing open-source hearing-device hardware platform in the repo's orbit.
 
-1. The architecture document (`docs/AIDS_FREE_ARCHITECTURE.md`).
-2. The research roadmap (`docs/RESEARCH_ROADMAP.md`).
-3. This prior-art list.
-4. A direct ask — collaboration, data sharing, predicate clarification, or RTL contribution.
+**What it brings.** Immediate prototyping hardware, clinically relevant signal-path lessons, and an open-hardware bridge between today's pipeline mode and tomorrow's wrist-native builds.
 
-No NDAs. No exclusivity. No subscription. Open data in, open data out.
+---
+
+## 12. OpenEarable (KIT / Karlsruhe)
+
+**What it is.** An open ear-worn sensing and audio research platform.
+
+**What it brings.** Contrast architecture, wearable sensor fusion ideas, and an open-hardware collaboration path for companion-mode experiments even though OpenHear's north star moves away from the ear.
+
+---
+
+## 13. RISC-V International and OpenHW Group
+
+**What it is.** The open ISA and reference-core ecosystem most suitable for an OpenHear hearing-specific NPU.
+
+**What it brings.** License-clean silicon foundations, community review, and a credible route from FPGA validation to open ASIC.
+
+---
+
+## 14. Lattice ECP5 / Project Trellis / FOSSi Foundation
+
+**What it is.** The most practical open FPGA toolchain ecosystem for deterministic prototype silicon work.
+
+**What it brings.** A genuinely open validation path for the hearing NPU and low-latency haptic scheduler without depending on proprietary synthesis toolchains.
+
+---
+
+## 15. Apple HealthKit, Apple Watch, Core Haptics, and Accessibility ecosystem
+
+**What it is.** The most mature consumer stack for on-device health correlation, haptics, automation, and accessibility integration.
+
+**What it brings.** Immediate infrastructure for focus modes, stress correlation, sleep scheduling, and watch-surface secondary haptics.
+
+---
+
+## 16. Android Health Connect, TensorFlow Lite, Oboe, and Wear OS ecosystem
+
+**What it is.** The open mobile counterpart to the Apple stack, with fewer platform gates and strong on-device ML tools.
+
+**What it brings.** Broader hardware reach, open distribution options, and a realistic path to low-cost sovereign deployments outside the Apple ecosystem.
+
+---
+
+## 17. bHaptics
+
+**What it is.** A mature multi-actuator wearable haptics company with real-world driver, actuator, and pattern-system experience.
+
+**What it brings.** Benchmark hardware, actuator design trade-offs, and immediate lessons for comfort, pattern authoring, and user comprehension.
+
+---
+
+## 18. Boréas Technologies / piezo haptics ecosystem
+
+**What it is.** A high-performance piezo haptics ecosystem relevant to dense, low-latency actuation.
+
+**What it brings.** A path beyond LRAs toward wider bandwidth, lower latency, and better suitability for speech-rich haptic rendering.
+
+---
+
+## 19. Whole-body vibration and vibroacoustic therapy literature clusters
+
+**What it is.** The interdisciplinary literature around low-frequency vibration for recovery, relaxation, and physiological modulation.
+
+**What it brings.** Candidate protocols, contraindication frameworks, and the first evidence scaffold for OpenHear's therapeutic layer beyond pure hearing applications.
+
+---
+
+## 20. OpenStreetMap and community mapping governance
+
+**What it is.** The strongest open, community-governed map contribution model on the internet.
+
+**What it brings.** A governance pattern for acoustic accessibility maps, venue annotations, trust scoring, forks, and local-first mirrors without central gatekeeping.
+
+---
+
+## Papers and artefacts to read first
+
+If the team needs a first reading packet, start here:
+
+1. Bach-y-Rita et al. (1969), *Vision substitution by tactile image projection*  
+2. Novich & Eagleman (2015), *Using space and time to encode vibrotactile information*  
+3. Perrotta et al. (2021), *Deciphering sounds through patterns of vibration on the skin*  
+4. Reed et al. (2019), *A phonemic-based tactile display for speech communication*  
+5. BrainPort 510(k) summary materials  
+6. Recent 40 Hz sensory stimulation papers from the MIT Picower orbit  
+7. Vibroacoustic / whole-body vibration systematic reviews relevant to 30–300 Hz therapeutic design  
+
+---
+
+## Engagement order
+
+OpenHear should sequence outreach like this:
+
+1. **Immediate build and validation partners** — Sharp Hearing, Tympan, UCL, ManCAD, Purdue/Hong Tan
+2. **Regulatory and comparator learning** — Neosensory, BrainPort/Wicab, MHRA/FDA-facing consultants via partner labs
+3. **Hardware acceleration** — OpenHW, FOSSi, Lattice, Boréas, bHaptics
+4. **Therapeutic evidence partners** — MIT Picower orbit and vibroacoustic researchers
+5. **Platform and ecosystem integration** — Apple and Android accessibility / health teams
+
+No NDA-first strategy. No exclusivity-first strategy. Open documents first, direct technical ask second, public collaboration where possible.

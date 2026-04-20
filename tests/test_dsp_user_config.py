@@ -123,9 +123,12 @@ def test_system_section_rejects_non_positive_sample_rate():
 
 
 def test_unknown_top_level_keys_warn_but_load(caplog):
-    cfg = Config.from_dict({"made_up_key": True, "compression": {"ratio": 4}})
+    import logging
+
+    with caplog.at_level(logging.WARNING, logger="dsp.user_config"):
+        cfg = Config.from_dict({"made_up_key": True, "compression": {"ratio": 4}})
     assert cfg.compression.ratio == 4
-    assert any("made_up_key" in rec.message for rec in caplog.records) or True
+    assert any("made_up_key" in rec.message for rec in caplog.records)
 
 
 def test_config_to_dict_round_trips():

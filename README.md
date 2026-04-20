@@ -2,6 +2,10 @@
 
 ### Your senses. Your data. Your world.
 
+[![Licence: Apache 2.0 + Sovereign Use Addendum](https://img.shields.io/badge/licence-Apache%202.0%20%2B%20Sovereign%20Use%20Addendum-blue.svg)](LICENSE)
+
+**Built on the Burgess Principle** — see [burgess-principle-docs-url].
+
 > **⚠️ EXPERIMENTAL — NOT A MEDICAL DEVICE**
 > OpenHear is a research platform and public build log, not a certified hearing aid.
 > Start at low volume, validate every configuration on your own hardware, and do
@@ -598,6 +602,18 @@ The Burgess Principle binary test applies to every OpenHear decision: does this 
 ### Burgess Principle extension point
 
 The sovereign philosophy has an explicit API surface in `advocacy/`. It is a minimal, offline, dependency-free extension point that lets a companion advocacy tool (for example [Iris](https://github.com/ljbudgie/Iris), the reference Burgess Principle implementation) consume OpenHear records — audiograms, fitting profiles, MPO safety calculations — without OpenHear ever importing the companion or phoning home to it. The package produces SHA‑256 commitments over sovereign records, tags returning receipts as `SOVEREIGN` or `NULL`, and emits offline export bundles carrying both the OpenHear "experimental, not a medical device" disclaimer and an "advisory only, not legal advice" disclaimer. Raw environmental audio is refused at the adapter boundary by design. See [`docs/ADVOCACY_INTEGRATION.md`](docs/ADVOCACY_INTEGRATION.md) for the full contract. A full advocacy workflow (tribunal-ready bundles, draft challenge language, shared vault formats) is scoped for post-v1.0.0 work with Iris.
+
+### For Industry Integrators
+
+OpenHear's Sovereign Advocacy Layer is designed to be integrated into hearing device manufacturer software, audiology platforms, and AI clinical systems. If you have been granted permission by the author, start with <a href="docs/INTEGRATORS.md">docs/INTEGRATORS.md</a>.
+
+### Advocacy quickstart
+
+For a runnable, self-contained walkthrough of the full integration — happy path (SOVEREIGN bundle), tamper detection (NULL bundle), and the `RawAudioRejectedError` boundary — see [`examples/reference_integration.py`](examples/reference_integration.py). It imports only from `advocacy` and the Python standard library, and runs offline with no flags or configuration:
+
+```bash
+python examples/reference_integration.py
+```
 
 
 ---

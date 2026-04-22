@@ -31,6 +31,8 @@ dependencies = [
     "hid>=1.0.6",
     # YAML user-config parsing
     "PyYAML>=6.0",
+    # CLI framework (audiogram manual entry / compare commands)
+    "click>=8.1",
 ]
 
 [project.optional-dependencies]

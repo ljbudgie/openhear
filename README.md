@@ -627,6 +627,59 @@ If you're a DSP engineer who wants to build something that actually matters to r
 
 If you're an audiologist who believes your patients should own their own data — we especially want to hear from you.
 
+Before you open an issue or a pull request, please read:
+
+- [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) — Contributor Covenant 2.1, with
+  project-specific additions covering ableist language and the privacy of
+  audiometric data.
+- [`SECURITY.md`](SECURITY.md) — private vulnerability disclosure process,
+  including a dedicated path for hearing-safety reports. **Do not** file
+  hearing-safety issues in the public tracker.
+- [`CHANGELOG.md`](CHANGELOG.md) — running log of user-visible changes,
+  following [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Add an
+  entry under `[Unreleased]` as part of any user-visible PR.
+
+The repository ships [issue templates](.github/ISSUE_TEMPLATE/) for bug
+reports, feature requests, and hearing-aid compatibility reports, plus a
+[pull request template](.github/PULL_REQUEST_TEMPLATE.md) and
+[`CODEOWNERS`](.github/CODEOWNERS) for review routing. Dependency upgrades
+land automatically via [`.github/dependabot.yml`](.github/dependabot.yml)
+(`pip` and `github-actions`).
+
+### Development & tooling
+
+The repo is set up so that `make ci` reproduces what GitHub Actions runs.
+
+```bash
+make install-dev   # editable install + ruff, pytest-cov, build, pre-commit
+make lint          # ruff check + ruff format --check
+make format        # ruff format + ruff check --fix
+make test          # pytest -q
+make coverage      # pytest with coverage (term + xml)
+make build         # python -m build  → sdist + wheel into ./dist
+make ci            # lint + tests, same as the CI job
+```
+
+All tool configuration lives in [`pyproject.toml`](pyproject.toml) under
+`[tool.ruff]`, `[tool.mypy]`, `[tool.coverage]`, and a consolidated
+`[tool.pytest.ini_options]` section (the old `pytest.ini` has been removed;
+test discovery and behaviour are unchanged). Editor defaults are pinned in
+[`.editorconfig`](.editorconfig), and [`.pre-commit-config.yaml`](.pre-commit-config.yaml)
+wires the same `ruff` checks into a `pre-commit install` hook so the
+in-tree style stays consistent.
+
+CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs lint,
+the test suite with coverage, a packaging smoke test (`python -m build`
+followed by a `pip install` of the resulting wheel), and a Windows job to
+match the README's "Windows 11 primary target" claim. A separate
+[CodeQL workflow](.github/workflows/codeql.yml) provides static security
+analysis of the Python codebase.
+
+A note on repository hygiene: `.gitignore` no longer blanket-ignores
+`*.json`, `*.png`, and `*.pdf` at every depth. Build and output
+directories are ignored explicitly, so new fixtures, schemas, and
+documentation media will not be silently dropped from commits.
+
 ---
 
 ## Legal

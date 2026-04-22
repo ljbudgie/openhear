@@ -7,7 +7,6 @@ import pytest
 
 from dsp.compression import WDRCompressor
 
-
 SR = 16_000
 
 

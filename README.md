@@ -24,7 +24,7 @@
 
 ## Why OpenHear in 2026
 
-Commercial aids from Phonak, Signia, and Starkey still ship with proprietary AI that mangles your own voice, whistles during hugs, and dies in sweat. Replacements cost £3,000–£8,000 and lock you into manufacturer fitting software. OpenHear is the sovereign alternative: an open-source DSP pipeline with adaptive feedback cancellation, own-voice bypass, and sweat-proof 3D-printed ITE shells you manufacture at home. Every algorithm is inspectable. Every parameter is yours. No cloud. No subscription. No lock-in. MIT licensed.
+Commercial aids from Phonak, Signia, and Starkey still ship with proprietary AI that mangles your own voice, whistles during hugs, and dies in sweat. Replacements cost £3,000–£8,000 and lock you into manufacturer fitting software. OpenHear is the sovereign alternative: an open-source DSP pipeline with adaptive feedback cancellation, own-voice bypass, and sweat-proof 3D-printed ITE shells you manufacture at home. Every algorithm is inspectable. Every parameter is yours. No cloud. No subscription. No lock-in. Licensed under Apache 2.0 with a Sovereign Use Addendum (see [`LICENSE`](LICENSE)).
 
 ---
 
@@ -635,7 +635,8 @@ OpenHear does not modify, reverse-engineer, or redistribute any proprietary firm
 
 Your audiogram is yours. Your fitting data is yours. This software helps you access both.
 
-MIT Licensed.
+Licensed under the Apache License, Version 2.0, with the OpenHear Sovereign Use
+Addendum. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE) for the full terms.
 
 ---
 

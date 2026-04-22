@@ -16,10 +16,9 @@ Flash this file to a BBC micro:bit v2 running a BLE-capable MicroPython
 build.  The device advertises as ``OpenHear`` where supported.
 """
 
-from microbit import display, pin0, pin1, sleep
 import bluetooth
 from bluetooth import UARTService
-
+from microbit import display, pin0, pin1, sleep
 
 DEVICE_NAME = "OpenHear"
 _ANALOG_MAX = 1023

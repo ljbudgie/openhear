@@ -18,10 +18,10 @@ Key components:
 """
 
 from audiogram.audiogram import (  # noqa: E402,F401
-    Audiogram,
-    STANDARD_FREQUENCIES_HZ,
-    MIN_THRESHOLD_DB_HL,
     MAX_THRESHOLD_DB_HL,
+    MIN_THRESHOLD_DB_HL,
+    STANDARD_FREQUENCIES_HZ,
+    Audiogram,
     severity,
 )
 

@@ -17,7 +17,6 @@ from voice.reference import (
     load_reference,
 )
 
-
 SR = 44_100
 
 

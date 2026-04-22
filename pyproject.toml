@@ -17,7 +17,7 @@ classifiers = [
     "Intended Audience :: Healthcare Industry",
     "Topic :: Multimedia :: Sound/Audio",
     "Topic :: Scientific/Engineering :: Medical Science Apps.",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -82,3 +82,86 @@ include-package-data = true
 "audiogram" = ["data/*.json"]
 "dsp" = ["config.schema.json"]
 "stream" = ["data/*.csv"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+
+[tool.coverage.run]
+branch = true
+source = [
+    "advocacy",
+    "audiogram",
+    "core",
+    "dsp",
+    "hardware",
+    "learn",
+    "stream",
+    "voice",
+    "wristband",
+]
+omit = [
+    "tests/*",
+    "examples/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = [
+    "build",
+    "dist",
+    ".venv",
+    "venv",
+]
+
+[tool.ruff.lint]
+# Start with a conservative rule set so the lint job can be enforcing from
+# day one without forcing a large auto-fix pass across the existing code.
+# Additional rule families (UP, B, SIM, PL, ...) can be enabled as the
+# codebase is brought in line with them.
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "W",    # pycodestyle warnings
+    "I",    # isort
+]
+ignore = [
+    "E501", # line length is enforced by the formatter, not the linter
+    # The following are tracked legacy issues that can be cleaned up
+    # incrementally without blocking the introduction of the lint job:
+    "E702", # multiple statements on one line (semicolon) — a few isolated cases
+    "E741", # ambiguous variable name (e.g. single-letter `l`)
+    "F841", # local variable assigned but never used — keep until reviewed
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["F401", "F811"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+
+[tool.mypy]
+python_version = "3.10"
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+ignore_missing_imports = true
+# Strictness is intentionally kept low for now; tighten module-by-module.
+check_untyped_defs = false
+disallow_untyped_defs = false

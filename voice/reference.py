@@ -27,16 +27,15 @@ Tunable parameters (from voice/config.py):
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from math import gcd
 from pathlib import Path
 
 import numpy as np
 from scipy.io import wavfile as scipy_wav
-from scipy.signal import butter, sosfilt, resample_poly
-from math import gcd
+from scipy.signal import butter, resample_poly, sosfilt
 
 from voice import config
-from voice.analyser import _spectral_envelope, _find_formants
-
+from voice.analyser import _find_formants, _spectral_envelope
 
 # ── Data structures ──────────────────────────────────────────────────────────
 

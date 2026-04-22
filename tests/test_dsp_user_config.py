@@ -8,8 +8,8 @@ from pathlib import Path
 import pytest
 
 from dsp.user_config import (
-    Config,
     CompressionConfig,
+    Config,
     NoiseConfig,
     SystemConfig,
     VoiceConfig,

@@ -7,7 +7,6 @@ import pytest
 
 from dsp.own_voice_bypass import OwnVoiceBypass, _VoiceState
 
-
 SR = 16_000
 
 

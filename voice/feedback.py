@@ -33,7 +33,6 @@ from voice import config
 from voice.analyser import VoiceSnapshot
 from voice.compare import VoiceComparison
 
-
 # ── ANSI colour codes ────────────────────────────────────────────────────────
 
 _GREEN = "\033[92m"

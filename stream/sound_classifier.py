@@ -20,7 +20,6 @@ import numpy as np
 
 from stream.haptic_mapper import SOUND_PROFILES
 
-
 WINDOW_SECONDS = 0.975
 TARGET_SAMPLE_RATE = 16_000
 DEFAULT_MIN_CONFIDENCE = 0.20

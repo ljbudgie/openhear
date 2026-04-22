@@ -16,15 +16,19 @@ venv/
 env/
 
 # Runtime outputs
-*.json
-*.png
-*.pdf
+# Narrowly scoped so that new fixtures, schemas, and documentation media are
+# not silently ignored. If you generate audio/plots/PDFs into the repo, drop
+# them into one of these paths or extend this list explicitly.
+/output/
+/tmp/
+*.log
+**/*.tmp.json
+**/*.tmp.png
+**/*.tmp.pdf
 
-# Allow audiogram data files (sovereign data belongs in the repo)
-!audiogram/data/*.json
-# Allow bundled examples and schemas
-!examples/*.json
-!dsp/*.schema.json
+# Tooling caches
+.ruff_cache/
+.mypy_cache/
 
 # IDE / OS
 .idea/

@@ -11,7 +11,6 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-
 if sys.version_info >= (3, 11):
     import tomllib as toml_lib
 else:  # pragma: no cover - only reached on 3.10

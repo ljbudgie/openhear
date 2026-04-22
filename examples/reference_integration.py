@@ -53,15 +53,14 @@ from typing import Any, Mapping
 
 from advocacy import (
     NULL,
+    SOVEREIGN,
     PersonGate,
     RawAudioRejectedError,
     Receipt,
-    SOVEREIGN,
     audiogram_commitment,
     export_record,
     hmac_verifier,
 )
-
 
 # ── Fictional fitting system ───────────────────────────────────────────────
 #
@@ -313,7 +312,7 @@ def demo_raw_audio_boundary() -> None:
     try:
         audiogram_commitment(facts_with_audio)
     except RawAudioRejectedError as exc:
-        print(f"RawAudioRejectedError raised, as required:")
+        print("RawAudioRejectedError raised, as required:")
         print(f"  {exc}")
     else:
         raise AssertionError(

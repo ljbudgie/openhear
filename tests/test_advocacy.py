@@ -28,10 +28,10 @@ from advocacy import (
     ADVISORY_DISCLAIMER,
     MEDICAL_DISCLAIMER,
     NULL,
+    SOVEREIGN,
     PersonGate,
     RawAudioRejectedError,
     Receipt,
-    SOVEREIGN,
     audiogram_commitment,
     commit,
     export_record,
@@ -40,7 +40,6 @@ from advocacy import (
     mpo_commitment,
     verify,
 )
-
 
 # ---- helpers ----------------------------------------------------------------
 

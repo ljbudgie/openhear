@@ -16,7 +16,6 @@ from voice.analyser import (
     analyse_frame,
 )
 
-
 SR = 44_100
 
 

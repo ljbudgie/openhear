@@ -9,7 +9,6 @@ from unittest.mock import MagicMock
 import numpy as np
 import pytest
 
-
 # ── bluetooth_output ───────────────────────────────────────────────────────
 
 
@@ -205,7 +204,7 @@ def test_measure_latency_above_target():
 
 
 def test_measure_latency_no_impulse():
-    from stream.latency import measure_latency, format_report
+    from stream.latency import format_report, measure_latency
     sr = 16_000
     report = measure_latency(np.zeros(160, dtype=np.float32), sr)
     assert report.impulse_index == -1

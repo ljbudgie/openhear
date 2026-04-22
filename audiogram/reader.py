@@ -32,13 +32,13 @@ import time
 import hid
 
 from core.read_fitting import (
-    NOAHLINK_VENDOR_ID,
-    NOAHLINK_PRODUCT_ID,
     HID_REPORT_LENGTH,
+    NOAHLINK_PRODUCT_ID,
+    NOAHLINK_VENDOR_ID,
+    _utc_now_iso,
     open_device,
     read_response,
     send_command,
-    _utc_now_iso,
 )
 
 logger = logging.getLogger(__name__)

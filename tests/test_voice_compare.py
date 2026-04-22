@@ -8,7 +8,6 @@ from voice.analyser import VoiceSnapshot
 from voice.compare import BANDS, VoiceComparison, compare
 from voice.reference import ReferenceProfile
 
-
 SR = 44_100
 FRAME = 1024
 

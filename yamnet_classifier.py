@@ -19,7 +19,6 @@ from stream.sound_classifier import (
     YamnetClassifier,
 )
 
-
 DEFAULT_LABELS_PATH = Path(__file__).resolve().parent / "stream" / "data" / "yamnet_class_map.csv"
 
 

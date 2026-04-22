@@ -10,8 +10,8 @@ import pytest
 from stream.haptic_mapper import (
     PATTERN_IDS,
     SOUND_CLASS_IDS,
-    HapticMapper,
     SOUND_PROFILES,
+    HapticMapper,
     threshold_to_scale,
 )
 

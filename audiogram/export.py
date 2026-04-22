@@ -16,7 +16,6 @@ Usage:
 """
 
 import csv
-import io
 
 from audiogram.loader import (
     get_gain_profile,

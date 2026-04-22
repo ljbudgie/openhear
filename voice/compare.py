@@ -25,7 +25,6 @@ from voice import config
 from voice.analyser import VoiceSnapshot
 from voice.reference import ReferenceProfile
 
-
 # ── Frequency band edges (Hz) ───────────────────────────────────────────────
 
 BAND_LOW = (80.0, 300.0)

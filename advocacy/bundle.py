@@ -17,7 +17,6 @@ from typing import Any
 
 from advocacy.gate import PersonGate, Record
 
-
 #: Mirrors the existing README experimental banner.  Hard‑coded so no
 #: export can omit it.
 MEDICAL_DISCLAIMER: str = (

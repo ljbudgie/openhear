@@ -34,7 +34,6 @@ from dataclasses import dataclass
 
 from audiogram.audiogram import Audiogram
 
-
 # Frequencies prescribed by this module.  Aligned with the four-band
 # WDRC layout and standard audiometric points.
 PRESCRIPTION_FREQUENCIES_HZ: tuple[int, ...] = (

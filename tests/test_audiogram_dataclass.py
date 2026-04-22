@@ -15,7 +15,6 @@ from audiogram.audiogram import (
     severity,
 )
 
-
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SAMPLE_PATH = REPO_ROOT / "examples" / "sample_audiogram.json"
 

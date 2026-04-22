@@ -23,13 +23,12 @@ Your audiogram, your gain profile, your hardware.
 
 import argparse
 import os
-import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
 
 import numpy as np
 
+from audiogram.export import to_dsp_config
 from audiogram.loader import (
     get_gain_profile,
     get_pta,
@@ -37,8 +36,6 @@ from audiogram.loader import (
     get_thresholds,
     load_audiogram,
 )
-from audiogram.export import to_dsp_config
-
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
@@ -413,7 +410,7 @@ def _print_summary(
     for freq, db in thresholds:
         print(f"  {freq:>10} Hz  {db:>8} dB HL")
 
-    print(f"\n  8-Band WDRC Configuration:")
+    print("\n  8-Band WDRC Configuration:")
     print("  " + "-" * 56)
     print(f"  {'Band':>6}  {'Gain':>8}  {'Ratio':>8}  {'MPO':>10}")
     print("  " + "-" * 56)
@@ -423,10 +420,10 @@ def _print_summary(
             f"{comp_ratios[i]:>6.1f}    {mpo_per_band[i]:>7.1f} dB SPL"
         )
 
-    print(f"\n  Attack time:   5.0 ms (all bands)")
-    print(f"  Release time:  200.0 ms (all bands)")
+    print("\n  Attack time:   5.0 ms (all bands)")
+    print("  Release time:  200.0 ms (all bands)")
     print(f"  Noise reduction: {noise_level:.1f}")
-    print(f"  Feedback cancellation: ON")
+    print("  Feedback cancellation: ON")
     print("=" * 60)
     print()
 

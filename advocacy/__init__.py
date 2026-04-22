@@ -45,18 +45,6 @@ language, receipt verification UI) lives in Iris, not here.
 
 from __future__ import annotations
 
-from advocacy.gate import (
-    PersonGate,
-    Commitment,
-    Receipt,
-    Record,
-    ReviewTag,
-    SOVEREIGN,
-    NULL,
-    commit,
-    verify,
-    hmac_verifier,
-)
 from advocacy.adapters import (
     RawAudioRejectedError,
     audiogram_commitment,
@@ -64,9 +52,21 @@ from advocacy.adapters import (
     mpo_commitment,
 )
 from advocacy.bundle import (
-    MEDICAL_DISCLAIMER,
     ADVISORY_DISCLAIMER,
+    MEDICAL_DISCLAIMER,
     export_record,
+)
+from advocacy.gate import (
+    NULL,
+    SOVEREIGN,
+    Commitment,
+    PersonGate,
+    Receipt,
+    Record,
+    ReviewTag,
+    commit,
+    hmac_verifier,
+    verify,
 )
 
 __all__ = [

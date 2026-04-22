@@ -10,10 +10,9 @@ Pins:
   - Right motor driver -> P1
 """
 
-from microbit import display, pin0, pin1, sleep
 import bluetooth
 from bluetooth import UARTService
-
+from microbit import display, pin0, pin1, sleep
 
 DEVICE_NAME = "OpenHear"
 _ANALOG_MAX = 1023

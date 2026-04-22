@@ -36,7 +36,6 @@ from scipy.signal import find_peaks
 
 from voice import config
 
-
 # ── Data structures ──────────────────────────────────────────────────────────
 
 @dataclass

@@ -20,16 +20,14 @@ Your hearing is irreplaceable.  When in doubt, use a lower MPO.
 
 import argparse
 import math
-import sys
 from typing import Any
 
 from audiogram.loader import (
-    get_thresholds,
     get_pta,
     get_severity,
+    get_thresholds,
     load_audiogram,
 )
-
 
 # ── Constants ────────────────────────────────────────────────────────────────
 

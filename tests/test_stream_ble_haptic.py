@@ -7,10 +7,10 @@ import asyncio
 import pytest
 
 from stream.ble_haptic import (
-    HapticPacket,
-    OpenHearBLEClient,
     PACKET_FIELDS,
     PACKET_LENGTH,
+    HapticPacket,
+    OpenHearBLEClient,
     encode_packet,
 )
 

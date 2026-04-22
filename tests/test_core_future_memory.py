@@ -8,8 +8,8 @@ from pathlib import Path
 import pytest
 
 from core.future_memory import (
-    FutureMemoryStore,
     MEMORY_FORMAT_VERSION,
+    FutureMemoryStore,
     main,
 )
 

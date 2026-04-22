@@ -20,7 +20,6 @@ from dsp.filters import (
     voice_bandpass,
 )
 
-
 SR = 16_000
 
 

@@ -35,7 +35,6 @@ from dataclasses import dataclass, field
 from enum import IntEnum
 from typing import Iterator
 
-
 SYNC_BYTE: int = 0xA5
 
 

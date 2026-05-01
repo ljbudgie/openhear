@@ -262,3 +262,34 @@ If the micro:bit does not appear or connect on Windows:
 7. If Bleak raises a Windows backend error, confirm you are using a normal
    64-bit Python build and that Windows has Bluetooth permission enabled for
    desktop apps.
+
+
+---
+
+## 7. OpenHear aids-free wristband v1 DIY prototype
+
+The v1 wristband assets live under [`hardware/wristband/`](hardware/wristband/)
+and are the first buildable DIY step toward the north-star described in
+[`docs/AIDS_FREE_ARCHITECTURE.md`](docs/AIDS_FREE_ARCHITECTURE.md). The design is
+Burgess Principle aligned: no device in/on the ear, no cloud dependency, and no
+phone in the acoustic-to-skin path.
+
+Key files:
+
+- CAD: [`hardware/wristband/cad/parametric_wristband_v1.scad`](hardware/wristband/cad/parametric_wristband_v1.scad)
+- STL export helper: [`hardware/wristband/cad/generate_stl.sh`](hardware/wristband/cad/generate_stl.sh)
+- KiCad v8 reference: [`hardware/wristband/kicad/`](hardware/wristband/kicad/)
+- BOM: [`hardware/wristband/BOM.csv`](hardware/wristband/BOM.csv)
+- Assembly guide: [`hardware/wristband/assembly_v1.md`](hardware/wristband/assembly_v1.md)
+- Haptic mapper: [`hardware/wristband/firmware/haptic_mapper.py`](hardware/wristband/firmware/haptic_mapper.py)
+- v1 firmware reference: [`hardware/wristband/firmware/openhear_firmware_v1.py`](hardware/wristband/firmware/openhear_firmware_v1.py)
+- Power and thermal budget: [`hardware/wristband/power_budget_v1.md`](hardware/wristband/power_budget_v1.md)
+
+The v0 micro:bit wristband remains supported through the v1 firmware packet codec
+and haptic mapper compatibility shim, so existing users can keep the 3-byte BLE
+UART flow while migrating to denser actuator hardware.
+
+Regulatory note: this is a DIY research sensory-substitution prototype, not a
+certified hearing aid or medical device. A clinical product would require a formal
+safety file, usability engineering, biocompatibility evidence, and likely a Class
+IIa-style route for an aids-free sensory substitution device.

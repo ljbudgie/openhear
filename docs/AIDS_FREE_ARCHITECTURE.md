@@ -344,3 +344,35 @@ There is no ear canal device of any kind.
 There is a wristband, a personal model, an audiogram, and a brain trained to read them.
 
 The user owns all four.
+
+
+---
+
+## 11. v1 DIY Prototype Status
+
+The buildable v1 reference now lives in [`hardware/wristband/`](../hardware/wristband/).
+It is intentionally not the final ASIC wristband; it is the community bridge that
+a skilled hobbyist can assemble with 2026 off-the-shelf parts for approximately
+£150-300 in the 24-actuator starter configuration.
+
+**What v1 meets today**
+
+- Nothing in or on the ear; the wristband is the complete sensory-substitution path.
+- Local-only processing and plain-file audiogram inputs; BLE is companion-only.
+- 24-actuator minimum viable lattice with a 64-actuator research configuration.
+- 8 MEMS microphone ports, IMU pose compensation hooks, hot-swap Li-Po cartridge,
+  IP67 sealing geometry, and medical silicone overmold allowance.
+- v0 micro:bit compatibility through the legacy 3-byte packet shim.
+
+**Known gaps against the north-star**
+
+- Off-the-shelf LRAs cannot guarantee <0.5 ms mechanical onset; dense haptic scenes
+  should be treated as adaptation research rigs, not certified daily devices.
+- Full source separation and scene classification under 5 ms at wearable power still
+  needs the custom 22 nm RISC-V Hearing NPU described in section 4.
+- 128-actuator hybrid piezo/voice-coil/electrostatic output remains a v2/v3 research
+  target pending affordable drivers and a validated forearm extension.
+
+Burgess Principle binary test for v1: if the wristband cannot produce a useful
+skin cue from local microphones, local audiogram data, and local firmware with the
+phone and internet disabled, the build fails.

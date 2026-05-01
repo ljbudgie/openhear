@@ -1,0 +1,11 @@
+{
+  "board": {"design_settings": {"defaults": {"track_width": 0.15, "via_diameter": 0.45}}},
+  "boards": ["wristband_v1.kicad_pcb"],
+  "erc": {"meta": {"version": 0}},
+  "libraries": {"pinned_footprint_libs": [], "pinned_symbol_libs": []},
+  "meta": {"filename": "wristband_v1.kicad_pro", "version": 1},
+  "net_settings": {"classes": [{"name": "Default", "clearance": 0.15, "track_width": 0.15, "via_diameter": 0.45, "via_drill": 0.2}]},
+  "project": {"files": []},
+  "schematic": {"legacy_lib_dir": "", "legacy_lib_list": []},
+  "sheets": [["00000000-0000-0000-0000-000000000000", "Root"]]
+}

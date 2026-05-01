@@ -9,7 +9,10 @@ description = "Open, user-controlled hearing-aid signal processing, fitting and 
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
-authors = [{ name = "OpenHear contributors" }]
+authors = [
+    { name = "Lewis Burgess", email = "lewisjames@theburgessprinciple.com" },
+    { name = "OpenHear contributors" },
+]
 keywords = ["hearing-aid", "audio", "dsp", "accessibility", "noahlink"]
 classifiers = [
     "Development Status :: 3 - Alpha",

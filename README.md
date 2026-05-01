@@ -723,4 +723,6 @@ Addendum. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE) for the full terms.
 
 **Lewis Burgess** — also the author of [The Burgess Principle](https://github.com/ljbudgie/Burgessprinciple).
 
+Contact: <lewisjames@theburgessprinciple.com>
+
 *Two repos. One argument. Your data belongs to you.*

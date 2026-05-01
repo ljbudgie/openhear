@@ -6,6 +6,8 @@ This is the beginner-friendly OpenHear wristband path: a true **Modular Lego** b
 
 The original compact v1 hardware in [`../`](../) remains the advanced/smallest option for experienced electronics builders. v1.5 is deliberately a little larger and about 10-15% more expensive so a complete beginner can build a working aids-free haptic wristband in a weekend.
 
+> 📖 **New builders:** read the [Definitive No-Solder Wristband Build Guide](definitive_build_guide_v1.5.md) for the full weekend walkthrough — printer profiles, tolerance compensation, test coupons, decision-tree recovery for the top failure modes, and safety gates.
+
 ## One-page quickstart
 
 1. **Buy the plug-and-play parts** from [`BOM.csv`](BOM.csv).
@@ -26,6 +28,7 @@ hardware/wristband/v1.5-no-solder/
 ├── README.md
 ├── BOM.csv
 ├── assembly_v1.5_no_solder.md
+├── definitive_build_guide_v1.5.md
 ├── firmware_notes.md
 ├── cad/
 │   ├── export_stls.sh

@@ -15,6 +15,12 @@ This directory keeps the original prototype firmware path for compatibility.
 - BLE troubleshooting: [`../../HARDWARE.md#windows-ble-debugging-checklist`](../../HARDWARE.md#windows-ble-debugging-checklist)
 
 
+## v1.5 No-Solder Modular Edition
+
+For complete beginners, start with [`v1.5-no-solder/`](v1.5-no-solder/): the Modular Lego build that uses pre-made dev boards, magnetic pogo or JST connectors, snap-fit printed bays, USB flashing, and pre-wired actuators. It is slightly larger and about 10-15% more expensive than compact v1, but it is the recommended Print & Done path with no soldering, crimping, wire stripping, or special electronics tools.
+
+Compact v1 remains the advanced/smallest option for experienced builders.
+
 ## Aids-free wristband v1 DIY prototype assets
 
 The v1 directory assets move the project toward `docs/AIDS_FREE_ARCHITECTURE.md`:

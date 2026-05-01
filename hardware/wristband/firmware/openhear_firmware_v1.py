@@ -62,7 +62,9 @@ class HapticScheduler:
         elif pattern_id == V0_COMPAT_PATTERN:
             self.driver.drive(0, 180, min(intensity, self.intensity_cap), 40)
             if self.actuator_count > 1:
-                self.driver.drive(self.actuator_count // 2, 180, min(intensity, self.intensity_cap), 40)
+                self.driver.drive(
+                    self.actuator_count // 2, 180, min(intensity, self.intensity_cap), 40
+                )
         else:
             self._legacy_pattern(pattern_id, intensity)
 
@@ -88,7 +90,9 @@ class NullHapticDriver:
     def __init__(self) -> None:
         self.log: list[tuple[int, int, int, int]] = []
 
-    def drive(self, actuator_index: int, frequency_hz: int, intensity: int, duration_ms: int) -> None:
+    def drive(
+        self, actuator_index: int, frequency_hz: int, intensity: int, duration_ms: int
+    ) -> None:
         self.log.append((actuator_index, frequency_hz, intensity, duration_ms))
 
     def all_off(self) -> None:

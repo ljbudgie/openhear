@@ -13,8 +13,30 @@ from math import cos, exp, floor, pi
 from typing import Iterable, Mapping, Sequence
 
 BARK_BAND_CENTRES_HZ: tuple[int, ...] = (
-    50, 150, 250, 350, 450, 570, 700, 840, 1000, 1170, 1370, 1600,
-    1850, 2150, 2500, 2900, 3400, 4000, 4800, 5800, 7000, 8500, 10500, 13500,
+    50,
+    150,
+    250,
+    350,
+    450,
+    570,
+    700,
+    840,
+    1000,
+    1170,
+    1370,
+    1600,
+    1850,
+    2150,
+    2500,
+    2900,
+    3400,
+    4000,
+    4800,
+    5800,
+    7000,
+    8500,
+    10500,
+    13500,
 )
 
 COMMON_PATTERNS: dict[str, int] = {
@@ -103,7 +125,9 @@ class HapticSkinMapper:
         """Return actuator events for one low-latency Bark-band frame."""
         if not bark_energies:
             return []
-        weighted = [self._weight_band(i, energy, audiogram) for i, energy in enumerate(bark_energies)]
+        weighted = [
+            self._weight_band(i, energy, audiogram) for i, energy in enumerate(bark_energies)
+        ]
         max_energy = max(weighted) or 1.0
         origin_column = self.azimuth_to_column(azimuth_deg, imu_pose)
         ring = self.elevation_to_ring(elevation_deg)
@@ -182,7 +206,9 @@ class HapticSkinMapper:
         return int(round(((normalised + 90.0) / 180.0) * (self.layout.rings - 1)))
 
     def band_to_column(self, band: int) -> int:
-        return int(round((band / max(1, len(BARK_BAND_CENTRES_HZ) - 1)) * (self.layout.columns - 1)))
+        return int(
+            round((band / max(1, len(BARK_BAND_CENTRES_HZ) - 1)) * (self.layout.columns - 1))
+        )
 
     def band_to_drive_frequency(self, band: int) -> int:
         phase = band / max(1, len(BARK_BAND_CENTRES_HZ) - 1)
@@ -191,7 +217,9 @@ class HapticSkinMapper:
     def distance_decay(self, distance_m: float) -> float:
         return max(0.08, min(1.0, exp(-max(0.0, distance_m - 0.5) / 5.0)))
 
-    def _weight_band(self, band: int, energy: float, audiogram: Mapping[str, object] | None) -> float:
+    def _weight_band(
+        self, band: int, energy: float, audiogram: Mapping[str, object] | None
+    ) -> float:
         threshold = _threshold_for_band(band, audiogram)
         if threshold >= 90:
             gain = 1.8

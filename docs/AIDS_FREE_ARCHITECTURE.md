@@ -218,9 +218,11 @@ Updating the audiogram is a JSON edit. There is no fitting appointment.
 
 ### 5.6 Open hardware path
 
-- Schematics: KiCad 8 in `/hardware/wristband/` (planned).
+- **v1 advanced compact prototype:** KiCad/OpenSCAD/BOM/firmware assets live in `/hardware/wristband/` for experienced electronics builders who want the smallest research form factor.
+- **v1.5 No-Solder Modular Edition:** beginner-first assets live in `/hardware/wristband/v1.5-no-solder/`. This is the Print & Done path: off-the-shelf ESP32-S3/RP2040 dev boards, STEMMA QT/JST cabling, magnetic pogo or keyed JST connectors, pre-wired actuators, snap-fit printed module bays, USB flashing, and no soldering/crimping/wire stripping.
+- **No-custom-PCB option:** v1.5 can be built entirely from stocked 2026 modules; its KiCad files document an optional connector-router/interconnect board rather than a requirement.
+- **Trade-off:** v1.5 is intentionally slightly larger and roughly 10-15% higher cost than compact v1, but it is the recommended one-weekend starter build for people with zero electronics experience.
 - RTL: Verilog/SystemVerilog under CERN-OHL-S in `/hardware/npu/` (planned).
-- Mechanical: FreeCAD/OpenSCAD parametric models in `/hardware/wristband/mech/` (planned).
 - Bill of materials sourced from globally-available distributors; no single-source critical parts.
 - Contribution model: per-module CODEOWNERS, RFC process for hardware revisions, signed-off-by for clinical-impacting changes.
 
@@ -320,10 +322,11 @@ The fastest credible path is **A→B in months, C in ~year 1, D in year 2, E in 
 
 ### Already in repo (foundation)
 - `core/`, `dsp/`, `audiogram/`, `stream/`, `mobile/`, `hardware/ite-shells/` — the sovereign pipeline for users with existing aids.
+- `hardware/wristband/` — compact v1 aids-free wristband KiCad schematics, mechanical CAD, BOM, assembly notes, haptic mapper, and firmware reference.
+- `hardware/wristband/v1.5-no-solder/` — v1.5 No-Solder Modular Edition: the beginner-friendly Modular Lego wristband with plug-in modules, magnetic pogo/JST connectors, snap-fit CAD, BOM, assembly guide, and firmware connector notes.
 - `SOVEREIGN_AUDIO.md` — the data sovereignty framework these all enforce.
 
 ### To be added (aids-free system)
-- `hardware/wristband/` — KiCad schematics, mechanical CAD, BOM.
 - `hardware/npu/` — open RTL for the Hearing NPU.
 - `firmware/npu/`, `firmware/mcu/` — runtime.
 - `dsp/haptic/` — frequency→position mapping, illusion library, audiogram weighting.

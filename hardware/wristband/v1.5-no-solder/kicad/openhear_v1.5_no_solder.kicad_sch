@@ -1,5 +1,5 @@
 (kicad_sch (version 20231120) (generator "OpenHear v1.5 no-solder documentation") (generator_version "0.1")
-  (uuid "8ad3cf70-1f54-47bf-a405-v15nosolder000")
+  (uuid "8ad3cf70-1f54-47bf-a405-515000000000")
   (paper "A4")
   (title_block
     (title "OpenHear v1.5 No-Solder Modular Edition")

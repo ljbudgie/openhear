@@ -73,6 +73,8 @@ packages = [
     "examples",
     "hardware",
     "hardware.tympan",
+    "hardware.wristband",
+    "hardware.wristband.firmware",
     "learn",
     "stream",
     "voice",

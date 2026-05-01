@@ -254,3 +254,31 @@ This roadmap identifies the highest-value open questions across all nine pillars
 6. Q15 — deployment-mode regulatory packaging
 
 OpenHear does not wait for certainty before building. It publishes the protocol, instruments the system, measures the result, and improves in public.
+
+
+---
+
+## v2 hardware research entry — 128-actuator wrist-plus-forearm NPU build
+
+The v1 DIY wristband establishes the printable enclosure, local haptic mapper,
+mic/IMU topology, and safety instrumentation. The next hardware research target is
+v2: a 128-actuator hybrid array extending 60-80 mm up the forearm with a custom
+low-power Hearing NPU.
+
+**Research objectives**
+
+- Compare 128-channel hybrid piezo/voice-coil/electrostatic layouts against the
+  v1 24/64-channel LRA lattice for speech, alarms, music, and 360° localisation.
+- Tape out or FPGA-validate the fixed-shape Bark filterbank, audiogram LUT engine,
+  haptic scheduler, and compact classifier on an open RISC-V data path.
+- Prove the Burgess Principle binary test with radios disabled: all hearing-as-skin
+  functionality remains local and user-owned.
+- Produce a regulatory evidence plan for an aids-free sensory substitution device,
+  including thermal, vibration exposure, biocompatibility, EMC, and usability data.
+
+**Future component needed**
+
+A custom 22 nm-class Hearing NPU or equivalent open low-power accelerator is still
+required for full source separation/classification below 5 ms at all-day wearable
+power. Existing 2026 MCUs are sufficient for v1 filterbank and scheduler research,
+but not for the complete north-star DSP/ML workload.

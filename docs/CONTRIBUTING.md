@@ -61,3 +61,27 @@ Bluetooth hardware — those paths are stubbed in `tests/conftest.py`.
 
 OpenHear is MIT-licensed (see `LICENSE`).  By submitting a PR you are
 licensing your contribution under the same terms.
+
+
+## Hardware PRs and safety sign-off
+
+Hardware contributions are welcome under CERN-OHL-S-2.0 for designs, MIT or
+Apache-2.0 for firmware/software, and CC-BY-SA-4.0 for documentation. If a PR
+changes wearer-contacting hardware, haptic drive limits, battery charging, sealing,
+or medical/regulatory claims, include a safety sign-off section in the PR body.
+
+Minimum hardware PR checklist:
+
+1. Identify the affected files and intended prototype configuration.
+2. State whether the acoustic-to-haptic path still passes the Burgess Principle
+   binary test: local processing, no cloud dependency, and no ear-worn dependency.
+3. Document maximum actuator intensity, duty cycle, thermal limits, and battery
+   protection assumptions.
+4. Note biocompatibility and IP67 assumptions; do not imply certification unless
+   test evidence is attached.
+5. Request review from hardware maintainers listed in `.github/CODEOWNERS` when
+   the PR touches `hardware/`, firmware, CAD, PCB, or safety documentation.
+
+Never merge a hardware PR that removes thermal derating, bypasses battery
+protection, hides raw-audio/cloud dependencies, or presents a DIY prototype as a
+certified hearing aid.

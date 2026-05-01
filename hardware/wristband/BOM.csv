@@ -1,0 +1,18 @@
+Part number,Description,Qty 24-actuator,Qty 64-actuator,Supplier,Unit price approx May 2026 GBP,Total 24 GBP,Total 64 GBP,Alternative,Notes
+ESP32-S3-MINI-1-N8,Wi-Fi/BLE 5 MCU module for companion link and scheduler,1,1,DigiKey/Mouser,3.80,3.80,3.80,RP2040 + MDBT50Q/nRF52840,Radio is companion-only; local hearing path remains on-device
+RP2040,Deterministic dual-core MCU option for low-latency scheduler,0,1,DigiKey/Mouser,0.95,0.00,0.95,ESP32-S3 only,Use PIO/DMA for PDM and haptic timing
+DRV2605LDGST,Haptic LRA/ERM driver with waveform engine,8,16,DigiKey/Mouser,2.25,18.00,36.00,TI DRV2625 or DA7280,Direct channels reduce latency; muxed starter builds are cheaper
+TCA9548APWR,8-channel I2C mux for DRV2605L address fan-out,1,2,DigiKey/Mouser,0.75,0.75,1.50,LCSC TCA9548A module,Keep branch capacitance low
+TDC TacHammer Haptuator,Wideband LRA actuator,24,64,Mouser/Tactile Labs,3.20,76.80,204.80,Precision Microdrives C10-100 or Jinlong LRA,Validate comfort before buying 64
+SPH0645LM4H-B,MEMS I2S microphone,8,8,DigiKey/Mouser,2.10,16.80,16.80,SPH0644LM4H PDM,Use acoustic mesh and isolated ground return
+BMI270,6-axis IMU for arm-pose compensation,1,1,DigiKey/Mouser/LCSC,1.70,1.70,1.70,BNO055 module,BNO055 is easier but larger and costlier
+BQ24075RGTR,Li-Po charger and power-path management,1,1,DigiKey/Mouser,2.60,2.60,2.60,TP4056 module for bench-only,Use BQ24075 for wearable power-path safety
+TPS62743DSSR,Low-quiescent 3.3 V buck regulator,1,1,DigiKey/Mouser,1.90,1.90,1.90,TPS62840,Choose low-Iq regulator for 18-24 h target
+2x 803040 Li-Po 800 mAh,Hot-swap battery cartridge cells,2,2,Adafruit/Pimoroni/Amazon UK,6.50,13.00,13.00,Protected 752540 cells,Use protected cells; never charge unattended during prototype
+Qi receiver coil 5 V 1 A,Optional wireless charging receiver,0,1,LCSC/Amazon UK,3.50,0.00,3.50,USB-C charge only,Optional; isolate thermally from skin
+USB-C 16-pin receptacle,Debug and charging connector,1,1,DigiKey/LCSC,0.35,0.35,0.35,Magnetic pogo dock,Seal with gasket or omit for Qi-only sealed builds
+Medical silicone sheet/dip,User-facing overmold and gasket material,1,1,Smooth-On/specialist supplier,18.00,18.00,18.00,Dragon Skin 10 MED equivalent,Biocompatibility depends on exact cure and supplier documentation
+IP67 acoustic membrane,Mic vent membrane patches,8,8,PUI/Gore reseller,0.45,3.60,3.60,PTFE vent dots,Protects MEMS ports from sweat ingress
+M1.6 stainless screws,Enclosure fasteners,12,16,Accu/DigiKey,0.08,0.96,1.28,Heat-set inserts + TPU strap,No exposed sharp edges
+Flex PCB fabrication,Polyimide actuator/mic flex tails,1,1,JLCPCB/PCBWay,18.00,18.00,32.00,Discrete silicone wire harness,Lead time and stack-up dominate risk
+Resin/FDM printed enclosure,Parametric wrist shell and battery cartridge,1,1,DIY print,8.00,8.00,10.00,TPU strap + SLA hard shell,Use biocompatible resin or seal completely

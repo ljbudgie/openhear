@@ -25,11 +25,13 @@ CLI:
     python -m dsp.pipeline --bypass      # passthrough only (for A/B)
     python -m dsp.pipeline --test-tone   # 1 kHz tone instead of microphone
     python -m dsp.pipeline --latency     # measure & log per-block latency
+    python -m dsp.pipeline --audiogram PATH  # load audiogram and tune DSP
 
 Press Ctrl+C to stop.
 """
 
 import argparse
+import json
 import logging
 import sys
 import time
@@ -38,6 +40,7 @@ import numpy as np
 import pyaudio
 
 from dsp import config
+from dsp.audiogram_profile import Prescription, prescribe
 from dsp.compression import WDRCompressor
 from dsp.feedback_canceller import FeedbackCanceller
 from dsp.noise_reduction import SpectralSubtractor
@@ -101,9 +104,113 @@ def generate_test_tone(
     return samples.astype(np.float32), float(next_phase)
 
 
-def build_dsp_chain() -> list:
-    """Construct and return the ordered list of active DSP processors."""
+def _load_prescription(audiogram_path: str) -> Prescription:
+    """Load an audiogram JSON file and compute a DSP prescription.
+
+    Sovereignty note: the audiogram is loaded locally, no cloud call is made.
+    The prescription values are logged so the user can inspect exactly which
+    parameters will drive the DSP chain.
+
+    Args:
+        audiogram_path: Path to an openhear-audiogram-v1 JSON file.
+
+    Returns:
+        A :class:`~dsp.audiogram_profile.Prescription` with per-ear, per-band
+        insertion gains and WDRC compression parameters.
+    """
+    from audiogram.audiogram import Audiogram
+
+    with open(audiogram_path, encoding="utf-8") as fh:
+        data = json.load(fh)
+
+    audiogram = Audiogram.from_dict(data)
+    prescription = prescribe(audiogram)
+    logger.info("Audiogram loaded: %s", audiogram_path)
+    logger.info("Prescription method: %s", prescription.method)
+
+    for ear in ("right", "left"):
+        gains = prescription.gains_db(ear)
+        ratios = prescription.ratios(ear)
+        knees = prescription.knees_dbfs(ear)
+        logger.info(
+            "Prescription (%s ear) — gains_db=%s  ratios=%s  knees_dbfs=%s",
+            ear,
+            {k: round(v, 1) for k, v in gains.items()},
+            {k: round(v, 2) for k, v in ratios.items()},
+            {k: round(v, 1) for k, v in knees.items()},
+        )
+
+    return prescription
+
+
+def _mean_prescription_values(
+    prescription: Prescription,
+) -> tuple[float, float, float]:
+    """Derive mean ratio, knee, and speech-band gain from a bilateral prescription.
+
+    For mono output the left and right ear values are averaged to produce a
+    single set of compressor parameters.  The speech-band gain is the mean
+    gain across the 1000–4000 Hz octave bands — the frequency range most
+    critical for speech understanding.
+
+    Returns:
+        ``(ratio, knee_dbfs, speech_gain_db)`` — all floats.
+    """
+    speech_freqs = {1000, 2000, 4000}
+
+    all_ratios: list[float] = []
+    all_knees: list[float] = []
+    speech_gains: list[float] = []
+
+    for ear in ("right", "left"):
+        all_ratios.extend(prescription.ratios(ear).values())
+        all_knees.extend(prescription.knees_dbfs(ear).values())
+        for freq, gain in prescription.gains_db(ear).items():
+            if freq in speech_freqs:
+                speech_gains.append(gain)
+
+    ratio = sum(all_ratios) / len(all_ratios) if all_ratios else config.COMPRESSION_RATIO
+    knee = sum(all_knees) / len(all_knees) if all_knees else config.COMPRESSION_KNEE_DBFS
+    speech_gain = (
+        sum(speech_gains) / len(speech_gains) if speech_gains else config.VOICE_CLARITY_GAIN
+    )
+    return ratio, knee, speech_gain
+
+
+def build_dsp_chain(prescription: "Prescription | None" = None) -> list:
+    """Construct and return the ordered list of active DSP processors.
+
+    Args:
+        prescription: Optional :class:`~dsp.audiogram_profile.Prescription`
+            produced by :func:`~dsp.audiogram_profile.prescribe`.  When
+            provided, the compressor ratio/knee and the voice-clarity gain are
+            derived from the individual's audiogram rather than the static
+            config defaults.  The mean of left and right ear values is used
+            for the mono output path; the specific values chosen are logged so
+            the user can inspect them (sovereignty requirement).
+            When ``None``, the static ``dsp/config.py`` defaults are used and
+            behaviour is identical to before this parameter was added.
+    """
     chain = []
+
+    # Derive compressor and voice-clarity parameters.  When a prescription is
+    # present, use the mean of both ears (appropriate for a mono output path);
+    # otherwise fall back to the static config defaults.
+    if prescription is not None:
+        rx_ratio, rx_knee, rx_speech_gain = _mean_prescription_values(prescription)
+        logger.info(
+            "Audiogram prescription applied — "
+            "compressor: ratio=%.2f, knee=%.1f dBFS; "
+            "voice clarity gain=%.2f dB (mean of both ears)",
+            rx_ratio, rx_knee, rx_speech_gain,
+        )
+        comp_ratio = rx_ratio
+        comp_knee = rx_knee
+        voice_gain = rx_speech_gain
+    else:
+        comp_ratio = config.COMPRESSION_RATIO
+        comp_knee = config.COMPRESSION_KNEE_DBFS
+        voice_gain = config.VOICE_CLARITY_GAIN
 
     if config.NOISE_REDUCTION_ENABLED:
         chain.append(SpectralSubtractor(
@@ -117,13 +224,13 @@ def build_dsp_chain() -> list:
     if config.COMPRESSION_ENABLED:
         chain.append(WDRCompressor(
             sample_rate=config.SAMPLE_RATE,
-            ratio=config.COMPRESSION_RATIO,
-            knee_dbfs=config.COMPRESSION_KNEE_DBFS,
+            ratio=comp_ratio,
+            knee_dbfs=comp_knee,
             attack_s=config.COMPRESSION_ATTACK_S,
             release_s=config.COMPRESSION_RELEASE_S,
         ))
-        logger.info("Stage added: WDRCompressor (ratio=%.1f, knee=%.0f dBFS)",
-                    config.COMPRESSION_RATIO, config.COMPRESSION_KNEE_DBFS)
+        logger.info("Stage added: WDRCompressor (ratio=%.2f, knee=%.1f dBFS)",
+                    comp_ratio, comp_knee)
 
     if config.VOICE_CLARITY_ENABLED:
         chain.append(VoiceClarityEnhancer(
@@ -131,11 +238,11 @@ def build_dsp_chain() -> list:
             sample_rate=config.SAMPLE_RATE,
             low_hz=config.VOICE_CLARITY_LOW_HZ,
             high_hz=config.VOICE_CLARITY_HIGH_HZ,
-            gain=config.VOICE_CLARITY_GAIN,
+            gain=voice_gain,
         ))
         logger.info("Stage added: VoiceClarityEnhancer (%.0f–%.0f Hz, gain=%.2f)",
                     config.VOICE_CLARITY_LOW_HZ, config.VOICE_CLARITY_HIGH_HZ,
-                    config.VOICE_CLARITY_GAIN)
+                    voice_gain)
 
     if config.FEEDBACK_CANCELLATION_ENABLED:
         chain.append(FeedbackCanceller(
@@ -179,6 +286,7 @@ def run_pipeline(
     test_tone: bool = False,
     measure_latency: bool = False,
     metrics_path: str | None = None,
+    audiogram_path: str | None = None,
 ) -> None:
     """Open audio streams and run the processing loop until interrupted.
 
@@ -189,6 +297,9 @@ def run_pipeline(
             standard logger every second.
         metrics_path: If set, append per-block metrics to this CSV path
             (see :class:`dsp.metrics.MetricsLogger`).
+        audiogram_path: If set, load the audiogram JSON at this path and
+            derive DSP parameters from the individual's hearing profile.
+            When ``None``, static ``dsp/config.py`` defaults are used.
     """
     pa = pyaudio.PyAudio()
 
@@ -217,7 +328,9 @@ def run_pipeline(
         pa.terminate()
         sys.exit(1)
 
-    dsp_chain = [] if bypass else build_dsp_chain()
+    dsp_chain = [] if bypass else build_dsp_chain(
+        prescription=_load_prescription(audiogram_path) if audiogram_path else None,
+    )
     if bypass:
         logger.info("Bypass mode: DSP chain skipped.")
     if test_tone:
@@ -307,6 +420,12 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         "--metrics-csv", default=None,
         help="Append per-block latency/CPU/level metrics to this CSV file.",
     )
+    parser.add_argument(
+        "--audiogram", default=None, metavar="PATH",
+        help="Path to an openhear-audiogram-v1 JSON file.  When provided, "
+             "compression ratio/knee and voice-clarity gain are derived from "
+             "the individual's audiogram rather than the static config defaults.",
+    )
     return parser
 
 
@@ -317,5 +436,6 @@ if __name__ == "__main__":
         test_tone=args.test_tone,
         measure_latency=args.latency,
         metrics_path=args.metrics_csv,
+        audiogram_path=args.audiogram,
     )
 

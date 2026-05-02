@@ -1,27 +1,36 @@
 """
 bluetooth_output.py – Bluetooth audio streaming to hearing aids.
 
-Streams processed audio to the hearing aids via the Windows system
-Bluetooth audio stack.  The strategy for each supported device is:
+Streams processed audio to the hearing aids via the system Bluetooth audio
+stack.  PyAudio abstracts the platform audio layer, so the same Python class
+works on macOS, Linux, and Windows.  The pairing and routing strategy for
+each supported device is platform-specific — see the notes below.
 
   Phonak Naída M70-SP (Marvel platform, Bluetooth Classic / A2DP):
-    Pairs via Windows Bluetooth settings as a standard A2DP sink.
+    macOS: Pairs via System Settings → Bluetooth as a standard audio
+    device.  Once connected, the Naída M70-SP appears in CoreAudio as a
+    standard output device and is enumerable by PyAudio.  Select it by
+    device name or index in dsp/config.py (OUTPUT_DEVICE_INDEX).
+    No proprietary API is needed.
+
+    Windows: Pairs via Windows Bluetooth settings as a standard A2DP sink.
     Once paired and connected the device appears as a Windows audio
     output device.  Select it by device name or index in dsp/config.py
     (OUTPUT_DEVICE_INDEX).  No proprietary API is needed.
 
   Signia Insio 7AX (AX platform, Made-for-iPhone / MFi Bluetooth LE):
     MFi devices use Apple's proprietary Bluetooth LE stack and are not
-    directly accessible from Windows.  Phase 1 workaround: connect the
-    Insio 7AX to an iPhone acting as an audio relay, and share iPhone
-    audio to the Windows machine via the iPhone's Bluetooth PAN or a
-    virtual audio cable.  Native Windows MFi support is planned for a
-    future phase.
+    directly accessible from macOS or Windows as a generic audio output.
+    Workaround (macOS and Windows): connect the Insio 7AX to an iPhone
+    acting as an audio relay, then share iPhone audio to the development
+    machine via AirPlay (macOS) or a virtual audio cable (Windows / macOS).
+    Native MFi routing without an iPhone relay is planned for a future phase.
 
 Phase 1 implementation:
   BluetoothAudioOutput wraps PyAudio output and adds device enumeration
-  helpers so users can identify the correct Windows audio device index
-  for their hearing aid streamer.
+  helpers so users can identify the correct audio device index for their
+  hearing aid streamer.  Run ``python -m stream.bluetooth_output --list``
+  to print all available output devices and flag likely Bluetooth ones.
 
 Usage:
     python -m stream.bluetooth_output --list

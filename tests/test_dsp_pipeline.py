@@ -141,3 +141,73 @@ class TestBuildDspChain:
             samples = stage.process(samples)
         assert samples.shape == (config.FRAMES_PER_BUFFER,)
         assert samples.dtype == np.float32
+
+
+class TestBuildDspChainWithPrescription:
+    """Tests that build_dsp_chain() correctly applies prescription values."""
+
+    def _make_prescription(self, ratio: float, knee: float, gain_1k: float):
+        """Build a minimal mock Prescription with symmetric ears."""
+        from dsp.audiogram_profile import BandPrescription, Prescription
+
+        def _bands(r, k, g):
+            # Provide all speech-band frequencies so the mean calculation works.
+            return [
+                BandPrescription(freq_hz=1000, threshold_db_hl=40.0,
+                                 gain_db=g, ratio=r, knee_dbfs=k),
+                BandPrescription(freq_hz=2000, threshold_db_hl=40.0,
+                                 gain_db=g, ratio=r, knee_dbfs=k),
+                BandPrescription(freq_hz=4000, threshold_db_hl=40.0,
+                                 gain_db=g, ratio=r, knee_dbfs=k),
+            ]
+
+        return Prescription(right=_bands(ratio, knee, gain_1k),
+                            left=_bands(ratio, knee, gain_1k))
+
+    def test_prescription_overrides_compressor_ratio(self, monkeypatch):
+        """WDRCompressor ratio must come from the prescription, not config."""
+        monkeypatch.setattr(config, "COMPRESSION_ENABLED", True)
+        monkeypatch.setattr(config, "NOISE_REDUCTION_ENABLED", False)
+        monkeypatch.setattr(config, "VOICE_CLARITY_ENABLED", False)
+        monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", False)
+        monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", False)
+        # Pick a ratio clearly different from the config default.
+        prescription_ratio = config.COMPRESSION_RATIO + 1.0
+        rx = self._make_prescription(ratio=prescription_ratio, knee=-40.0, gain_1k=10.0)
+
+        chain = pipeline.build_dsp_chain(prescription=rx)
+        assert len(chain) == 1
+        from dsp.compression import WDRCompressor
+        compressor = chain[0]
+        assert isinstance(compressor, WDRCompressor)
+        assert abs(compressor.ratio - prescription_ratio) < 0.01
+
+    def test_prescription_overrides_compressor_knee(self, monkeypatch):
+        """WDRCompressor knee_dbfs must come from the prescription, not config."""
+        monkeypatch.setattr(config, "COMPRESSION_ENABLED", True)
+        monkeypatch.setattr(config, "NOISE_REDUCTION_ENABLED", False)
+        monkeypatch.setattr(config, "VOICE_CLARITY_ENABLED", False)
+        monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", False)
+        monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", False)
+        prescription_knee = config.COMPRESSION_KNEE_DBFS - 10.0
+        rx = self._make_prescription(ratio=2.0, knee=prescription_knee, gain_1k=10.0)
+
+        chain = pipeline.build_dsp_chain(prescription=rx)
+        from dsp.compression import WDRCompressor
+        assert isinstance(chain[0], WDRCompressor)
+        assert abs(chain[0].knee_dbfs - prescription_knee) < 0.01
+
+    def test_no_prescription_uses_config_defaults(self, monkeypatch):
+        """Without a prescription, config defaults must be used unchanged."""
+        monkeypatch.setattr(config, "COMPRESSION_ENABLED", True)
+        monkeypatch.setattr(config, "NOISE_REDUCTION_ENABLED", False)
+        monkeypatch.setattr(config, "VOICE_CLARITY_ENABLED", False)
+        monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", False)
+        monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", False)
+
+        chain = pipeline.build_dsp_chain(prescription=None)
+        from dsp.compression import WDRCompressor
+        compressor = chain[0]
+        assert isinstance(compressor, WDRCompressor)
+        assert compressor.ratio == config.COMPRESSION_RATIO
+        assert compressor.knee_dbfs == config.COMPRESSION_KNEE_DBFS

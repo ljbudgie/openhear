@@ -229,7 +229,8 @@ def build_dsp_chain(prescription: "Prescription | None" = None) -> list:
         ))
         logger.info("Stage added: WDRCompressor")
 
-        logger.info("Stage added: WDRCompressor")
+    if config.VOICE_CLARITY_ENABLED:
+        chain.append(VoiceClarityEnhancer(
             frame_length=config.FRAMES_PER_BUFFER,
             sample_rate=config.SAMPLE_RATE,
             low_hz=config.VOICE_CLARITY_LOW_HZ,

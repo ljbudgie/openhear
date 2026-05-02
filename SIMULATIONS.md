@@ -141,3 +141,40 @@ pattern id, environment tag, reaction time, user response, rating, and outcomes.
 They intentionally exclude raw audio, waveforms, speaker embeddings, cloud ids,
 and clinical claims. These records are experimental adaptation telemetry only
 and are not clinical evidence.
+
+## Phase 4 spatial/extended scaffold
+
+The Phase 4 implementation lives in `stream.phase4_spatial_extended`. It covers
+direction, elevation, and extended-band drills for the "Spatial & extended"
+stage without storing raw audio, location traces, biometric identifiers, cloud
+services, or clinical claims.
+
+Examples:
+
+```bash
+# List built-in spatial and extended-band tasks.
+python -m stream.phase4_spatial_extended list-tasks
+
+# Append one spatial-localisation check.
+python -m stream.phase4_spatial_extended spatial \
+  --task localise_left \
+  --predicted-azimuth -80 \
+  --confidence 0.85 \
+  --user-response answered \
+  --progress /tmp/openhear-phase4-progress.json
+
+# Append one extended-band recognition check and summarise progress.
+python -m stream.phase4_spatial_extended extended \
+  --task band_ultrasonic \
+  --predicted-band ultrasonic \
+  --user-response ultrasonic \
+  --progress /tmp/openhear-phase4-progress.json
+python -m stream.phase4_spatial_extended summary \
+  --progress /tmp/openhear-phase4-progress.json
+```
+
+Progress files use the `openhear-phase4-progress-v1` schema and store only
+derived localisation, haptic, timing, environment, rating, and outcome metadata.
+They intentionally exclude raw audio, waveforms, location traces, biometric
+identifiers, cloud ids, and clinical claims. These records are experimental
+adaptation telemetry only and are not clinical evidence.

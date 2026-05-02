@@ -63,6 +63,7 @@ openhear-recorder = "stream.recorder:main"
 openhear-demo = "examples.demo:main"
 openhear-phase2-training = "stream.phase2_training:main"
 openhear-phase3-open-conversation = "stream.phase3_open_conversation:main"
+openhear-phase4-spatial-extended = "stream.phase4_spatial_extended:main"
 
 [project.urls]
 Homepage = "https://github.com/ljbudgie/openhear"

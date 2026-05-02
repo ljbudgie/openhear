@@ -285,6 +285,20 @@ active-recall checks. It does not store raw audio, waveforms, speaker identity,
 or cloud identifiers, and it is experimental telemetry rather than clinical
 evidence.
 
+Phase 4 adds a local-only scaffold for spatial and extended-band training:
+
+```bash
+python -m stream.phase4_spatial_extended list-tasks
+python -m stream.phase4_spatial_extended spatial --task localise_left --predicted-azimuth -80 --confidence 0.85 --user-response answered --progress /tmp/openhear-phase4-progress.json
+python -m stream.phase4_spatial_extended extended --task band_ultrasonic --predicted-band ultrasonic --user-response ultrasonic --progress /tmp/openhear-phase4-progress.json
+python -m stream.phase4_spatial_extended summary --progress /tmp/openhear-phase4-progress.json
+```
+
+The Phase 4 progress file stores only derived localisation, extended-band,
+timing, environment, rating, and outcome metadata. It does not store raw audio,
+waveforms, location traces, biometric identifiers, cloud identifiers, or
+clinical claims.
+
 ### A Hearing NPU, designed from first principles
 
 A general-purpose mobile SoC running PyTorch Mobile cannot meet the latency or power budget. The Hearing NPU is designed for *one* job: continuous, personalised, low-latency hearing-as-haptics.

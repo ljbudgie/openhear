@@ -163,7 +163,7 @@ class TestMicHelpers:
                 opened_kwargs.update(kwargs)
                 return "stream"
 
-        fake_module = types.SimpleNamespace(PyAudio=lambda: FakePyAudio(), paInt16="int16")
+        fake_module = types.SimpleNamespace(PyAudio=FakePyAudio, paInt16="int16")
         monkeypatch.setitem(sys.modules, "pyaudio", fake_module)
 
         pa, stream = open_mic_stream(sample_rate=8000, frame_buffer=128, device_index=3)

@@ -128,9 +128,10 @@ def test_update_from_feedback_returns_new_state_with_summary():
 
 def test_update_from_feedback_rejects_invalid_state_shapes():
     event = PreferenceEvent(environment="office", choice="A")
+    valid_state = EngineState(data={"events": [], "summary": {}})
 
     with pytest.raises(ValueError, match="Invalid preference choice"):
-        update_from_feedback(EngineState(data={}), PreferenceEvent(choice="C"))  # type: ignore[arg-type]
+        update_from_feedback(valid_state, PreferenceEvent(choice="C"))  # type: ignore[arg-type]
 
     with pytest.raises(ValueError, match="events"):
         update_from_feedback(EngineState(data={"events": {}}), event)
@@ -211,21 +212,45 @@ def test_suggest_next_config_without_feedback_keeps_base_values(tmp_path):
     assert candidate.voice.boost_db == pytest.approx(2.0)
 
 
-def test_suggest_next_config_ignores_unusable_preferred_events(tmp_path):
+def test_suggest_next_config_ignores_non_mapping_and_undecided_events(tmp_path):
     base = _write_test_config(tmp_path / "base.yaml", ratio=3.0, boost_db=5.0)
-    invalid = tmp_path / "invalid.yaml"
-    invalid.write_text("compression: []\n", encoding="utf-8")
     output = tmp_path / "candidate.yaml"
     state = EngineState(
         data={
             "events": [
                 "not a mapping",
                 {"choice": "undecided", "config_a_path": str(base)},
-                {"choice": "A", "config_a_path": str(tmp_path / "missing.yaml")},
-                {"choice": "B", "config_b_path": str(invalid)},
             ]
         }
     )
+
+    suggest_next_config(state, base_config_path=base, output_path=output)
+
+    candidate = load_config(output)
+    assert candidate.compression.ratio == pytest.approx(3.0)
+    assert candidate.voice.boost_db == pytest.approx(5.0)
+
+
+def test_suggest_next_config_explores_when_preferred_config_is_missing(tmp_path):
+    base = _write_test_config(tmp_path / "base.yaml", ratio=3.0, boost_db=5.0)
+    output = tmp_path / "candidate.yaml"
+    state = EngineState(
+        data={"events": [{"choice": "A", "config_a_path": str(tmp_path / "missing.yaml")}]}
+    )
+
+    suggest_next_config(state, base_config_path=base, output_path=output)
+
+    candidate = load_config(output)
+    assert candidate.compression.ratio == pytest.approx(3.0)
+    assert candidate.voice.boost_db == pytest.approx(5.5)
+
+
+def test_suggest_next_config_ignores_invalid_preferred_config(tmp_path):
+    base = _write_test_config(tmp_path / "base.yaml", ratio=3.0, boost_db=5.0)
+    invalid = tmp_path / "invalid.yaml"
+    invalid.write_text("compression: []\n", encoding="utf-8")
+    output = tmp_path / "candidate.yaml"
+    state = EngineState(data={"events": [{"choice": "B", "config_b_path": str(invalid)}]})
 
     suggest_next_config(state, base_config_path=base, output_path=output)
 

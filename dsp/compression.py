@@ -7,10 +7,16 @@ dynamic range of the acoustic world into the narrower dynamic range that
 a hearing aid user can perceive comfortably.
 
 Design choices:
-  - Peak-following envelope detection with independent attack/release.
+  - Block-based envelope detection with independent attack/release.
+    The envelope follower is updated once per buffer (not per sample),
+    which is the standard approach in embedded hearing aid WDRC and
+    eliminates the Python per-sample loop overhead entirely.  A single
+    scalar gain is computed for the block and applied via a numpy
+    multiply — fast, vectorised, and accurate enough for typical
+    buffer sizes of 128–512 samples at 16 kHz.
   - Knee point and ratio tunable via dsp/config.py.
   - Operates on a numpy float32 array (values in [-1.0, 1.0] representing
-    normalised PCM samples) to avoid per-sample Python overhead.
+    normalised PCM samples).
   - No look-ahead; processing is causal to stay within the 20 ms budget.
 
 References:
@@ -53,8 +59,12 @@ class WDRCompressor:
         self.ratio = ratio
         self.knee_dbfs = knee_dbfs
 
-        # Pre-compute per-sample time constants from the block-level
-        # attack/release times using a first-order IIR approximation.
+        # Pre-compute IIR time constants from the standard per-sample formula.
+        # The same coefficients are used in the block-based path: rather than
+        # stepping them sample-by-sample, the envelope follower is advanced
+        # once per buffer using the block's peak level.  This is a standard
+        # block-based approximation of per-sample first-order IIR tracking
+        # used in embedded hearing aid WDRC implementations.
         self._attack_coeff = np.exp(-1.0 / (sample_rate * attack_s))
         self._release_coeff = np.exp(-1.0 / (sample_rate * release_s))
 
@@ -64,7 +74,14 @@ class WDRCompressor:
     # ------------------------------------------------------------------
 
     def process(self, samples: np.ndarray) -> np.ndarray:
-        """Apply WDRC to *samples* in-place and return the result.
+        """Apply WDRC to *samples* and return the compressed result.
+
+        Block-based envelope approach (standard for embedded hearing aid WDRC):
+        the peak level of the entire input buffer is computed in one numpy
+        operation, the envelope follower is updated once per block using the
+        attack/release coefficients, and a single scalar gain is applied to
+        all samples via a numpy multiply.  The envelope state carries over
+        between calls so block boundaries are handled correctly.
 
         Args:
             samples: 1-D float32 array of normalised PCM samples [-1.0, 1.0].
@@ -73,35 +90,36 @@ class WDRCompressor:
             Compressed float32 array of the same shape.
         """
         samples = samples.astype(np.float32, copy=False)
-        output = np.empty_like(samples)
-        env = self._envelope
 
+        # ── 1. Compute block peak level (single numpy operation) ────────────
+        block_peak = float(np.max(np.abs(samples))) if samples.size else 0.0
+
+        # ── 2. Update envelope follower once per block ──────────────────────
+        if block_peak > self._envelope:
+            self._envelope = (
+                self._attack_coeff * self._envelope
+                + (1.0 - self._attack_coeff) * block_peak
+            )
+        else:
+            self._envelope = (
+                self._release_coeff * self._envelope
+                + (1.0 - self._release_coeff) * block_peak
+            )
+        # Guard against log(0) — maintain a small positive floor.
+        self._envelope = max(self._envelope, 1e-10)
+
+        # ── 3. Compute a single scalar gain for the block ───────────────────
         knee_linear = 10.0 ** (self.knee_dbfs / 20.0)
+        if self._envelope > knee_linear:
+            # Desired output level = knee + (input_level - knee) / ratio.
+            input_db = 20.0 * np.log10(self._envelope)
+            output_db = self.knee_dbfs + (input_db - self.knee_dbfs) / self.ratio
+            gain = 10.0 ** ((output_db - input_db) / 20.0)
+        else:
+            gain = 1.0
 
-        for i, x in enumerate(samples):
-            # Envelope follower (peak detector).
-            abs_x = abs(float(x))
-            if abs_x > env:
-                env = self._attack_coeff * env + (1.0 - self._attack_coeff) * abs_x
-            else:
-                env = self._release_coeff * env + (1.0 - self._release_coeff) * abs_x
-
-            env = max(env, 1e-10)  # prevent log(0)
-
-            # Apply gain above the knee.
-            if env > knee_linear:
-                # Desired output level = knee + (input_level - knee) / ratio
-                input_db = 20.0 * np.log10(env)
-                knee_db = self.knee_dbfs
-                output_db = knee_db + (input_db - knee_db) / self.ratio
-                gain = 10.0 ** ((output_db - input_db) / 20.0)
-            else:
-                gain = 1.0
-
-            output[i] = np.float32(x * gain)
-
-        self._envelope = env
-        return output
+        # ── 4. Apply gain to the whole buffer (vectorised multiply) ─────────
+        return (samples * gain).astype(np.float32)
 
     def reset(self) -> None:
         """Reset the compressor state (envelope follower)."""

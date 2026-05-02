@@ -10,10 +10,12 @@ these modules can be imported and their pure helpers exercised here.
 from __future__ import annotations
 
 import importlib
+import os as _os
 import sys
 import types
 from typing import Any
 
+import pytest
 
 # ---------------------------------------------------------------------------
 # MicroPython stubs (installed once on import).
@@ -114,7 +116,6 @@ def _load_firmware_module(module_name: str, source_path: str) -> types.ModuleTyp
     return module
 
 
-import os as _os
 _REPO_ROOT = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
 firmware_canonical = _load_firmware_module(
     "wristband.openhear_firmware",
@@ -130,8 +131,6 @@ firmware_legacy = _load_firmware_module(
 # Shared parametrised tests for both firmware copies.
 # ---------------------------------------------------------------------------
 
-
-import pytest
 
 FIRMWARES = [firmware_canonical, firmware_legacy]
 

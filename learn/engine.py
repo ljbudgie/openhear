@@ -145,7 +145,7 @@ def _apply_preferred_config_average(config: dict[str, Any], state: EngineState) 
             continue
         try:
             preferred_configs.append(load_config(candidate_path).to_dict())
-        except (FileNotFoundError, ValueError, json.JSONDecodeError, RuntimeError):
+        except (FileNotFoundError, ValueError, json.JSONDecodeError):
             continue
 
     if not preferred_configs:

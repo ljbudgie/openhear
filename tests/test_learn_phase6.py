@@ -221,10 +221,11 @@ def test_profiles_root_default_location():
     assert PROFILES_ROOT.parent.name == ".openhear"
 
 
-def test_profile_metadata_is_json_object(tmp_path):
+@pytest.mark.parametrize("metadata", [["not", "object"], "not an object", 7, None])
+def test_profile_metadata_is_json_object(tmp_path, metadata):
     config = _write_config(tmp_path / "config.yaml")
     profile_dir = save_profile(config, "Restaurant", root=tmp_path / "profiles")
-    (profile_dir / "metadata.json").write_text(json.dumps(["not", "object"]), encoding="utf-8")
+    (profile_dir / "metadata.json").write_text(json.dumps(metadata), encoding="utf-8")
 
     with pytest.raises(ValueError, match="metadata"):
         load_profile("Restaurant", root=tmp_path / "profiles")

@@ -13,7 +13,7 @@ import argparse
 import hashlib
 import json
 from dataclasses import asdict, dataclass
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -33,8 +33,7 @@ _REQUIRED_ROLES = {
     "programming",
 }
 
-
-@dataclass(frozen=True)
+dataclass(frozen=True)
 class Component:
     """One community-maintained commodity/open component entry."""
 
@@ -61,7 +60,7 @@ class Component:
         return not self.proprietary and self.firmware_license.lower() != "proprietary"
 
 
-@dataclass(frozen=True)
+dataclass(frozen=True)
 class Phase5BuildManifest:
     """Verifiable output manifest for one generated Phase 5 device bundle."""
 
@@ -151,7 +150,7 @@ def generate_phase5_device_bundle(
     cost = estimate_binaural_cost(component_db_file)
     manifest = Phase5BuildManifest(
         schema_version=MANIFEST_SCHEMA,
-        generated_at=datetime.now(UTC).isoformat(),
+        generated_at=datetime.now(timezone.utc).isoformat(),
         mode=mode,
         ear=None if binaural else ear,
         audiogram_sha256=_sha256_file(Path(audiogram_path)),
@@ -262,7 +261,6 @@ def main() -> None:
     print(f"Phase 5 bundle written to {Path(args.output_dir).resolve()}")
     print(f"Estimated binaural component cost: £{manifest.component_cost_gbp:.2f}")
     print(f"Cost target met: {manifest.cost_target_met}")
-
 
 if __name__ == "__main__":
     main()

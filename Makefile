@@ -6,7 +6,7 @@
 PYTHON ?= python
 PIP ?= pip
 
-.PHONY: help install install-dev lint format test coverage build clean ci
+.PHONY: help install install-dev lint format test coverage build clean ci benchmark
 
 help:
 	@echo "Available targets:"
@@ -17,6 +17,7 @@ help:
 	@echo "  test         Run the unit-test suite."
 	@echo "  coverage     Run tests with coverage reporting."
 	@echo "  build        Build sdist + wheel into ./dist."
+	@echo "  benchmark    Run the deterministic DSP benchmark and emit a signed JSON report."
 	@echo "  clean        Remove build/test artefacts."
 	@echo "  ci           Run lint + tests (what CI runs)."
 
@@ -43,6 +44,9 @@ coverage:
 
 build:
 	$(PYTHON) -m build
+
+benchmark:
+	$(PYTHON) -m scripts.benchmark $(BENCHMARK_ARGS)
 
 clean:
 	rm -rf build dist *.egg-info .pytest_cache .ruff_cache .mypy_cache htmlcov coverage.xml .coverage

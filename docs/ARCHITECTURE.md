@@ -29,9 +29,9 @@ openhear/
 │                  integration, shell manufacturing notes, safety docs,
 │                  Phase 5 sovereign-device bundle generation.
 │
-├── learn/       ← Listener preference capture and adaptive tuning
-│                  (Phase 6 scaffolding — every function is currently
-│                  a documented NotImplementedError).
+├── learn/       ← Listener preference capture, adaptive tuning,
+│                  JSONL learning-state persistence, and saved
+│                  per-environment profiles.
 │
 ├── voice/       ← Legacy voice-reference / analysis helpers.
 ├── wristband/   ← Prototype haptic wristband transport.

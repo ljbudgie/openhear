@@ -23,6 +23,17 @@ OUTCOME_CORRECT = "correct"
 OUTCOME_PARTIAL = "partial"
 OUTCOME_INCORRECT = "incorrect"
 OUTCOME_SILENCE = "silence"
+_REQUIRED_EVENT_FIELDS = (
+    "session_id",
+    "timestamp",
+    "target_id",
+    "predicted_target_id",
+    "predicted_sound_class",
+    "source_label",
+    "confidence",
+    "outcome",
+)
+_OPTIONAL_EVENT_FIELDS = ("reaction_time_ms", "user_rating")
 
 
 @dataclass(frozen=True)
@@ -279,6 +290,24 @@ def _parse_score(value: str) -> tuple[str, float]:
     return label, confidence
 
 
+def _event_from_mapping(raw_event: object) -> Phase2Evaluation:
+    if not isinstance(raw_event, dict):
+        raise ValueError("Phase 2 progress events must be JSON objects.")
+
+    missing = [field for field in _REQUIRED_EVENT_FIELDS if field not in raw_event]
+    if missing:
+        raise ValueError(f"Phase 2 progress event is missing fields: {', '.join(missing)}")
+
+    payload = {
+        field: raw_event[field]
+        for field in (*_REQUIRED_EVENT_FIELDS, *_OPTIONAL_EVENT_FIELDS)
+        if field in raw_event
+    }
+    payload.setdefault("reaction_time_ms", None)
+    payload.setdefault("user_rating", None)
+    return Phase2Evaluation(**payload)
+
+
 def _print_json(payload: object) -> None:
     print(json.dumps(payload, indent=2, sort_keys=True))
 
@@ -327,11 +356,10 @@ def main() -> None:
 
     if args.command == "summary":
         data = Phase2ProgressStore(args.progress).load()
-        raw_events = data["events"]
-        first_session_id = raw_events[0]["session_id"] if raw_events else None
+        raw_events = [_event_from_mapping(raw_event) for raw_event in data["events"]]
+        first_session_id = raw_events[0].session_id if raw_events else None
         session = Phase2TrainingSession(session_id=first_session_id)
-        for raw_event in raw_events:
-            session.events.append(Phase2Evaluation(**raw_event))
+        session.events.extend(raw_events)
         _print_json(session.summary())
 
 

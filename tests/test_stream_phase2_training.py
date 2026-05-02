@@ -195,3 +195,30 @@ def test_cli_summary_reads_progress(monkeypatch, capsys, tmp_path: Path):
     payload = json.loads(capsys.readouterr().out)
     assert payload["attempts"] == 1
     assert payload["accuracy"] == 1.0
+    assert payload["session_id"] == "s1"
+
+
+def test_cli_summary_ignores_extra_event_fields(monkeypatch, capsys, tmp_path: Path):
+    progress = tmp_path / "phase2.json"
+    session = Phase2TrainingSession(session_id="s1")
+    event = session.evaluate_scores("word_help", {"Spoken help": 0.9})
+    data = Phase2ProgressStore(progress).append(event)
+    data["events"][0]["future_field"] = "ignored"
+    progress.write_text(json.dumps(data), encoding="utf-8")
+
+    monkeypatch.setattr("sys.argv", ["phase2", "summary", "--progress", str(progress)])
+    main()
+
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["attempts"] == 1
+
+
+def test_cli_summary_rejects_missing_event_fields(monkeypatch, tmp_path: Path):
+    progress = tmp_path / "phase2.json"
+    progress.write_text(
+        json.dumps({"schema_version": SCHEMA_VERSION, "events": [{"session_id": "s1"}]}),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr("sys.argv", ["phase2", "summary", "--progress", str(progress)])
+    with pytest.raises(ValueError, match="missing fields"):
+        main()

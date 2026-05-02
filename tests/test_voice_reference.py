@@ -81,6 +81,12 @@ class TestDominantRange:
         assert lo == 300.0
         assert hi == 300.0
 
+    def test_negative_threshold_can_return_empty_range(self):
+        env = np.array([0.0, -10.0], dtype=np.float32)
+        freqs = np.array([100.0, 200.0], dtype=np.float32)
+
+        assert _dominant_range(env, freqs, threshold_db=-1.0) == (0.0, 0.0)
+
     def test_all_equal_envelope(self):
         env = np.full(4, -30.0, dtype=np.float32)
         freqs = np.array([100, 200, 300, 400], dtype=np.float32)
@@ -120,6 +126,15 @@ class TestLoadAudio:
         assert data.dtype == np.float32
         # 2^30 / 2^31 = 0.5.
         assert abs(data[1] - 0.5) < 1e-6
+
+    def test_wav_float64_casts_to_float32(self, tmp_path: Path):
+        path = tmp_path / "float64.wav"
+        scipy_wav.write(str(path), SR, np.array([0.0, 0.25, -0.25], dtype=np.float64))
+
+        _, data = _load_audio(path)
+
+        assert data.dtype == np.float32
+        np.testing.assert_allclose(data, [0.0, 0.25, -0.25])
 
     def test_unsupported_format(self, tmp_path: Path):
         path = tmp_path / "file.mp3"

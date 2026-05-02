@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import sys
+import types
+
 import numpy as np
 import pytest
 
@@ -14,6 +17,8 @@ from voice.analyser import (
     _rms_db,
     _spectral_envelope,
     analyse_frame,
+    capture_snapshot,
+    open_mic_stream,
 )
 
 SR = 44_100
@@ -148,3 +153,46 @@ class TestAnalyseFrame:
         snap = analyse_frame(tone, sample_rate=SR)
         # Envelope is float32 per implementation.
         assert snap.spectral_envelope.dtype == np.float32
+
+
+class TestMicHelpers:
+    def test_open_mic_stream_passes_device_index(self, monkeypatch):
+        opened_kwargs = {}
+
+        class FakePyAudio:
+            def open(self, **kwargs):
+                opened_kwargs.update(kwargs)
+                return "stream"
+
+        fake_module = types.SimpleNamespace(PyAudio=lambda: FakePyAudio(), paInt16="int16")
+        monkeypatch.setitem(sys.modules, "pyaudio", fake_module)
+
+        pa, stream = open_mic_stream(sample_rate=8000, frame_buffer=128, device_index=3)
+
+        assert isinstance(pa, FakePyAudio)
+        assert stream == "stream"
+        assert opened_kwargs == {
+            "format": "int16",
+            "channels": 1,
+            "rate": 8000,
+            "input": True,
+            "frames_per_buffer": 128,
+            "input_device_index": 3,
+        }
+
+    def test_capture_snapshot_reads_stream_bytes(self):
+        class FakeStream:
+            def __init__(self):
+                self.calls = []
+
+            def read(self, frame_buffer, exception_on_overflow):
+                self.calls.append((frame_buffer, exception_on_overflow))
+                return np.zeros(frame_buffer, dtype=np.int16).tobytes()
+
+        stream = FakeStream()
+
+        snap = capture_snapshot(stream, sample_rate=SR, frame_buffer=16, n_formants=1)
+
+        assert stream.calls == [(16, False)]
+        assert isinstance(snap, VoiceSnapshot)
+        assert snap.energy_db == -100.0

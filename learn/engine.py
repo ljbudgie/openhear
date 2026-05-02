@@ -37,9 +37,10 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 _BLEND_FACTOR = 0.5
+_VOICE_BAND_MIN_GAP_HZ = 100.0
 _VOICE_BAND_LOW_MIN = 20.0
-_VOICE_BAND_LOW_MAX = 19999.0
-_VOICE_BAND_HIGH_MIN = 21.0
+_VOICE_BAND_LOW_MAX = 20000.0 - _VOICE_BAND_MIN_GAP_HZ
+_VOICE_BAND_HIGH_MIN = _VOICE_BAND_LOW_MIN + _VOICE_BAND_MIN_GAP_HZ
 _VOICE_BAND_HIGH_MAX = 20000.0
 
 _TUNABLE_PARAMETER_BOUNDS: dict[tuple[str, str], tuple[float, float]] = {
@@ -201,10 +202,10 @@ def _apply_voice_band_average(
         _VOICE_BAND_HIGH_MIN,
         _VOICE_BAND_HIGH_MAX,
     )
-    if next_low >= next_high:
+    if next_low + _VOICE_BAND_MIN_GAP_HZ > next_high:
         midpoint = (next_low + next_high) / 2
-        next_low = max(_VOICE_BAND_LOW_MIN, midpoint - _BLEND_FACTOR)
-        next_high = min(_VOICE_BAND_HIGH_MAX, midpoint + _BLEND_FACTOR)
+        next_low = max(_VOICE_BAND_LOW_MIN, midpoint - (_VOICE_BAND_MIN_GAP_HZ / 2))
+        next_high = min(_VOICE_BAND_HIGH_MAX, midpoint + (_VOICE_BAND_MIN_GAP_HZ / 2))
     config["voice"]["boost_hz"] = [next_low, next_high]
 
 
@@ -247,8 +248,10 @@ def _clamp_config(config: dict[str, Any]) -> None:
     low, high = [float(value) for value in config["voice"]["boost_hz"]]
     low = _clamp(low, _VOICE_BAND_LOW_MIN, _VOICE_BAND_LOW_MAX)
     high = _clamp(high, _VOICE_BAND_HIGH_MIN, _VOICE_BAND_HIGH_MAX)
-    if low >= high:
-        high = min(_VOICE_BAND_HIGH_MAX, low + 1.0)
+    if low + _VOICE_BAND_MIN_GAP_HZ > high:
+        high = min(_VOICE_BAND_HIGH_MAX, low + _VOICE_BAND_MIN_GAP_HZ)
+        if low + _VOICE_BAND_MIN_GAP_HZ > high:
+            low = max(_VOICE_BAND_LOW_MIN, high - _VOICE_BAND_MIN_GAP_HZ)
     config["voice"]["boost_hz"] = [low, high]
 
 

@@ -194,7 +194,16 @@ def test_profiles_save_load_list_delete(tmp_path):
     assert list_profiles(root=root) == ["Quiet Home"]
     loaded = load_profile("Quiet Home", root=root)
     assert loaded["metadata"]["name"] == "Quiet Home"
+    assert set(loaded["metadata"]) == {
+        "created_at",
+        "environment",
+        "name",
+        "notes",
+        "slug",
+    }
     assert loaded["metadata"]["environment"] == "home"
+    assert loaded["metadata"]["notes"] == "evening"
+    assert loaded["metadata"]["slug"] == "quiet_home"
     assert loaded["config"]["compression"]["ratio"] == 3.0
     assert Path(loaded["config_path"]).name == "config.yaml"
 

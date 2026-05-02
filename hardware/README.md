@@ -49,6 +49,7 @@ OpenHear hardware has three build tiers. Start wherever you are comfortable. Eve
 | [ite-shells/](ite-shells/README.md) | Custom In-The-Ear (ITE) shells: materials, sweat-proofing, full build workflow |
 | [safety/](safety/README.md) | **Mandatory.** MPO limiters, calibration procedures, risk register, safety circuits |
 | [assembly/](assembly/README.md) | Step-by-step build guide for all three tiers, assuming zero electronics experience |
+| [sovereign_device/](sovereign_device/) | Phase 5 local audiogram → firmware + manifest pipeline and component database |
 | [BOM.md](BOM.md) | Complete bill of materials with suppliers, costs, and substitution notes |
 | [ROADMAP.md](ROADMAP.md) | Hardware development roadmap from documentation to sovereign device |
 

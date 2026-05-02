@@ -110,7 +110,7 @@ class TestLoadAudio:
     def test_wav_stereo_downmix(self, tmp_path: Path):
         n = 512
         left = np.zeros(n, dtype=np.int16)
-        right = (np.ones(n, dtype=np.int16) * 10_000)
+        right = np.ones(n, dtype=np.int16) * 10_000
         stereo = np.stack([left, right], axis=1)
         path = tmp_path / "stereo.wav"
         scipy_wav.write(str(path), SR, stereo)
@@ -152,8 +152,7 @@ class TestLoadReference:
     def test_populates_profile(self, tmp_path: Path):
         p = tmp_path / "tone.wav"
         self._write_tone(p)
-        prof = load_reference(p, artist_name="test_tone",
-                              sample_rate=SR, frame_size=1024)
+        prof = load_reference(p, artist_name="test_tone", sample_rate=SR, frame_size=1024)
         assert prof.artist_name == "test_tone"
         assert prof.spectral_envelope.size > 0
         lo, hi = prof.dominant_frequency_range

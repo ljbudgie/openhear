@@ -24,8 +24,7 @@ from voice.analyser import (
 SR = 44_100
 
 
-def _tone(freq: float, amplitude: float = 0.5, n: int = 4096,
-          sr: int = SR) -> np.ndarray:
+def _tone(freq: float, amplitude: float = 0.5, n: int = 4096, sr: int = SR) -> np.ndarray:
     t = np.arange(n) / sr
     return (amplitude * np.sin(2 * np.pi * freq * t)).astype(np.float32)
 
@@ -111,7 +110,7 @@ class TestFindFormants:
         env = np.full(n, -50.0, dtype=np.float32)
         freqs = np.linspace(0, 8000, n, dtype=np.float32)
         for i in (50, 100, 150):
-            env[i - 2:i + 3] = -10.0
+            env[i - 2 : i + 3] = -10.0
         formants = _find_formants(env, freqs, n_formants=3, min_freq=200.0)
         assert len(formants) == 3
         # Peaks should be sorted ascending by frequency.

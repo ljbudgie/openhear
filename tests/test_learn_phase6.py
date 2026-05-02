@@ -20,7 +20,13 @@ from learn.profiles import (
 )
 
 
-def _write_test_config(path: Path, *, ratio: float = 2.5, boost_db: float = 6.0) -> Path:
+def _write_test_config(
+    path: Path,
+    *,
+    ratio: float = 2.5,
+    boost_db: float = 6.0,
+    boost_hz: tuple[float, float] = (1000.0, 4000.0),
+) -> Path:
     path.write_text(
         "\n".join(
             [
@@ -34,7 +40,7 @@ def _write_test_config(path: Path, *, ratio: float = 2.5, boost_db: float = 6.0)
                 "  reduction_strength: 0.6",
                 "  gate_enabled: true",
                 "voice:",
-                "  boost_hz: [1000, 4000]",
+                f"  boost_hz: [{boost_hz[0]}, {boost_hz[1]}]",
                 f"  boost_db: {boost_db}",
                 "beamforming:",
                 "  enabled: false",
@@ -120,6 +126,23 @@ def test_update_from_feedback_returns_new_state_with_summary():
     assert updated.data["last_environment"] == "office"
 
 
+def test_update_from_feedback_rejects_invalid_state_shapes():
+    event = PreferenceEvent(environment="office", choice="A")
+    valid_state = EngineState(data={"events": [], "summary": {}})
+
+    with pytest.raises(ValueError, match="Invalid preference choice"):
+        update_from_feedback(valid_state, PreferenceEvent(choice="C"))  # type: ignore[arg-type]
+
+    with pytest.raises(ValueError, match="events"):
+        update_from_feedback(EngineState(data={"events": {}}), event)
+
+    with pytest.raises(ValueError, match="summary"):
+        update_from_feedback(EngineState(data={"summary": []}), event)
+
+    with pytest.raises(ValueError, match="office"):
+        update_from_feedback(EngineState(data={"summary": {"office": []}}), event)
+
+
 def test_suggest_next_config_blends_toward_preferred_config(tmp_path):
     base = _write_test_config(tmp_path / "base.yaml", ratio=2.0, boost_db=4.0)
     preferred = _write_test_config(
@@ -178,6 +201,103 @@ def test_suggest_next_config_explores_when_feedback_has_no_files(tmp_path):
     assert load_config(output).voice.boost_db == pytest.approx(4.5)
 
 
+def test_suggest_next_config_without_feedback_keeps_base_values(tmp_path):
+    base = _write_test_config(tmp_path / "base.yaml", ratio=3.25, boost_db=2.0)
+    output = tmp_path / "candidate.yaml"
+
+    suggest_next_config(EngineState(data={}), base_config_path=base, output_path=output)
+
+    candidate = load_config(output)
+    assert candidate.compression.ratio == pytest.approx(3.25)
+    assert candidate.voice.boost_db == pytest.approx(2.0)
+
+
+def test_suggest_next_config_ignores_non_mapping_and_undecided_events(tmp_path):
+    base = _write_test_config(tmp_path / "base.yaml", ratio=3.0, boost_db=5.0)
+    output = tmp_path / "candidate.yaml"
+    state = EngineState(
+        data={
+            "events": [
+                "not a mapping",
+                {"choice": "undecided", "config_a_path": str(base)},
+            ]
+        }
+    )
+
+    suggest_next_config(state, base_config_path=base, output_path=output)
+
+    candidate = load_config(output)
+    assert candidate.compression.ratio == pytest.approx(3.0)
+    assert candidate.voice.boost_db == pytest.approx(5.0)
+
+
+def test_suggest_next_config_explores_when_preferred_config_is_missing(tmp_path):
+    base = _write_test_config(tmp_path / "base.yaml", ratio=3.0, boost_db=5.0)
+    output = tmp_path / "candidate.yaml"
+    state = EngineState(
+        data={"events": [{"choice": "A", "config_a_path": str(tmp_path / "missing.yaml")}]}
+    )
+
+    suggest_next_config(state, base_config_path=base, output_path=output)
+
+    candidate = load_config(output)
+    assert candidate.compression.ratio == pytest.approx(3.0)
+    assert candidate.voice.boost_db == pytest.approx(5.5)
+
+
+def test_suggest_next_config_ignores_invalid_preferred_config(tmp_path):
+    base = _write_test_config(tmp_path / "base.yaml", ratio=3.0, boost_db=5.0)
+    invalid = tmp_path / "invalid.yaml"
+    invalid.write_text("compression: []\n", encoding="utf-8")
+    output = tmp_path / "candidate.yaml"
+    state = EngineState(data={"events": [{"choice": "B", "config_b_path": str(invalid)}]})
+
+    suggest_next_config(state, base_config_path=base, output_path=output)
+
+    candidate = load_config(output)
+    assert candidate.compression.ratio == pytest.approx(3.0)
+    assert candidate.voice.boost_db == pytest.approx(5.0)
+
+
+def test_suggest_next_config_keeps_voice_band_gap_when_averaging(tmp_path):
+    base = _write_test_config(tmp_path / "base.yaml", boost_hz=(1000.0, 1100.0))
+    preferred = _write_test_config(tmp_path / "preferred.yaml", boost_hz=(1080.0, 1120.0))
+    output = tmp_path / "candidate.yaml"
+    state = update_from_feedback(
+        EngineState(data={}),
+        PreferenceEvent(config_a_path=str(preferred), choice="A"),
+    )
+
+    suggest_next_config(state, base_config_path=base, output_path=output)
+
+    low, high = load_config(output).voice.boost_hz
+    assert high - low >= 100.0
+    assert (low, high) == pytest.approx((1025.0, 1125.0))
+
+
+def test_suggest_next_config_ignores_non_mapping_and_unknown_overrides(tmp_path):
+    base = _write_test_config(tmp_path / "base.yaml", ratio=2.0, boost_db=4.0)
+    output = tmp_path / "candidate.yaml"
+
+    suggest_next_config(
+        EngineState(data={"config_overrides": "ignored"}),
+        base_config_path=base,
+        output_path=output,
+    )
+    candidate = load_config(output)
+    assert candidate.compression.ratio == pytest.approx(2.0)
+    assert candidate.voice.boost_db == pytest.approx(4.0)
+
+    suggest_next_config(
+        EngineState(data={"config_overrides": {"missing": {"ratio": 9}, "voice": "ignored"}}),
+        base_config_path=base,
+        output_path=output,
+    )
+    candidate = load_config(output)
+    assert candidate.compression.ratio == pytest.approx(2.0)
+    assert candidate.voice.boost_db == pytest.approx(4.0)
+
+
 def test_profiles_save_load_list_delete(tmp_path):
     config = _write_test_config(tmp_path / "config.yaml", ratio=3.0)
     root = tmp_path / "profiles"
@@ -227,6 +347,24 @@ def test_list_profiles_ignores_invalid_metadata(tmp_path):
     bad.mkdir(parents=True)
     (bad / "metadata.json").write_text("{", encoding="utf-8")
     assert list_profiles(root=root) == []
+
+
+def test_list_profiles_ignores_files_missing_metadata_and_logs_bad_names(tmp_path, caplog):
+    root = tmp_path / "profiles"
+    root.mkdir()
+    (root / "not_a_directory").write_text("ignored", encoding="utf-8")
+    (root / "no_metadata").mkdir()
+    bad_name = root / "bad_name"
+    bad_name.mkdir()
+    (bad_name / "metadata.json").write_text(json.dumps({"name": 123}), encoding="utf-8")
+
+    assert list_profiles(root=root) == []
+    assert "invalid metadata name" in caplog.text
+
+
+def test_delete_profile_missing_raises_file_not_found(tmp_path):
+    with pytest.raises(FileNotFoundError, match="Profile not found"):
+        delete_profile("Missing", root=tmp_path / "profiles")
 
 
 def test_profiles_root_default_location():

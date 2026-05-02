@@ -26,7 +26,8 @@ openhear/
 │                  write / backup CLIs.  See docs/PROTOCOL_NOTES.md.
 │
 ├── hardware/    ← Out-of-tree open hearing-aid hardware: Tympan SDK
-│                  integration, shell manufacturing notes, safety docs.
+│                  integration, shell manufacturing notes, safety docs,
+│                  Phase 5 sovereign-device bundle generation.
 │
 ├── learn/       ← Listener preference capture and adaptive tuning
 │                  (Phase 6 scaffolding — every function is currently

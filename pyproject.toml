@@ -64,6 +64,7 @@ openhear-demo = "examples.demo:main"
 openhear-phase2-training = "stream.phase2_training:main"
 openhear-phase3-open-conversation = "stream.phase3_open_conversation:main"
 openhear-phase4-spatial-extended = "stream.phase4_spatial_extended:main"
+openhear-phase5-device = "hardware.sovereign_device.pipeline:main"
 
 [project.urls]
 Homepage = "https://github.com/ljbudgie/openhear"
@@ -78,6 +79,7 @@ packages = [
     "dsp",
     "examples",
     "hardware",
+    "hardware.sovereign_device",
     "hardware.tympan",
     "hardware.wristband",
     "hardware.wristband.firmware",
@@ -91,6 +93,7 @@ include-package-data = true
 [tool.setuptools.package-data]
 "audiogram" = ["data/*.json"]
 "dsp" = ["config.schema.json"]
+"hardware.sovereign_device" = ["components.json"]
 "stream" = ["data/*.csv"]
 
 [tool.pytest.ini_options]

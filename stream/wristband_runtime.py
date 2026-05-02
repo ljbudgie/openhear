@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import logging
 
 from stream.ble_haptic import HapticPacket, OpenHearBLEClient
 from stream.haptic_mapper import HapticMapper
@@ -20,8 +19,6 @@ from stream.phase3_open_conversation import (
     Phase3ProgressStore,
 )
 from stream.sound_classifier import WINDOW_SECONDS, YamnetClassifier, classify_scores
-
-logger = logging.getLogger(__name__)
 
 
 class WristbandRuntime:
@@ -143,11 +140,6 @@ async def _run_live(args) -> None:
     client = OpenHearBLEClient()
     phase2_session = Phase2TrainingSession() if args.phase2_target else None
     phase2_progress = Phase2ProgressStore(args.phase2_progress) if args.phase2_progress else None
-    if args.phase3_passive_log and not args.phase3_progress:
-        logger.warning(
-            "Phase 3 passive logging is enabled without --phase3-progress; "
-            "events will only be retained in memory for this process."
-        )
     phase3_session = (
         Phase3OpenConversationSession()
         if args.phase3_passive_log or args.phase3_recall_prompt
@@ -285,6 +277,9 @@ def main() -> None:
         help="BLE scan timeout in seconds.",
     )
     args = parser.parse_args()
+
+    if args.phase3_passive_log and not args.phase3_progress:
+        parser.error("--phase3-progress is required when --phase3-passive-log is enabled.")
 
     if args.sound_class:
         asyncio.run(_run_manual(args))

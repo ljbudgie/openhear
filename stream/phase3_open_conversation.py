@@ -370,9 +370,11 @@ def score_recall(
         return OUTCOME_CORRECT if response or user_rating is not None else OUTCOME_MISSED
     if not response:
         return OUTCOME_MISSED
-    if confidence < min_confidence or predicted_sound_class == "silence":
+    if predicted_sound_class == "silence":
         if expected == "silence" and response_class == "silence":
             return OUTCOME_CORRECT
+        return OUTCOME_SILENCE
+    if confidence < min_confidence:
         return OUTCOME_SILENCE
     if response_class == expected and predicted_sound_class == expected:
         return OUTCOME_CORRECT

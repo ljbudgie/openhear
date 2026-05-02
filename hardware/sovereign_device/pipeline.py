@@ -134,7 +134,9 @@ def generate_phase5_device_bundle(
     if ear not in {"right", "left"}:
         raise ValueError("ear must be 'right' or 'left'.")
     component_db = load_component_database(component_db_path)
-    component_db_file = Path(component_db_path) if component_db_path is not None else _DEFAULT_COMPONENT_DB
+    component_db_file = (
+        Path(component_db_path) if component_db_path is not None else _DEFAULT_COMPONENT_DB
+    )
     output = Path(output_dir)
     output.mkdir(parents=True, exist_ok=True)
 
@@ -160,7 +162,9 @@ def generate_phase5_device_bundle(
         component_cost_gbp=cost,
         cost_target_gbp=float(cost_target_gbp),
         cost_target_met=cost <= cost_target_gbp,
-        components=[_manifest_component(component) for component in list_components(component_db_file)],
+        components=[
+            _manifest_component(component) for component in list_components(component_db_file)
+        ],
         safety_requirements=[
             "Passive hardware MPO limiter is mandatory and cannot be bypassed by firmware.",
             "Generated firmware must be calibrated on real hardware before use.",

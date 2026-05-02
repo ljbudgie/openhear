@@ -435,10 +435,10 @@ def summarise_events(
 def _summarise_by_environment(
     passive_events: list[Phase3PassiveEvent], recall_events: list[Phase3RecallEvent]
 ) -> dict[str, dict[str, int | float]]:
-    by_environment: dict[str, dict[str, int | float]] = {}
+    environment_stats: dict[str, dict[str, int | float]] = {}
     for event in passive_events:
         key = event.environment_tag or "unspecified"
-        bucket = by_environment.setdefault(
+        bucket = environment_stats.setdefault(
             key,
             {
                 "passive_windows": 0,
@@ -458,7 +458,7 @@ def _summarise_by_environment(
 
     for event in recall_events:
         key = event.environment_tag or "unspecified"
-        bucket = by_environment.setdefault(
+        bucket = environment_stats.setdefault(
             key,
             {
                 "passive_windows": 0,
@@ -473,10 +473,10 @@ def _summarise_by_environment(
         if event.is_success:
             bucket["recall_successes"] = int(bucket["recall_successes"]) + 1
 
-    for bucket in by_environment.values():
+    for bucket in environment_stats.values():
         attempts = int(bucket["recall_attempts"])
         bucket["recall_accuracy"] = int(bucket["recall_successes"]) / attempts if attempts else 0.0
-    return by_environment
+    return environment_stats
 
 
 def _passive_event_from_mapping(raw_event: object) -> Phase3PassiveEvent:

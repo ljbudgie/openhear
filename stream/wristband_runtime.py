@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import logging
 
 from stream.ble_haptic import HapticPacket, OpenHearBLEClient
 from stream.haptic_mapper import HapticMapper
@@ -19,6 +20,8 @@ from stream.phase3_open_conversation import (
     Phase3ProgressStore,
 )
 from stream.sound_classifier import WINDOW_SECONDS, YamnetClassifier, classify_scores
+
+logger = logging.getLogger(__name__)
 
 
 class WristbandRuntime:
@@ -140,6 +143,11 @@ async def _run_live(args) -> None:
     client = OpenHearBLEClient()
     phase2_session = Phase2TrainingSession() if args.phase2_target else None
     phase2_progress = Phase2ProgressStore(args.phase2_progress) if args.phase2_progress else None
+    if args.phase3_passive_log and not args.phase3_progress:
+        logger.warning(
+            "Phase 3 passive logging is enabled without --phase3-progress; "
+            "events will only be retained in memory for this process."
+        )
     phase3_session = (
         Phase3OpenConversationSession()
         if args.phase3_passive_log or args.phase3_recall_prompt
@@ -184,7 +192,12 @@ async def _run_live(args) -> None:
                     suffix = f" phase3={event.outcome}"
                 else:
                     packet = await runtime.send_scores(scores)
-                    suffix = " phase3=passive" if args.phase3_passive_log else ""
+                    if args.phase3_passive_log and args.phase3_progress:
+                        suffix = " phase3=passive"
+                    elif args.phase3_passive_log:
+                        suffix = " phase3=passive-memory"
+                    else:
+                        suffix = ""
                 print(
                     f"{classified.sound_key:<8} conf={classified.confidence:.2f} "
                     f"packet={list(packet.to_bytes())}{suffix}"

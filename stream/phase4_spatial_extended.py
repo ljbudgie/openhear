@@ -222,7 +222,6 @@ _BAND_ALIASES: dict[str, str] = {
     "low": "tactile_low",
     "low_tactile": "tactile_low",
     "speech_band": "speech",
-    "speech": "speech",
     "high": "high_frequency",
     "ultra": "ultrasonic",
     "ultrasound": "ultrasonic",
@@ -478,7 +477,7 @@ def normalise_band(value: str) -> str:
     band = _normalise_band_key(raw)
     if band in EXTENDED_BANDS or band == "silence":
         return band
-    alias = _BAND_ALIASES.get(raw) or _BAND_ALIASES.get(band)
+    alias = _BAND_ALIASES.get(band)
     if alias in EXTENDED_BANDS or alias == "silence":
         return alias
     raise ValueError(

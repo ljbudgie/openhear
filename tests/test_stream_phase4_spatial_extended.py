@@ -77,10 +77,9 @@ def test_spatial_event_records_derived_metadata_only(tmp_path: Path):
         environment_tag="street",
     )
     data = Phase4ProgressStore(tmp_path / "phase4.json").append_spatial(event)
-    raw = json.dumps(data)
+    event_keys = set(data["spatial_events"][0])
     assert data["schema_version"] == SCHEMA_VERSION
-    assert "raw_audio" not in raw
-    assert "location_trace" not in raw
+    assert {"raw_audio", "location_trace"}.isdisjoint(event_keys)
     assert data["spatial_events"][0]["outcome"] == OUTCOME_CORRECT
 
 

@@ -219,7 +219,6 @@ _TASKS_BY_ID: dict[str, Phase4Task] = {task.task_id: task for task in DEFAULT_TA
 _BAND_ALIASES: dict[str, str] = {
     "infra": "infrasonic",
     "infrasound": "infrasonic",
-    "low": "tactile_low",
     "low_tactile": "tactile_low",
     "high": "high_frequency",
     "ultra": "ultrasonic",

@@ -227,8 +227,7 @@ def build_dsp_chain(prescription: "Prescription | None" = None) -> list:
             attack_s=config.COMPRESSION_ATTACK_S,
             release_s=config.COMPRESSION_RELEASE_S,
         ))
-        logger.info("Stage added: WDRCompressor (ratio=%.2f, knee=%.1f dBFS)",
-                    comp_ratio, comp_knee)
+        logger.info("Stage added: WDRCompressor")
 
     if config.VOICE_CLARITY_ENABLED:
         chain.append(VoiceClarityEnhancer(

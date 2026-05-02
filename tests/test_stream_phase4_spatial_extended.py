@@ -57,7 +57,9 @@ def test_angle_helpers_wrap_azimuths():
 def test_band_normalisation_resolves_aliases_and_rejects_unknown():
     assert normalise_band("infra") == "infrasonic"
     assert normalise_band("high frequency") == "high_frequency"
+    assert normalise_band("low tactile") == "tactile_low"
     assert normalise_band("low-tactile") == "tactile_low"
+    assert normalise_band("low_tactile") == "tactile_low"
     with pytest.raises(ValueError, match="Unsupported Phase 4 band"):
         normalise_band("unknown band")
 

@@ -221,7 +221,6 @@ _BAND_ALIASES: dict[str, str] = {
     "infrasound": "infrasonic",
     "low": "tactile_low",
     "low_tactile": "tactile_low",
-    "speech_band": "speech",
     "high": "high_frequency",
     "ultra": "ultrasonic",
     "ultrasound": "ultrasonic",

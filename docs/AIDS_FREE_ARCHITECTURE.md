@@ -126,6 +126,14 @@ progress records under the `openhear-phase2-progress-v1` schema. These records
 store labels, confidence, reaction time, user rating, and outcomes only; raw
 audio is deliberately excluded.
 
+The Phase 3 software scaffold lives in `stream.phase3_open_conversation`. It
+extends the same local-only pattern to open conversation: passive daily-wear
+exposure windows and periodic active-recall checks are stored under the
+`openhear-phase3-progress-v1` schema. The records contain derived classifier and
+haptic metadata, environment tags, reaction times, ratings, and outcomes only;
+raw audio, waveforms, speaker embeddings, cloud identifiers, and clinical claims
+are deliberately excluded.
+
 ### 3.3 Measuring adaptation
 
 Open metrics, logged on-device only:

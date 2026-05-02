@@ -113,3 +113,31 @@ Progress files use the `openhear-phase2-progress-v1` schema and store target
 ids, classifier labels, confidence, reaction time, user rating, and outcomes.
 They intentionally do not store raw audio or waveforms. These records are
 experimental training telemetry only and are not clinical evidence.
+
+## Phase 3 open-conversation scaffold
+
+The Phase 3 implementation lives in `stream.phase3_open_conversation`. It
+covers passive daily wear plus periodic active-recall checks for the "Open
+conversation" stage without adding cloud services, speaker identity, raw audio
+storage, or new wristband firmware packet ids.
+
+Examples:
+
+```bash
+# List built-in active-recall prompts.
+python -m stream.phase3_open_conversation list-prompts
+
+# Append one passive exposure event using derived classifier/haptic metadata.
+python -m stream.phase3_open_conversation passive   --sound-class voice   --source-label Speech   --confidence 0.90   --intensity 128   --environment quiet_home   --progress /tmp/openhear-phase3-progress.json
+
+# Append one active-recall check and summarise longitudinal progress.
+python -m stream.phase3_open_conversation recall   --prompt classify_voice   --predicted-class voice   --user-response voice   --progress /tmp/openhear-phase3-progress.json
+python -m stream.phase3_open_conversation summary   --progress /tmp/openhear-phase3-progress.json
+```
+
+Progress files use the `openhear-phase3-progress-v1` schema and store only
+local derived metadata: sound class, source label, confidence, haptic intensity,
+pattern id, environment tag, reaction time, user response, rating, and outcomes.
+They intentionally exclude raw audio, waveforms, speaker embeddings, cloud ids,
+and clinical claims. These records are experimental adaptation telemetry only
+and are not clinical evidence.

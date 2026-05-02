@@ -271,6 +271,20 @@ Phase 3  Open conversation   (week 7+,  passive)   — continuous wear; periodic
 Phase 4  Spatial & extended  (month 3+)            — direction, elevation, ultrasonic/infrasonic bands
 ```
 
+
+Phase 3 has a local-only scaffold for open conversation telemetry:
+
+```bash
+python -m stream.phase3_open_conversation list-prompts
+python -m stream.phase3_open_conversation passive   --sound-class voice --source-label Speech --confidence 0.9   --intensity 128 --progress /tmp/openhear-phase3-progress.json
+python -m stream.phase3_open_conversation summary   --progress /tmp/openhear-phase3-progress.json
+```
+
+The Phase 3 progress file stores only derived metadata for passive wear and
+active-recall checks. It does not store raw audio, waveforms, speaker identity,
+or cloud identifiers, and it is experimental telemetry rather than clinical
+evidence.
+
 ### A Hearing NPU, designed from first principles
 
 A general-purpose mobile SoC running PyTorch Mobile cannot meet the latency or power budget. The Hearing NPU is designed for *one* job: continuous, personalised, low-latency hearing-as-haptics.

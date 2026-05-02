@@ -17,7 +17,8 @@ openhear/
 │
 ├── stream/      ← Audio I/O and transport: Bluetooth output, virtual
 │                  audio cable detection, round-trip latency test,
-│                  raw/processed recorder.
+│                  raw/processed recorder, Phase 2/3 local training
+│                  telemetry for wristband adaptation.
 │
 ├── core/        ← Noahlink Wireless 2 bridge: HID wrapper
 │                  (core/noahlink.py), framing parser (core/protocol.py),

@@ -8,6 +8,13 @@ import pytest
 
 from stream.haptic_mapper import HapticMapper
 from stream.phase2_training import OUTCOME_CORRECT, Phase2ProgressStore, Phase2TrainingSession
+from stream.phase3_open_conversation import (
+    OUTCOME_CORRECT as PHASE3_OUTCOME_CORRECT,
+)
+from stream.phase3_open_conversation import (
+    Phase3OpenConversationSession,
+    Phase3ProgressStore,
+)
 from stream.wristband_runtime import WristbandRuntime, _run_manual
 
 
@@ -65,6 +72,79 @@ def test_send_phase2_scores_dispatches_existing_packet_and_logs(audiogram_path: 
     assert packet.to_bytes()[0] == 3
     assert client.sent == [packet]
     assert progress.load()["events"][0]["target_id"] == "alarm_smoke"
+
+
+def test_send_scores_logs_phase3_passive_without_changing_packet(audiogram_path: str, tmp_path):
+    client = _StubBleClient()
+    progress = Phase3ProgressStore(tmp_path / "phase3.json")
+    runtime = WristbandRuntime(
+        HapticMapper(audiogram_path),
+        client,
+        phase3_session=Phase3OpenConversationSession(session_id="p3"),
+        phase3_progress=progress,
+        phase3_environment="home",
+        phase3_passive_log=True,
+    )
+
+    packet = asyncio.run(runtime.send_scores({"Speech": 0.9}))
+
+    assert client.sent == [packet]
+    assert packet.to_bytes()[0] == 1
+    stored = progress.load()["passive_events"][0]
+    assert stored["predicted_sound_class"] == "voice"
+    assert stored["environment_tag"] == "home"
+
+
+def test_send_phase3_recall_scores_dispatches_existing_packet_and_logs(
+    audiogram_path: str, tmp_path
+):
+    client = _StubBleClient()
+    progress = Phase3ProgressStore(tmp_path / "phase3.json")
+    runtime = WristbandRuntime(
+        HapticMapper(audiogram_path),
+        client,
+        phase3_session=Phase3OpenConversationSession(session_id="p3"),
+        phase3_progress=progress,
+    )
+
+    packet, event = asyncio.run(
+        runtime.send_phase3_recall_scores(
+            "classify_voice",
+            {"Speech": 0.9},
+            user_response="voice",
+        )
+    )
+
+    assert event.outcome == PHASE3_OUTCOME_CORRECT
+    assert packet.to_bytes()[0] == 1
+    assert client.sent == [packet]
+    assert progress.load()["recall_events"][0]["prompt_id"] == "classify_voice"
+
+
+def test_phase2_and_phase3_options_do_not_conflict(audiogram_path: str, tmp_path):
+    client = _StubBleClient()
+    phase2_progress = Phase2ProgressStore(tmp_path / "phase2.json")
+    phase3_progress = Phase3ProgressStore(tmp_path / "phase3.json")
+    runtime = WristbandRuntime(
+        HapticMapper(audiogram_path),
+        client,
+        phase2_session=Phase2TrainingSession(session_id="p2"),
+        phase2_progress=phase2_progress,
+        phase3_session=Phase3OpenConversationSession(session_id="p3"),
+        phase3_progress=phase3_progress,
+        phase3_passive_log=True,
+    )
+
+    phase2_packet, phase2_event = asyncio.run(
+        runtime.send_phase2_scores("alarm_smoke", {"Smoke detector": 0.9})
+    )
+    phase3_packet = asyncio.run(runtime.send_scores({"Speech": 0.9}))
+
+    assert phase2_event.outcome == OUTCOME_CORRECT
+    assert phase2_packet.to_bytes()[0] == 3
+    assert phase3_packet.to_bytes()[0] == 1
+    assert phase2_progress.load()["events"][0]["target_id"] == "alarm_smoke"
+    assert phase3_progress.load()["passive_events"][0]["predicted_sound_class"] == "voice"
 
 
 def test_run_manual_prints_packet_for_sound_class(audiogram_path, capsys):

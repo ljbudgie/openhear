@@ -6,9 +6,9 @@ from __future__ import annotations
 import pytest
 
 from core.protocol import (
+    SYNC_BYTE,
     MessageType,
     ParsedFrame,
-    SYNC_BYTE,
     _xor_checksum,
     decode_session,
     encode_frame,
@@ -88,14 +88,14 @@ class TestParseFrame:
 
     def test_incomplete_payload_returns_none(self):
         # Encode a frame then truncate it before the checksum
-        raw = encode_frame(MessageType.BACKUP, b"\xDE\xAD\xBE\xEF")
+        raw = encode_frame(MessageType.BACKUP, b"\xde\xad\xbe\xef")
         truncated = raw[:-2]  # remove last 2 bytes
         frame, consumed = parse_frame(truncated)
         assert frame is None
 
     def test_junk_before_sync_is_skipped(self):
         raw = encode_frame(MessageType.GET_DEVICE_INFO, b"\x42")
-        data = b"\xBB\xCC" + raw
+        data = b"\xbb\xcc" + raw
         frame, consumed = parse_frame(data)
         assert frame is not None
         assert frame.checksum_ok is True
@@ -115,7 +115,7 @@ class TestDecodeSession:
 
     def test_two_consecutive_frames(self):
         f1 = encode_frame(MessageType.HELLO, b"", seq=0)
-        f2 = encode_frame(MessageType.ACK, b"\xFF", seq=1)
+        f2 = encode_frame(MessageType.ACK, b"\xff", seq=1)
         frames = list(decode_session(f1 + f2))
         assert len(frames) == 2
         assert frames[0].msg_type == MessageType.HELLO
@@ -126,7 +126,7 @@ class TestDecodeSession:
         assert frames == []
 
     def test_partial_frame_at_end_does_not_crash(self):
-        raw = encode_frame(MessageType.GET_FITTING, b"\xAA\xBB")
+        raw = encode_frame(MessageType.GET_FITTING, b"\xaa\xbb")
         partial = raw[:3]  # just sync + seq + type, no payload
         frames = list(decode_session(partial))
         assert frames == []
@@ -141,7 +141,7 @@ class TestDecodeSession:
     def test_junk_between_valid_frames(self):
         f1 = encode_frame(MessageType.HELLO, b"", seq=0)
         f2 = encode_frame(MessageType.ACK, b"", seq=1)
-        stream = f1 + b"\xDE\xAD" + f2  # junk bytes between frames
+        stream = f1 + b"\xde\xad" + f2  # junk bytes between frames
         frames = list(decode_session(stream))
         # Both frames should be found; the junk bytes before f2's sync are skipped
         msg_types = [f.msg_type for f in frames]
@@ -161,10 +161,10 @@ class TestXorChecksum:
         assert _xor_checksum(b"") == 0
 
     def test_single_byte(self):
-        assert _xor_checksum(b"\xAB") == 0xAB
+        assert _xor_checksum(b"\xab") == 0xAB
 
     def test_two_same_bytes_is_zero(self):
-        assert _xor_checksum(b"\xFF\xFF") == 0
+        assert _xor_checksum(b"\xff\xff") == 0
 
     def test_known_value(self):
         assert _xor_checksum(b"\x01\x02\x03") == 0x01 ^ 0x02 ^ 0x03

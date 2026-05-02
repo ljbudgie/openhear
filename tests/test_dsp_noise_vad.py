@@ -7,7 +7,6 @@ import pytest
 
 from dsp.noise import VoiceActivityDetector
 
-
 SR = 16_000
 
 

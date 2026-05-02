@@ -721,6 +721,14 @@ match the README's "Windows 11 primary target" claim. A separate
 [CodeQL workflow](.github/workflows/codeql.yml) provides static security
 analysis of the Python codebase.
 
+A May 2026 pre-Phase 6 coverage pass confirms the Python suite exercises the
+core DSP, audiogram, advocacy, wristband, stream, hardware safety, and Phase 5
+sovereign-device paths with branch coverage enabled. The lowest-coverage gaps
+found in that pass were the live wristband runtime loop and micro:bit firmware
+main-loop/fallback branches; both now have deterministic tests using local
+hardware stubs, so Phase 6 mobile-native work can start from a stronger
+regression baseline without requiring BLE, audio devices, or a micro:bit in CI.
+
 A note on repository hygiene: `.gitignore` no longer blanket-ignores
 `*.json`, `*.png`, and `*.pdf` at every depth. Build and output
 directories are ignored explicitly, so new fixtures, schemas, and

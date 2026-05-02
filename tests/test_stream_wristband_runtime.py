@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import asyncio
+import sys
+import types
 
+import numpy as np
 import pytest
 
 import stream.phase3_open_conversation as phase3
@@ -18,6 +21,10 @@ class _StubBleClient:
 
     async def send_packet(self, packet):
         self.sent.append(packet)
+
+
+class _StopLiveLoop(RuntimeError):
+    pass
 
 
 def test_packet_from_classification(audiogram_path: str):
@@ -191,3 +198,111 @@ def test_main_manual_branch_runs_without_ble(audiogram_path, monkeypatch, capsys
     out = capsys.readouterr().out.strip()
     # Doorbell sound_class_id is 2.
     assert out.startswith("[2,")
+
+
+def test_main_requires_phase3_progress_for_passive_log(audiogram_path, monkeypatch):
+    from stream import wristband_runtime
+
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "wristband_runtime",
+            "--audiogram",
+            audiogram_path,
+            "--model",
+            "model.tflite",
+            "--labels",
+            "labels.csv",
+            "--phase3-passive-log",
+        ],
+    )
+
+    with pytest.raises(SystemExit):
+        wristband_runtime.main()
+
+
+def test_run_live_processes_one_frame_and_disconnects(audiogram_path, monkeypatch, capsys):
+    from stream import wristband_runtime
+
+    class _FakeInputStream:
+        def __init__(self, *, samplerate, channels, dtype, blocksize):
+            self.samplerate = samplerate
+            self.channels = channels
+            self.dtype = dtype
+            self.blocksize = blocksize
+            self.reads = 0
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+        def read(self, frame_samples):
+            assert frame_samples == self.blocksize
+            self.reads += 1
+            if self.reads > 1:
+                raise _StopLiveLoop("stop after one frame")
+            return np.zeros((frame_samples, 1), dtype=np.float32), None
+
+    fake_sounddevice = types.SimpleNamespace(InputStream=_FakeInputStream)
+    monkeypatch.setitem(sys.modules, "sounddevice", fake_sounddevice)
+
+    class _FakeClassifier:
+        def __init__(self, model, labels):
+            assert model == "model.tflite"
+            assert labels == "labels.csv"
+
+        def classify_window(self, samples, sample_rate):
+            assert sample_rate == 16_000
+            assert samples.ndim == 1
+            return types.SimpleNamespace(
+                source_label="Speech",
+                sound_key="voice",
+                confidence=0.9,
+            )
+
+    class _FakeBLEClient(_StubBleClient):
+        instances = []
+
+        def __init__(self):
+            super().__init__()
+            self.connected = False
+            self.disconnected = False
+            self.__class__.instances.append(self)
+
+        async def connect(self, *, timeout):
+            assert timeout == 1.25
+            self.connected = True
+
+        async def disconnect(self):
+            self.disconnected = True
+
+    monkeypatch.setattr(wristband_runtime, "YamnetClassifier", _FakeClassifier)
+    monkeypatch.setattr(wristband_runtime, "OpenHearBLEClient", _FakeBLEClient)
+    args = types.SimpleNamespace(
+        audiogram=audiogram_path,
+        comfort_scale=1.0,
+        ear_strategy="worst",
+        model="model.tflite",
+        labels="labels.csv",
+        phase2_target=None,
+        phase2_progress=None,
+        phase3_passive_log=False,
+        phase3_recall_prompt=None,
+        phase3_progress=None,
+        phase3_environment="",
+        phase3_user_response=None,
+        phase3_reaction_time_ms=None,
+        phase3_user_rating=None,
+        scan_timeout=1.25,
+    )
+
+    with pytest.raises(_StopLiveLoop):
+        asyncio.run(wristband_runtime._run_live(args))
+
+    client = _FakeBLEClient.instances[0]
+    assert client.connected is True
+    assert client.disconnected is True
+    assert client.sent[0].sound_class_id == 1
+    assert "voice" in capsys.readouterr().out

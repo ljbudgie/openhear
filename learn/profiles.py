@@ -125,8 +125,9 @@ def list_profiles(*, root: Path = PROFILES_ROOT) -> list[str]:
         except json.JSONDecodeError:
             continue
         if isinstance(metadata, dict):
-            names.append(str(metadata.get("name") or child.name))
-    return sorted(names, key=str.casefold)
+            profile_name = metadata.get("name")
+            names.append(profile_name if isinstance(profile_name, str) else child.name)
+    return sorted(names, key=lambda name: name.casefold())
 
 
 def delete_profile(

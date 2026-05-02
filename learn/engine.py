@@ -19,6 +19,7 @@ that remain valid for :mod:`dsp.user_config`.
 from __future__ import annotations
 
 import json
+import logging
 from copy import deepcopy
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -33,7 +34,9 @@ __all__ = [
     "update_from_feedback",
 ]
 
-_ADAPTIVE_BOUNDS: dict[tuple[str, str], tuple[float, float]] = {
+logger = logging.getLogger(__name__)
+
+_TUNABLE_PARAMETER_BOUNDS: dict[tuple[str, str], tuple[float, float]] = {
     ("compression", "ratio"): (1.0, 10.0),
     ("compression", "knee_db"): (-120.0, 0.0),
     ("compression", "attack_ms"): (0.1, 1000.0),
@@ -145,13 +148,14 @@ def _apply_preferred_config_average(config: dict[str, Any], state: EngineState) 
             continue
         try:
             preferred_configs.append(load_config(candidate_path).to_dict())
-        except (FileNotFoundError, ValueError, json.JSONDecodeError):
+        except (FileNotFoundError, ValueError, json.JSONDecodeError) as exc:
+            logger.debug("Skipping preferred config %s: %s", candidate_path, exc)
             continue
 
     if not preferred_configs:
         return
 
-    for section, key in _ADAPTIVE_BOUNDS:
+    for section, key in _TUNABLE_PARAMETER_BOUNDS:
         values = [
             preferred[section][key]
             for preferred in preferred_configs
@@ -197,7 +201,7 @@ def _apply_explicit_overrides(config: dict[str, Any], overrides: Any) -> None:
         if section not in config or not isinstance(values, dict):
             continue
         for key, value in values.items():
-            if (section, key) in _ADAPTIVE_BOUNDS:
+            if (section, key) in _TUNABLE_PARAMETER_BOUNDS:
                 config[section][key] = float(value)
 
 
@@ -224,7 +228,7 @@ def _has_preferred_config(state: EngineState) -> bool:
 
 
 def _clamp_config(config: dict[str, Any]) -> None:
-    for (section, key), (minimum, maximum) in _ADAPTIVE_BOUNDS.items():
+    for (section, key), (minimum, maximum) in _TUNABLE_PARAMETER_BOUNDS.items():
         config[section][key] = _clamp(float(config[section][key]), minimum, maximum)
     low, high = [float(value) for value in config["voice"]["boost_hz"]]
     low = _clamp(low, 20.0, 19999.0)

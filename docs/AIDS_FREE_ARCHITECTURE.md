@@ -134,6 +134,13 @@ haptic metadata, environment tags, reaction times, ratings, and outcomes only;
 raw audio, waveforms, speaker embeddings, cloud identifiers, and clinical claims
 are deliberately excluded.
 
+The Phase 4 software scaffold lives in `stream.phase4_spatial_extended`. It
+extends the local-only adaptation tools to direction, elevation, and
+extended-band drills under the `openhear-phase4-progress-v1` schema. The records
+contain derived localisation, band, confidence, timing, environment, rating, and
+outcome metadata only; raw audio, waveforms, location traces, biometric
+identifiers, cloud identifiers, and clinical claims are deliberately excluded.
+
 ### 3.3 Measuring adaptation
 
 Open metrics, logged on-device only:

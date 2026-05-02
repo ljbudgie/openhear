@@ -104,10 +104,7 @@ def _load_firmware_module(module_name: str, source_path: str) -> types.ModuleTyp
         source = fh.read()
     # Remove the bare top-level ``main()`` invocation that runs the
     # blocking event loop on the device.
-    sanitised_lines = [
-        line for line in source.splitlines()
-        if line.strip() != "main()"
-    ]
+    sanitised_lines = [line for line in source.splitlines() if line.strip() != "main()"]
     module = types.ModuleType(module_name)
     module.__file__ = source_path
     code = compile("\n".join(sanitised_lines), source_path, "exec")
@@ -157,14 +154,16 @@ class TestScaleIntensity:
 @pytest.mark.parametrize("firmware", FIRMWARES)
 class TestPatterns:
     def test_pattern_silence_keeps_pins_off(self, firmware):
-        _PIN0.values.clear(); _PIN1.values.clear()
+        _PIN0.values.clear()
+        _PIN1.values.clear()
         firmware._pattern_silence(200)
         # _off writes 0 to both
         assert _PIN0.values == [0]
         assert _PIN1.values == [0]
 
     def test_pattern_voice_pulses_three_times(self, firmware):
-        _PIN0.values.clear(); _PIN1.values.clear()
+        _PIN0.values.clear()
+        _PIN1.values.clear()
         firmware._pattern_voice(255)
         # 3 motor pulses + 3 _off calls => 6 writes per pin
         assert len(_PIN0.values) == 6
@@ -174,13 +173,15 @@ class TestPatterns:
         assert _PIN0.values[1::2] == [0] * 3
 
     def test_pattern_doorbell(self, firmware):
-        _PIN0.values.clear(); _PIN1.values.clear()
+        _PIN0.values.clear()
+        _PIN1.values.clear()
         firmware._pattern_doorbell(128)
         # 2 pulses
         assert len(_PIN0.values) == 4
 
     def test_pattern_alarm_alternates_left_right(self, firmware):
-        _PIN0.values.clear(); _PIN1.values.clear()
+        _PIN0.values.clear()
+        _PIN1.values.clear()
         firmware._pattern_alarm(255)
         # 8 steps each producing 1 motor write + 1 off write per pin.
         assert len(_PIN0.values) == 16
@@ -195,20 +196,23 @@ class TestPatterns:
         assert on_writes_right[1] == firmware._ANALOG_MAX
 
     def test_pattern_dog_drives_right_only(self, firmware):
-        _PIN0.values.clear(); _PIN1.values.clear()
+        _PIN0.values.clear()
+        _PIN1.values.clear()
         firmware._pattern_dog(255)
         # _motors then _off => 2 writes per pin
         assert _PIN0.values == [0, 0]
         assert _PIN1.values == [firmware._ANALOG_MAX, 0]
 
     def test_pattern_traffic_drives_left_only(self, firmware):
-        _PIN0.values.clear(); _PIN1.values.clear()
+        _PIN0.values.clear()
+        _PIN1.values.clear()
         firmware._pattern_traffic(255)
         assert _PIN0.values == [firmware._ANALOG_MAX, 0]
         assert _PIN1.values == [0, 0]
 
     def test_pattern_media(self, firmware):
-        _PIN0.values.clear(); _PIN1.values.clear()
+        _PIN0.values.clear()
+        _PIN1.values.clear()
         firmware._pattern_media(255)
         # 2 pulses, 4 writes per pin.
         assert len(_PIN0.values) == 4
@@ -268,3 +272,97 @@ class TestAdvertise:
         monkeypatch.setattr(bt, "advertise", _adv)
         firmware._advertise(_NoAdvertUart())
         assert called["count"] == 1
+
+    def test_set_advertisement_type_error_falls_back_to_uart_without_name(
+        self, firmware, monkeypatch
+    ):
+        bt = sys.modules["bluetooth"]
+
+        def _set_advertisement(*args, **kwargs):  # noqa: ARG001
+            raise TypeError("old MicroPython signature")
+
+        class _TypeErrorStartUART(_FakeUART):
+            def start_advertising(self, advertise_name: str | None = None) -> None:
+                if advertise_name is not None:
+                    raise TypeError("old UART signature")
+                self.advertised = True
+                self.advertised_name = advertise_name
+
+        monkeypatch.setattr(bt, "set_advertisement", _set_advertisement, raising=False)
+        uart = _TypeErrorStartUART()
+
+        firmware._advertise(uart)
+
+        assert uart.advertised is True
+        assert uart.advertised_name is None
+
+    def test_bluetooth_advertise_type_error_retries_boolean_signature(self, firmware, monkeypatch):
+        bt = sys.modules["bluetooth"]
+        monkeypatch.delattr(bt, "set_advertisement", raising=False)
+
+        class _NoAdvertUart:
+            pass
+
+        calls: list[tuple[tuple, dict]] = []
+
+        def _advertise(*args, **kwargs):
+            calls.append((args, kwargs))
+            if len(calls) == 1:
+                raise TypeError("old bluetooth signature")
+
+        monkeypatch.setattr(bt, "advertise", _advertise)
+
+        uart = _NoAdvertUart()
+        firmware._advertise(uart)
+
+        assert calls[0] == ((100000, uart), {})
+        assert calls[1] == ((True,), {})
+
+
+@pytest.mark.parametrize("firmware", FIRMWARES)
+class TestFirmwareMain:
+    def test_idle_loop_turns_motors_off_and_sleeps(self, firmware, monkeypatch):
+        uart = _FakeUART()
+        sleep_calls: list[int] = []
+
+        def _sleep(ms: int) -> None:
+            sleep_calls.append(ms)
+            if ms == 20:
+                raise KeyboardInterrupt
+
+        monkeypatch.setattr(firmware, "UARTService", lambda: uart)
+        monkeypatch.setattr(firmware, "_advertise", lambda _uart: None)
+        monkeypatch.setattr(firmware, "sleep", _sleep)
+        _PIN0.values.clear()
+        _PIN1.values.clear()
+
+        with pytest.raises(KeyboardInterrupt):
+            firmware.main()
+
+        assert firmware.display.shown[-1] == "H"
+        assert _PIN0.values == [0]
+        assert _PIN1.values == [0]
+        assert sleep_calls == [20]
+
+    def test_packet_loop_dispatches_pattern_and_turns_motors_off(self, firmware, monkeypatch):
+        uart = _FakeUART()
+        uart.queued.append(bytes([4, 255, 4]))
+        sleep_calls: list[int] = []
+
+        def _sleep(ms: int) -> None:
+            sleep_calls.append(ms)
+            if ms == 20:
+                raise KeyboardInterrupt
+
+        monkeypatch.setattr(firmware, "UARTService", lambda: uart)
+        monkeypatch.setattr(firmware, "_advertise", lambda _uart: None)
+        monkeypatch.setattr(firmware, "sleep", _sleep)
+        _PIN0.values.clear()
+        _PIN1.values.clear()
+
+        with pytest.raises(KeyboardInterrupt):
+            firmware.main()
+
+        assert _PIN0.values == [0, 0, 0]
+        assert _PIN1.values == [firmware._ANALOG_MAX, 0, 0]
+        assert sleep_calls == [150, 20]

@@ -76,3 +76,40 @@ python -m tests.simulations.simulate_population --n-users 10000 --seed 42
 
 # Full population simulation (may take time)
 python -m tests.simulations.simulate_population --n-users 1000000 --output results/
+```
+
+## Phase 2 dry-run training scaffold
+
+The first implementation of Phase 2 is a local-only dry-run scaffold in
+`stream.phase2_training`. It covers the "Words & environment" stage from the
+aids-free adaptation protocol without adding model files, datasets, cloud
+services, or raw-audio storage.
+
+The built-in catalog includes deterministic targets for alarms, traffic,
+household/environmental sounds, a small closed word set, and a configurable
+name placeholder. Detailed targets collapse back to the existing wristband BLE
+classes (`voice`, `doorbell`, `alarm`, `dog`, `traffic`, `media`, `silence`),
+so the current firmware packet ids remain stable.
+
+Examples:
+
+```bash
+# List the built-in Phase 2 target catalog.
+python -m stream.phase2_training list
+
+# Score one dry-run classifier result and append a local progress JSON record.
+python -m stream.phase2_training run \
+  --target alarm_smoke \
+  --score "Smoke detector=0.90" \
+  --session-id phase2-demo \
+  --progress /tmp/openhear-phase2-progress.json
+
+# Summarise local progress.
+python -m stream.phase2_training summary \
+  --progress /tmp/openhear-phase2-progress.json
+```
+
+Progress files use the `openhear-phase2-progress-v1` schema and store target
+ids, classifier labels, confidence, reaction time, user rating, and outcomes.
+They intentionally do not store raw audio or waveforms. These records are
+experimental training telemetry only and are not clinical evidence.

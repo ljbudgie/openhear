@@ -23,6 +23,7 @@ from stream.phase4_spatial_extended import (
     list_tasks,
     main,
     normalise_azimuth,
+    normalise_band,
     score_extended_band,
     score_spatial,
 )
@@ -51,6 +52,14 @@ def test_angle_helpers_wrap_azimuths():
     assert normalise_azimuth(270) == -90
     assert normalise_azimuth(-180) == 180
     assert angular_error_degrees(179, -179) == 2
+
+
+def test_band_normalisation_resolves_aliases_and_rejects_unknown():
+    assert normalise_band("infra") == "infrasonic"
+    assert normalise_band("high frequency") == "high_frequency"
+    assert normalise_band("low-tactile") == "tactile_low"
+    with pytest.raises(ValueError, match="Unsupported Phase 4 band"):
+        normalise_band("unknown band")
 
 
 def test_progress_store_empty_document(tmp_path: Path):
@@ -86,6 +95,17 @@ def test_extended_event_records_derived_metadata_only(tmp_path: Path):
     data = Phase4ProgressStore(tmp_path / "phase4.json").append_extended(event)
     assert data["extended_events"][0]["predicted_band"] == "ultrasonic"
     assert data["extended_events"][0]["outcome"] == OUTCOME_CORRECT
+
+
+def test_extended_event_rejects_unknown_predicted_band():
+    session = Phase4SpatialExtendedSession(session_id="s1")
+    with pytest.raises(ValueError, match="Unsupported Phase 4 band"):
+        session.record_extended_band(
+            "band_ultrasonic",
+            predicted_band="unknown band",
+            confidence=0.9,
+            user_response="ultrasonic",
+        )
 
 
 def test_progress_store_rejects_unknown_schema(tmp_path: Path):

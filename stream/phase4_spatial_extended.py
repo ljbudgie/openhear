@@ -221,6 +221,7 @@ _BAND_ALIASES: dict[str, str] = {
     "infrasound": "infrasonic",
     "low": "tactile_low",
     "low tactile": "tactile_low",
+    "low_tactile": "tactile_low",
     "speech band": "speech",
     "speech": "speech",
     "high": "high_frequency",
@@ -395,6 +396,8 @@ class Phase4ProgressStore:
 
     def append_extended(self, event: Phase4ExtendedBandEvent) -> dict[str, object]:
         """Append one extended-band event and write the local JSON progress file."""
+        normalise_band(event.expected_band)
+        normalise_band(event.predicted_band)
         data = self.load()
         extended_events = data["extended_events"]
         assert isinstance(extended_events, list)
@@ -449,8 +452,8 @@ def score_extended_band(
     response = user_response.strip().lower()
     if response in {"skip", "skipped"}:
         return OUTCOME_SKIPPED
-    response_band = normalise_band(response) if response else ""
-    if not response_band:
+    response_band = _normalise_band_response(response) if response else None
+    if response_band is None:
         return OUTCOME_MISSED
     if confidence < min_confidence or predicted == "silence":
         return OUTCOME_SILENCE
@@ -474,10 +477,28 @@ def angular_error_degrees(a: float, b: float) -> float:
 
 def normalise_band(value: str) -> str:
     """Collapse a user or classifier band label into a stable Phase 4 band."""
-    band = value.lower().strip().replace("-", "_").replace(" ", "_")
+    raw = value.lower().strip()
+    band = _normalise_band_key(raw)
     if band in EXTENDED_BANDS or band == "silence":
         return band
-    return _BAND_ALIASES.get(value.lower().strip(), band)
+    alias = _BAND_ALIASES.get(raw) or _BAND_ALIASES.get(band)
+    if alias in EXTENDED_BANDS or alias == "silence":
+        return alias
+    raise ValueError(
+        f"Unsupported Phase 4 band {value!r}. "
+        f"Expected one of: {', '.join((*EXTENDED_BANDS, 'silence'))}."
+    )
+
+
+def _normalise_band_key(value: str) -> str:
+    return value.replace("-", "_").replace(" ", "_")
+
+
+def _normalise_band_response(value: str) -> str | None:
+    try:
+        return normalise_band(value)
+    except ValueError:
+        return None
 
 
 def summarise_events(

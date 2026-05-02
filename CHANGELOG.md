@@ -11,6 +11,40 @@ release; they will be called out under a **Breaking** subsection.
 
 ### Added
 
+- Burgess Principle reference layer in `advocacy/` (gate, adapters,
+  sovereign/null receipt tagging, SHA-256 commitments, raw-audio refusal at
+  the boundary), plus `examples/reference_integration.py` and the
+  `docs/BURGESS_PRINCIPLE.md`, `docs/ADVOCACY_INTEGRATION.md`, and
+  `docs/INTEGRATORS.md` contracts.
+- Apache 2.0 `LICENSE` and `NOTICE` carrying the OpenHear Sovereign Use
+  Addendum.
+- Aids-free training scaffolds (local-only, no raw audio):
+  `stream/phase2_training.py` (closed-set words, names, alarms, traffic),
+  `stream/phase3_open_conversation.py` (passive wear + active recall),
+  `stream/phase4_spatial_extended.py` (localisation and extended-band tasks).
+- Phase 5 sovereign device bundle generator
+  (`hardware/sovereign_device/pipeline.py`,
+  `python -m hardware.sovereign_device.pipeline AUDIOGRAM.json ./build`)
+  producing firmware plus a sovereign build manifest with hashes, safety
+  requirements, regulatory status, and cost-target status. Plan documented
+  in `docs/PHASE5_SOVEREIGN_DEVICE.md`.
+- Phase 6 listener-preference engine in `learn/`:
+  `learn/preferences.py` (A/B choice capture as JSONL),
+  `learn/engine.py` (deterministic, bounded adaptive config suggestions),
+  `learn/profiles.py` (per-environment saved profiles under
+  `~/.openhear/profiles/`).
+- Wristband stack: micro:bit v2 prototype firmware
+  (`wristband/openhear_firmware.py`), `stream/wristband_runtime.py`
+  classifier-to-BLE runtime, `haptic_commander.py` audiogram-weighted
+  command tool, `yamnet_classifier.py` standalone classifier, and the
+  bundled YAMNet label CSV under `stream/data/`.
+- New north-star documents:
+  `docs/HUMAN_SENSORY_SOVEREIGNTY_ARCHITECTURE.md`,
+  `docs/AIDS_FREE_ARCHITECTURE.md`, `docs/RESEARCH_ROADMAP.md`,
+  `docs/PRIOR_ART.md`, `docs/GO_TO_MARKET.md`,
+  `docs/FUNDING_AND_PARTNERSHIPS.md`, `docs/SOVEREIGN_PHILOSOPHY.md`,
+  `docs/HAPTIC_PRIOR_ART.md`, and the `docs/index.md` entry point.
+- `core/future_memory.py` running development memory CLI.
 - `SECURITY.md` describing the private vulnerability disclosure process,
   including a dedicated path for hearing-safety reports.
 - `CODE_OF_CONDUCT.md` (Contributor Covenant 2.1, with project-specific
@@ -33,6 +67,12 @@ release; they will be called out under a **Breaking** subsection.
 
 ### Changed
 
+- `README.md` substantially expanded: nine-pillar platform expansion,
+  OpenHear Wristband and aids-free vision sections, Burgess Principle
+  summary, Path 2.5 wristband prototype quick-start, and Phase 2/3/4/5/6
+  module documentation. Phase tag on the Learn module corrected (Phase 6,
+  not phase 3) and Phase 5 sovereign-device bundle generator surfaced in
+  the body of the README and the aids-free roadmap.
 - License metadata is now consistent across the repository. `pyproject.toml`
   classifier and `README.md` references that previously said "MIT" have been
   corrected to match `LICENSE` / `NOTICE`, which are
@@ -42,6 +82,8 @@ release; they will be called out under a **Breaking** subsection.
   fixtures, schemas, and documentation media are not silently dropped.
 - `pytest.ini` has been replaced by the consolidated configuration in
   `pyproject.toml`. Test discovery and behaviour are unchanged.
+- `dsp/pipeline.py` migrated off `datetime.UTC` to `timezone.utc` for
+  Python 3.10 compatibility.
 
 ### Fixed
 

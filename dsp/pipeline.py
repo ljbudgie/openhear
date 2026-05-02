@@ -199,10 +199,8 @@ def build_dsp_chain(prescription: "Prescription | None" = None) -> list:
     if prescription is not None:
         rx_ratio, rx_knee, rx_speech_gain = _mean_prescription_values(prescription)
         logger.info(
-            "Audiogram prescription applied; personalized compressor and "
-            "voice-clarity parameters enabled (mean of both ears)"
-        )
-        comp_ratio = rx_ratio
+            "Audiogram prescription applied; compressor and voice-clarity "
+            "parameters set from user profile (mean of both ears)"
         comp_knee = rx_knee
         voice_gain = rx_speech_gain
     else:

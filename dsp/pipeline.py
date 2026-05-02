@@ -235,9 +235,8 @@ def build_dsp_chain(prescription: "Prescription | None" = None) -> list:
             high_hz=config.VOICE_CLARITY_HIGH_HZ,
             gain=voice_gain,
         ))
-        logger.info("Stage added: VoiceClarityEnhancer (%.0f–%.0f Hz, gain=%.2f)",
-                    config.VOICE_CLARITY_LOW_HZ, config.VOICE_CLARITY_HIGH_HZ,
-                    voice_gain)
+        logger.info("Stage added: VoiceClarityEnhancer (%.0f–%.0f Hz)",
+                    config.VOICE_CLARITY_LOW_HZ, config.VOICE_CLARITY_HIGH_HZ)
 
     if config.FEEDBACK_CANCELLATION_ENABLED:
         chain.append(FeedbackCanceller(

@@ -327,8 +327,10 @@ def main() -> None:
 
     if args.command == "summary":
         data = Phase2ProgressStore(args.progress).load()
-        session = Phase2TrainingSession()
-        for raw_event in data["events"]:
+        raw_events = data["events"]
+        first_session_id = raw_events[0]["session_id"] if raw_events else None
+        session = Phase2TrainingSession(session_id=first_session_id)
+        for raw_event in raw_events:
             session.events.append(Phase2Evaluation(**raw_event))
         _print_json(session.summary())
 

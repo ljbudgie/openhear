@@ -76,6 +76,7 @@ python -m tests.simulations.simulate_population --n-users 10000 --seed 42
 
 # Full population simulation (may take time)
 python -m tests.simulations.simulate_population --n-users 1000000 --output results/
+```
 
 ## Phase 2 dry-run training scaffold
 

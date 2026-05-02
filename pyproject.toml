@@ -62,6 +62,7 @@ openhear-latency = "stream.latency:main"
 openhear-recorder = "stream.recorder:main"
 openhear-demo = "examples.demo:main"
 openhear-phase2-training = "stream.phase2_training:main"
+openhear-phase3-open-conversation = "stream.phase3_open_conversation:main"
 
 [project.urls]
 Homepage = "https://github.com/ljbudgie/openhear"

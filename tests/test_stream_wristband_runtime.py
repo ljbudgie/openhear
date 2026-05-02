@@ -7,6 +7,7 @@ import asyncio
 import pytest
 
 from stream.haptic_mapper import HapticMapper
+from stream.phase2_training import OUTCOME_CORRECT, Phase2ProgressStore, Phase2TrainingSession
 from stream.wristband_runtime import WristbandRuntime, _run_manual
 
 
@@ -29,9 +30,7 @@ def test_send_scores_dispatches_packet_via_ble(audiogram_path: str):
     client = _StubBleClient()
     runtime = WristbandRuntime(HapticMapper(audiogram_path), client)
 
-    packet = asyncio.run(
-        runtime.send_scores({"Doorbell": 0.9, "Music": 0.05})
-    )
+    packet = asyncio.run(runtime.send_scores({"Doorbell": 0.9, "Music": 0.05}))
 
     assert client.sent == [packet]
     # Doorbell maps to OpenHear sound class id 2 (see haptic_mapper.SOUND_PROFILES).
@@ -48,6 +47,24 @@ def test_send_scores_silence_when_below_confidence(audiogram_path: str):
     # The silence profile's sound_class_id is 0.
     assert packet.to_bytes()[0] == 0
     assert client.sent == [packet]
+
+
+def test_send_phase2_scores_dispatches_existing_packet_and_logs(audiogram_path: str, tmp_path):
+    client = _StubBleClient()
+    progress = Phase2ProgressStore(tmp_path / "phase2.json")
+    runtime = WristbandRuntime(
+        HapticMapper(audiogram_path),
+        client,
+        phase2_session=Phase2TrainingSession(session_id="s1"),
+        phase2_progress=progress,
+    )
+
+    packet, event = asyncio.run(runtime.send_phase2_scores("alarm_smoke", {"Smoke detector": 0.9}))
+
+    assert event.outcome == OUTCOME_CORRECT
+    assert packet.to_bytes()[0] == 3
+    assert client.sent == [packet]
+    assert progress.load()["events"][0]["target_id"] == "alarm_smoke"
 
 
 def test_run_manual_prints_packet_for_sound_class(audiogram_path, capsys):
@@ -90,12 +107,13 @@ def test_main_manual_branch_runs_without_ble(audiogram_path, monkeypatch, capsys
         "sys.argv",
         [
             "wristband_runtime",
-            "--audiogram", audiogram_path,
-            "--manual-sound", "doorbell",
+            "--audiogram",
+            audiogram_path,
+            "--manual-sound",
+            "doorbell",
         ],
     )
     wristband_runtime.main()
     out = capsys.readouterr().out.strip()
     # Doorbell sound_class_id is 2.
     assert out.startswith("[2,")
-

@@ -61,6 +61,7 @@ openhear-virtual-cable = "stream.virtual_cable:main"
 openhear-latency = "stream.latency:main"
 openhear-recorder = "stream.recorder:main"
 openhear-demo = "examples.demo:main"
+openhear-phase2-training = "stream.phase2_training:main"
 
 [project.urls]
 Homepage = "https://github.com/ljbudgie/openhear"

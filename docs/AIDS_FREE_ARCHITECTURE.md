@@ -117,6 +117,15 @@ Phase 4  Spatial & extended  (month 3+)            — direction, elevation, ult
 
 All training data, performance curves, and model checkpoints are stored locally as plain files. The user can export, delete, fork, or share them. There is no cloud account.
 
+The Phase 2 software scaffold now lives in `stream.phase2_training`. It defines
+a deterministic local catalog for common words, configurable name detection
+placeholders, alarms, traffic, and environmental sounds. The scaffold scores
+dry-run classifier labels against prompted targets, collapses detailed targets
+back to the existing wristband haptic classes, and can append local JSON
+progress records under the `openhear-phase2-progress-v1` schema. These records
+store labels, confidence, reaction time, user rating, and outcomes only; raw
+audio is deliberately excluded.
+
 ### 3.3 Measuring adaptation
 
 Open metrics, logged on-device only:

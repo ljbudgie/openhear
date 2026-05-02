@@ -26,7 +26,6 @@ from hardware.wristband.firmware.openhear_firmware_v1 import (
     process_packet,
 )
 
-
 # ===========================================================================
 # openhear_firmware_v1
 # ===========================================================================

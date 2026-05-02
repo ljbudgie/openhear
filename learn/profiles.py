@@ -19,12 +19,15 @@ Profiles use this on-disk layout:
 from __future__ import annotations
 
 import json
+import logging
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 from dsp.user_config import load_config
+
+logger = logging.getLogger(__name__)
 
 __all__ = [
     "PROFILES_ROOT",
@@ -126,7 +129,10 @@ def list_profiles(*, root: Path = PROFILES_ROOT) -> list[str]:
             continue
         if isinstance(metadata, dict):
             profile_name = metadata.get("name")
-            names.append(profile_name if isinstance(profile_name, str) else child.name)
+            if isinstance(profile_name, str):
+                names.append(profile_name)
+            else:
+                logger.warning("Skipping profile with invalid metadata name: %s", metadata_path)
     return sorted(names, key=lambda name: name.casefold())
 
 

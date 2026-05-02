@@ -96,6 +96,23 @@ def test_send_scores_logs_phase3_passive_without_changing_packet(audiogram_path:
     assert stored["environment_tag"] == "home"
 
 
+def test_send_scores_passive_log_creates_in_memory_session_without_progress(audiogram_path: str):
+    client = _StubBleClient()
+    runtime = WristbandRuntime(
+        HapticMapper(audiogram_path),
+        client,
+        phase3_environment="garden",
+        phase3_passive_log=True,
+    )
+
+    packet = asyncio.run(runtime.send_scores({"Dog bark": 0.9}))
+
+    assert packet.to_bytes()[0] == 4
+    assert client.sent == [packet]
+    assert runtime.phase3_session is not None
+    assert runtime.phase3_session.passive_events[0].environment_tag == "garden"
+
+
 def test_send_phase3_recall_scores_dispatches_existing_packet_and_logs(
     audiogram_path: str, tmp_path
 ):
@@ -120,6 +137,44 @@ def test_send_phase3_recall_scores_dispatches_existing_packet_and_logs(
     assert packet.to_bytes()[0] == 1
     assert client.sent == [packet]
     assert progress.load()["recall_events"][0]["prompt_id"] == "classify_voice"
+
+
+def test_send_phase2_scores_creates_session_without_progress(audiogram_path: str):
+    client = _StubBleClient()
+    runtime = WristbandRuntime(HapticMapper(audiogram_path), client)
+
+    packet, event = asyncio.run(runtime.send_phase2_scores("alarm_smoke", {"Smoke detector": 0.9}))
+
+    assert runtime.phase2_session is not None
+    assert event.outcome == OUTCOME_CORRECT
+    assert packet.to_bytes()[0] == 3
+    assert client.sent == [packet]
+
+
+def test_send_phase3_recall_scores_creates_session_without_progress(audiogram_path: str):
+    client = _StubBleClient()
+    runtime = WristbandRuntime(
+        HapticMapper(audiogram_path),
+        client,
+        phase3_environment="office",
+    )
+
+    packet, event = asyncio.run(
+        runtime.send_phase3_recall_scores(
+            "classify_voice",
+            {"Speech": 0.9},
+            user_response="voice",
+            reaction_time_ms=800.0,
+            user_rating=5,
+            notes="clear",
+        )
+    )
+
+    assert runtime.phase3_session is not None
+    assert event.outcome == phase3.OUTCOME_CORRECT
+    assert event.environment_tag == "office"
+    assert packet.to_bytes()[0] == 1
+    assert client.sent == [packet]
 
 
 def test_phase2_and_phase3_options_do_not_conflict(audiogram_path: str, tmp_path):
@@ -198,6 +253,34 @@ def test_main_manual_branch_runs_without_ble(audiogram_path, monkeypatch, capsys
     out = capsys.readouterr().out.strip()
     # Doorbell sound_class_id is 2.
     assert out.startswith("[2,")
+
+
+def test_main_live_branch_delegates_to_async_runtime(audiogram_path, monkeypatch):
+    from stream import wristband_runtime
+
+    calls = []
+
+    async def _fake_run_live(args):
+        calls.append(args)
+
+    monkeypatch.setattr(wristband_runtime, "_run_live", _fake_run_live)
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "wristband_runtime",
+            "--audiogram",
+            audiogram_path,
+            "--model",
+            "model.tflite",
+            "--labels",
+            "labels.csv",
+        ],
+    )
+
+    wristband_runtime.main()
+
+    assert calls[0].model == "model.tflite"
+    assert calls[0].labels == "labels.csv"
 
 
 def test_main_requires_phase3_progress_for_passive_log(audiogram_path, monkeypatch):

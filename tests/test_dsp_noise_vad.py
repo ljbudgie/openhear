@@ -44,13 +44,13 @@ class TestIsSpeech:
 
     def test_silence_returns_false(self):
         vad = _make_vad()
-        assert vad.is_speech(np.zeros(256, dtype=np.float32)) == False
+        assert not vad.is_speech(np.zeros(256, dtype=np.float32))
 
     def test_loud_tone_returns_true(self):
         vad = _make_vad(threshold_db=6.0)
         t = np.arange(512) / SR
         tone = (0.5 * np.sin(2 * np.pi * 200.0 * t)).astype(np.float32)
-        assert vad.is_speech(tone) == True
+        assert vad.is_speech(tone)
 
     def test_noise_floor_adapts_on_non_speech_frames(self):
         vad = _make_vad(adapt_seconds=0.01)
@@ -75,7 +75,7 @@ class TestIsSpeech:
         white = rng.standard_normal(1024).astype(np.float32) * 0.5
         # Speech-like energy but very high ZCR → should be rejected.
         result = vad.is_speech(white)
-        assert result == False
+        assert not result
 
     def test_zcr_disabled_allows_wideband(self):
         """With max_zcr=None, white noise passes the ZCR test."""
@@ -84,7 +84,7 @@ class TestIsSpeech:
         white = rng.standard_normal(1024).astype(np.float32) * 0.5
         # Energy is well above threshold=0 so should be classified as speech.
         result = vad.is_speech(white)
-        assert result == True
+        assert result
 
 
 class TestNoiseFloorDb:

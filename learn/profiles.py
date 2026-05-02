@@ -28,6 +28,7 @@ from typing import Any
 from dsp.user_config import load_config
 
 logger = logging.getLogger(__name__)
+_SLUG_ALLOWED_PUNCTUATION = "-_"
 
 __all__ = [
     "PROFILES_ROOT",
@@ -45,7 +46,7 @@ PROFILES_ROOT: Path = Path.home() / ".openhear" / "profiles"
 
 
 def _slugify(name: str) -> str:
-    safe = "".join(ch if ch.isalnum() or ch in "-_" else "_" for ch in name)
+    safe = "".join(ch if ch.isalnum() or ch in _SLUG_ALLOWED_PUNCTUATION else "_" for ch in name)
     return safe.lower() or "unnamed"
 
 

@@ -36,6 +36,12 @@ __all__ = [
 
 logger = logging.getLogger(__name__)
 
+_BLEND_FACTOR = 0.5
+_VOICE_BAND_LOW_MIN = 20.0
+_VOICE_BAND_LOW_MAX = 19999.0
+_VOICE_BAND_HIGH_MIN = 21.0
+_VOICE_BAND_HIGH_MAX = 20000.0
+
 _TUNABLE_PARAMETER_BOUNDS: dict[tuple[str, str], tuple[float, float]] = {
     ("compression", "ratio"): (1.0, 10.0),
     ("compression", "knee_db"): (-120.0, 0.0),
@@ -165,7 +171,7 @@ def _apply_preferred_config_average(config: dict[str, Any], state: EngineState) 
             continue
         target = sum(float(value) for value in values) / len(values)
         current = float(config[section][key])
-        config[section][key] = current + ((target - current) * 0.5)
+        config[section][key] = current + ((target - current) * _BLEND_FACTOR)
 
     _apply_voice_band_average(config, preferred_configs)
 
@@ -185,12 +191,20 @@ def _apply_voice_band_average(
     current_low, current_high = [float(value) for value in config["voice"]["boost_hz"]]
     target_low = sum(lows) / len(lows)
     target_high = sum(highs) / len(highs)
-    next_low = _clamp(current_low + ((target_low - current_low) * 0.5), 20.0, 19999.0)
-    next_high = _clamp(current_high + ((target_high - current_high) * 0.5), 21.0, 20000.0)
+    next_low = _clamp(
+        current_low + ((target_low - current_low) * _BLEND_FACTOR),
+        _VOICE_BAND_LOW_MIN,
+        _VOICE_BAND_LOW_MAX,
+    )
+    next_high = _clamp(
+        current_high + ((target_high - current_high) * _BLEND_FACTOR),
+        _VOICE_BAND_HIGH_MIN,
+        _VOICE_BAND_HIGH_MAX,
+    )
     if next_low >= next_high:
         midpoint = (next_low + next_high) / 2
-        next_low = max(20.0, midpoint - 0.5)
-        next_high = min(20000.0, midpoint + 0.5)
+        next_low = max(_VOICE_BAND_LOW_MIN, midpoint - _BLEND_FACTOR)
+        next_high = min(_VOICE_BAND_HIGH_MAX, midpoint + _BLEND_FACTOR)
     config["voice"]["boost_hz"] = [next_low, next_high]
 
 
@@ -231,10 +245,10 @@ def _clamp_config(config: dict[str, Any]) -> None:
     for (section, key), (minimum, maximum) in _TUNABLE_PARAMETER_BOUNDS.items():
         config[section][key] = _clamp(float(config[section][key]), minimum, maximum)
     low, high = [float(value) for value in config["voice"]["boost_hz"]]
-    low = _clamp(low, 20.0, 19999.0)
-    high = _clamp(high, 21.0, 20000.0)
+    low = _clamp(low, _VOICE_BAND_LOW_MIN, _VOICE_BAND_LOW_MAX)
+    high = _clamp(high, _VOICE_BAND_HIGH_MIN, _VOICE_BAND_HIGH_MAX)
     if low >= high:
-        high = min(20000.0, low + 1.0)
+        high = min(_VOICE_BAND_HIGH_MAX, low + 1.0)
     config["voice"]["boost_hz"] = [low, high]
 
 

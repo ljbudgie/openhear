@@ -20,7 +20,7 @@ from learn.profiles import (
 )
 
 
-def _write_config(path: Path, *, ratio: float = 2.5, boost_db: float = 6.0) -> Path:
+def _write_test_config(path: Path, *, ratio: float = 2.5, boost_db: float = 6.0) -> Path:
     path.write_text(
         "\n".join(
             [
@@ -121,8 +121,12 @@ def test_update_from_feedback_returns_new_state_with_summary():
 
 
 def test_suggest_next_config_blends_toward_preferred_config(tmp_path):
-    base = _write_config(tmp_path / "base.yaml", ratio=2.0, boost_db=4.0)
-    preferred = _write_config(tmp_path / "preferred.yaml", ratio=6.0, boost_db=12.0)
+    base = _write_test_config(tmp_path / "base.yaml", ratio=2.0, boost_db=4.0)
+    preferred = _write_test_config(
+        tmp_path / "preferred.yaml",
+        ratio=6.0,
+        boost_db=12.0,
+    )
     output = tmp_path / "candidate.yaml"
     state = update_from_feedback(
         EngineState(data={}),
@@ -143,7 +147,7 @@ def test_suggest_next_config_blends_toward_preferred_config(tmp_path):
 
 
 def test_suggest_next_config_clamps_explicit_overrides(tmp_path):
-    base = _write_config(tmp_path / "base.yaml")
+    base = _write_test_config(tmp_path / "base.yaml")
     output = tmp_path / "candidate.yaml"
     state = EngineState(
         data={
@@ -162,7 +166,7 @@ def test_suggest_next_config_clamps_explicit_overrides(tmp_path):
 
 
 def test_suggest_next_config_explores_when_feedback_has_no_files(tmp_path):
-    base = _write_config(tmp_path / "base.yaml", boost_db=4.0)
+    base = _write_test_config(tmp_path / "base.yaml", boost_db=4.0)
     output = tmp_path / "candidate.yaml"
     state = update_from_feedback(
         EngineState(data={}),
@@ -175,7 +179,7 @@ def test_suggest_next_config_explores_when_feedback_has_no_files(tmp_path):
 
 
 def test_profiles_save_load_list_delete(tmp_path):
-    config = _write_config(tmp_path / "config.yaml", ratio=3.0)
+    config = _write_test_config(tmp_path / "config.yaml", ratio=3.0)
     root = tmp_path / "profiles"
 
     profile_dir = save_profile(
@@ -201,7 +205,7 @@ def test_profiles_save_load_list_delete(tmp_path):
 
 
 def test_profile_save_rejects_blank_name_and_missing_config(tmp_path):
-    config = _write_config(tmp_path / "config.yaml")
+    config = _write_test_config(tmp_path / "config.yaml")
     with pytest.raises(ValueError, match="must not be blank"):
         save_profile(config, " ", root=tmp_path / "profiles")
     with pytest.raises(FileNotFoundError, match="Config file not found"):
@@ -223,7 +227,7 @@ def test_profiles_root_default_location():
 
 @pytest.mark.parametrize("invalid_metadata", [["not", "object"], "not an object", 7, None])
 def test_profile_metadata_is_json_object(tmp_path, invalid_metadata):
-    config = _write_config(tmp_path / "config.yaml")
+    config = _write_test_config(tmp_path / "config.yaml")
     profile_dir = save_profile(config, "Restaurant", root=tmp_path / "profiles")
     (profile_dir / "metadata.json").write_text(json.dumps(invalid_metadata), encoding="utf-8")
 

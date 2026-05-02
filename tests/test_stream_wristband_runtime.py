@@ -6,15 +6,9 @@ import asyncio
 
 import pytest
 
+import stream.phase3_open_conversation as phase3
 from stream.haptic_mapper import HapticMapper
 from stream.phase2_training import OUTCOME_CORRECT, Phase2ProgressStore, Phase2TrainingSession
-from stream.phase3_open_conversation import (
-    OUTCOME_CORRECT as PHASE3_OUTCOME_CORRECT,
-)
-from stream.phase3_open_conversation import (
-    Phase3OpenConversationSession,
-    Phase3ProgressStore,
-)
 from stream.wristband_runtime import WristbandRuntime, _run_manual
 
 
@@ -76,11 +70,11 @@ def test_send_phase2_scores_dispatches_existing_packet_and_logs(audiogram_path: 
 
 def test_send_scores_logs_phase3_passive_without_changing_packet(audiogram_path: str, tmp_path):
     client = _StubBleClient()
-    progress = Phase3ProgressStore(tmp_path / "phase3.json")
+    progress = phase3.Phase3ProgressStore(tmp_path / "phase3.json")
     runtime = WristbandRuntime(
         HapticMapper(audiogram_path),
         client,
-        phase3_session=Phase3OpenConversationSession(session_id="p3"),
+        phase3_session=phase3.Phase3OpenConversationSession(session_id="p3"),
         phase3_progress=progress,
         phase3_environment="home",
         phase3_passive_log=True,
@@ -99,11 +93,11 @@ def test_send_phase3_recall_scores_dispatches_existing_packet_and_logs(
     audiogram_path: str, tmp_path
 ):
     client = _StubBleClient()
-    progress = Phase3ProgressStore(tmp_path / "phase3.json")
+    progress = phase3.Phase3ProgressStore(tmp_path / "phase3.json")
     runtime = WristbandRuntime(
         HapticMapper(audiogram_path),
         client,
-        phase3_session=Phase3OpenConversationSession(session_id="p3"),
+        phase3_session=phase3.Phase3OpenConversationSession(session_id="p3"),
         phase3_progress=progress,
     )
 
@@ -115,7 +109,7 @@ def test_send_phase3_recall_scores_dispatches_existing_packet_and_logs(
         )
     )
 
-    assert event.outcome == PHASE3_OUTCOME_CORRECT
+    assert event.outcome == phase3.OUTCOME_CORRECT
     assert packet.to_bytes()[0] == 1
     assert client.sent == [packet]
     assert progress.load()["recall_events"][0]["prompt_id"] == "classify_voice"
@@ -124,13 +118,13 @@ def test_send_phase3_recall_scores_dispatches_existing_packet_and_logs(
 def test_phase2_and_phase3_options_do_not_conflict(audiogram_path: str, tmp_path):
     client = _StubBleClient()
     phase2_progress = Phase2ProgressStore(tmp_path / "phase2.json")
-    phase3_progress = Phase3ProgressStore(tmp_path / "phase3.json")
+    phase3_progress = phase3.Phase3ProgressStore(tmp_path / "phase3.json")
     runtime = WristbandRuntime(
         HapticMapper(audiogram_path),
         client,
         phase2_session=Phase2TrainingSession(session_id="p2"),
         phase2_progress=phase2_progress,
-        phase3_session=Phase3OpenConversationSession(session_id="p3"),
+        phase3_session=phase3.Phase3OpenConversationSession(session_id="p3"),
         phase3_progress=phase3_progress,
         phase3_passive_log=True,
     )

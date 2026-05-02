@@ -122,7 +122,7 @@ World → Microphone → Custom DSP Engine → Bluetooth Stream → Your Aids �
 
 **Audiogram module** — reads, visualises, and exports your hearing thresholds in open formats. The data your audiologist has been keeping in a system you can't access.
 
-**Learn module** *(phase 3)* — a preference engine that adjusts to your own corrections over time. Your hearing profile improves every day, not once every two years.
+**Learn module** *(Phase 6)* — a local preference engine that adjusts to your own corrections over time. Listener A/B choices are captured by [`learn/preferences.py`](learn/preferences.py), folded into deterministic config suggestions by [`learn/engine.py`](learn/engine.py), and recalled per environment via the saved profiles in [`learn/profiles.py`](learn/profiles.py). Your hearing profile improves every day, not once every two years.
 
 ---
 
@@ -272,6 +272,17 @@ Phase 4  Spatial & extended  (month 3+)            — direction, elevation, ult
 ```
 
 
+Phase 2 has a local-only scaffold for word, name, and environment training:
+
+```bash
+python -m stream.phase2_training list
+python -m stream.phase2_training run --target word_water --scores word_water=0.92 --progress /tmp/openhear-phase2-progress.json
+python -m stream.phase2_training summary --progress /tmp/openhear-phase2-progress.json
+```
+
+The Phase 2 progress file stores only target ids, classifier labels, scores,
+timing, and outcomes. It does not store raw audio or speaker identity.
+
 Phase 3 has a local-only scaffold for open conversation telemetry:
 
 ```bash
@@ -298,6 +309,21 @@ The Phase 4 progress file stores only derived localisation, extended-band,
 timing, environment, rating, and outcome metadata. It does not store raw audio,
 waveforms, location traces, biometric identifiers, cloud identifiers, or
 clinical claims.
+
+### Phase 5 — Sovereign Device bundle
+
+Phase 5 is the local, one-click bridge from an audiogram to a self-contained
+device build. It generates firmware plus a sovereign build manifest from a
+`openhear-audiogram-v1` JSON file, with no network dependency and no raw audio:
+
+```bash
+python -m hardware.sovereign_device.pipeline AUDIOGRAM.json ./build --ear right
+```
+
+The manifest records firmware, audiogram, and component-database hashes,
+safety requirements, regulatory status, and cost-target status without
+embedding the underlying audiogram thresholds. Full plan and exit criteria
+are in [`docs/PHASE5_SOVEREIGN_DEVICE.md`](docs/PHASE5_SOVEREIGN_DEVICE.md).
 
 ### A Hearing NPU, designed from first principles
 
@@ -427,6 +453,11 @@ See `SOVEREIGN_AUDIO.md` for the full framework.
 3. `python -m core.read_fitting` — exports the current raw Noahlink payload to JSON; add `--session` to emit the new structured `FittingSession` format and `--verbose` for DEBUG logging
 4. `python -m dsp.pipeline` — starts the real-time audio processor. Useful flags: `--bypass` for A/B, `--test-tone` when no mic is plugged in, `--latency` for per-block latency logs, `--metrics-csv metrics.csv` to record CPU / RMS / latency
 5. Copy `examples/config.yaml` to `~/.openhear/config.yaml` and tune it (see `docs/TUNING_GUIDE.md`); `dsp/config.py` defaults still work as a fallback
+6. Optional — exercise the aids-free training scaffolds with
+   `python -m stream.phase2_training`,
+   `python -m stream.phase3_open_conversation`, and
+   `python -m stream.phase4_spatial_extended`; build a sovereign-device bundle
+   with `python -m hardware.sovereign_device.pipeline AUDIOGRAM.json ./build`
 
 ### Path 2.5 — Wristband prototype (Windows + micro:bit v2)
 1. Export or copy the patient's audiogram JSON
@@ -501,7 +532,7 @@ Before using Path 2 or 3, set your aids to linear mode. This alone will transfor
 - [x] `dsp/own_voice_bypass` — own-voice detection and DSP bypass
 - [x] `mobile/` — Android scaffold (Compose UI + Oboe/JNI audio engine skeleton)
 - [ ] `mobile/` — production-ready Android DSP + hearing-aid streaming
-- [x] `learn/` — on-device preference learning engine
+- [x] `learn/` — on-device preference learning engine (Phase 6: `preferences.py` capture, deterministic `engine.py` config suggestions, per-environment `profiles.py`)
 - [ ] `ui/` — desktop GUI (the OSCAR moment)
 - [ ] iOS version of mobile app
 - [ ] Community scan library
@@ -521,7 +552,7 @@ Before using Path 2 or 3, set your aids to linear mode. This alone will transfor
 - [ ] `firmware/npu/`, `firmware/mcu/` — bare-metal Rust runtime
 - [ ] `dsp/haptic/` — frequency→position mapping, illusion library, audiogram weighting
 - [ ] `models/` — base classifier, separator, and personal-LoRA scaffold
-- [ ] `training/protocol/` — Phase 0–4 training app and metrics
+- [ ] `training/protocol/` — Phase 0–4 training app and metrics (Phases 2–4 currently scaffolded under `stream/phase{2,3,4}_*.py`; Phases 0–1 still pending)
 - [ ] v0 prototype on Raspberry Pi CM4 + Hailo-8L + 24-LRA wrist sleeve
 - [ ] v0.5 prototype on RISC-V SBC + 64-piezo lattice
 - [ ] v1 FPGA validation on Lattice ECP5

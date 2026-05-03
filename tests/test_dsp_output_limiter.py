@@ -61,7 +61,6 @@ class TestPeakLimiterProcess:
     def test_below_ceiling_unity_gain(self):
         """Signals well below the ceiling should pass through without reduction."""
         ceiling_dbfs = -6.0
-        ceiling_lin = 10 ** (ceiling_dbfs / 20.0)  # ≈ 0.501
         # Use a signal clearly below the ceiling (0.1 << 0.5).
         lim = PeakLimiter(ceiling_dbfs=ceiling_dbfs, sample_rate=SAMPLE_RATE)
         x = np.full(FRAMES, 0.1, dtype=np.float32)

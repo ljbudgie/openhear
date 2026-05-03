@@ -168,6 +168,31 @@ OCCLUSION_REDUCTION_CORNER_HZ: float = 300.0
 OCCLUSION_REDUCTION_SLOPE_DB_OCT: float = 12.0
 
 
+# ── Output Limiter (final safety stage) ────────────────────────────────────
+
+# Enable / disable the software peak limiter.
+# When enabled, the limiter is inserted as the LAST stage in the DSP chain
+# and prevents the output from exceeding OUTPUT_LIMITER_CEILING_DBFS.
+# This is a software complement to the passive hardware MPO limiter described
+# in hardware/safety/mpo_calculator.py.  Both should be used together.
+OUTPUT_LIMITER_ENABLED: bool = True
+
+# Output ceiling in dBFS (must be ≤ 0.0).
+# −1.0 dBFS leaves 1 dB of headroom below digital full-scale, preventing
+# the hard clip in _float32_to_bytes from ever being reached during normal
+# operation.  Lower values provide more headroom but reduce loudness.
+OUTPUT_LIMITER_CEILING_DBFS: float = -1.0
+
+# Attack time constant (seconds): how quickly gain reduction is applied
+# when a loud transient is detected.  1 ms is fast enough to catch
+# transients before they clip while still sounding natural.
+OUTPUT_LIMITER_ATTACK_S: float = 0.001
+
+# Release time constant (seconds): how long gain takes to recover after
+# a loud passage.  100 ms avoids a pumping artefact on typical speech.
+OUTPUT_LIMITER_RELEASE_S: float = 0.100
+
+
 # ── Logging ─────────────────────────────────────────────────────────────────
 
 # Python logging level for the DSP pipeline.

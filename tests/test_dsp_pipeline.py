@@ -84,56 +84,69 @@ class TestFloat32ToBytes:
 
 class TestBuildDspChain:
     def test_all_stages_enabled(self, monkeypatch):
+        monkeypatch.setattr(config, "OCCLUSION_REDUCTION_ENABLED", True)
         monkeypatch.setattr(config, "NOISE_REDUCTION_ENABLED", True)
         monkeypatch.setattr(config, "COMPRESSION_ENABLED", True)
         monkeypatch.setattr(config, "VOICE_CLARITY_ENABLED", True)
         monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", True)
         monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", True)
+        monkeypatch.setattr(config, "OUTPUT_LIMITER_ENABLED", True)
 
         chain = pipeline.build_dsp_chain()
-        assert len(chain) == 5
+        assert len(chain) == 7
 
         from dsp.compression import WDRCompressor
         from dsp.feedback_canceller import FeedbackCanceller
         from dsp.noise_reduction import SpectralSubtractor
+        from dsp.occlusion_reduction import OcclusionReducer
+        from dsp.output_limiter import PeakLimiter
         from dsp.own_voice_bypass import OwnVoiceBypass
         from dsp.voice_clarity import VoiceClarityEnhancer
 
-        assert isinstance(chain[0], SpectralSubtractor)
-        assert isinstance(chain[1], WDRCompressor)
-        assert isinstance(chain[2], VoiceClarityEnhancer)
-        assert isinstance(chain[3], FeedbackCanceller)
-        assert isinstance(chain[4], OwnVoiceBypass)
+        assert isinstance(chain[0], OcclusionReducer)
+        assert isinstance(chain[1], SpectralSubtractor)
+        assert isinstance(chain[2], WDRCompressor)
+        assert isinstance(chain[3], VoiceClarityEnhancer)
+        assert isinstance(chain[4], FeedbackCanceller)
+        assert isinstance(chain[5], OwnVoiceBypass)
+        assert isinstance(chain[6], PeakLimiter)
 
     def test_all_stages_disabled(self, monkeypatch, caplog):
+        monkeypatch.setattr(config, "OCCLUSION_REDUCTION_ENABLED", False)
         monkeypatch.setattr(config, "NOISE_REDUCTION_ENABLED", False)
         monkeypatch.setattr(config, "COMPRESSION_ENABLED", False)
         monkeypatch.setattr(config, "VOICE_CLARITY_ENABLED", False)
         monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", False)
         monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", False)
+        monkeypatch.setattr(config, "OUTPUT_LIMITER_ENABLED", False)
 
         import logging
+
         with caplog.at_level(logging.WARNING):
             chain = pipeline.build_dsp_chain()
         assert chain == []
         assert any("disabled" in r.message for r in caplog.records)
 
     def test_partial_enable(self, monkeypatch):
+        monkeypatch.setattr(config, "OCCLUSION_REDUCTION_ENABLED", False)
         monkeypatch.setattr(config, "NOISE_REDUCTION_ENABLED", False)
         monkeypatch.setattr(config, "COMPRESSION_ENABLED", True)
         monkeypatch.setattr(config, "VOICE_CLARITY_ENABLED", False)
         monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", False)
         monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", False)
+        monkeypatch.setattr(config, "OUTPUT_LIMITER_ENABLED", False)
 
         chain = pipeline.build_dsp_chain()
         assert len(chain) == 1
 
     def test_chain_processes_samples(self, monkeypatch):
+        monkeypatch.setattr(config, "OCCLUSION_REDUCTION_ENABLED", True)
         monkeypatch.setattr(config, "NOISE_REDUCTION_ENABLED", True)
         monkeypatch.setattr(config, "COMPRESSION_ENABLED", True)
         monkeypatch.setattr(config, "VOICE_CLARITY_ENABLED", True)
         monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", True)
         monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", True)
+        monkeypatch.setattr(config, "OUTPUT_LIMITER_ENABLED", True)
 
         chain = pipeline.build_dsp_chain()
         samples = np.zeros(config.FRAMES_PER_BUFFER, dtype=np.float32)
@@ -153,24 +166,32 @@ class TestBuildDspChainWithPrescription:
         def _bands(r, k, g):
             # Provide all speech-band frequencies so the mean calculation works.
             return [
-                BandPrescription(freq_hz=1000, threshold_db_hl=40.0,
-                                 gain_db=g, ratio=r, knee_dbfs=k),
-                BandPrescription(freq_hz=2000, threshold_db_hl=40.0,
-                                 gain_db=g, ratio=r, knee_dbfs=k),
-                BandPrescription(freq_hz=4000, threshold_db_hl=40.0,
-                                 gain_db=g, ratio=r, knee_dbfs=k),
+                BandPrescription(
+                    freq_hz=1000, threshold_db_hl=40.0, gain_db=g, ratio=r, knee_dbfs=k
+                ),
+                BandPrescription(
+                    freq_hz=2000, threshold_db_hl=40.0, gain_db=g, ratio=r, knee_dbfs=k
+                ),
+                BandPrescription(
+                    freq_hz=4000, threshold_db_hl=40.0, gain_db=g, ratio=r, knee_dbfs=k
+                ),
             ]
 
-        return Prescription(right=_bands(ratio, knee, gain_1k),
-                            left=_bands(ratio, knee, gain_1k))
+        return Prescription(right=_bands(ratio, knee, gain_1k), left=_bands(ratio, knee, gain_1k))
 
-    def test_prescription_overrides_compressor_ratio(self, monkeypatch):
-        """WDRCompressor ratio must come from the prescription, not config."""
-        monkeypatch.setattr(config, "COMPRESSION_ENABLED", True)
+    def _disable_all_except_compression(self, monkeypatch):
+        """Helper: disable every stage except the compressor."""
+        monkeypatch.setattr(config, "OCCLUSION_REDUCTION_ENABLED", False)
         monkeypatch.setattr(config, "NOISE_REDUCTION_ENABLED", False)
+        monkeypatch.setattr(config, "COMPRESSION_ENABLED", True)
         monkeypatch.setattr(config, "VOICE_CLARITY_ENABLED", False)
         monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", False)
         monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", False)
+        monkeypatch.setattr(config, "OUTPUT_LIMITER_ENABLED", False)
+
+    def test_prescription_overrides_compressor_ratio(self, monkeypatch):
+        """WDRCompressor ratio must come from the prescription, not config."""
+        self._disable_all_except_compression(monkeypatch)
         # Pick a ratio clearly different from the config default.
         prescription_ratio = config.COMPRESSION_RATIO + 1.0
         rx = self._make_prescription(ratio=prescription_ratio, knee=-40.0, gain_1k=10.0)
@@ -178,35 +199,30 @@ class TestBuildDspChainWithPrescription:
         chain = pipeline.build_dsp_chain(prescription=rx)
         assert len(chain) == 1
         from dsp.compression import WDRCompressor
+
         compressor = chain[0]
         assert isinstance(compressor, WDRCompressor)
         assert abs(compressor.ratio - prescription_ratio) < 0.01
 
     def test_prescription_overrides_compressor_knee(self, monkeypatch):
         """WDRCompressor knee_dbfs must come from the prescription, not config."""
-        monkeypatch.setattr(config, "COMPRESSION_ENABLED", True)
-        monkeypatch.setattr(config, "NOISE_REDUCTION_ENABLED", False)
-        monkeypatch.setattr(config, "VOICE_CLARITY_ENABLED", False)
-        monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", False)
-        monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", False)
+        self._disable_all_except_compression(monkeypatch)
         prescription_knee = config.COMPRESSION_KNEE_DBFS - 10.0
         rx = self._make_prescription(ratio=2.0, knee=prescription_knee, gain_1k=10.0)
 
         chain = pipeline.build_dsp_chain(prescription=rx)
         from dsp.compression import WDRCompressor
+
         assert isinstance(chain[0], WDRCompressor)
         assert abs(chain[0].knee_dbfs - prescription_knee) < 0.01
 
     def test_no_prescription_uses_config_defaults(self, monkeypatch):
         """Without a prescription, config defaults must be used unchanged."""
-        monkeypatch.setattr(config, "COMPRESSION_ENABLED", True)
-        monkeypatch.setattr(config, "NOISE_REDUCTION_ENABLED", False)
-        monkeypatch.setattr(config, "VOICE_CLARITY_ENABLED", False)
-        monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", False)
-        monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", False)
+        self._disable_all_except_compression(monkeypatch)
 
         chain = pipeline.build_dsp_chain(prescription=None)
         from dsp.compression import WDRCompressor
+
         compressor = chain[0]
         assert isinstance(compressor, WDRCompressor)
         assert compressor.ratio == config.COMPRESSION_RATIO

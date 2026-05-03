@@ -13,7 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 from dataclasses import asdict, dataclass
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
 
@@ -283,7 +283,7 @@ class Phase4SpatialExtendedSession:
         )
         event = Phase4SpatialEvent(
             session_id=self.session_id,
-            timestamp=datetime.now(UTC).isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
             task_id=task.task_id,
             expected_azimuth_degrees=task.expected_azimuth_degrees,
             predicted_azimuth_degrees=normalise_azimuth(predicted_azimuth_degrees),
@@ -329,7 +329,7 @@ class Phase4SpatialExtendedSession:
         )
         event = Phase4ExtendedBandEvent(
             session_id=self.session_id,
-            timestamp=datetime.now(UTC).isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
             task_id=task.task_id,
             expected_band=task.expected_band,
             predicted_band=predicted,

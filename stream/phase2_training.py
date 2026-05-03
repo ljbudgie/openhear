@@ -12,7 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 from dataclasses import asdict, dataclass
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
 
@@ -193,7 +193,7 @@ class Phase2TrainingSession:
         outcome = _score_outcome(target, predicted_target, predicted_sound_class, confidence)
         event = Phase2Evaluation(
             session_id=self.session_id,
-            timestamp=datetime.now(UTC).isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
             target_id=target.target_id,
             predicted_target_id=predicted_target.target_id if predicted_target else None,
             predicted_sound_class=predicted_sound_class,

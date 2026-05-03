@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 from dsp.user_config import load_config
-from learn import engine, preferences, profiles
+from learn import engine, preferences, profiles, universal_friend
 from learn.engine import EngineState, suggest_next_config, update_from_feedback
 from learn.preferences import PreferenceEvent, load_events, record_choice, summarise
 from learn.profiles import (
@@ -17,6 +17,14 @@ from learn.profiles import (
     list_profiles,
     load_profile,
     save_profile,
+)
+from learn.universal_friend import (
+    DEFAULT_CONSENT_SCOPES,
+    UniversalFriendInvite,
+    create_invite,
+    load_invite,
+    start_mirrored_session,
+    write_invite,
 )
 
 
@@ -63,6 +71,7 @@ def test_learn_package_exposes_subpackages():
     assert preferences is not None
     assert engine is not None
     assert profiles is not None
+    assert universal_friend is not None
 
 
 def test_preference_event_has_sane_defaults():
@@ -380,3 +389,78 @@ def test_profile_metadata_is_json_object(tmp_path, invalid_metadata):
 
     with pytest.raises(ValueError, match="metadata"):
         load_profile("Restaurant", root=tmp_path / "profiles")
+
+
+def test_universal_friend_invite_references_profile_without_exporting_config(tmp_path):
+    config = _write_test_config(tmp_path / "config.yaml", ratio=3.0)
+    root = tmp_path / "profiles"
+    save_profile(config, "Quiet Home", root=root)
+
+    invite = create_invite(
+        "Quiet Home",
+        alias="Universal Friend",
+        scopes=("profile_summary", "focus_policy"),
+        note="share focus mode only",
+        root=root,
+    )
+
+    assert invite.alias == "Universal Friend"
+    assert invite.profile_name == "Quiet Home"
+    assert invite.profile_slug == "quiet_home"
+    assert len(invite.profile_digest) == 64
+    assert invite.scopes == ("profile_summary", "focus_policy")
+    exported = invite.to_dict()
+    assert exported["scopes"] == ["profile_summary", "focus_policy"]
+    assert "config" not in exported
+    assert "audiogram" not in exported
+    assert "raw_audio" not in exported
+
+
+def test_universal_friend_invite_round_trip_and_defaults(tmp_path):
+    config = _write_test_config(tmp_path / "config.yaml")
+    root = tmp_path / "profiles"
+    save_profile(config, "Restaurant", root=root)
+    output = tmp_path / "universal_friend.json"
+
+    invite = create_invite("Restaurant", root=root)
+    write_invite(invite, output)
+
+    loaded = load_invite(output)
+    assert loaded == invite
+    assert loaded.scopes == DEFAULT_CONSENT_SCOPES
+    UniversalFriendInvite.from_dict(loaded.to_dict())
+
+
+def test_universal_friend_mirrored_session_is_policy_metadata_only(tmp_path):
+    config = _write_test_config(tmp_path / "config.yaml")
+    root = tmp_path / "profiles"
+    save_profile(config, "Commute", root=root)
+    invite = create_invite("Commute", alias="Sam", scopes=("haptic_ack",), root=root)
+
+    session = start_mirrored_session(invite, session_id="session-1")
+
+    assert session["session_id"] == "session-1"
+    assert session["trusted_contact"] == "Sam"
+    assert session["profile_name"] == "Commute"
+    assert session["scopes"] == ["haptic_ack"]
+    assert session["raw_personal_data"] is False
+    assert "phone" not in session
+    assert "contacts" not in session
+    assert "config" not in session
+
+
+def test_universal_friend_validates_alias_profile_and_scopes(tmp_path):
+    config = _write_test_config(tmp_path / "config.yaml")
+    root = tmp_path / "profiles"
+    save_profile(config, "Office", root=root)
+
+    with pytest.raises(ValueError, match="alias"):
+        create_invite("Office", alias=" ", root=root)
+    with pytest.raises(ValueError, match="profile name"):
+        create_invite(" ", root=root)
+    with pytest.raises(ValueError, match="consent scope"):
+        create_invite("Office", scopes=(), root=root)
+    with pytest.raises(ValueError, match="Unknown"):
+        create_invite("Office", scopes=("phone_contacts",), root=root)  # type: ignore[arg-type]
+    with pytest.raises(FileNotFoundError, match="Profile not found"):
+        create_invite("Missing", root=root)

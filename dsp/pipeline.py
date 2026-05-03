@@ -44,6 +44,8 @@ from dsp.audiogram_profile import Prescription, prescribe
 from dsp.compression import WDRCompressor
 from dsp.feedback_canceller import FeedbackCanceller
 from dsp.noise_reduction import SpectralSubtractor
+from dsp.occlusion_reduction import OcclusionReducer
+from dsp.output_limiter import PeakLimiter
 from dsp.own_voice_bypass import OwnVoiceBypass
 from dsp.voice_clarity import VoiceClarityEnhancer
 
@@ -193,6 +195,18 @@ def build_dsp_chain(prescription: "Prescription | None" = None) -> list:
     """
     chain = []
 
+    if config.OCCLUSION_REDUCTION_ENABLED:
+        chain.append(OcclusionReducer(
+            sample_rate=config.SAMPLE_RATE,
+            corner_hz=config.OCCLUSION_REDUCTION_CORNER_HZ,
+            slope_db_oct=config.OCCLUSION_REDUCTION_SLOPE_DB_OCT,
+        ))
+        logger.info(
+            "Stage added: OcclusionReducer (corner=%.0f Hz, slope=%.0f dB/oct)",
+            config.OCCLUSION_REDUCTION_CORNER_HZ,
+            config.OCCLUSION_REDUCTION_SLOPE_DB_OCT,
+        )
+
     # Derive compressor and voice-clarity parameters.  When a prescription is
     # present, use the mean of both ears (appropriate for a mono output path);
     # otherwise fall back to the static config defaults.
@@ -268,6 +282,20 @@ def build_dsp_chain(prescription: "Prescription | None" = None) -> list:
             config.OWN_VOICE_F0_HIGH_HZ,
             config.OWN_VOICE_ENERGY_THRESHOLD_DBFS,
             config.OWN_VOICE_BYPASS_GAIN,
+        )
+
+    if config.OUTPUT_LIMITER_ENABLED:
+        chain.append(PeakLimiter(
+            ceiling_dbfs=config.OUTPUT_LIMITER_CEILING_DBFS,
+            attack_s=config.OUTPUT_LIMITER_ATTACK_S,
+            release_s=config.OUTPUT_LIMITER_RELEASE_S,
+            sample_rate=config.SAMPLE_RATE,
+        ))
+        logger.info(
+            "Stage added: PeakLimiter (ceiling=%.1f dBFS, attack=%.0f ms, release=%.0f ms)",
+            config.OUTPUT_LIMITER_CEILING_DBFS,
+            config.OUTPUT_LIMITER_ATTACK_S * 1000,
+            config.OUTPUT_LIMITER_RELEASE_S * 1000,
         )
 
     if not chain:

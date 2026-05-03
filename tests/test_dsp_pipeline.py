@@ -121,6 +121,7 @@ class TestBuildDspChain:
         monkeypatch.setattr(config, "OUTPUT_LIMITER_ENABLED", False)
 
         import logging
+
         with caplog.at_level(logging.WARNING):
             chain = pipeline.build_dsp_chain()
         assert chain == []
@@ -165,16 +166,18 @@ class TestBuildDspChainWithPrescription:
         def _bands(r, k, g):
             # Provide all speech-band frequencies so the mean calculation works.
             return [
-                BandPrescription(freq_hz=1000, threshold_db_hl=40.0,
-                                 gain_db=g, ratio=r, knee_dbfs=k),
-                BandPrescription(freq_hz=2000, threshold_db_hl=40.0,
-                                 gain_db=g, ratio=r, knee_dbfs=k),
-                BandPrescription(freq_hz=4000, threshold_db_hl=40.0,
-                                 gain_db=g, ratio=r, knee_dbfs=k),
+                BandPrescription(
+                    freq_hz=1000, threshold_db_hl=40.0, gain_db=g, ratio=r, knee_dbfs=k
+                ),
+                BandPrescription(
+                    freq_hz=2000, threshold_db_hl=40.0, gain_db=g, ratio=r, knee_dbfs=k
+                ),
+                BandPrescription(
+                    freq_hz=4000, threshold_db_hl=40.0, gain_db=g, ratio=r, knee_dbfs=k
+                ),
             ]
 
-        return Prescription(right=_bands(ratio, knee, gain_1k),
-                            left=_bands(ratio, knee, gain_1k))
+        return Prescription(right=_bands(ratio, knee, gain_1k), left=_bands(ratio, knee, gain_1k))
 
     def _disable_all_except_compression(self, monkeypatch):
         """Helper: disable every stage except the compressor."""
@@ -196,6 +199,7 @@ class TestBuildDspChainWithPrescription:
         chain = pipeline.build_dsp_chain(prescription=rx)
         assert len(chain) == 1
         from dsp.compression import WDRCompressor
+
         compressor = chain[0]
         assert isinstance(compressor, WDRCompressor)
         assert abs(compressor.ratio - prescription_ratio) < 0.01
@@ -208,6 +212,7 @@ class TestBuildDspChainWithPrescription:
 
         chain = pipeline.build_dsp_chain(prescription=rx)
         from dsp.compression import WDRCompressor
+
         assert isinstance(chain[0], WDRCompressor)
         assert abs(chain[0].knee_dbfs - prescription_knee) < 0.01
 
@@ -217,6 +222,7 @@ class TestBuildDspChainWithPrescription:
 
         chain = pipeline.build_dsp_chain(prescription=None)
         from dsp.compression import WDRCompressor
+
         compressor = chain[0]
         assert isinstance(compressor, WDRCompressor)
         assert compressor.ratio == config.COMPRESSION_RATIO

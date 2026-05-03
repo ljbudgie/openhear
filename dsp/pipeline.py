@@ -100,7 +100,7 @@ def generate_test_tone(
         A tuple ``(samples, next_phase)`` where ``next_phase`` should be
         passed back in for the following block.
     """
-    t = (np.arange(frame_count, dtype=np.float64) / sample_rate)
+    t = np.arange(frame_count, dtype=np.float64) / sample_rate
     samples = amplitude * np.sin(2.0 * np.pi * frequency_hz * t + phase)
     next_phase = (phase + 2.0 * np.pi * frequency_hz * frame_count / sample_rate) % (2.0 * np.pi)
     return samples.astype(np.float32), float(next_phase)
@@ -196,11 +196,13 @@ def build_dsp_chain(prescription: "Prescription | None" = None) -> list:
     chain = []
 
     if config.OCCLUSION_REDUCTION_ENABLED:
-        chain.append(OcclusionReducer(
-            sample_rate=config.SAMPLE_RATE,
-            corner_hz=config.OCCLUSION_REDUCTION_CORNER_HZ,
-            slope_db_oct=config.OCCLUSION_REDUCTION_SLOPE_DB_OCT,
-        ))
+        chain.append(
+            OcclusionReducer(
+                sample_rate=config.SAMPLE_RATE,
+                corner_hz=config.OCCLUSION_REDUCTION_CORNER_HZ,
+                slope_db_oct=config.OCCLUSION_REDUCTION_SLOPE_DB_OCT,
+            )
+        )
         logger.info(
             "Stage added: OcclusionReducer (corner=%.0f Hz, slope=%.0f dB/oct)",
             config.OCCLUSION_REDUCTION_CORNER_HZ,
@@ -225,42 +227,53 @@ def build_dsp_chain(prescription: "Prescription | None" = None) -> list:
         voice_gain = config.VOICE_CLARITY_GAIN
 
     if config.NOISE_REDUCTION_ENABLED:
-        chain.append(SpectralSubtractor(
-            frame_length=config.FRAMES_PER_BUFFER,
-            noise_floor_multiplier=config.NOISE_FLOOR_MULTIPLIER,
-            spectral_floor=config.SPECTRAL_FLOOR,
-            noise_estimation_frames=config.NOISE_ESTIMATION_FRAMES,
-        ))
+        chain.append(
+            SpectralSubtractor(
+                frame_length=config.FRAMES_PER_BUFFER,
+                noise_floor_multiplier=config.NOISE_FLOOR_MULTIPLIER,
+                spectral_floor=config.SPECTRAL_FLOOR,
+                noise_estimation_frames=config.NOISE_ESTIMATION_FRAMES,
+            )
+        )
         logger.info("Stage added: SpectralSubtractor")
 
     if config.COMPRESSION_ENABLED:
-        chain.append(WDRCompressor(
-            sample_rate=config.SAMPLE_RATE,
-            ratio=comp_ratio,
-            knee_dbfs=comp_knee,
-            attack_s=config.COMPRESSION_ATTACK_S,
-            release_s=config.COMPRESSION_RELEASE_S,
-        ))
+        chain.append(
+            WDRCompressor(
+                sample_rate=config.SAMPLE_RATE,
+                ratio=comp_ratio,
+                knee_dbfs=comp_knee,
+                attack_s=config.COMPRESSION_ATTACK_S,
+                release_s=config.COMPRESSION_RELEASE_S,
+            )
+        )
         logger.info("Stage added: WDRCompressor")
 
     if config.VOICE_CLARITY_ENABLED:
-        chain.append(VoiceClarityEnhancer(
-            frame_length=config.FRAMES_PER_BUFFER,
-            sample_rate=config.SAMPLE_RATE,
-            low_hz=config.VOICE_CLARITY_LOW_HZ,
-            high_hz=config.VOICE_CLARITY_HIGH_HZ,
-            gain=voice_gain,
-        ))
-        logger.info("Stage added: VoiceClarityEnhancer (%.0f–%.0f Hz)",
-                    config.VOICE_CLARITY_LOW_HZ, config.VOICE_CLARITY_HIGH_HZ)
+        chain.append(
+            VoiceClarityEnhancer(
+                frame_length=config.FRAMES_PER_BUFFER,
+                sample_rate=config.SAMPLE_RATE,
+                low_hz=config.VOICE_CLARITY_LOW_HZ,
+                high_hz=config.VOICE_CLARITY_HIGH_HZ,
+                gain=voice_gain,
+            )
+        )
+        logger.info(
+            "Stage added: VoiceClarityEnhancer (%.0f–%.0f Hz)",
+            config.VOICE_CLARITY_LOW_HZ,
+            config.VOICE_CLARITY_HIGH_HZ,
+        )
 
     if config.FEEDBACK_CANCELLATION_ENABLED:
-        chain.append(FeedbackCanceller(
-            filter_length=config.FEEDBACK_FILTER_LENGTH,
-            mu=config.FEEDBACK_MU,
-            sample_rate=config.SAMPLE_RATE,
-            anti_feedback_gain_db=config.ANTI_FEEDBACK_GAIN_DB,
-        ))
+        chain.append(
+            FeedbackCanceller(
+                filter_length=config.FEEDBACK_FILTER_LENGTH,
+                mu=config.FEEDBACK_MU,
+                sample_rate=config.SAMPLE_RATE,
+                anti_feedback_gain_db=config.ANTI_FEEDBACK_GAIN_DB,
+            )
+        )
         logger.info(
             "Stage added: FeedbackCanceller (length=%d, mu=%.4f, gain=%.1f dB)",
             config.FEEDBACK_FILTER_LENGTH,
@@ -269,13 +282,15 @@ def build_dsp_chain(prescription: "Prescription | None" = None) -> list:
         )
 
     if config.OWN_VOICE_BYPASS_ENABLED:
-        chain.append(OwnVoiceBypass(
-            sample_rate=config.SAMPLE_RATE,
-            f0_low_hz=config.OWN_VOICE_F0_LOW_HZ,
-            f0_high_hz=config.OWN_VOICE_F0_HIGH_HZ,
-            energy_threshold_dbfs=config.OWN_VOICE_ENERGY_THRESHOLD_DBFS,
-            bypass_gain=config.OWN_VOICE_BYPASS_GAIN,
-        ))
+        chain.append(
+            OwnVoiceBypass(
+                sample_rate=config.SAMPLE_RATE,
+                f0_low_hz=config.OWN_VOICE_F0_LOW_HZ,
+                f0_high_hz=config.OWN_VOICE_F0_HIGH_HZ,
+                energy_threshold_dbfs=config.OWN_VOICE_ENERGY_THRESHOLD_DBFS,
+                bypass_gain=config.OWN_VOICE_BYPASS_GAIN,
+            )
+        )
         logger.info(
             "Stage added: OwnVoiceBypass (F0 %.0f–%.0f Hz, threshold=%.1f dBFS, gain=%.2f)",
             config.OWN_VOICE_F0_LOW_HZ,
@@ -285,12 +300,14 @@ def build_dsp_chain(prescription: "Prescription | None" = None) -> list:
         )
 
     if config.OUTPUT_LIMITER_ENABLED:
-        chain.append(PeakLimiter(
-            ceiling_dbfs=config.OUTPUT_LIMITER_CEILING_DBFS,
-            attack_s=config.OUTPUT_LIMITER_ATTACK_S,
-            release_s=config.OUTPUT_LIMITER_RELEASE_S,
-            sample_rate=config.SAMPLE_RATE,
-        ))
+        chain.append(
+            PeakLimiter(
+                ceiling_dbfs=config.OUTPUT_LIMITER_CEILING_DBFS,
+                attack_s=config.OUTPUT_LIMITER_ATTACK_S,
+                release_s=config.OUTPUT_LIMITER_RELEASE_S,
+                sample_rate=config.SAMPLE_RATE,
+            )
+        )
         logger.info(
             "Stage added: PeakLimiter (ceiling=%.1f dBFS, attack=%.0f ms, release=%.0f ms)",
             config.OUTPUT_LIMITER_CEILING_DBFS,
@@ -352,16 +369,19 @@ def run_pipeline(
         pa.terminate()
         sys.exit(1)
 
-    dsp_chain = [] if bypass else build_dsp_chain(
-        prescription=_load_prescription(audiogram_path) if audiogram_path else None,
+    dsp_chain = (
+        []
+        if bypass
+        else build_dsp_chain(
+            prescription=_load_prescription(audiogram_path) if audiogram_path else None,
+        )
     )
     if bypass:
         logger.info("Bypass mode: DSP chain skipped.")
     if test_tone:
         logger.info("Test-tone mode: synthesising 1 kHz sine instead of mic input.")
     logger.info(
-        "Pipeline running — %d Hz, %d frames/buffer (~%.1f ms latency). "
-        "Press Ctrl+C to stop.",
+        "Pipeline running — %d Hz, %d frames/buffer (~%.1f ms latency). Press Ctrl+C to stop.",
         config.SAMPLE_RATE,
         config.FRAMES_PER_BUFFER,
         config.FRAMES_PER_BUFFER / config.SAMPLE_RATE * 1000,
@@ -370,6 +390,7 @@ def run_pipeline(
     metrics_logger = None
     if metrics_path is not None:
         from dsp.metrics import MetricsLogger
+
         metrics_logger = MetricsLogger(path=metrics_path).open()
 
     last_latency_log = time.monotonic()
@@ -379,12 +400,12 @@ def run_pipeline(
             block_start = time.perf_counter()
             if test_tone:
                 samples, tone_phase = generate_test_tone(
-                    config.FRAMES_PER_BUFFER, config.SAMPLE_RATE, phase=tone_phase,
+                    config.FRAMES_PER_BUFFER,
+                    config.SAMPLE_RATE,
+                    phase=tone_phase,
                 )
             else:
-                raw = input_stream.read(
-                    config.FRAMES_PER_BUFFER, exception_on_overflow=False
-                )
+                raw = input_stream.read(config.FRAMES_PER_BUFFER, exception_on_overflow=False)
                 samples = _bytes_to_float32(raw)
 
             for stage in dsp_chain:
@@ -428,27 +449,33 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         description="Run the OpenHear real-time DSP pipeline.",
     )
     parser.add_argument(
-        "--bypass", action="store_true",
+        "--bypass",
+        action="store_true",
         help="Skip the DSP chain (passthrough).  Useful for A/B testing.",
     )
     parser.add_argument(
-        "--test-tone", action="store_true",
+        "--test-tone",
+        action="store_true",
         help="Synthesise a 1 kHz sine wave instead of reading the mic. "
-             "Useful when no microphone is available.",
+        "Useful when no microphone is available.",
     )
     parser.add_argument(
-        "--latency", action="store_true",
+        "--latency",
+        action="store_true",
         help="Log per-block latency once per second.",
     )
     parser.add_argument(
-        "--metrics-csv", default=None,
+        "--metrics-csv",
+        default=None,
         help="Append per-block latency/CPU/level metrics to this CSV file.",
     )
     parser.add_argument(
-        "--audiogram", default=None, metavar="PATH",
+        "--audiogram",
+        default=None,
+        metavar="PATH",
         help="Path to an openhear-audiogram-v1 JSON file.  When provided, "
-             "compression ratio/knee and voice-clarity gain are derived from "
-             "the individual's audiogram rather than the static config defaults.",
+        "compression ratio/knee and voice-clarity gain are derived from "
+        "the individual's audiogram rather than the static config defaults.",
     )
     return parser
 
@@ -462,4 +489,3 @@ if __name__ == "__main__":
         metrics_path=args.metrics_csv,
         audiogram_path=args.audiogram,
     )
-

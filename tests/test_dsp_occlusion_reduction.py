@@ -7,7 +7,6 @@ import pytest
 
 from dsp.occlusion_reduction import OcclusionReducer
 
-
 SAMPLE_RATE = 16_000
 FRAMES = 256
 
@@ -66,7 +65,7 @@ class TestOcclusionReducerProcess:
         # so the filter has settled into steady state.
         signal = (0.5 * np.sin(2.0 * np.pi * 2000.0 * t)).astype(np.float32)
         for i in range(10):
-            chunk = signal[i * FRAMES: (i + 1) * FRAMES]
+            chunk = signal[i * FRAMES : (i + 1) * FRAMES]
             out = r.process(chunk)
         # The last block should be close to the original amplitude.
         rms_in = float(np.sqrt(np.mean(chunk**2)))
@@ -81,7 +80,7 @@ class TestOcclusionReducerProcess:
         t = np.arange(FRAMES * n_blocks, dtype=np.float64) / SAMPLE_RATE
         signal = (0.5 * np.sin(2.0 * np.pi * 50.0 * t)).astype(np.float32)
         for i in range(n_blocks):
-            chunk = signal[i * FRAMES: (i + 1) * FRAMES]
+            chunk = signal[i * FRAMES : (i + 1) * FRAMES]
             out = r.process(chunk)
         rms_in = float(np.sqrt(np.mean(chunk**2)))
         rms_out = float(np.sqrt(np.mean(out**2)))
@@ -97,10 +96,12 @@ class TestOcclusionReducerProcess:
         x = rng.uniform(-0.5, 0.5, FRAMES).astype(np.float32)
 
         y_full = r_full.process(x)
-        y_split = np.concatenate([
-            r_split.process(x[:FRAMES // 2]),
-            r_split.process(x[FRAMES // 2:]),
-        ])
+        y_split = np.concatenate(
+            [
+                r_split.process(x[: FRAMES // 2]),
+                r_split.process(x[FRAMES // 2 :]),
+            ]
+        )
         np.testing.assert_allclose(y_full, y_split, atol=1e-6)
 
 

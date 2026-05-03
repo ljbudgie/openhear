@@ -33,6 +33,7 @@ _REQUIRED_ROLES = {
     "programming",
 }
 
+
 @dataclass(frozen=True)
 class Component:
     """One community-maintained commodity/open component entry."""
@@ -58,6 +59,7 @@ class Component:
     def is_sovereign(self) -> bool:
         """Return true if the component has no proprietary firmware dependency."""
         return not self.proprietary and self.firmware_license.lower() != "proprietary"
+
 
 @dataclass(frozen=True)
 class Phase5BuildManifest:

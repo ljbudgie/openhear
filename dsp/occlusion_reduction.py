@@ -47,9 +47,7 @@ class OcclusionReducer:
     ) -> None:
         nyquist = sample_rate / 2.0
         if not (0 < corner_hz < nyquist):
-            raise ValueError(
-                f"corner_hz must be in (0, {nyquist}), got {corner_hz}."
-            )
+            raise ValueError(f"corner_hz must be in (0, {nyquist}), got {corner_hz}.")
         if slope_db_oct <= 0:
             raise ValueError(f"slope_db_oct must be positive, got {slope_db_oct}.")
 

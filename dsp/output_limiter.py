@@ -87,14 +87,10 @@ class PeakLimiter:
 
         # Attack when gain must fall; release when gain is recovering.
         if target_gain < self._gain:
-            self._gain = (
-                self._attack_coeff * self._gain
-                + (1.0 - self._attack_coeff) * target_gain
-            )
+            self._gain = self._attack_coeff * self._gain + (1.0 - self._attack_coeff) * target_gain
         else:
             self._gain = (
-                self._release_coeff * self._gain
-                + (1.0 - self._release_coeff) * target_gain
+                self._release_coeff * self._gain + (1.0 - self._release_coeff) * target_gain
             )
 
         return (samples * self._gain).astype(np.float32)

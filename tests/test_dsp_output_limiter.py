@@ -7,7 +7,6 @@ import pytest
 
 from dsp.output_limiter import PeakLimiter
 
-
 SAMPLE_RATE = 16_000
 FRAMES = 256
 
@@ -18,7 +17,9 @@ class TestPeakLimiterInit:
         assert lim is not None
 
     def test_custom_parameters(self):
-        lim = PeakLimiter(ceiling_dbfs=-6.0, attack_s=0.002, release_s=0.200, sample_rate=SAMPLE_RATE)
+        lim = PeakLimiter(
+            ceiling_dbfs=-6.0, attack_s=0.002, release_s=0.200, sample_rate=SAMPLE_RATE
+        )
         assert lim is not None
 
     def test_invalid_ceiling_positive(self):

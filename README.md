@@ -650,6 +650,11 @@ OpenHear learns how sound affects this specific user, not a statistical average 
 
 OpenHear users should be able to share acoustic meaning, not just settings.
 
+- **Universal Friend** — the default trusted-contact flow is a local,
+  consent-scoped invite derived from a saved profile. It is not a social graph,
+  friend list, or contact importer: it mirrors only profile-policy metadata for
+  a chosen alias while raw personal data, audiograms, biometrics, and audio stay
+  on the user's device.
 - **Shared acoustic presence** — two users in different places experience the same acoustic profile simultaneously.
 - **Haptic communication** — a new non-verbal channel built from user-owned haptic vocabulary. A squeeze can mean “I am here.” A rhythm can mean “pay attention.” A burst can mean “I love this moment.”
 - **Community acoustic mapping** — venues, transport hubs, parks, streets, and public spaces become annotatable for acoustic accessibility, safety, and therapeutic quality.

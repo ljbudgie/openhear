@@ -500,6 +500,30 @@ Shared sessions allow:
 - guardian / child alert mirroring without exposing raw audio
 - collaborative training sessions
 
+### 9.1.1 Universal Friend
+
+Universal Friend is the default trusted-contact pattern for OpenHear.  It is not
+a phone-style friend list, address-book import, or social graph.  A user creates
+a consent-scoped local invite from a saved acoustic profile, and the runtime can
+mirror only the policy metadata needed for presence, acknowledgement, or guardian
+alerts.
+
+Required boundaries:
+
+- invites reference saved profiles by name, slug, and SHA-256 digest, not by
+  exporting the full profile, audiogram, biometrics, or raw audio
+- consent scopes are explicit, small, and revocable by deleting or rotating the
+  local invite
+- contact identity is a user-chosen alias unless an integration adds its own
+  sovereign identity layer
+- session mirroring carries profile-policy metadata only; raw personal data
+  remains local and sovereign
+- community profile sharing still belongs in the Acoustic Profile Store, while
+  Universal Friend covers one-to-one trusted-contact mirroring
+
+Contributor entry point: `learn.universal_friend` contains the reference
+offline model for creating invites and describing mirrored sessions.
+
 ### 9.2 Haptic communication
 
 A phrase pack contains:

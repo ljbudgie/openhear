@@ -9,6 +9,7 @@ Public modules:
 * :mod:`learn.preferences` — capture listener A/B choices.
 * :mod:`learn.engine` — convert preferences into config updates.
 * :mod:`learn.profiles` — store/load per-environment profiles.
+* :mod:`learn.universal_friend` — local trusted-contact invite/session metadata.
 """
 
 from __future__ import annotations
@@ -17,4 +18,5 @@ __all__ = [
     "preferences",
     "engine",
     "profiles",
+    "universal_friend",
 ]

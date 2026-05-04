@@ -1,268 +1,228 @@
-"""
-pipeline.py – Phase 5 sovereign-device bundle generation.
-
-The Phase 5 software deliverable is intentionally local-only: it turns an
-OpenHear audiogram into firmware plus a verifiable build manifest, validates a
-community component database, and records cost/safety/sovereignty checks without
-uploading audiograms, firmware, or telemetry anywhere.
-"""
-
-from __future__ import annotations
-
-import argparse
-import hashlib
-import json
-from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
-from pathlib import Path
-from typing import Any
-
-from hardware.tympan.audiogram_to_tympan import generate_binaural_sketch, generate_tympan_sketch
-
-COMPONENT_DATABASE_SCHEMA = "openhear-phase5-component-db-v1"
-MANIFEST_SCHEMA = "openhear-phase5-device-build-v1"
-DEFAULT_COST_TARGET_GBP = 100.0
-_DEFAULT_COMPONENT_DB = Path(__file__).with_name("components.json")
-_REQUIRED_ROLES = {
-    "shell",
-    "receiver",
-    "microphone",
-    "processor",
-    "power",
-    "safety_limiter",
-    "programming",
-}
-
-
-@dataclass(frozen=True)
-class Component:
-    """One community-maintained commodity/open component entry."""
-
-    component_id: str
-    role: str
-    part: str
-    category: str
-    unit_cost_gbp: float
-    quantity: int
-    proprietary: bool
-    firmware_license: str
-    supplier_count: int
-    verified_supplier_regions: tuple[str, ...]
-    notes: str = ""
-
-    @property
-    def extended_cost_gbp(self) -> float:
-        """Return the quantity-adjusted cost contribution."""
-        return round(self.unit_cost_gbp * self.quantity, 2)
-
-    @property
-    def is_sovereign(self) -> bool:
-        """Return true if the component has no proprietary firmware dependency."""
-        return not self.proprietary and self.firmware_license.lower() != "proprietary"
-
-
-@dataclass(frozen=True)
-class Phase5BuildManifest:
-    """Verifiable output manifest for one generated Phase 5 device bundle."""
-
-    schema_version: str
-    generated_at: str
-    mode: str
-    ear: str | None
-    audiogram_sha256: str
-    firmware_file: str
-    firmware_sha256: str
-    component_database_version: str
-    component_database_sha256: str
-    component_cost_gbp: float
-    cost_target_gbp: float
-    cost_target_met: bool
-    components: list[dict[str, Any]]
-    safety_requirements: list[str]
-    sovereignty_guarantees: list[str]
-    regulatory_status: str
-
-
-def load_component_database(path: str | Path | None = None) -> dict[str, Any]:
-    """Load and validate a Phase 5 component database document."""
-    db_path = Path(path) if path is not None else _DEFAULT_COMPONENT_DB
-    data = json.loads(db_path.read_text(encoding="utf-8"))
-    if data.get("schema_version") != COMPONENT_DATABASE_SCHEMA:
-        raise ValueError(f"Unsupported component database schema: {data.get('schema_version')!r}")
-    if data.get("currency") != "GBP":
-        raise ValueError("Phase 5 component database must use GBP costs.")
-    components = data.get("components")
-    if not isinstance(components, list) or not components:
-        raise ValueError("Phase 5 component database must contain components.")
-    parsed = [_component_from_mapping(raw) for raw in components]
-    missing = _REQUIRED_ROLES - {component.role for component in parsed}
-    if missing:
-        raise ValueError(
-            f"Phase 5 component database is missing roles: {', '.join(sorted(missing))}"
-        )
-    for component in parsed:
-        if not component.is_sovereign:
-            raise ValueError(f"Component {component.component_id!r} is proprietary.")
-        if component.supplier_count == 0:
-            raise ValueError(f"Component {component.component_id!r} has no verified suppliers.")
-    return data
-
-
-def list_components(path: str | Path | None = None) -> list[Component]:
-    """Return validated component entries in database order."""
-    data = load_component_database(path)
-    raw_components = data["components"]
-    assert isinstance(raw_components, list)
-    return [_component_from_mapping(raw) for raw in raw_components]
-
-
-def estimate_binaural_cost(path: str | Path | None = None) -> float:
-    """Return the total cost estimate for one binaural Phase 5 build."""
-    return round(sum(component.extended_cost_gbp for component in list_components(path)), 2)
-
-
-def generate_phase5_device_bundle(
-    audiogram_path: str | Path,
-    output_dir: str | Path,
-    *,
-    ear: str = "right",
-    binaural: bool = True,
-    component_db_path: str | Path | None = None,
-    cost_target_gbp: float = DEFAULT_COST_TARGET_GBP,
-) -> Phase5BuildManifest:
-    """Generate firmware and a manifest for an offline Phase 5 device bundle."""
-    if ear not in {"right", "left"}:
-        raise ValueError("ear must be 'right' or 'left'.")
-    component_db = load_component_database(component_db_path)
-    component_db_file = (
-        Path(component_db_path) if component_db_path is not None else _DEFAULT_COMPONENT_DB
-    )
-    output = Path(output_dir)
-    output.mkdir(parents=True, exist_ok=True)
-
-    mode = "binaural" if binaural else "single-ear"
-    firmware_name = "openhear_phase5_binaural.ino" if binaural else f"openhear_phase5_{ear}.ino"
-    firmware_path = output / firmware_name
-    if binaural:
-        generate_binaural_sketch(str(audiogram_path), str(firmware_path))
-    else:
-        generate_tympan_sketch(str(audiogram_path), str(firmware_path), ear=ear)
-
-    cost = estimate_binaural_cost(component_db_file)
-    manifest = Phase5BuildManifest(
-        schema_version=MANIFEST_SCHEMA,
-        generated_at=datetime.now(timezone.utc).isoformat(),
-        mode=mode,
-        ear=None if binaural else ear,
-        audiogram_sha256=_sha256_file(Path(audiogram_path)),
-        firmware_file=firmware_path.name,
-        firmware_sha256=_sha256_file(firmware_path),
-        component_database_version=str(component_db.get("version", "")),
-        component_database_sha256=_sha256_file(component_db_file),
-        component_cost_gbp=cost,
-        cost_target_gbp=float(cost_target_gbp),
-        cost_target_met=cost <= cost_target_gbp,
-        components=[
-            _manifest_component(component) for component in list_components(component_db_file)
-        ],
-        safety_requirements=[
-            "Passive hardware MPO limiter is mandatory and cannot be bypassed by firmware.",
-            "Generated firmware must be calibrated on real hardware before use.",
-            "OpenHear remains experimental and is not a certified medical device.",
-        ],
-        sovereignty_guarantees=[
-            "Audiogram processing runs locally.",
-            "Manifest stores hashes, not audiogram thresholds or raw audio.",
-            "No proprietary component or firmware dependency is allowed in the component database.",
-            "No cloud service is required to generate, inspect, or flash the bundle.",
-        ],
-        regulatory_status=(
-            "Research/DIY PSAP scaffold only; CE/FDA/UK MDR classification is not claimed."
-        ),
-    )
-    (output / "manifest.json").write_text(
-        json.dumps(asdict(manifest), indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
-    return manifest
-
-
-def _component_from_mapping(raw: object) -> Component:
-    if not isinstance(raw, dict):
-        raise ValueError("Each component entry must be a JSON object.")
-    suppliers = raw.get("suppliers")
-    if not isinstance(suppliers, list):
-        raise ValueError(f"Component {raw.get('id')!r} must contain a suppliers list.")
-    verified_regions = tuple(
-        str(supplier.get("region", ""))
-        for supplier in suppliers
-        if isinstance(supplier, dict) and supplier.get("verified") is True
-    )
-    return Component(
-        component_id=str(raw["id"]),
-        role=str(raw["role"]),
-        part=str(raw["part"]),
-        category=str(raw["category"]),
-        unit_cost_gbp=float(raw["unit_cost_gbp"]),
-        quantity=int(raw.get("quantity", 1)),
-        proprietary=bool(raw.get("proprietary", False)),
-        firmware_license=str(raw.get("firmware_license", "none")),
-        supplier_count=len(verified_regions),
-        verified_supplier_regions=verified_regions,
-        notes=str(raw.get("notes", "")),
-    )
-
-
-def _manifest_component(component: Component) -> dict[str, Any]:
-    return {
-        "id": component.component_id,
-        "role": component.role,
-        "part": component.part,
-        "category": component.category,
-        "unit_cost_gbp": component.unit_cost_gbp,
-        "quantity": component.quantity,
-        "extended_cost_gbp": component.extended_cost_gbp,
-        "supplier_count": component.supplier_count,
-        "verified_supplier_regions": list(component.verified_supplier_regions),
-    }
-
-
-def _sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as fh:
-        for chunk in iter(lambda: fh.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
-def main() -> None:
-    """Command-line entry point for Phase 5 bundle generation."""
-    parser = argparse.ArgumentParser(
-        description="Generate an offline OpenHear Phase 5 firmware bundle and manifest.",
-        epilog="Your audiogram, your firmware, your device — no cloud required.",
-    )
-    parser.add_argument("audiogram", help="Path to an openhear-audiogram-v1 JSON file.")
-    parser.add_argument("output_dir", help="Directory for firmware and manifest.json.")
-    parser.add_argument("--ear", choices=["right", "left"], default="right")
-    parser.add_argument(
-        "--single-ear", action="store_true", help="Generate for one ear instead of binaural."
-    )
-    parser.add_argument("--component-db", help="Override the Phase 5 component database JSON.")
-    parser.add_argument("--cost-target", type=float, default=DEFAULT_COST_TARGET_GBP)
-    args = parser.parse_args()
-
-    manifest = generate_phase5_device_bundle(
-        args.audiogram,
-        args.output_dir,
-        ear=args.ear,
-        binaural=not args.single_ear,
-        component_db_path=args.component_db,
-        cost_target_gbp=args.cost_target,
-    )
-    print(f"Phase 5 bundle written to {Path(args.output_dir).resolve()}")
-    print(f"Estimated binaural component cost: £{manifest.component_cost_gbp:.2f}")
-    print(f"Cost target met: {manifest.cost_target_met}")
-
-
-if __name__ == "__main__":
-    main()
+IiIiCnBpcGVsaW5lLnB5IOKAkyBQaGFzZSA1IHNvdmVyZWlnbi1kZXZpY2UK
+YnVuZGxlIGdlbmVyYXRpb24uCgpUaGUgUGhhc2UgNSBzb2Z0d2FyZSBkZWxp
+dmVyYWJsZSBpcyBpbnRlbnRpb25hbGx5IGxvY2FsLW9ubHk6IGl0IHR1cm5z
+IGFuCk9wZW5IZWFyIGF1ZGlvZ3JhbSBpbnRvIGZpcm13YXJlIHBsdXMgYSB2
+ZXJpZmlhYmxlIGJ1aWxkIG1hbmlmZXN0LCB2YWxpZGF0ZXMgYQpjb21tdW5p
+dHkgY29tcG9uZW50IGRhdGFiYXNlLCBhbmQgcmVjb3JkcyBjb3N0L3NhZmV0
+eS9zb3ZlcmVpZ250eSBjaGVja3Mgd2l0aG91dAp1cGxvYWRpbmcgYXVkaW9n
+cmFtcywgZmlybXdhcmUsIG9yIHRlbGVtZXRyeSBhbnl3aGVyZS4KIiIiCgpm
+cm9tIF9fZnV0dXJlX18gaW1wb3J0IGFubm90YXRpb25zCgppbXBvcnQgYXJn
+cGFyc2UKaW1wb3J0IGhhc2hsaWIKaW1wb3J0IGpzb24KZnJvbSBkYXRhY2xh
+c3NlcyBpbXBvcnQgYXNkaWN0LCBkYXRhY2xhc3MKZnJvbSBkYXRldGltZSBp
+bXBvcnQgZGF0ZXRpbWUsIHRpbWV6b25lCmZyb20gcGF0aGxpYiBpbXBvcnQg
+UGF0aApmcm9tIHR5cGluZyBpbXBvcnQgQW55Cgpmcm9tIGhhcmR3YXJlLnR5
+bXBhbi5hdWRpb2dyYW1fdG9fdHltcGFuIGltcG9ydCBnZW5lcmF0ZV9iaW5h
+dXJhbF9za2V0Y2gsIGdlbmVyYXRlX3R5bXBhbl9za2V0Y2gKCkNPTVBPTkVO
+VF9EQVRBQkFTRV9TQ0hFTUEgPSAib3BlbmhlYXItcGhhc2U1LWNvbXBvbmVu
+dC1kYi12MSIKTUFOSUZFU1RfU0NIRU1BID0gIm9wZW5oZWFyLXBoYXNlNS1k
+ZXZpY2UtYnVpbGQtdjEiCkRFRkFVTFRfQ09TVF9UQVJHRVRfR0JQID0gMTAw
+LjAKX0RFRkFVTFRfQ09NUE9ORU5UX0RCID0gUGF0aChfX2ZpbGVfXykud2l0
+aF9uYW1lKCJjb21wb25lbnRzLmpzb24iKQpfUkVRVUlSRURfUk9MRVMgPSB7
+CiAgICAic2hlbGwiLAogICAgInJlY2VpdmVyIiwKICAgICJtaWNyb3Bob25l
+IiwKICAgICJwcm9jZXNzb3IiLAogICAgInBvd2VyIiwKICAgICJzYWZldHlf
+bGltaXRlciIsCiAgICAicHJvZ3JhbW1pbmciLAp9CgoKQGRhdGFjbGFzcyhm
+cm96ZW49VHJ1ZSkKY2xhc3MgQ29tcG9uZW50OgogICAgIiIiT25lIGNvbW11
+bml0eS1tYWludGFpbmVkIGNvbW1vZGl0eS9vcGVuIGNvbXBvbmVudCBlbnRy
+eS4iIiIKCiAgICBjb21wb25lbnRfaWQ6IHN0cgogICAgcm9sZTogc3RyCiAg
+ICBwYXJ0OiBzdHIKICAgIGNhdGVnb3J5OiBzdHIKICAgIHVuaXRfY29zdF9n
+YnA6IGZsb2F0CiAgICBxdWFudGl0eTogaW50CiAgICBwcm9wcmlldGFyeTog
+Ym9vbAogICAgZmlybXdhcmVfbGljZW5zZTogc3RyCiAgICBzdXBwbGllcl9j
+b3VudDogaW50CiAgICB2ZXJpZmllZF9zdXBwbGllcl9yZWdpb25zOiB0dXBs
+eVtzdHIsIC4uLl0KICAgIG5vdGVzOiBzdHIgPSAiIgoKICAgIEBwcm9wZXJ0
+eQogICAgZGVmIGV4dGVuZGVkX2Nvc3RfZ2JwKHNlbGYpIC0+IGZsb2F0Ogog
+ICAgICAgICIiIlJldHVybiB0aGUgcXVhbnRpdHktYWRqdXN0ZWQgY29zdCBj
+b250cmlidXRpb24uIiIiCiAgICAgICAgcmV0dXJuIHJvdW5kKHNlbGYudW5p
+dF9jb3N0X2dicCAqIHNlbGYucXVhbnRpdHksIDIpCgogICAgQHByb3BlcnR5
+CiAgICBkZWYgaXNfc292ZXJlaWduKHNlbGYpIC0+IGJvb2w6CiAgICAgICAg
+IiIiUmV0dXJuIHRydWUgaWYgdGhlIGNvbXBvbmVudCBoYXMgbm8gcHJvcHJp
+ZXRhcnkgZmlybXdhcmUgZGVwZW5kZW5jeS4iIiIKICAgICAgICByZXR1cm4g
+bm90IHNlbGYucHJvcHJpZXRhcnkgYW5kIHNlbGYuZmlybXdhcmVfbGljZW5z
+eS5sb3dlcigpICE9ICJwcm9wcmlldGFyeSIKCgpAZGF0YWNsYXNzKGZyb3pl
+bj1UcnVlKQpjbGFzcyBQaGFzZTVCdWlsZE1hbmlmZXN0OgogICAgIiIiVmVy
+aWZpYWJsZSBvdXRwdXQgbWFuaWZlc3QgZm9yIG9uZSBnZW5lcmF0ZWQgUGhh
+c2UgNSBkZXZpY2UgYnVuZGxlLiIiIgoKICAgIHNjaGVtYV92ZXJzaW9uOiBz
+dHIKICAgIGdlbmVyYXRlZF9hdDogc3RyCiAgICBtb2RlOiBzdHIKICAgIGVh
+cj1Ob25lIGlmIGJpbmF1cmFsIGVsc2UgZWFyLAogICAgYXVkaW9ncmFtX3No
+YTI1Njogc3RyCiAgICBmaXJtd2FyZV9maWxlOiBzdHIKICAgIGZpcm13YXJl
+X3NoYTI1Njogc3RyCiAgICBjb21wb25lbnRfZGF0YWJhc2VfdmVyc2lvbjog
+c3RyCiAgICBjb21wb25lbnRfZGF0YWJhc2Vfc2hhMjU2OiBzdHIKICAgIGNv
+bXBvbmVudF9jb3N0X2dicDogZmxvYXQKICAgIGNvc3RfdGFyZ2V0X2dicDog
+ZmxvYXQKICAgIGNvc3RfdGFyZ2V0X21ldDogYm9vbAogICAgY29tcG9uZW50
+czogbGlzdFtkaWN0W3N0ciwgQW55XV0KICAgIHNhZmV0eV9yZXF1aXJlbWVu
+dHM6IGxpc3Rbc3RyXQogICAgc292ZXJlaWdudHlfZ3VhcmFudGVlczogbGlz
+dFtzdHJdCiAgICByZWd1bGF0b3J5X3N0YXR1czogc3RyCgoKZGVmIGxvYWRf
+Y29tcG9uZW50X2RhdGFiYXNlKHBhdGg6IHN0ciB8IFBhdGggfCBOb25lID0g
+Tm9uZSkgLT4gZGljdFtzdHIsIEFueV06CiAgICAiIiJMb2FkIGFuZCB2YWxp
+ZGF0ZSBhIFBoYXNlIDUgY29tcG9uZW50IGRhdGFiYXNlIGRvY3VtZW50LiIi
+IgogICAgZGJfcGF0aCA9IFBhdGgocGF0aCkgaWYgcGF0aCBpcyBub3QgTm9u
+ZSBlbHNlIF9ERUZBVUxUX0NPTVBPTkVOVF9EQgogICAgZGF0YSA9IGpzb24u
+bG9hZHMoZGJfcGF0aC5yZWFkX3RleHQoZW5jb2Rpbmc9InV0Zi04IikpCiAg
+ICBpZiBkYXRhLmdldCgic2NoZW1hX3ZlcnNpb24iKSAhPSBDT01QT05FTlRf
+REFUQUJBU0VfU0NIRU1BOgogICAgICAgIHJhaXNlIFZhbHVlRXJyb3IoZiJV
+bnN1cHBvcnRlZCBjb21wb25lbnQgZGF0YWJhc2Ugc2NoZW1hOiB7ZGF0YS5n
+ZXQoJ3NjaGVtYV92ZXJzaW9uJykhcn0iKQogICAgaWYgZGF0YS5nZXQoImN1
+cnJlbmN5IikgIT0gIkdCUCI6CiAgICAgICAgcmFpc2UgVmFsdWVFcnJvcigi
+UGhhc2UgNSBjb21wb25lbnQgZGF0YWJhc2UgbXVzdCB1c2UgR0JQIGNvc3Rz
+LiIpCiAgICBjb21wb25lbnRzID0gZGF0YS5nZXQoImNvbXBvbmVudHMiKQog
+ICAgaWYgbm90IGlzaW5zdGFuY2UoY29tcG9uZW50cywgbGlzdCkgb3Igbm90
+IGNvbXBvbmVudHM6CiAgICAgICAgcmFpc2UgVmFsdWVFcnJvcigiUGhhc2Ug
+NSBjb21wb25lbnQgZGF0YWJhc2UgbXVzdCBjb250YWluIGNvbXBvbmVudHMu
+IikKICAgIHBhcnNlZCA9IFtfY29tcG9uZW50X2Zyb21fbWFwcGluZyhyYXcp
+IGZvciByYXcgaW4gY29tcG9uZW50c10KICAgIG1pc3NpbmcgPSBfUkVRVUlS
+RURfUk9MRVMgLSB7Y29tcG9uZW50LnJvbGUgZm9yIGNvbXBvbmVudCBpbiBw
+YXJzZWR9CiAgICBpZiBtaXNzaW5nOgogICAgICAgIHJhaXNlIFZhbHVlRXJy
+b3IoCiAgICAgICAgICAgIGYiUGhhc2UgNSBjb21wb25lbnQgZGF0YWJhc2Ug
+aXMgbWlzc2luZyByb2xlczogeycsICcuam9pbihzb3J0ZWQobWlzc2luZykp
+fSIKICAgICAgICApCiAgICBmb3IgY29tcG9uZW50IGluIHBhcnNlZDoKICAg
+ICAgICBpZiBub3QgY29tcG9uZW50LmlzX3NvdmVyZWlnbjoKICAgICAgICAg
+ICAgcmFpc2UgVmFsdWVFcnJvcihmIkNvbXBvbmVudCB7Y29tcG9uZW50LmNv
+bXBvbmVudF9pZCFyfSBpcyBwcm9wcmlldGFyeS4iKQogICAgICAgIGlmIGNv
+bXBvbmVudC5zdXBwbGllcl9jb3VudCA9PSAwOgogICAgICAgICAgICByYWlz
+ZSBWYWx1ZUVycm9yKGYiQ29tcG9uZW50IHtjb21wb25lbnQuY29tcG9uZW50
+X2lkIXJ9IGhhcyBubyB2ZXJpZmllZCBzdXBwbGllcnMuIikKICAgIHJldHVy
+biBkYXRhCgoKZGVmIGxpc3RfY29tcG9uZW50cyhwYXRoOiBzdHIgfCBQYXRo
+IHwgTm9uZSA9IE5vbmUpIC0+IGxpc3RbQ29tcG9uZW50XToKICAgICIiIlJl
+dHVybiB2YWxpZGF0ZWQgY29tcG9uZW50IGVudHJpZXMgaW4gZGF0YWJhc2Ug
+b3JkZXIuIiIiCiAgICBkYXRhID0gbG9hZF9jb21wb25lbnRfZGF0YWJhc2Uo
+cGF0aCkKICAgIHJhd19jb21wb25lbnRzID0gZGF0YVsiY29tcG9uZW50cyJd
+CiAgICBhc3NlcnQgaXNpbnN0YW5jZShyYXdfY29tcG9uZW50cywgbGlzdCkp
+CiAgICByZXR1cm4gW19jb21wb25lbnRfZnJvbV9tYXBwaW5nKHJhdykgZm9y
+IHJhdyBpbiByYXdfY29tcG9uZW50c10KCgpkZWYgZXN0aW1hdGVfYmluYXVy
+YWxfY29zdChwYXRoOiBzdHIgfCBQYXRoIHwgTm9uZSA9IE5vbmUpIC0+IGZs
+b2F0OgogICAgIiIiUmV0dXJuIHRvdGFsIGNvc3QgZXN0aW1hdGUgZm9yIG9u
+ZSBiaW5hdXJhbCBQaGFzZSA1IGJ1aWxkLiIiIgogICAgcmV0dXJuIHJvdW5k
+KHN1bShjb21wb25lbnQuZXh0ZW5kZWRfY29zdF9nYnAgZm9yIGNvbXBvbmVu
+dCBpbiBsaXN0X2NvbXBvbmVudHMocGF0aCkpLCAyKQoKCmRlZiBnZW5lcmF0
+ZV9waGFzZTVfZGV2aWNlX2J1bmRsZSgKICAgIGF1ZGlvZ3JhbV9wYXRoOiBz
+dHIgfCBQYXRoLAogICAgb3V0cHV0X2Rpcjogc3RyIHwgUGF0aCwKICAgICos
+CiAgICBlYXI6IHN0ciA9ICJyaWdodCIsCiAgICBiaW5hdXJhbDogYm9vbCA9
+IFRydWUsCiAgICBjb21wb25lbnRfZGJfcGF0aDogc3RyIHwgUGF0aCB8IE5v
+uuID0gTm9uZSwKICAgIGNvc3RfdGFyZ2V0X2dicDogZmxvYXQgPSBERUZB
+VUxUX0NPU1RfVEFSR0VUX0dCUCwKKSAtPiBQaGFzZTVCdWlsZE1hbmlmZXN0
+OgogICAgIiIiR2VuZXJhdGUgZmlybXdhcmUgYW5kIGEgbWFuaWZlc3QgZm9y
+IGFuIG9mZmxpbmUgUGhhc2UgNSBkZXZpY2UgYnVuZGxlLiIiIgogICAgaWYg
+ZWFyIG5vdCBpbiB7InJpZ2h0IiwgImxlZnQifToKICAgICAgICByYWlzZSBW
+YWx1ZUVycm9yKCJlYXIgbXVzdCBiZSAncmlnaHQnIG9yICdsZWZ0Jy4iKQog
+ICAgY29tcG9uZW50X2RiID0gbG9hZF9jb21wb25lbnRfZGF0YWJhc2UoY29t
+cG9uZW50X2RiX3BhdGgpCiAgICBjb21wb25lbnRfZGJfZmlsZSA9ICgKICAg
+ICAgICBQYXRoKGNvbXBvbmVudF9kYl9wYXRoKSBpZiBjb21wb25lbnRfZGJf
+cGF0aCBpcyBub3QgTm9uZSBlbHNlIF9ERUZBVUxUX0NPTVBPTkVOVF9EQgog
+ICAgKQogICAgb3V0cHV0ID0gUGF0aChvdXRwdXRfZGlyKQogICAgb3V0cHV0
+Lm1rZGlyKHBhcmVudHM9VHJ1ZSwgZXhpc3Rfb2s9VHJ1ZSkKCiAgICBtb2Rl
+ID0gImJpbmF1cmFsIiBpZiBiaW5hdXJhbCBlbHNlICJzaW5nbGUtZWFyIgog
+ICAgZmlybXdhcmVfbmFtZSA9ICJvcGVuaGVhcl9waGFzZTVfYmluYXVyYWwu
+aW5vIiBpZiBiaW5hdXJhbCBlbHNlIGYib3BlbmhlYXJfcGhhc2U1X3tlYXJ9
+LmlubyIKICAgIGZpcm13YXJlX3BhdGggPSBvdXRwdXQgLyBmaXJtd2FyZV9u
+YW1lCiAgICBpZiBiaW5hdXJhbDoKICAgICAgICBnZW5lcmF0ZV9iaW5hdXJh
+bF9za2V0Y2goc3RyKGF1ZGlvZ3JhbV9wYXRoKSwgc3RyKGZpcm13YXJlX3Bh
+dGgpKQogICAgZWxzZToKICAgICAgICBnZW5lcmF0ZV90eW1wYW5fc2tldGNo
+KHN0cihhdWRpb2dyYW1fcGF0aCksIHN0cihmaXJtd2FyZV9wYXRoKSwgZWFy
+PWVhcikKCiAgICBjb3N0ID0gZXN0aW1hdGVfYmluYXVyYWxfY29zdChjb21w
+b25lbnRfZGJfZmlsZSkKICAgIG1hbmlmZXN0ID0gUGhhc2U1YnVpbGRNYW5p
+ZmVzdCgKICAgICAgICBzY2hlbWFfdmVyc2lvbj1NQU5JRkVTVF9TQ0hFTUEs
+CiAgICAgICAgZ2VuZXJhdGVkX2F0PWRhdGV0aW1lLm5vdyh0aW1lem9uZS51
+dGMpLmlzb2Zvcm1hdCgpLAogICAgICAgIG1vZGU9bW9kZSwKICAgICAgICBl
+YXI9Tm9uZSBpZiBiaW5hdXJhbCBlbHNlIGVhciwKICAgICAgICBhdWRpb2dy
+YW1fc2hhMjU2PV9zaGEyNTZfZmlsZShQYXRoKGF1ZGlvZ3JhbV9wYXRoKSks
+CiAgICAgICAgZmlybXdhcmVfZmlsZT1maXJtd2FyZV9wYXRoLm5hbWUsCiAg
+ICAgICAgZmlybXdhcmVfc2hhMjU2PV9zaGEyNTZfZmlsZShmaXJtd2FyZV9w
+dGgpLAogICAgICAgIGNvbXBvbmVudF9kYXRhYmFzZV92ZXJzaW9uPXN0cihj
+b21wb25lbnRfZGIuZ2V0KCJ2ZXJzaW9uIiwgIiIpKSwKICAgICAgICBjb21w
+b25lbnRfZGF0YWJhc2Vfc2hhMjU2PV9zaGEyNTZfZmlsZShjb21wb25lbnRf
+ZGJfZmlsZSksCiAgICAgICAgY29tcG9uZW50X2Nvc3RfZ2JwPWNvc3QsCiAg
+ICAgICAgY29zdF90YXJnZXRfZ2JwPWZsb2F0KGNvc3RfdGFyZ2V0X2dicCks
+CiAgICAgICAgY29zdF90YXJnZXRfbWV0PWNvc3QgPD0gY29zdF90YXJnZXRf
+Z2JwLAogICAgICAgIGNvbXBvbmVudHM9WwogICAgICAgICAgICBfbWFuaWZl
+c3RfY29tcG9uZW50KGNvbXBvbmVudCkgZm9yIGNvbXBvbmVudCBpbiBsaXN0
+X2NvbXBvbmVudHMoY29tcG9uZW50X2RiX2ZpbGUpCiAgICAgICAgXSwKICAg
+ICAgICBzYWZldHlfcmVxdWlyZW1lbnRzPVsKICAgICAgICAgICAgIlBhc3Np
+dmUgaGFyZHdhcmUgTVBPIGxpbWl0ZXIgaXMgbWFuZGF0b3J5IGFuZCBjYW5u
+b3QgYmUgYnlwYXNzZWQgYnkgZmlybXdhcmUuIiwKICAgICAgICAgICAgIkdl
+bmVyYXRlZCBmaXJtd2FyZSBtdXN0IGJlIGNhbGlicmF0ZWQgb24gcmVhbCBo
+YXJkd2FyZSBiZWZvcmUgdXNlLiIsCiAgICAgICAgICAgICJPcGVuSGVhciBy
+ZW1haW5zIGV4cGVyaW1lbnRhbCBhbmQgaXMgbm90IGEgY2VydGlmaWVkIG1l
+ZGljYWwgZGV2aWNlLiIsCiAgICAgICAgXSwKICAgICAgICBzb3ZlcmVpZ250
+eyVndWFyYW50ZWVzPVsKICAgICAgICAgICAgIkF1ZGlvZ3JhbSBwcm9jZXNz
+aW5nIHJ1bnMgbG9jYWxseS4iLAogICAgICAgICAgICAiTWFuaWZlc3Qgc3Rv
+cmVzIGhhc2hlcywgbm90IGF1ZGlvZ3JhbSB0aHJlc2hvbGRzIG9yIHJhdyBh
+dWRpby4iLAogICAgICAgICAgICAiTm8gcHJvcHJpZXRhcnkgY29tcG9uZW50
+IG9yIGZpcm13YXJlIGRlcGVuZGVuY3kgaXMgYWxsb3dlZCBpbiB0aGUgY29t
+cG9uZW50IGRhdGFiYXNlLiIsCiAgICAgICAgICAgICJObyBjbG91ZCBzZXJ2
+aWNlIGlzIHJlcXVpcmVkIHRvIGdlbmVyYXRlLCBpbnNwZWN0LCBvciBmbGFz
+aCB0aGUgYnVuZGxlLiIsCiAgICAgICAgXSwKICAgICAgICByZWd1bGF0b3J5
+X3N0YXR1cz0oCiAgICAgICAgICAgICJSZXNlYXJjaC9ESVkgUFNBUCBzY2Fm
+Zm9sZCBvbmx5OyBDRS9GREEvVUsgTURSIGNsYXNzaWZpY2F0aW9uIGlzIG5v
+dCBjbGFpbWVkLiIKICAgICAgICApLAogICAgKQogICAgKG91dHB1dCAvICJt
+YW5pZmVzdC5qc29uIikud3JpdGVfdGV4dCgKICAgICAgICBqc29uLmR1bXBz
+KGFzZGljdChtYW5pZmVzdCksIGluZGVudD0yLCBzb3J0X2tleXM9VHJ1ZSkg
+KyAiXG4iLAogICAgICAgIGVuY29kaW5nPSJ1dGYtOCIsCiAgICApCiAgICBy
+ZXR1cm4gbWFuaWZlc3QKCgpkZWYgX2NvbXBvbmVudF9mcm9tX21hcHBpbmco
+cmF3OiBvYmplY3QpIC0+IENvbXBvbmVudDoKICAgIGlmIG5vdCBpc2luc3Rh
+bmNlKHJhdywgZGljdCk6CiAgICAgICAgcmFpc2UgVmFsdWVFcnJvcigiRWFj
+aCBjb21wb25lbnQgZW50cnkgbXVzdCBiZSBhIEpTT04gb2JqZWN0LiIpCiAg
+ICBzdXBwbGllcnMgPSByYXcuZ2V0KCJzdXBwbGllcnMiKQogICAgaWYgbm90
+IGlzaW5zdGFuY2Uoc3VwcGxpZXJzLCBsaXN0KToKICAgICAgICByYWlzZSBW
+YWx1ZUVycm9yKGYiQ29tcG9uZW50IHtyYXcuZ2V0KCdpZCcpIXJ9IG11c3Qg
+Y29udGFpbiBhIHN1cHBsaWVycyBsaXN0LiIpCiAgICB2ZXJpZmllZF9yZWdp
+b25zID0gdHVwbGUoCiAgICAgICAgc3RyKHN1cHBsaWVyLmdldCgicmVnaW9u
+IiwgIiIpKQogICAgICAgIGZvciBzdXBwbGllciBpbiBzdXBwbGllcnMKICAg
+ICAgICBpZiBpc2luc3RhbmNlKHN1cHBsaWVyLCBkaWN0KSBhbmQgc3VwcGxp
+ZXIuZ2V0KCJ2ZXJpZmllZCIpIGlzIFRydWUKICAgICkKICAgIHJldHVybiBD
+b21wb25lbnQoCiAgICAgICAgY29tcG9uZW50X2lkPXN0cihyYXdbImlkIl0p
+LAogICAgICAgIHJvbGU9c3RyKHJhd1sicm9sZSJdKSwKICAgICAgICBwYXJ0
+PXN0cihyYXdbInBhcnQiXSksCiAgICAgICAgY2F0ZWdvcnk9c3RyKHJhd1si
+Y2F0ZWdvcnkiXSksCiAgICAgICAgdW5pdF9jb3N0X2dicD1mbG9hdChyYXdb
+InVuaXRfY29zdF9nYnAiXSksCiAgICAgICAgcXVhbnRpdHk9aW50KHJhdy5n
+ZXQoInF1YW50aXR5IiwgMSkpLAogICAgICAgIHByb3ByaWV0YXJ5PWJvb2wo
+cmF3LmdldCgicHJvcHJpZXRhcnkiLCBGYWxzZSkpLAogICAgICAgIGZpcm13
+YXJlX2xpY2Vuc2U9c3RyKHJhdy5nZXQoImZpcm13YXJlX2xpY2Vuc2UiLCAi
+bm9uZSIpKSwKICAgICAgICBzdXBwbGllcl9jb3VudD1sZW4odmVyaWZpZWRf
+cmVnaW9ucyksCiAgICAgICAgdmVyaWZpZWRfc3VwcGxpZXJfcmVnaW9ucz12
+ZXJpZmllZF9yZWdpb25zLAogICAgICAgIG5vdGVzPXN0cihyYXcuZ2V0KCJu
+b3RlcyIsICIiKSksCiAgICApCgoKZGVmIF9tYW5pZmVzdF9jb21wb25lbnQo
+Y29tcG9uZW50OiBDb21wb25lbnQpIC0+IGRpY3Rbc3RyLCBBbnldOgogICAg
+cmV0dXJuIHsKICAgICAgICAiaWQiOiBjb21wb25lbnQuY29tcG9uZW50X2lk
+LAogICAgICAgICJyb2xlIjogY29tcG9uZW50LnJvbGUsCiAgICAgICAgInBh
+cnQiOiBjb21wb25lbnQucGFydCwKICAgICAgICAiY2F0ZWdvcnkiOiBjb21w
+b25lbnQuY2F0ZWdvcnksCiAgICAgICAgInVuaXRfY29zdF9nYnAiOiBjb21w\nb25lbnQudW5pdF9jb3N0X2dicCwKICAgICAgICAicXVhbnRpdHkiOiBjb21w
+b25lbnQucXVhbnRpdHksCiAgICAgICAgImV4dGVuZGVkX2Nvc3RfZ2JwIjog
+Y29tcG9uZW50LmV4dGVuZGVkX2Nvc3RfZ2JwLAogICAgICAgICJzdXBwbGll
+cl9jb3VudCI6IGNvbXBvbmVudC5zdXBwbGllcl9jb3VudCwKICAgICAgICAi
+dmVyaWZpZWRfc3VwcGxpZXJfcmVnaW9ucyI6IGxpc3QoY29tcG9uZW50LnZl
+cmlmaWVkX3N1cHBsaWVyX3JlZ2lvbnMpLAogICAgfQoKCmRlZiBfc2hhMjU2
+X2ZpbGUocGF0aDogUGF0aCkgLT4gc3RyOgogICAgZGlnZXN0ID0gaGFzaGxp
+Yi5zaGEyNTYoKQogICAgd2l0aCBwYXRoLm9wZW4oInJiIikgYXMgZmg6CiAg
+ICAgICAgZm9yIGNodW5rIGluIGl0ZXIobGFtYmRhOiBmaC5yZWFkKDEwMjQg
+KiAxMDI0KSwgYiIiKToKICAgICAgICAgICAgZGlnZXN0LnVwZGF0ZShjaHVu
+aykKICAgIHJldHVybiBkaWdlc3QuaGV4ZGlnZXN0KCkKCgpkZWYgbWFpbigp
+IC0+IE5vbmU6CiAgICAiIiJDb21tYW5kLWxpbmUgZW50cnkgcG9pbnQgZm9y
+IFBoYXNlIDUgYnVuZGxlIGdlbmVyYXRpb24uIiIiCiAgICBwYXJzZXIgPSBh
+cmdwYXJzZS5Bcmd1bWVudFBhcnNlcigKICAgICAgICBkZXNjcmlwdGlvbj0i
+R2VuZXJhdGUgYW4gb2ZmbGluZSBPcGVuSGVhciBQaGFzZSA1IGZpcm13YXJl
+IGJ1bmRsZSBhbmQgbWFuaWZlc3QuIiwKICAgICAgICBlcGlsb2c9IllvdXIg
+YXVkaW9ncmFtLCB5b3VyIGZpcm13YXJlLCB5b3VyIGRldmljZSDigJQgbm8g
+Y2xvdWQgcmVxdWlyZWQuIiwKICAgICkKICAgIHBhcnNlci5hZGRfYXJndW1l
+bmQoImF1ZGlvZ3JhbSIsIGhlbHA9IlBhdGggdG8gYW4gb3BlbmhlYXItYXVk
+aW9ncmFtLXYxIEpTT04gZmlsZS4iKQogICAgcGFyc2VyLmFkZF9hcmd1bWVu
+dCgib3V0cHV0X2RpciIsIGhlbHA9IkRpcmVjdG9yeSBmb3IgZmlybXdhcmUg
+YW5kIG1hbmlmZXN0Lmpzb24uIikKICAgIHBhcnNlci5hZGRfYXJndW1lbnQo
+Ii0tZWFyIiwgY2hvaWNlcz1bInJpZ2h0IiwgImxlZnQiXSwgZGVmYXVsdD0i
+cmlnaHQiKQogICAgcGFyc2VyLmFkZF9hcmd1bWVudCgKICAgICAgICAiLS1z
+aW5nbGUtZWFyIiwgYWN0aW9uPSJzdG9yZV90cnVlIiwgaGVscD0iR2VuZXJh
+dGUgZm9yIG9uZSBlYXIgaW5zdGVhZCBvZiBiaW5hdXJhbC4iCiAgICApCiAg
+ICBwYXJzZXIuYWRkX2FyZ3VtZW50KCItLWNvbXBvbmVudC1kYiIsIGhlbHA9
+Ik92ZXJyaWRlIHRoZSBQaGFzZSA1IGNvbXBvbmVudCBkYXRhYmFzZSBKU09O
+LiIpCiAgICBwYXJzZXIuYWRkX2FyZ3VtZW50KCItLWNvc3QtdGFyZ2V0Iiwg
+dHlwZT1mbG9hdCwgZGVmYXVsdD1ERUZBVUxUX0NPU1RfVEFSR0VUX0dCUCkK
+ICAgIGFyZ3MgPSBwYXJzZXIucGFyc2VfYXJncygpCgogICAgbWFuaWZlc3Qg
+PSBnZW5lcmF0ZV9waGFzZTVfZGV2aWNlX2J1bmRsZSgKICAgICAgICBhcmdz
+LmF1ZGlvZ3JhbSwKICAgICAgICBhcmdzLm91dHB1dF9kaXIsCiAgICAgICAg
+ZWFyPWFyZ3MuZWFyLAogICAgICAgIGJpbmF1cmFsPW5vdCBhcmdzLnNpbmds
+ZV9lYXIsCiAgICAgICAgY29tcG9uZW50X2RiX3BhdGg9YXJncy5jb21wb25l
+bnRfZGIsCiAgICAgICAgY29zdF90YXJnZXRfZ2JwPWFyZ3MuY29zdF90YXJn
+ZXQsCiAgICApCiAgICBwcmludChmIlBoYXNlIDUgYnVuZGxlIHdyaXR0ZW4g
+dG8ge1BhdGgoYXJncy5vdXRwdXRfZGlyKS5yZXNvbHZlKCl9IikKICAgIHBy
+aW50KGYiRXN0aW1hdGVkIGJpbmF1cmFsIGNvbXBvbmVudCBjb3N0OiDCo3tt
+YW5pZmVzdC5jb21wb25lbnRfY29zdF9nYnA6LjJmfSIpCiAgICBwcmludChm
+IkNvc3QgdGFyZ2V0IG1ldDoge21hbmlmZXN0LmNvc3RfdGFyZ2V0X21ldH0i
+KQoKCmlmIF9fbmFtZV9fID09ICJfX21haW5fXyI6CiAgICBtYWluKCkK

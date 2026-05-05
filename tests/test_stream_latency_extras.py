@@ -176,7 +176,7 @@ def test_main_measures_latency_with_fake_pyaudio(monkeypatch, capsys):
 
         def read(self, frames, exception_on_overflow=False):
             assert frames == recording.size
-            assert exception_on_overflow is False
+            assert not exception_on_overflow
             return self.raw
 
         def write(self, data):

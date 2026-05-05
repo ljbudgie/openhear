@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import click
 import pytest
 from click.testing import CliRunner
 
@@ -54,7 +55,7 @@ def test_collect_audiogram_stops_when_preprovided_answers_run_out():
 
 
 def test_collect_audiogram_rejects_non_numeric_preprovided_answer():
-    with pytest.raises(Exception, match="not a number"):
+    with pytest.raises(click.BadParameter, match="not a number"):
         collect_audiogram(answers=["loud"])
 
 

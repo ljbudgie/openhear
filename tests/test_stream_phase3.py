@@ -283,8 +283,10 @@ def test_recorder_arg_parser_accepts_raw_and_processed_outputs(tmp_path: Path):
         ]
     )
 
-    assert Path(args.raw) == tmp_path / "raw.wav"
-    assert Path(args.processed) == tmp_path / "processed.wav"
+    assert isinstance(args.raw, Path)
+    assert isinstance(args.processed, Path)
+    assert args.raw == tmp_path / "raw.wav"
+    assert args.processed == tmp_path / "processed.wav"
     assert args.duration == 1.5
     assert args.sample_rate == 48_000
     assert args.block_size == 128

@@ -158,3 +158,78 @@ def test_main_returns_2_when_pyaudio_missing(monkeypatch, caplog):
 def test_main_arg_parser_rejects_unknown_flag():
     with pytest.raises(SystemExit):
         main(["--no-such-flag"])
+
+
+def test_main_measures_latency_with_fake_pyaudio(monkeypatch, capsys):
+    sample_rate = 1000
+    duration_ms = 50
+    impulse_index = 5
+    recording = np.zeros(int(sample_rate * duration_ms / 1000), dtype=np.int16)
+    recording[impulse_index] = 32767
+
+    class _FakeStream:
+        def __init__(self, raw: bytes = b""):
+            self.raw = raw
+            self.stopped = False
+            self.closed = False
+            self.written = b""
+
+        def read(self, frames, exception_on_overflow=False):
+            assert frames == recording.size
+            assert exception_on_overflow is False
+            return self.raw
+
+        def write(self, data):
+            self.written = data
+
+        def stop_stream(self):
+            self.stopped = True
+
+        def close(self):
+            self.closed = True
+
+    class _FakePyAudioInstance:
+        def __init__(self):
+            self.input_stream = _FakeStream(recording.tobytes())
+            self.output_stream = _FakeStream()
+            self.terminated = False
+
+        def open(self, **kwargs):
+            assert kwargs["rate"] == sample_rate
+            assert kwargs["format"] == _FakePyAudio.paInt16
+            assert kwargs["frames_per_buffer"] == recording.size
+            if kwargs.get("input"):
+                return self.input_stream
+            if kwargs.get("output"):
+                return self.output_stream
+            raise AssertionError("expected input or output stream")
+
+        def terminate(self):
+            self.terminated = True
+
+    class _FakePyAudio:
+        paInt16 = object()
+        instance = _FakePyAudioInstance()
+
+        @staticmethod
+        def PyAudio():
+            return _FakePyAudio.instance
+
+    monkeypatch.setitem(sys.modules, "pyaudio", _FakePyAudio)
+
+    rc = main(
+        [
+            "--sample-rate",
+            str(sample_rate),
+            "--duration-ms",
+            str(duration_ms),
+            "--target",
+            "10",
+        ]
+    )
+
+    assert rc == 0
+    assert "latency=  5.00 ms" in capsys.readouterr().out
+    assert _FakePyAudio.instance.input_stream.stopped is True
+    assert _FakePyAudio.instance.output_stream.closed is True
+    assert _FakePyAudio.instance.terminated is True

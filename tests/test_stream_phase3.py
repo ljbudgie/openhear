@@ -261,3 +261,31 @@ def test_write_wav_validates_inputs(tmp_path: Path):
         write_wav(tmp_path / "x.wav", np.zeros(8, dtype=np.float32), 0)
     with pytest.raises(ValueError, match="empty WAV"):
         write_wav(tmp_path / "y.wav", np.zeros(0, dtype=np.float32), 16_000)
+
+
+def test_recorder_arg_parser_accepts_raw_and_processed_outputs(tmp_path: Path):
+    from stream.recorder import _build_arg_parser
+
+    args = _build_arg_parser().parse_args(
+        [
+            "--raw",
+            str(tmp_path / "raw.wav"),
+            "--processed",
+            str(tmp_path / "processed.wav"),
+            "--duration",
+            "1.5",
+            "--sample-rate",
+            "48000",
+            "--block-size",
+            "128",
+            "--input-device",
+            "3",
+        ]
+    )
+
+    assert args.raw == tmp_path / "raw.wav"
+    assert args.processed == tmp_path / "processed.wav"
+    assert args.duration == pytest.approx(1.5)
+    assert args.sample_rate == 48_000
+    assert args.block_size == 128
+    assert args.input_device == 3

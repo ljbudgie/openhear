@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 from click.testing import CliRunner
 
-from audiogram.manual_entry import _prompt_threshold, collect_audiogram, main
+from audiogram.manual_entry import collect_audiogram, main
 
 
 def _ten_thresholds(start: int) -> list[str]:
@@ -47,20 +47,24 @@ def test_collect_audiogram_rejects_out_of_range_value():
         collect_audiogram(answers=answers)
 
 
-def test_prompt_threshold_returns_none_when_preprovided_answers_run_out():
-    assert _prompt_threshold(1000, "right", interactive=False, answers=[]) is None
+def test_collect_audiogram_stops_when_preprovided_answers_run_out():
+    ag = collect_audiogram(answers=[])
+    assert ag.right_ear == {}
+    assert ag.left_ear == {}
 
 
-def test_prompt_threshold_rejects_non_numeric_preprovided_answer():
+def test_collect_audiogram_rejects_non_numeric_preprovided_answer():
     with pytest.raises(Exception, match="not a number"):
-        _prompt_threshold(1000, "right", interactive=False, answers=["loud"])
+        collect_audiogram(answers=["loud"])
 
 
-def test_prompt_threshold_reprompts_interactively_after_bad_answers(monkeypatch):
-    answers = iter(["loud", "999", "25"])
+def test_collect_audiogram_reprompts_interactively_after_bad_answers(monkeypatch):
+    answers = iter(["loud", "999", "25"] + ["skip"] * 19)
     monkeypatch.setattr("click.prompt", lambda *args, **kwargs: next(answers))
 
-    assert _prompt_threshold(1000, "left", interactive=True) == 25.0
+    ag = collect_audiogram(interactive=True)
+    assert ag.right_ear[250] == 25.0
+    assert ag.left_ear == {}
 
 
 def test_cli_writes_json_file(tmp_path: Path):

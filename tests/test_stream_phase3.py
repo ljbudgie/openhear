@@ -291,3 +291,10 @@ def test_recorder_arg_parser_accepts_raw_and_processed_outputs(tmp_path: Path):
     assert args.sample_rate == 48_000
     assert args.block_size == 128
     assert args.input_device == 3
+
+
+def test_recorder_arg_parser_rejects_unknown_options():
+    from stream.recorder import _build_arg_parser
+
+    with pytest.raises(SystemExit):
+        _build_arg_parser().parse_args(["--not-a-recorder-option"])

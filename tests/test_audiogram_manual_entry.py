@@ -60,7 +60,8 @@ def test_collect_audiogram_rejects_non_numeric_preprovided_answer():
 
 
 def test_collect_audiogram_reprompts_interactively_after_bad_answers(monkeypatch):
-    answers = iter(["loud", "999", "25"] + ["skip"] * 19)
+    remaining_frequency_prompts = 19
+    answers = iter(["loud", "999", "25"] + ["skip"] * remaining_frequency_prompts)
     monkeypatch.setattr("click.prompt", lambda *args, **kwargs: next(answers))
 
     ag = collect_audiogram(interactive=True)

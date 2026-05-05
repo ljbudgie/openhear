@@ -175,8 +175,10 @@ def test_main_measures_latency_with_fake_pyaudio(monkeypatch, capsys):
             self.written = b""
 
         def read(self, frames, exception_on_overflow=False):
-            assert frames == recording.size, "latency CLI should read the full capture window"
-            assert not exception_on_overflow, "latency CLI should disable overflow exceptions"
+            if frames != recording.size:
+                raise ValueError("latency CLI should read the full capture window")
+            if exception_on_overflow:
+                raise ValueError("latency CLI should disable overflow exceptions")
             return self.raw
 
         def write(self, data):

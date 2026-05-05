@@ -293,8 +293,11 @@ def test_recorder_arg_parser_accepts_raw_and_processed_outputs(tmp_path: Path):
     assert args.input_device == 3
 
 
-def test_recorder_arg_parser_rejects_unknown_options():
+def test_recorder_arg_parser_rejects_unknown_options(capsys):
     from stream.recorder import _build_arg_parser
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(SystemExit) as excinfo:
         _build_arg_parser().parse_args(["--not-a-recorder-option"])
+
+    assert excinfo.value.code == 2
+    assert "unrecognized arguments: --not-a-recorder-option" in capsys.readouterr().err

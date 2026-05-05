@@ -113,7 +113,6 @@ def list_components(path: str | Path | None = None) -> list[Component]:
     """Return validated component entries in database order."""
     data = load_component_database(path)
     raw_components = data["components"]
-    assert isinstance(raw_components, list)
     return [_component_from_mapping(raw) for raw in raw_components]
 
 

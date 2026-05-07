@@ -4,8 +4,8 @@
 
 [![Licence: Apache 2.0 + Sovereign Use Addendum](https://img.shields.io/badge/licence-Apache%202.0%20%2B%20Sovereign%20Use%20Addendum-blue.svg)](LICENSE)
 
-**Built on the Burgess Principle** — see [`docs/BURGESS_PRINCIPLE.md`](docs/BURGESS_PRINCIPLE.md).  
-→ [`Full documentation index`](docs/index.md)
+**Built on the Burgess Principle** — see [docs/BURGESS_PRINCIPLE.md](docs/BURGESS_PRINCIPLE.md).  
+→ [Full documentation index](docs/index.md)
 
 > **⚠️ EXPERIMENTAL — NOT A MEDICAL DEVICE**
 > OpenHear is a research platform and public build log, not a certified hearing aid.

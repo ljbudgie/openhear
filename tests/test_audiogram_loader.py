@@ -104,8 +104,7 @@ class TestGetPta:
     def test_pta_insufficient_frequencies(self, sample_audiogram_dict):
         # Remove 4000 Hz from right ear.
         sample_audiogram_dict["right_ear"]["thresholds"] = [
-            t for t in sample_audiogram_dict["right_ear"]["thresholds"]
-            if t["freq_hz"] != 4000
+            t for t in sample_audiogram_dict["right_ear"]["thresholds"] if t["freq_hz"] != 4000
         ]
         with pytest.raises(ValueError, match="missing thresholds"):
             get_pta(sample_audiogram_dict, "right")
@@ -180,16 +179,13 @@ class TestCompareAudiograms:
         assert result["right_pta_diff"] == 10.0
         assert result["left_pta_diff"] == 10.0
 
-    def test_comparison_pta_handles_missing(
-        self, tmp_path: Path, sample_audiogram_dict: dict
-    ):
+    def test_comparison_pta_handles_missing(self, tmp_path: Path, sample_audiogram_dict: dict):
         # Remove 4000 Hz from one file → its PTA calc fails → diff is None.
         a_path = tmp_path / "a.json"
         a_path.write_text(json.dumps(sample_audiogram_dict), encoding="utf-8")
         incomplete = json.loads(json.dumps(sample_audiogram_dict))
         incomplete["right_ear"]["thresholds"] = [
-            t for t in incomplete["right_ear"]["thresholds"]
-            if t["freq_hz"] != 4000
+            t for t in incomplete["right_ear"]["thresholds"] if t["freq_hz"] != 4000
         ]
         b_path = tmp_path / "b.json"
         b_path.write_text(json.dumps(incomplete), encoding="utf-8")

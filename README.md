@@ -109,6 +109,23 @@ It is yours.
 
 ---
 
+## OpenHear is a safe biohack
+
+Biohacking means using technology to extend, restore, or augment your own biology — on your own terms, with your own data, without asking permission. OpenHear is a biohack in the most literal sense: it takes a biological measurement (your audiogram), a physiological system (your hearing), and a wearable compute surface (the wristband), and gives you control of all three in a way the commercial market deliberately withholds.
+
+It is also **safe** — by design, by architecture, and by philosophy:
+
+- **Non-invasive.** No surgery. No implant. No ear canal device required in the long-term configuration. The wristband sits on the wrist. The receiver, where used, rests behind the ear. Nothing enters the body.
+- **Non-destructive.** OpenHear does not modify, reflash, or irreversibly alter your existing hearing aids. It reads your fitting data and processes audio alongside your current setup. Your aids continue to function exactly as before.
+- **Open and inspectable.** Every algorithm that acts on your hearing is open source and readable. No proprietary DSP, no black-box AI making silent decisions about what you hear. If you want to know what the compression curve is doing, you can read it. If you disagree with it, you can change it.
+- **Data stays with you.** Your audiogram lives as plain JSON on your own device. The wristband has no IP stack in the hearing data path — there is no route for your biometric data to leave the hardware. The personal adaptation model, the haptic preference profile, and the training telemetry all live in files you own, can inspect, and can delete.
+- **Graduated.** The system starts as a companion to your existing aids and builds capability incrementally. Sensation levels are user-controlled. Nothing fires at full intensity without calibration. The training protocol is phased over months, not days, specifically to allow safe, measurable neural adaptation.
+- **Transparent about what it is not.** OpenHear is not a medical device and does not claim to be. It does not diagnose, treat, or replace clinical care. The experimental disclaimer is in the README header, the safety section, and the codebase. The regulatory pathway — sensory substitution, not hearing aid — is documented honestly, with the evidence required before any clinical claim can be made.
+
+The biohacking community already uses non-invasive neurostimulation, transcranial devices, wearable biosensors, and DIY CPAP titration. OpenHear is that same tradition applied to hearing: your sensory data, your hardware, your parameters, your outcomes. The only thing unusual about it is that it works.
+
+---
+
 ## What OpenHear does
 ```
 World → Microphone → Custom DSP Engine → Bluetooth Stream → Your Aids → Your Ears

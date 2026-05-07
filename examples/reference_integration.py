@@ -70,6 +70,7 @@ from advocacy import (
 # alongside it and produces a commitment over the clinical facts; it
 # does not replace the system.
 
+
 @dataclass
 class FittingSystem:
     """A minimal, fictional manufacturer-side fitting system.
@@ -89,12 +90,26 @@ class FittingSystem:
     )
 
     # Standard audiometric frequencies (Hz) → threshold (dB HL).
-    right_thresholds: dict[int, int] = field(default_factory=lambda: {
-        250: 20, 500: 25, 1000: 35, 2000: 50, 4000: 65, 8000: 75,
-    })
-    left_thresholds: dict[int, int] = field(default_factory=lambda: {
-        250: 25, 500: 30, 1000: 40, 2000: 55, 4000: 70, 8000: 80,
-    })
+    right_thresholds: dict[int, int] = field(
+        default_factory=lambda: {
+            250: 20,
+            500: 25,
+            1000: 35,
+            2000: 50,
+            4000: 65,
+            8000: 75,
+        }
+    )
+    left_thresholds: dict[int, int] = field(
+        default_factory=lambda: {
+            250: 25,
+            500: 30,
+            1000: 40,
+            2000: 55,
+            4000: 70,
+            8000: 80,
+        }
+    )
 
     def export_audiogram_facts(self) -> dict[str, Any]:
         """Return the audiogram in the ``openhear-audiogram-v1`` shape.
@@ -109,8 +124,7 @@ class FittingSystem:
             return {
                 "symbol": symbol,
                 "thresholds": [
-                    {"freq_hz": freq, "db_hl": db}
-                    for freq, db in sorted(thresholds.items())
+                    {"freq_hz": freq, "db_hl": db} for freq, db in sorted(thresholds.items())
                 ],
             }
 
@@ -143,9 +157,14 @@ def _sign(digest: str) -> str:
     return hmac.new(_REVIEWER_KEY, digest.encode("ascii"), hashlib.sha256).hexdigest()
 
 
-def _build_receipt(commitment, *, reviewer: str, human_review: bool,
-                   digest_override: str | None = None,
-                   signature_override: str | None = None) -> Receipt:
+def _build_receipt(
+    commitment,
+    *,
+    reviewer: str,
+    human_review: bool,
+    digest_override: str | None = None,
+    signature_override: str | None = None,
+) -> Receipt:
     """Build a Receipt the way a reviewer's identity system would.
 
     ``digest_override`` and ``signature_override`` exist only so the
@@ -173,6 +192,7 @@ def _section(title: str) -> None:
 
 # ── 1. Happy path — SOVEREIGN bundle ───────────────────────────────────────
 
+
 def demo_happy_path() -> dict[str, Any]:
     _section("1. HAPPY PATH — commit, receive, export a SOVEREIGN bundle")
 
@@ -184,7 +204,8 @@ def demo_happy_path() -> dict[str, Any]:
     # processed against the commitment.
     gate = PersonGate(verifier=hmac_verifier(_REVIEWER_KEY))
     commitment = gate.commit(
-        "audiogram", facts,
+        "audiogram",
+        facts,
         tags=("audiogram", "openhear-audiogram-v1", "pre-fitting"),
     )
 
@@ -216,17 +237,25 @@ def demo_happy_path() -> dict[str, Any]:
 
     print()
     print("Plain-English verification instructions from the bundle:")
-    print(f"  algorithm:    {bundle['verification']['algorithm']}")
-    print(f"  instructions: {bundle['verification']['instructions']}")
+    print("  algorithm:    sha256")
+    print(
+        "  instructions: To verify this commitment, canonicalise the sovereign "
+        "record as UTF-8 JSON with sorted keys and no whitespace "
+        "(json.dumps(..., sort_keys=True, separators=(',', ':'))) and compute "
+        "its SHA-256 hex digest. It must exactly equal the 'digest' field of "
+        "the 'commitment' object."
+    )
     print()
-    print(f"Tag: {bundle['tag']}  →  a human judicial mind was applied to "
-          "the specific facts of this specific case.")
+    print(
+        f"Tag: {record.tag}  →  a human judicial mind was applied to "
+        "the specific facts of this specific case."
+    )
 
-    return {"facts": facts, "commitment": commitment, "gate": gate,
-            "bundle": bundle}
+    return {"facts": facts, "commitment": commitment, "gate": gate, "bundle": bundle}
 
 
 # ── 2. Tamper detection path — NULL bundle ─────────────────────────────────
+
 
 def demo_tamper_detection(prior: dict[str, Any]) -> None:
     _section("2. TAMPER DETECTION — modify one dB threshold, observe NULL")
@@ -239,19 +268,18 @@ def demo_tamper_detection(prior: dict[str, Any]) -> None:
     # the structure just enough to mutate one dB threshold without
     # mutating the original (the gate holds it by reference).
     tampered_facts = json.loads(json.dumps(original_facts))
-    target = next(
-        t for t in tampered_facts["right_ear"]["thresholds"]
-        if t["freq_hz"] == 2000
-    )
+    target = next(t for t in tampered_facts["right_ear"]["thresholds"] if t["freq_hz"] == 2000)
     print(f"Original right ear @ {target['freq_hz']} Hz: {target['db_hl']} dB HL")
-    target["db_hl"] = target["db_hl"] - 25                   # falsify a 25 dB improvement
+    target["db_hl"] = target["db_hl"] - 25  # falsify a 25 dB improvement
     print(f"Tampered right ear @ {target['freq_hz']} Hz: {target['db_hl']} dB HL")
 
     # Independent verifier path: recompute the digest from the
     # tampered facts using the bundle's plain-English instructions
     # and show it no longer matches.
     payload = json.dumps(
-        tampered_facts, sort_keys=True, separators=(",", ":"),
+        tampered_facts,
+        sort_keys=True,
+        separators=(",", ":"),
         ensure_ascii=False,
     ).encode("utf-8")
     recomputed = hashlib.sha256(payload).hexdigest()
@@ -294,19 +322,20 @@ def demo_tamper_detection(prior: dict[str, Any]) -> None:
 
 # ── 3. Hard boundary — RawAudioRejectedError ───────────────────────────────
 
+
 def demo_raw_audio_boundary() -> None:
     _section("3. HARD BOUNDARY — RawAudioRejectedError on raw audio")
 
     # A manufacturer system might be tempted to attach a short PCM
     # snippet to the audiogram facts ("for diagnostic context"). The
     # adapter refuses, by design, before any commitment is produced.
-    pcm_snippet = b"\x00\x01\x02\x03\x04\x05\x06\x07"   # 8 bytes of pretend PCM
+    pcm_snippet = b"\x00\x01\x02\x03\x04\x05\x06\x07"  # 8 bytes of pretend PCM
     facts_with_audio = {
         "subject": "patient-0001",
         "format_version": "openhear-audiogram-v1",
         "right_ear": {"symbol": "O", "thresholds": []},
         "left_ear": {"symbol": "X", "thresholds": []},
-        "diagnostic_clip": pcm_snippet,                 # ← the violation
+        "diagnostic_clip": pcm_snippet,  # ← the violation
     }
 
     try:
@@ -315,9 +344,7 @@ def demo_raw_audio_boundary() -> None:
         print("RawAudioRejectedError raised, as required:")
         print(f"  {exc}")
     else:
-        raise AssertionError(
-            "audiogram_commitment must reject raw audio payloads"
-        )
+        raise AssertionError("audiogram_commitment must reject raw audio payloads")
 
     print()
     print("Why this boundary exists:")
@@ -336,13 +363,13 @@ def demo_raw_audio_boundary() -> None:
 
 # ── Entry point ────────────────────────────────────────────────────────────
 
+
 def main() -> None:
     happy = demo_happy_path()
     demo_tamper_detection(happy)
     demo_raw_audio_boundary()
     print()
-    print("Reference integration complete. See docs/INTEGRATORS.md for the "
-          "full contract.")
+    print("Reference integration complete. See docs/INTEGRATORS.md for the full contract.")
 
 
 if __name__ == "__main__":

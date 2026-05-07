@@ -40,8 +40,9 @@ CMD_GET_FITTING = bytes([0x00, 0x01, 0x00] + [0x00] * (HID_REPORT_LENGTH - 3))
 logger = logging.getLogger(__name__)
 
 
-def open_device(vendor_id: int = NOAHLINK_VENDOR_ID,
-                product_id: int = NOAHLINK_PRODUCT_ID) -> hid.device:
+def open_device(
+    vendor_id: int = NOAHLINK_VENDOR_ID, product_id: int = NOAHLINK_PRODUCT_ID
+) -> hid.device:
     """Open the first matching HID device and return the handle.
 
     Raises:
@@ -123,6 +124,7 @@ def export_json(data: dict, path: str) -> None:
 def _utc_now_iso() -> str:
     """Return the current UTC time as an ISO-8601 string."""
     from datetime import datetime, timezone
+
     return datetime.now(tz=timezone.utc).isoformat()
 
 
@@ -196,31 +198,39 @@ def main() -> None:
         description="Read fitting data from Noahlink Wireless 2 and export as JSON."
     )
     parser.add_argument(
-        "--output", "-o",
+        "--output",
+        "-o",
         default="fitting.json",
         help="Path for the output JSON file (default: fitting.json).",
     )
     parser.add_argument(
-        "--vendor-id", type=lambda x: int(x, 0), default=NOAHLINK_VENDOR_ID,
+        "--vendor-id",
+        type=lambda x: int(x, 0),
+        default=NOAHLINK_VENDOR_ID,
         help=f"USB vendor ID (default: {NOAHLINK_VENDOR_ID:#06x}).",
     )
     parser.add_argument(
-        "--product-id", type=lambda x: int(x, 0), default=NOAHLINK_PRODUCT_ID,
+        "--product-id",
+        type=lambda x: int(x, 0),
+        default=NOAHLINK_PRODUCT_ID,
         help=f"USB product ID (default: {NOAHLINK_PRODUCT_ID:#06x}).",
     )
     parser.add_argument(
-        "--session", action="store_true",
+        "--session",
+        action="store_true",
         help="Use the new core.protocol parser to emit a structured "
-             "FittingSession JSON document.  Default behaviour writes "
-             "the legacy raw-payload JSON for backwards compatibility.",
+        "FittingSession JSON document.  Default behaviour writes "
+        "the legacy raw-payload JSON for backwards compatibility.",
     )
     parser.add_argument(
-        "--raw", action="store_true",
-        help="Force a raw dump even when --session is set.  Equivalent "
-             "to the legacy default.",
+        "--raw",
+        action="store_true",
+        help="Force a raw dump even when --session is set.  Equivalent to the legacy default.",
     )
     parser.add_argument(
-        "--verbose", "-v", action="store_true",
+        "--verbose",
+        "-v",
+        action="store_true",
         help="Enable verbose (DEBUG) logging.",
     )
     args = parser.parse_args()

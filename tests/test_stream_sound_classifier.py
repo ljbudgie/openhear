@@ -64,9 +64,7 @@ def test_load_labels_supports_plain_text(tmp_path):
 
 
 def test_load_labels_supports_official_yamnet_csv():
-    labels_path = (
-        Path(__file__).resolve().parents[1] / "stream" / "data" / "yamnet_class_map.csv"
-    )
+    labels_path = Path(__file__).resolve().parents[1] / "stream" / "data" / "yamnet_class_map.csv"
     labels = _load_labels(str(labels_path))
     assert len(labels) == 521
     assert labels[0] == "Speech"
@@ -99,10 +97,12 @@ def test_classify_scores_dominant_silence_below_threshold():
 
 
 def test_prepare_audio_window_downmixes_stereo():
-    stereo = np.column_stack([
-        np.ones(8000, dtype=np.float32),
-        -np.ones(8000, dtype=np.float32),
-    ])
+    stereo = np.column_stack(
+        [
+            np.ones(8000, dtype=np.float32),
+            -np.ones(8000, dtype=np.float32),
+        ]
+    )
     window = prepare_audio_window(stereo, 8_000)
     # The two channels cancel; the average is zero everywhere.
     assert np.allclose(window, 0.0)
@@ -240,4 +240,3 @@ def test_load_tflite_interpreter_uses_tensorflow_when_no_tflite_runtime(monkeypa
     interp = _load_tflite_interpreter("/tmp/model.tflite")
     assert isinstance(interp, _FakeInterpreter)
     assert captured["model_path"] == "/tmp/model.tflite"
-

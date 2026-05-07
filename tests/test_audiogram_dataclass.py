@@ -22,7 +22,16 @@ SAMPLE_PATH = REPO_ROOT / "examples" / "sample_audiogram.json"
 def test_standard_frequencies_match_iso_8253_1():
     """Per the master prompt, these are the ten standard test frequencies."""
     assert STANDARD_FREQUENCIES_HZ == (
-        250, 500, 750, 1000, 1500, 2000, 3000, 4000, 6000, 8000,
+        250,
+        500,
+        750,
+        1000,
+        1500,
+        2000,
+        3000,
+        4000,
+        6000,
+        8000,
     )
 
 
@@ -172,9 +181,7 @@ def test_audiogram_from_path_loads_bundled_sample():
     assert ag.source == "manual_entry"
     assert ag.right_ear[1000] == 45.0
     assert ag.left_ear[8000] == 80.0
-    assert ag.pure_tone_average("right") == pytest.approx(
-        (35 + 45 + 55 + 65) / 4
-    )
+    assert ag.pure_tone_average("right") == pytest.approx((35 + 45 + 55 + 65) / 4)
 
 
 def test_existing_burgess_v1_file_loads_via_dataclass(burgess_audiogram_path):

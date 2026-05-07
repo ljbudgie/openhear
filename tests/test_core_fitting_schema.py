@@ -83,8 +83,7 @@ class TestPhonakProfile:
         assert p.noise_reduction_active is True
 
     def test_from_dict_ignores_unknown_keys(self):
-        p = phonak_profile_from_dict({"unknown_field": "ignore_me",
-                                      "device_serial": "SN1"})
+        p = phonak_profile_from_dict({"unknown_field": "ignore_me", "device_serial": "SN1"})
         assert p.device_serial == "SN1"
 
     def test_from_dict_partial_gain_table(self):

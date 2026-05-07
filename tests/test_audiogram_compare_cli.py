@@ -102,20 +102,26 @@ class TestCompareCli:
             "date": "2024-01-01",
             "format_version": "openhear-audiogram-v1",
         }
-        old.write_text(json.dumps({
-            **common,
-            "right_ear": {"symbol": "O",
-                          "thresholds": [{"freq_hz": 250, "db_hl": 10}]},
-            "left_ear": {"symbol": "X",
-                         "thresholds": [{"freq_hz": 250, "db_hl": 15}]},
-        }), encoding="utf-8")
-        new.write_text(json.dumps({
-            **common,
-            "right_ear": {"symbol": "O",
-                          "thresholds": [{"freq_hz": 8000, "db_hl": 50}]},
-            "left_ear": {"symbol": "X",
-                         "thresholds": [{"freq_hz": 8000, "db_hl": 55}]},
-        }), encoding="utf-8")
+        old.write_text(
+            json.dumps(
+                {
+                    **common,
+                    "right_ear": {"symbol": "O", "thresholds": [{"freq_hz": 250, "db_hl": 10}]},
+                    "left_ear": {"symbol": "X", "thresholds": [{"freq_hz": 250, "db_hl": 15}]},
+                }
+            ),
+            encoding="utf-8",
+        )
+        new.write_text(
+            json.dumps(
+                {
+                    **common,
+                    "right_ear": {"symbol": "O", "thresholds": [{"freq_hz": 8000, "db_hl": 50}]},
+                    "left_ear": {"symbol": "X", "thresholds": [{"freq_hz": 8000, "db_hl": 55}]},
+                }
+            ),
+            encoding="utf-8",
+        )
 
         runner = CliRunner()
         result = runner.invoke(main, [str(old), str(new)])

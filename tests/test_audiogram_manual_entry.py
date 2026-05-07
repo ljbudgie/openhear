@@ -54,8 +54,7 @@ def test_cli_writes_json_file(tmp_path: Path):
     answers = "\n".join(_ten_thresholds(30) + _ten_thresholds(35)) + "\n"
     result = runner.invoke(
         main,
-        ["--output", str(out), "--subject", "anon",
-         "--date", "2024-11-15"],
+        ["--output", str(out), "--subject", "anon", "--date", "2024-11-15"],
         input=answers,
     )
     assert result.exit_code == 0, result.output
@@ -63,9 +62,7 @@ def test_cli_writes_json_file(tmp_path: Path):
     data = json.loads(out.read_text())
     assert data["format_version"] == "openhear-audiogram-v1"
     assert data["source"] == "manual_entry"
-    right_thresholds = {
-        e["freq_hz"]: e["db_hl"] for e in data["right_ear"]["thresholds"]
-    }
+    right_thresholds = {e["freq_hz"]: e["db_hl"] for e in data["right_ear"]["thresholds"]}
     assert right_thresholds[250] == 30
     assert right_thresholds[8000] == 75
 

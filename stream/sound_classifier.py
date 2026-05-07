@@ -87,9 +87,7 @@ def prepare_audio_window(
     if sample_rate != target_sample_rate:
         original_times = np.linspace(0.0, len(mono) / sample_rate, num=len(mono), endpoint=False)
         target_length = max(1, int(round(len(mono) * target_sample_rate / sample_rate)))
-        target_times = np.linspace(
-            0.0, len(mono) / sample_rate, num=target_length, endpoint=False
-        )
+        target_times = np.linspace(0.0, len(mono) / sample_rate, num=target_length, endpoint=False)
         mono = np.interp(target_times, original_times, mono).astype(np.float32)
 
     desired_length = int(round(target_sample_rate * window_seconds))
@@ -153,15 +151,16 @@ class YamnetClassifier:
         input_shape = tuple(self._input_details[0]["shape"])
         if len(input_shape) == 2:
             input_tensor = window[np.newaxis, :]
-        self._interpreter.set_tensor(self._input_details[0]["index"], input_tensor.astype(np.float32))
+        self._interpreter.set_tensor(
+            self._input_details[0]["index"], input_tensor.astype(np.float32)
+        )
         self._interpreter.invoke()
         raw_scores = self._interpreter.get_tensor(self._output_details[0]["index"])
         scores = np.asarray(raw_scores, dtype=np.float32)
         if scores.ndim == 2:
             scores = scores.mean(axis=0)
         scores_by_label = {
-            label: float(scores[idx])
-            for idx, label in enumerate(self.labels[: len(scores)])
+            label: float(scores[idx]) for idx, label in enumerate(self.labels[: len(scores)])
         }
         return classify_scores(scores_by_label)
 

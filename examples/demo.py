@@ -85,26 +85,32 @@ def process_signal(
 
     chain = []
     if config.NOISE_REDUCTION_ENABLED:
-        chain.append(SpectralSubtractor(
+        chain.append(
+            SpectralSubtractor(
+                frame_length=block_size,
+                noise_floor_multiplier=config.NOISE_FLOOR_MULTIPLIER,
+                spectral_floor=config.SPECTRAL_FLOOR,
+                noise_estimation_frames=config.NOISE_ESTIMATION_FRAMES,
+            )
+        )
+    chain.append(
+        WDRCompressor(
+            sample_rate=sample_rate,
+            ratio=user_config.compression.ratio,
+            knee_dbfs=user_config.compression.knee_db,
+            attack_s=user_config.compression.attack_ms / 1000.0,
+            release_s=user_config.compression.release_ms / 1000.0,
+        )
+    )
+    chain.append(
+        VoiceClarityEnhancer(
             frame_length=block_size,
-            noise_floor_multiplier=config.NOISE_FLOOR_MULTIPLIER,
-            spectral_floor=config.SPECTRAL_FLOOR,
-            noise_estimation_frames=config.NOISE_ESTIMATION_FRAMES,
-        ))
-    chain.append(WDRCompressor(
-        sample_rate=sample_rate,
-        ratio=user_config.compression.ratio,
-        knee_dbfs=user_config.compression.knee_db,
-        attack_s=user_config.compression.attack_ms / 1000.0,
-        release_s=user_config.compression.release_ms / 1000.0,
-    ))
-    chain.append(VoiceClarityEnhancer(
-        frame_length=block_size,
-        sample_rate=sample_rate,
-        low_hz=user_config.voice.boost_hz[0],
-        high_hz=user_config.voice.boost_hz[1],
-        gain=10.0 ** (user_config.voice.boost_db / 20.0),
-    ))
+            sample_rate=sample_rate,
+            low_hz=user_config.voice.boost_hz[0],
+            high_hz=user_config.voice.boost_hz[1],
+            gain=10.0 ** (user_config.voice.boost_db / 20.0),
+        )
+    )
 
     out = np.zeros_like(samples)
     pos = 0
@@ -128,16 +134,21 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--input", "-i", required=True, type=Path)
     parser.add_argument("--output", "-o", required=True, type=Path)
     parser.add_argument(
-        "--config", "-c", type=Path, default=None,
-        help="Path to a user config YAML file.  Defaults to "
-             "~/.openhear/config.yaml.",
+        "--config",
+        "-c",
+        type=Path,
+        default=None,
+        help="Path to a user config YAML file.  Defaults to ~/.openhear/config.yaml.",
     )
     parser.add_argument(
-        "--block-size", type=int, default=256,
+        "--block-size",
+        type=int,
+        default=256,
         help="Block size in samples (default: 256).",
     )
     parser.add_argument(
-        "--bypass", action="store_true",
+        "--bypass",
+        action="store_true",
         help="Skip DSP processing — copy input to output.  Useful for A/B.",
     )
     parser.add_argument("--verbose", action="store_true")
@@ -157,7 +168,9 @@ def main(argv: list[str] | None = None) -> int:
     samples, sample_rate = _read_wav(args.input)
     logger.info(
         "Loaded %s: %d samples @ %d Hz (%.2f s)",
-        args.input, samples.shape[0], sample_rate,
+        args.input,
+        samples.shape[0],
+        sample_rate,
         samples.shape[0] / sample_rate,
     )
     processed = process_signal(

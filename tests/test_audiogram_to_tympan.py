@@ -115,7 +115,9 @@ class TestGenerateSketch:
     def test_generates_file_and_substitutes(self, burgess_audiogram_path, tmp_path: Path):
         output = tmp_path / "sketch.ino"
         sketch = generate_tympan_sketch(
-            burgess_audiogram_path, str(output), ear="right",
+            burgess_audiogram_path,
+            str(output),
+            ear="right",
         )
         assert output.exists()
         assert sketch == output.read_text(encoding="utf-8")
@@ -126,7 +128,9 @@ class TestGenerateSketch:
     def test_contains_expected_metadata(self, burgess_audiogram_path, tmp_path: Path):
         output = tmp_path / "sketch.ino"
         sketch = generate_tympan_sketch(
-            burgess_audiogram_path, str(output), ear="right",
+            burgess_audiogram_path,
+            str(output),
+            ear="right",
         )
         assert "Right ear" in sketch
         # The audiogram's subject name should appear as AUDIOGRAM_SOURCE.
@@ -144,6 +148,8 @@ class TestGenerateSketch:
     def test_ear_left(self, burgess_audiogram_path, tmp_path: Path):
         output = tmp_path / "sketch_left.ino"
         sketch = generate_tympan_sketch(
-            burgess_audiogram_path, str(output), ear="left",
+            burgess_audiogram_path,
+            str(output),
+            ear="left",
         )
         assert "Left ear" in sketch

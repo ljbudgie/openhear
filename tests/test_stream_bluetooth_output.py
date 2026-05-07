@@ -15,23 +15,29 @@ from stream import bluetooth_output
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("name", [
-    "Phonak Marvel BT Headset",
-    "Signia Insio AX",
-    "Bluetooth Audio Device",
-    "OTICON More 1",
-    "ReSound Naida",
-    "AUDEO P90",
-])
+@pytest.mark.parametrize(
+    "name",
+    [
+        "Phonak Marvel BT Headset",
+        "Signia Insio AX",
+        "Bluetooth Audio Device",
+        "OTICON More 1",
+        "ReSound Naida",
+        "AUDEO P90",
+    ],
+)
 def test_is_likely_bluetooth_device_positive(name):
     assert bluetooth_output.is_likely_bluetooth_device(name) is True
 
 
-@pytest.mark.parametrize("name", [
-    "Realtek HD Audio",
-    "USB Microphone",
-    "Built-in Output",
-])
+@pytest.mark.parametrize(
+    "name",
+    [
+        "Realtek HD Audio",
+        "USB Microphone",
+        "Built-in Output",
+    ],
+)
 def test_is_likely_bluetooth_device_negative(name):
     assert bluetooth_output.is_likely_bluetooth_device(name) is False
 
@@ -106,12 +112,24 @@ class _FakePyAudio:
 
 def _devices_fixture():
     return [
-        {"name": "Built-in Output", "maxOutputChannels": 2,
-         "maxInputChannels": 0, "defaultSampleRate": 48000.0},
-        {"name": "Built-in Microphone", "maxOutputChannels": 0,
-         "maxInputChannels": 1, "defaultSampleRate": 48000.0},
-        {"name": "Phonak Marvel Bluetooth", "maxOutputChannels": 2,
-         "maxInputChannels": 0, "defaultSampleRate": 16000.0},
+        {
+            "name": "Built-in Output",
+            "maxOutputChannels": 2,
+            "maxInputChannels": 0,
+            "defaultSampleRate": 48000.0,
+        },
+        {
+            "name": "Built-in Microphone",
+            "maxOutputChannels": 0,
+            "maxInputChannels": 1,
+            "defaultSampleRate": 48000.0,
+        },
+        {
+            "name": "Phonak Marvel Bluetooth",
+            "maxOutputChannels": 2,
+            "maxInputChannels": 0,
+            "defaultSampleRate": 16000.0,
+        },
     ]
 
 
@@ -151,10 +169,20 @@ class TestListOutputDevices:
 
 def test_print_device_table_renders_rows(capsys):
     devices = [
-        {"index": 0, "name": "Built-in Output", "max_output_channels": 2,
-         "default_sample_rate": 48000.0, "likely_bluetooth": False},
-        {"index": 3, "name": "Phonak Bluetooth Headset", "max_output_channels": 2,
-         "default_sample_rate": 16000.0, "likely_bluetooth": True},
+        {
+            "index": 0,
+            "name": "Built-in Output",
+            "max_output_channels": 2,
+            "default_sample_rate": 48000.0,
+            "likely_bluetooth": False,
+        },
+        {
+            "index": 3,
+            "name": "Phonak Bluetooth Headset",
+            "max_output_channels": 2,
+            "default_sample_rate": 16000.0,
+            "likely_bluetooth": True,
+        },
     ]
     bluetooth_output._print_device_table(devices, bluetooth_only=False)
     out = capsys.readouterr().out
@@ -165,10 +193,20 @@ def test_print_device_table_renders_rows(capsys):
 
 def test_print_device_table_bluetooth_only(capsys):
     devices = [
-        {"index": 0, "name": "Built-in Output", "max_output_channels": 2,
-         "default_sample_rate": 48000.0, "likely_bluetooth": False},
-        {"index": 3, "name": "Phonak BT", "max_output_channels": 2,
-         "default_sample_rate": 16000.0, "likely_bluetooth": True},
+        {
+            "index": 0,
+            "name": "Built-in Output",
+            "max_output_channels": 2,
+            "default_sample_rate": 48000.0,
+            "likely_bluetooth": False,
+        },
+        {
+            "index": 3,
+            "name": "Phonak BT",
+            "max_output_channels": 2,
+            "default_sample_rate": 16000.0,
+            "likely_bluetooth": True,
+        },
     ]
     bluetooth_output._print_device_table(devices, bluetooth_only=True)
     out = capsys.readouterr().out
@@ -275,32 +313,50 @@ class TestBluetoothAudioOutput:
         assert patched_pyaudio.terminated is True
 
     def test_device_name_hint_resolves_index(self, monkeypatch, caplog):
-        pa = _FakePyAudioWithStream(devices=[
-            {"name": "Built-in", "maxOutputChannels": 2,
-             "maxInputChannels": 0, "defaultSampleRate": 48000.0},
-            {"name": "Phonak Naida BT", "maxOutputChannels": 2,
-             "maxInputChannels": 0, "defaultSampleRate": 16000.0},
-        ])
-        monkeypatch.setattr(bluetooth_output.pyaudio, "PyAudio", lambda: pa)
-        bt = bluetooth_output.BluetoothAudioOutput(
-            sample_rate=16_000, device_name_hint="phonak"
+        pa = _FakePyAudioWithStream(
+            devices=[
+                {
+                    "name": "Built-in",
+                    "maxOutputChannels": 2,
+                    "maxInputChannels": 0,
+                    "defaultSampleRate": 48000.0,
+                },
+                {
+                    "name": "Phonak Naida BT",
+                    "maxOutputChannels": 2,
+                    "maxInputChannels": 0,
+                    "defaultSampleRate": 16000.0,
+                },
+            ]
         )
+        monkeypatch.setattr(bluetooth_output.pyaudio, "PyAudio", lambda: pa)
+        bt = bluetooth_output.BluetoothAudioOutput(sample_rate=16_000, device_name_hint="phonak")
         bt.open()
         assert pa.opened_with["output_device_index"] == 1
 
     def test_device_name_hint_not_found_logs_warning(self, monkeypatch, caplog):
-        pa = _FakePyAudioWithStream(devices=[
-            {"name": "Built-in", "maxOutputChannels": 2,
-             "maxInputChannels": 0, "defaultSampleRate": 48000.0},
-        ])
+        pa = _FakePyAudioWithStream(
+            devices=[
+                {
+                    "name": "Built-in",
+                    "maxOutputChannels": 2,
+                    "maxInputChannels": 0,
+                    "defaultSampleRate": 48000.0,
+                },
+            ]
+        )
         monkeypatch.setattr(bluetooth_output.pyaudio, "PyAudio", lambda: pa)
         with caplog.at_level(logging.WARNING):
             bt = bluetooth_output.BluetoothAudioOutput(
                 sample_rate=16_000, device_name_hint="missing"
             )
-        assert any("missing" in r.message and "fallback" in r.message.lower() or
-                   "missing" in r.message and "default" in r.message.lower()
-                   for r in caplog.records)
+        assert any(
+            "missing" in r.message
+            and "fallback" in r.message.lower()
+            or "missing" in r.message
+            and "default" in r.message.lower()
+            for r in caplog.records
+        )
         # When not found, default (None) is used.
         bt.open()
         assert pa.opened_with["output_device_index"] is None

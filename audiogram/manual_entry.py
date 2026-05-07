@@ -154,29 +154,36 @@ def collect_audiogram(
 
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
 @click.option(
-    "--output", "-o",
+    "--output",
+    "-o",
     type=click.Path(dir_okay=False, writable=True, path_type=Path),
     required=True,
     help="Where to write the resulting audiogram JSON file.",
 )
 @click.option(
-    "--subject", default="",
+    "--subject",
+    default="",
     help="Subject identifier to embed in the file (default: anonymous).",
 )
 @click.option(
-    "--date", "date_measured", default="unknown",
+    "--date",
+    "date_measured",
+    default="unknown",
     help="Date the audiogram was taken (ISO-8601 YYYY-MM-DD).",
 )
 @click.option(
-    "--notes", default="",
+    "--notes",
+    default="",
     help="Free-form notes to embed in the file.",
 )
 @click.option(
-    "--force", is_flag=True,
+    "--force",
+    is_flag=True,
     help="Overwrite the output file if it already exists.",
 )
 @click.option(
-    "--verbose", is_flag=True,
+    "--verbose",
+    is_flag=True,
     help="Enable INFO logging.",
 )
 def main(
@@ -194,9 +201,7 @@ def main(
     )
 
     if output.exists() and not force:
-        raise click.UsageError(
-            f"{output} already exists; pass --force to overwrite."
-        )
+        raise click.UsageError(f"{output} already exists; pass --force to overwrite.")
 
     audiogram = collect_audiogram(
         subject=subject,

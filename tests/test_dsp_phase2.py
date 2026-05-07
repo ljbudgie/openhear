@@ -69,6 +69,7 @@ def test_delay_sum_rejects_wrong_channel_count():
 
 def test_mvdr_falls_back_to_delay_sum_with_warning(caplog):
     import logging
+
     array = MicrophoneArray(positions_m=(0.0, 0.014), sample_rate=16_000)
     bf = MvdrBeamformer(array)
     x = np.zeros(64, dtype=np.float32)
@@ -86,8 +87,10 @@ def test_metrics_logger_writes_csv_with_header(tmp_path):
     with MetricsLogger(path=out, keep_in_memory=True) as ml:
         for _ in range(3):
             ml.log_block(
-                block_samples=256, sample_rate=16_000,
-                process_seconds=0.005, samples=block,
+                block_samples=256,
+                sample_rate=16_000,
+                process_seconds=0.005,
+                samples=block,
             )
     rows = list(csv.reader(out.open("r")))
     assert rows[0] == list(MetricsLogger.HEADER)
@@ -100,8 +103,10 @@ def test_metrics_logger_computes_latency_and_rms(tmp_path):
     block = np.full(256, 0.5, dtype=np.float32)  # ≈ -6 dBFS RMS
     with MetricsLogger(path=out, keep_in_memory=True) as ml:
         row = ml.log_block(
-            block_samples=256, sample_rate=16_000,
-            process_seconds=0.008, samples=block,
+            block_samples=256,
+            sample_rate=16_000,
+            process_seconds=0.008,
+            samples=block,
         )
     # latency = 256/16000 s = 16 ms.
     assert row.latency_ms == pytest.approx(16.0, abs=0.1)
@@ -114,8 +119,10 @@ def test_metrics_logger_log_block_before_open_raises(tmp_path):
     ml = MetricsLogger(path=tmp_path / "m.csv")
     with pytest.raises(RuntimeError, match="before open"):
         ml.log_block(
-            block_samples=128, sample_rate=16_000,
-            process_seconds=0.001, samples=np.zeros(128, dtype=np.float32),
+            block_samples=128,
+            sample_rate=16_000,
+            process_seconds=0.001,
+            samples=np.zeros(128, dtype=np.float32),
         )
 
 
@@ -124,13 +131,17 @@ def test_metrics_logger_validates_inputs(tmp_path):
     try:
         with pytest.raises(ValueError, match="sample_rate must be positive"):
             ml.log_block(
-                block_samples=128, sample_rate=0,
-                process_seconds=0.001, samples=np.zeros(128, dtype=np.float32),
+                block_samples=128,
+                sample_rate=0,
+                process_seconds=0.001,
+                samples=np.zeros(128, dtype=np.float32),
             )
         with pytest.raises(ValueError, match="block_samples must be positive"):
             ml.log_block(
-                block_samples=0, sample_rate=16_000,
-                process_seconds=0.001, samples=np.zeros(128, dtype=np.float32),
+                block_samples=0,
+                sample_rate=16_000,
+                process_seconds=0.001,
+                samples=np.zeros(128, dtype=np.float32),
             )
     finally:
         ml.close()
@@ -140,8 +151,10 @@ def test_format_dashboard_line_includes_key_fields(tmp_path):
     block = np.full(256, 0.1, dtype=np.float32)
     with MetricsLogger(path=tmp_path / "m.csv", keep_in_memory=True) as ml:
         row = ml.log_block(
-            block_samples=256, sample_rate=16_000,
-            process_seconds=0.004, samples=block,
+            block_samples=256,
+            sample_rate=16_000,
+            process_seconds=0.004,
+            samples=block,
         )
     line = format_dashboard_line(row)
     assert "latency=" in line
@@ -155,6 +168,7 @@ def test_format_dashboard_line_includes_key_fields(tmp_path):
 def test_noise_module_re_exports_spectral_subtractor():
     """Backwards-compat: the canonical module name still exposes the class."""
     from dsp import noise_reduction
+
     assert SpectralSubtractor is noise_reduction.SpectralSubtractor
 
 

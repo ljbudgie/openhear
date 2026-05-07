@@ -86,9 +86,19 @@ class GainTable:
             *frequencies_hz*).
     """
 
-    frequencies_hz: list[int] = field(default_factory=lambda: [
-        250, 500, 1000, 1500, 2000, 3000, 4000, 6000, 8000,
-    ])
+    frequencies_hz: list[int] = field(
+        default_factory=lambda: [
+            250,
+            500,
+            1000,
+            1500,
+            2000,
+            3000,
+            4000,
+            6000,
+            8000,
+        ]
+    )
     gains_db: list[float] = field(default_factory=lambda: [0.0] * 9)
 
     def __post_init__(self) -> None:
@@ -139,9 +149,7 @@ class CompressionProfile:
             ("release_ms", self.release_ms),
         ):
             if len(lst) != n:
-                raise ValueError(
-                    f"{name} length {len(lst)} != centre_frequencies_hz length {n}."
-                )
+                raise ValueError(f"{name} length {len(lst)} != centre_frequencies_hz length {n}.")
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -166,9 +174,7 @@ class MPOProfile:
 
     def __post_init__(self) -> None:
         if len(self.centre_frequencies_hz) != len(self.max_db_spl):
-            raise ValueError(
-                "centre_frequencies_hz and max_db_spl must have equal length."
-            )
+            raise ValueError("centre_frequencies_hz and max_db_spl must have equal length.")
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

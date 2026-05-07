@@ -35,7 +35,9 @@ from audiogram.loader import (
 # This is used to convert a target SPL to a zener clamping voltage.
 # Actual values depend on the specific receiver model and ear canal volume.
 # Calibration is ALWAYS required after building the circuit.
-_RECEIVER_SENSITIVITY_DB_SPL_PER_VOLT: float = 95.0  # dB SPL at 1 Vrms (typical BA receiver in 2cc coupler)
+_RECEIVER_SENSITIVITY_DB_SPL_PER_VOLT: float = (
+    95.0  # dB SPL at 1 Vrms (typical BA receiver in 2cc coupler)
+)
 
 # Standard series resistor value (ohms).
 _SERIES_RESISTOR_OHMS: int = 100
@@ -134,21 +136,21 @@ def calculate_mpo(
 
         # Recalculate actual clamping SPL from the standard zener voltage
         if zener_voltage > 0:
-            actual_spl = _RECEIVER_SENSITIVITY_DB_SPL_PER_VOLT + 20.0 * math.log10(
-                zener_voltage
-            )
+            actual_spl = _RECEIVER_SENSITIVITY_DB_SPL_PER_VOLT + 20.0 * math.log10(zener_voltage)
         else:
             actual_spl = _MINIMUM_MPO_DB
 
-        freq_results.append({
-            "freq_hz": freq,
-            "threshold_db": threshold,
-            "estimated_ucl_db": round(ucl_estimate, 1),
-            "recommended_mpo_db": round(mpo, 1),
-            "zener_voltage": zener_voltage,
-            "series_resistor_ohms": _SERIES_RESISTOR_OHMS,
-            "expected_clamping_spl": round(actual_spl, 1),
-        })
+        freq_results.append(
+            {
+                "freq_hz": freq,
+                "threshold_db": threshold,
+                "estimated_ucl_db": round(ucl_estimate, 1),
+                "recommended_mpo_db": round(mpo, 1),
+                "zener_voltage": zener_voltage,
+                "series_resistor_ohms": _SERIES_RESISTOR_OHMS,
+                "expected_clamping_spl": round(actual_spl, 1),
+            }
+        )
 
     return {
         "ear": ear,
@@ -172,11 +174,52 @@ def _nearest_standard_zener(voltage: float) -> float:
         Nearest standard zener voltage.
     """
     standard_voltages: list[float] = [
-        0.47, 0.51, 0.56, 0.62, 0.68, 0.75, 0.82, 0.91,
-        1.0, 1.1, 1.2, 1.3, 1.5, 1.6, 1.8, 2.0, 2.2, 2.4,
-        2.7, 3.0, 3.3, 3.6, 3.9, 4.3, 4.7, 5.1, 5.6, 6.2,
-        6.8, 7.5, 8.2, 9.1, 10.0, 11.0, 12.0, 13.0, 15.0,
-        16.0, 18.0, 20.0, 22.0, 24.0, 27.0, 30.0, 33.0, 36.0,
+        0.47,
+        0.51,
+        0.56,
+        0.62,
+        0.68,
+        0.75,
+        0.82,
+        0.91,
+        1.0,
+        1.1,
+        1.2,
+        1.3,
+        1.5,
+        1.6,
+        1.8,
+        2.0,
+        2.2,
+        2.4,
+        2.7,
+        3.0,
+        3.3,
+        3.6,
+        3.9,
+        4.3,
+        4.7,
+        5.1,
+        5.6,
+        6.2,
+        6.8,
+        7.5,
+        8.2,
+        9.1,
+        10.0,
+        11.0,
+        12.0,
+        13.0,
+        15.0,
+        16.0,
+        18.0,
+        20.0,
+        22.0,
+        24.0,
+        27.0,
+        30.0,
+        33.0,
+        36.0,
     ]
 
     # Find the nearest standard voltage that does not exceed the target
@@ -225,8 +268,9 @@ def print_mpo_table(audiogram_path: str, ear: str = "right") -> None:
     print(f"  - Series resistor: {_SERIES_RESISTOR_OHMS} Ω (1/4W minimum)")
     print("  - ALWAYS calibrate after building — these are starting values")
     print("  - If measured SPL exceeds target: use LOWER zener voltage")
-    print("  - Receiver sensitivity assumed: "
-          f"{_RECEIVER_SENSITIVITY_DB_SPL_PER_VOLT:.0f} dB SPL/Vrms")
+    print(
+        f"  - Receiver sensitivity assumed: {_RECEIVER_SENSITIVITY_DB_SPL_PER_VOLT:.0f} dB SPL/Vrms"
+    )
     print("=" * 72)
     print()
 

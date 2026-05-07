@@ -119,8 +119,7 @@ def encode_frame(msg_type: int, payload: bytes, seq: int = 0) -> bytes:
         raise ValueError(f"msg_type must fit in one byte, got {msg_type}.")
     if len(payload) > 0xFF:
         raise ValueError(
-            f"payload too long ({len(payload)} bytes); "
-            "max 255 due to 1-byte length field."
+            f"payload too long ({len(payload)} bytes); max 255 due to 1-byte length field."
         )
     body = bytes([seq, int(msg_type), len(payload)]) + payload
     cs = _xor_checksum(body)
@@ -161,7 +160,7 @@ def parse_frame(data: bytes) -> tuple[ParsedFrame | None, int]:
         # Wait for more bytes.
         return None, start
 
-    payload = bytes(data[start + 4: start + 4 + payload_len])
+    payload = bytes(data[start + 4 : start + 4 + payload_len])
     received_cs = data[start + 4 + payload_len]
     body = bytes([seq, msg_type, payload_len]) + payload
     expected_cs = _xor_checksum(body)

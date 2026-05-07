@@ -31,9 +31,7 @@ def _load_sounddevice():
     try:
         import sounddevice as sd
     except ImportError as exc:  # pragma: no cover - runtime-only path.
-        raise RuntimeError(
-            "Live microphone capture requires the 'sounddevice' package."
-        ) from exc
+        raise RuntimeError("Live microphone capture requires the 'sounddevice' package.") from exc
     return sd
 
 

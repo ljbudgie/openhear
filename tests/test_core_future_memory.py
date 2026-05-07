@@ -136,12 +136,17 @@ class TestCli:
             "sys.argv",
             [
                 "future_memory",
-                "--path", str(store_path),
+                "--path",
+                str(store_path),
                 "add",
-                "--topic", "test",
-                "--note", "Hello",
-                "--tag", "alpha",
-                "--tag", "beta",
+                "--topic",
+                "test",
+                "--note",
+                "Hello",
+                "--tag",
+                "alpha",
+                "--tag",
+                "beta",
             ],
         )
         main()
@@ -177,14 +182,16 @@ class TestCli:
             "sys.argv",
             [
                 "future_memory",
-                "--path", str(store_path),
+                "--path",
+                str(store_path),
                 "latest",
-                "--topic", "a",
-                "--limit", "1",
+                "--topic",
+                "a",
+                "--limit",
+                "1",
             ],
         )
         main()
         notes = json.loads(capsys.readouterr().out)
         assert len(notes) == 1
         assert notes[0]["note"] == "newer"
-

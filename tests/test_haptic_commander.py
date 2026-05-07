@@ -69,8 +69,10 @@ def test_main_dry_run_prints_packet_without_ble(audiogram_path, monkeypatch, cap
         "sys.argv",
         [
             "haptic_commander",
-            "--audiogram", audiogram_path,
-            "--sound-class", "voice",
+            "--audiogram",
+            audiogram_path,
+            "--sound-class",
+            "voice",
             "--dry-run",
         ],
     )
@@ -92,9 +94,12 @@ def test_main_full_path_uses_ble_client(audiogram_path, monkeypatch, capsys):
         "sys.argv",
         [
             "haptic_commander",
-            "--audiogram", audiogram_path,
-            "--sound-class", "alarm",
-            "--scan-timeout", "0.1",
+            "--audiogram",
+            audiogram_path,
+            "--sound-class",
+            "alarm",
+            "--scan-timeout",
+            "0.1",
         ],
     )
     haptic_commander.main()
@@ -111,8 +116,10 @@ def test_main_rejects_unknown_sound_class(audiogram_path, monkeypatch):
         "sys.argv",
         [
             "haptic_commander",
-            "--audiogram", audiogram_path,
-            "--sound-class", "telephone",  # not in SUPPORTED_SOUND_CLASSES
+            "--audiogram",
+            audiogram_path,
+            "--sound-class",
+            "telephone",  # not in SUPPORTED_SOUND_CLASSES
         ],
     )
     with pytest.raises(SystemExit):
@@ -121,6 +128,7 @@ def test_main_rejects_unknown_sound_class(audiogram_path, monkeypatch):
 
 def test_main_disconnects_even_on_send_failure(audiogram_path, monkeypatch):
     """If ``send_packet`` raises, the BLE link must still be closed."""
+
     class _ExplodingBle(_StubBleClient):
         async def send_packet(self, packet):
             raise RuntimeError("BLE link dropped")
@@ -131,12 +139,14 @@ def test_main_disconnects_even_on_send_failure(audiogram_path, monkeypatch):
         "sys.argv",
         [
             "haptic_commander",
-            "--audiogram", audiogram_path,
-            "--sound-class", "alarm",
-            "--scan-timeout", "0.1",
+            "--audiogram",
+            audiogram_path,
+            "--sound-class",
+            "alarm",
+            "--scan-timeout",
+            "0.1",
         ],
     )
     with pytest.raises(RuntimeError):
         haptic_commander.main()
     assert stub.disconnect_calls == 1
-

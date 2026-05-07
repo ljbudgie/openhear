@@ -40,6 +40,7 @@ BANDS: dict[str, tuple[float, float]] = {
 
 # ── Data structures ──────────────────────────────────────────────────────────
 
+
 @dataclass
 class VoiceComparison:
     """Result of comparing a VoiceSnapshot against a ReferenceProfile.
@@ -58,6 +59,7 @@ class VoiceComparison:
         similarity_score:   Overall spectral similarity between 0.0 (no
                             match) and 1.0 (identical envelope shape).
     """
+
     band_differences: dict[str, float] = field(default_factory=dict)
     underused_formants: list[float] = field(default_factory=list)
     resonance_gap_hz: list[float] = field(default_factory=list)
@@ -66,8 +68,10 @@ class VoiceComparison:
 
 # ── Internal helpers ─────────────────────────────────────────────────────────
 
-def _band_energy(envelope_db: np.ndarray, freqs: np.ndarray,
-                 low_hz: float, high_hz: float) -> float:
+
+def _band_energy(
+    envelope_db: np.ndarray, freqs: np.ndarray, low_hz: float, high_hz: float
+) -> float:
     """Return the mean energy (dB) within a frequency band."""
     mask = (freqs >= low_hz) & (freqs <= high_hz)
     if not np.any(mask):
@@ -75,9 +79,11 @@ def _band_energy(envelope_db: np.ndarray, freqs: np.ndarray,
     return float(np.mean(envelope_db[mask]))
 
 
-def _envelope_freqs(envelope: np.ndarray,
-                    sample_rate: int = config.SAMPLE_RATE,
-                    frame_size: int = config.FRAME_BUFFER) -> np.ndarray:
+def _envelope_freqs(
+    envelope: np.ndarray,
+    sample_rate: int = config.SAMPLE_RATE,
+    frame_size: int = config.FRAME_BUFFER,
+) -> np.ndarray:
     """Return the frequency axis matching an envelope array."""
     n_bins = len(envelope)
     return np.fft.rfftfreq(frame_size, d=1.0 / sample_rate).astype(np.float32)[:n_bins]
@@ -85,12 +91,15 @@ def _envelope_freqs(envelope: np.ndarray,
 
 # ── Public API ───────────────────────────────────────────────────────────────
 
-def compare(snapshot: VoiceSnapshot,
-            reference: ReferenceProfile,
-            sample_rate: int = config.SAMPLE_RATE,
-            frame_size: int = config.FRAME_BUFFER,
-            match_tolerance_db: float = config.MATCH_TOLERANCE_DB,
-            gap_threshold_db: float = config.GAP_THRESHOLD_DB) -> VoiceComparison:
+
+def compare(
+    snapshot: VoiceSnapshot,
+    reference: ReferenceProfile,
+    sample_rate: int = config.SAMPLE_RATE,
+    frame_size: int = config.FRAME_BUFFER,
+    match_tolerance_db: float = config.MATCH_TOLERANCE_DB,
+    gap_threshold_db: float = config.GAP_THRESHOLD_DB,
+) -> VoiceComparison:
     """Compare a live voice snapshot against a reference profile.
 
     Args:
@@ -155,8 +164,7 @@ def compare(snapshot: VoiceSnapshot,
     if user_norm < 1e-10 or ref_norm < 1e-10:
         similarity = 0.0
     else:
-        correlation = float(np.dot(user_centered, ref_centered) /
-                            (user_norm * ref_norm))
+        correlation = float(np.dot(user_centered, ref_centered) / (user_norm * ref_norm))
         # Map from [-1, 1] correlation to [0, 1] similarity.
         similarity = float(np.clip((correlation + 1.0) / 2.0, 0.0, 1.0))
 

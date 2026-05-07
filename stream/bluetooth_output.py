@@ -52,8 +52,21 @@ logger = logging.getLogger(__name__)
 # devices likely to be hearing-aid streamers.  Used by
 # :func:`is_likely_bluetooth_device` and ``--list`` filtering.
 LIKELY_BLUETOOTH_NAME_HINTS: tuple[str, ...] = (
-    "bluetooth", "bt", "phonak", "signia", "oticon", "resound", "starkey",
-    "widex", "hearing", "naida", "insio", "audeo", "marvel", "ax", "sennheiser",
+    "bluetooth",
+    "bt",
+    "phonak",
+    "signia",
+    "oticon",
+    "resound",
+    "starkey",
+    "widex",
+    "hearing",
+    "naida",
+    "insio",
+    "audeo",
+    "marvel",
+    "ax",
+    "sennheiser",
 )
 
 
@@ -129,13 +142,15 @@ def list_output_devices(pa: pyaudio.PyAudio | None = None) -> list[dict]:
             info = pa.get_device_info_by_index(i)
             if int(info.get("maxOutputChannels", 0)) <= 0:
                 continue
-            devices.append({
-                "index": i,
-                "name": str(info["name"]),
-                "max_output_channels": int(info["maxOutputChannels"]),
-                "default_sample_rate": float(info.get("defaultSampleRate", 0)),
-                "likely_bluetooth": is_likely_bluetooth_device(str(info["name"])),
-            })
+            devices.append(
+                {
+                    "index": i,
+                    "name": str(info["name"]),
+                    "max_output_channels": int(info["maxOutputChannels"]),
+                    "default_sample_rate": float(info.get("defaultSampleRate", 0)),
+                    "likely_bluetooth": is_likely_bluetooth_device(str(info["name"])),
+                }
+            )
     finally:
         if owns_pa:
             pa.terminate()
@@ -212,7 +227,9 @@ class BluetoothAudioOutput:
             )
             logger.info(
                 "Bluetooth audio output opened (device_index=%s, %d Hz, %d ch).",
-                self._device_index, self._sample_rate, self._channels,
+                self._device_index,
+                self._sample_rate,
+                self._channels,
             )
         except OSError as exc:
             raise OSError(
@@ -257,35 +274,35 @@ class BluetoothAudioOutput:
         hint_lower = name_hint.lower()
         for i in range(self._pa.get_device_count()):
             info = self._pa.get_device_info_by_index(i)
-            if (info["maxOutputChannels"] > 0
-                    and hint_lower in info["name"].lower()):
-                logger.debug("Found Bluetooth device '%s' at index %d.",
-                             info["name"], i)
+            if info["maxOutputChannels"] > 0 and hint_lower in info["name"].lower():
+                logger.debug("Found Bluetooth device '%s' at index %d.", info["name"], i)
                 return i
         return None
 
 
 # ── CLI entry point ──────────────────────────────────────────────────────────
 
+
 def main(argv: list[str] | None = None) -> int:
     """CLI helper: list available output devices or run a loopback test."""
-    logging.basicConfig(level=logging.INFO,
-                        format="%(levelname)s %(name)s: %(message)s")
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 
-    parser = argparse.ArgumentParser(
-        description="Bluetooth audio output helper for OpenHear."
-    )
+    parser = argparse.ArgumentParser(description="Bluetooth audio output helper for OpenHear.")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
-        "--list", action="store_true",
+        "--list",
+        action="store_true",
         help="List all available PyAudio output devices and their indices.",
     )
     group.add_argument(
-        "--device-index", type=int, metavar="N",
+        "--device-index",
+        type=int,
+        metavar="N",
         help="Open device N and play 1 second of silence as a connection test.",
     )
     parser.add_argument(
-        "--bluetooth-only", action="store_true",
+        "--bluetooth-only",
+        action="store_true",
         help="With --list, hide non-Bluetooth-looking devices.",
     )
     args = parser.parse_args(argv)
@@ -313,4 +330,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
-

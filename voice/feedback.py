@@ -48,8 +48,10 @@ _BLOCKS = " ▏▎▍▌▋▊▉█"
 
 # ── Rendering helpers ────────────────────────────────────────────────────────
 
-def _bar(value_db: float, ref_db: float, max_db: float,
-         bar_width: int, match_tol: float, gap_thr: float) -> str:
+
+def _bar(
+    value_db: float, ref_db: float, max_db: float, bar_width: int, match_tol: float, gap_thr: float
+) -> str:
     """Render a single spectrum bar with colour coding.
 
     Args:
@@ -101,15 +103,18 @@ def _format_freq(hz: float) -> str:
 
 # ── Public API ───────────────────────────────────────────────────────────────
 
-def render_frame(snapshot: VoiceSnapshot,
-                 ref_envelope: np.ndarray,
-                 comparison: VoiceComparison,
-                 sample_rate: int = config.SAMPLE_RATE,
-                 frame_size: int = config.FRAME_BUFFER,
-                 bar_width: int = 40,
-                 n_bands: int = 24,
-                 match_tol: float = config.MATCH_TOLERANCE_DB,
-                 gap_thr: float = config.GAP_THRESHOLD_DB) -> str:
+
+def render_frame(
+    snapshot: VoiceSnapshot,
+    ref_envelope: np.ndarray,
+    comparison: VoiceComparison,
+    sample_rate: int = config.SAMPLE_RATE,
+    frame_size: int = config.FRAME_BUFFER,
+    bar_width: int = 40,
+    n_bands: int = 24,
+    match_tol: float = config.MATCH_TOLERANCE_DB,
+    gap_thr: float = config.GAP_THRESHOLD_DB,
+) -> str:
     """Render one frame of visual feedback as a multi-line string.
 
     Produces a frequency spectrum display with the user's voice bars,
@@ -135,8 +140,11 @@ def render_frame(snapshot: VoiceSnapshot,
     lines: list[str] = []
 
     # Header with live stats.
-    f0_str = (f"{snapshot.fundamental_frequency_hz:.0f} Hz"
-              if snapshot.fundamental_frequency_hz > 0 else "—")
+    f0_str = (
+        f"{snapshot.fundamental_frequency_hz:.0f} Hz"
+        if snapshot.fundamental_frequency_hz > 0
+        else "—"
+    )
     lines.append(
         f"  {_BOLD}F0:{_RESET} {_CYAN}{f0_str}{_RESET}  "
         f"{_BOLD}HNR:{_RESET} {_CYAN}{snapshot.hnr_db:.1f} dB{_RESET}  "
@@ -193,11 +201,9 @@ def render_frame(snapshot: VoiceSnapshot,
     return "\n".join(lines)
 
 
-def run_live(snapshot_generator,
-             ref_envelope: np.ndarray,
-             comparison_fn,
-             refresh_hz: float = 15.0,
-             **kwargs) -> None:
+def run_live(
+    snapshot_generator, ref_envelope: np.ndarray, comparison_fn, refresh_hz: float = 15.0, **kwargs
+) -> None:
     """Run the live feedback display in the terminal.
 
     This is a blocking loop that clears the screen and re-renders on every

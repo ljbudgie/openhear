@@ -78,8 +78,7 @@ class TestMainCli:
     def test_manual_sound_path(self, audiogram_path, monkeypatch, capsys):
         monkeypatch.setattr(
             "sys.argv",
-            ["wristband_runtime", "--audiogram", audiogram_path,
-             "--manual-sound", "doorbell"],
+            ["wristband_runtime", "--audiogram", audiogram_path, "--manual-sound", "doorbell"],
         )
         # Should not require --model/--labels in manual mode.
         main()
@@ -97,8 +96,15 @@ class TestMainCli:
     def test_invalid_ear_strategy_rejected(self, audiogram_path, monkeypatch):
         monkeypatch.setattr(
             "sys.argv",
-            ["wristband_runtime", "--audiogram", audiogram_path,
-             "--manual-sound", "voice", "--ear-strategy", "loud"],
+            [
+                "wristband_runtime",
+                "--audiogram",
+                audiogram_path,
+                "--manual-sound",
+                "voice",
+                "--ear-strategy",
+                "loud",
+            ],
         )
         with pytest.raises(SystemExit):
             main()
@@ -106,8 +112,7 @@ class TestMainCli:
     def test_invalid_manual_sound_rejected(self, audiogram_path, monkeypatch):
         monkeypatch.setattr(
             "sys.argv",
-            ["wristband_runtime", "--audiogram", audiogram_path,
-             "--manual-sound", "thunder"],
+            ["wristband_runtime", "--audiogram", audiogram_path, "--manual-sound", "thunder"],
         )
         with pytest.raises(SystemExit):
             main()

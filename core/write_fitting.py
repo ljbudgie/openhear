@@ -34,11 +34,13 @@ logger = logging.getLogger(__name__)
 
 
 #: Parameters this module is willing to write back to the device.
-ALLOWED_PARAMETERS: frozenset[str] = frozenset({
-    "programme_name",
-    "volume_offset_db",
-    "streaming_preference",
-})
+ALLOWED_PARAMETERS: frozenset[str] = frozenset(
+    {
+        "programme_name",
+        "volume_offset_db",
+        "streaming_preference",
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -80,8 +82,7 @@ def _validate_request(request: WriteRequest) -> None:
         allowed = {"automatic", "priority", "off"}
         if request.value not in allowed:
             raise ValueError(
-                f"streaming_preference must be one of {sorted(allowed)}, "
-                f"got {request.value!r}."
+                f"streaming_preference must be one of {sorted(allowed)}, got {request.value!r}."
             )
 
 

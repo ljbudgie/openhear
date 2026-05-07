@@ -242,7 +242,9 @@ class TestHapticSkinMapperCues:
     def test_render_spatial_cue_emits_five_actuators(self):
         mapper = HapticSkinMapper(WristbandLayout(actuator_count=64))
         events = mapper.render_spatial_cue(
-            azimuth_deg=90, elevation_deg=0, distance_m=1.5,
+            azimuth_deg=90,
+            elevation_deg=0,
+            distance_m=1.5,
             imu_pose=ImuPose(yaw_deg=10),
         )
         assert len(events) == 5
@@ -253,7 +255,9 @@ class TestHapticSkinMapperCues:
     def test_render_spatial_cue_unknown_pattern_falls_back(self):
         mapper = HapticSkinMapper()
         events = mapper.render_spatial_cue(
-            azimuth_deg=0, elevation_deg=0, distance_m=1.0,
+            azimuth_deg=0,
+            elevation_deg=0,
+            distance_m=1.0,
             pattern="unknown_pattern",
         )
         # Falls back to directional_speech.

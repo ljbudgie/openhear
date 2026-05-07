@@ -16,8 +16,10 @@ def _build_ag(threshold_db_hl: float = 40.0) -> Audiogram:
     """Construct a flat audiogram at *threshold_db_hl* across both ears."""
     thresholds = {f: threshold_db_hl for f in (250, 500, 1000, 2000, 4000, 8000)}
     return Audiogram(
-        right_ear=dict(thresholds), left_ear=dict(thresholds),
-        date_measured="2024-11-15", source="synthetic",
+        right_ear=dict(thresholds),
+        left_ear=dict(thresholds),
+        date_measured="2024-11-15",
+        source="synthetic",
     )
 
 

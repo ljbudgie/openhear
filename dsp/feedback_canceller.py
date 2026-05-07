@@ -74,9 +74,7 @@ class FeedbackCanceller:
         anti_feedback_gain_db: float = -6.0,
     ) -> None:
         if filter_length < 1:
-            raise ValueError(
-                f"filter_length must be >= 1, got {filter_length}"
-            )
+            raise ValueError(f"filter_length must be >= 1, got {filter_length}")
         if mu <= 0.0:
             raise ValueError(f"mu must be > 0, got {mu}")
 

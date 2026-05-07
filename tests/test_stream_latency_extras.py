@@ -91,6 +91,7 @@ def test_measure_latency_no_impulse_returns_nan():
     assert report.within_target is False
     # NaN check
     import math
+
     assert math.isnan(report.latency_ms)
 
 
@@ -101,8 +102,10 @@ def test_measure_latency_no_impulse_returns_nan():
 
 def test_format_report_no_impulse():
     report = LatencyReport(
-        latency_ms=float("nan"), target_ms=20.0,
-        sample_rate=16_000, impulse_index=-1,
+        latency_ms=float("nan"),
+        target_ms=20.0,
+        sample_rate=16_000,
+        impulse_index=-1,
     )
     text = format_report(report)
     assert "No impulse detected" in text
@@ -110,8 +113,10 @@ def test_format_report_no_impulse():
 
 def test_format_report_with_values():
     report = LatencyReport(
-        latency_ms=12.34, target_ms=20.0,
-        sample_rate=16_000, impulse_index=200,
+        latency_ms=12.34,
+        target_ms=20.0,
+        sample_rate=16_000,
+        impulse_index=200,
     )
     text = format_report(report)
     assert "latency=" in text

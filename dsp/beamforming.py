@@ -40,8 +40,7 @@ def mono_passthrough(samples: np.ndarray) -> np.ndarray:
     if arr.ndim == 2 and arr.shape[0] == 1:
         return arr[0]
     raise ValueError(
-        "mono_passthrough expects a 1-D or single-row 2-D array; got "
-        f"shape {arr.shape}."
+        f"mono_passthrough expects a 1-D or single-row 2-D array; got shape {arr.shape}."
     )
 
 
@@ -96,7 +95,7 @@ def _fractional_delay(samples: np.ndarray, delay_samples: float) -> np.ndarray:
             shifted = x[: n - int_part]
             out[int_part:] = (1.0 - frac) * shifted
             if frac > 0 and (int_part + 1) < n:
-                out[int_part + 1:] += frac * shifted[: n - int_part - 1]
+                out[int_part + 1 :] += frac * shifted[: n - int_part - 1]
     else:
         # Left shift (rare for beamforming but handle for completeness).
         shift = -int_part
@@ -136,13 +135,11 @@ class DelaySumBeamformer:
             return mono_passthrough(x)
         if x.ndim != 2:
             raise ValueError(
-                "channels must be 1-D or 2-D; got "
-                f"{x.ndim}-D array of shape {x.shape}."
+                f"channels must be 1-D or 2-D; got {x.ndim}-D array of shape {x.shape}."
             )
         if x.shape[0] != self.array.n_channels:
             raise ValueError(
-                f"channels has {x.shape[0]} rows but array has "
-                f"{self.array.n_channels} mics."
+                f"channels has {x.shape[0]} rows but array has {self.array.n_channels} mics."
             )
 
         delays_seconds = self.array.delays_for_direction(self.direction_deg)

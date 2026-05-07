@@ -164,6 +164,7 @@ class TestMvdrBeamformer:
 
     def test_warning_logged_once(self, caplog):
         import logging
+
         bf = MvdrBeamformer(self._two_mic_array())
         channels = np.ones((2, 64), dtype=np.float32)
 

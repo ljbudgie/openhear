@@ -19,9 +19,7 @@ from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
-DEFAULT_MEMORY_PATH = (
-    Path(__file__).resolve().parent.parent / ".openhear_future_memory.json"
-)
+DEFAULT_MEMORY_PATH = Path(__file__).resolve().parent.parent / ".openhear_future_memory.json"
 MEMORY_FORMAT_VERSION = "openhear-future-memory-v1"
 
 

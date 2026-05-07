@@ -18,21 +18,29 @@ class TestConstruction:
     def test_invalid_band_raises(self):
         with pytest.raises(ValueError, match="must be less than"):
             VoiceClarityEnhancer(
-                frame_length=256, sample_rate=16_000, low_hz=4000, high_hz=1000,
+                frame_length=256,
+                sample_rate=16_000,
+                low_hz=4000,
+                high_hz=1000,
             )
 
     def test_invalid_gain_raises(self):
         with pytest.raises(ValueError, match="should be >= 1.0"):
             VoiceClarityEnhancer(
-                frame_length=256, sample_rate=16_000, gain=0.5,
+                frame_length=256,
+                sample_rate=16_000,
+                gain=0.5,
             )
 
 
 class TestMask:
     def test_mask_within_band_is_gain(self):
         v = VoiceClarityEnhancer(
-            frame_length=512, sample_rate=16_000,
-            low_hz=1000.0, high_hz=4000.0, gain=2.0,
+            frame_length=512,
+            sample_rate=16_000,
+            low_hz=1000.0,
+            high_hz=4000.0,
+            gain=2.0,
         )
         freqs = np.fft.rfftfreq(512, d=1.0 / 16_000)
         in_band = (freqs >= 1000.0) & (freqs <= 4000.0)
@@ -40,8 +48,11 @@ class TestMask:
 
     def test_mask_outside_band_is_unity(self):
         v = VoiceClarityEnhancer(
-            frame_length=512, sample_rate=16_000,
-            low_hz=1000.0, high_hz=4000.0, gain=2.0,
+            frame_length=512,
+            sample_rate=16_000,
+            low_hz=1000.0,
+            high_hz=4000.0,
+            gain=2.0,
         )
         freqs = np.fft.rfftfreq(512, d=1.0 / 16_000)
         out_band = (freqs < 1000.0) | (freqs > 4000.0)
@@ -64,8 +75,11 @@ class TestProcess:
         sr = 16_000
         n = 1024
         v = VoiceClarityEnhancer(
-            frame_length=n, sample_rate=sr,
-            low_hz=1000.0, high_hz=4000.0, gain=2.0,
+            frame_length=n,
+            sample_rate=sr,
+            low_hz=1000.0,
+            high_hz=4000.0,
+            gain=2.0,
         )
         t = np.arange(n) / sr
         tone = (0.3 * np.sin(2 * np.pi * 200.0 * t)).astype(np.float32)
@@ -78,8 +92,11 @@ class TestProcess:
         n = 1024
         gain = 2.0
         v = VoiceClarityEnhancer(
-            frame_length=n, sample_rate=sr,
-            low_hz=1000.0, high_hz=4000.0, gain=gain,
+            frame_length=n,
+            sample_rate=sr,
+            low_hz=1000.0,
+            high_hz=4000.0,
+            gain=gain,
         )
         t = np.arange(n) / sr
         tone = (0.3 * np.sin(2 * np.pi * 2000.0 * t)).astype(np.float32)

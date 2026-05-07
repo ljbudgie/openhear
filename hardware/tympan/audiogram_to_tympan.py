@@ -43,28 +43,59 @@ from audiogram.loader import (
 # These divide the audio spectrum into 8 bands at standard audiometric
 # boundaries.  The Tympan filterbank uses these as crossover points.
 _TYMPAN_CROSSOVER_FREQS: list[float] = [
-    250.0, 500.0, 1000.0, 2000.0, 3000.0, 4000.0, 6000.0,
+    250.0,
+    500.0,
+    1000.0,
+    2000.0,
+    3000.0,
+    4000.0,
+    6000.0,
 ]
 
 # Centre frequencies for each of the 8 bands (for display and mapping).
 _TYMPAN_BAND_CENTRES: list[int] = [
-    125, 375, 750, 1500, 2500, 3500, 5000, 7000,
+    125,
+    375,
+    750,
+    1500,
+    2500,
+    3500,
+    5000,
+    7000,
 ]
 
 # Standard audiometric test frequencies that we map from.
 _AUDIOMETRIC_FREQS: list[int] = [
-    125, 250, 500, 1000, 1500, 2000, 3000, 4000, 6000, 8000,
+    125,
+    250,
+    500,
+    1000,
+    1500,
+    2000,
+    3000,
+    4000,
+    6000,
+    8000,
 ]
 
 # Maximum gain ceiling per band (safety limit).
 # Even if the audiogram calls for more gain, the software will cap here.
 _MAX_GAIN_CEILING: list[float] = [
-    50.0, 50.0, 55.0, 55.0, 55.0, 60.0, 60.0, 60.0,
+    50.0,
+    50.0,
+    55.0,
+    55.0,
+    55.0,
+    60.0,
+    60.0,
+    60.0,
 ]
 
 # Path to the Arduino template sketch.
 _TEMPLATE_PATH: str = os.path.join(
-    os.path.dirname(__file__), "templates", "basic_openhear.ino",
+    os.path.dirname(__file__),
+    "templates",
+    "basic_openhear.ino",
 )
 
 
@@ -328,8 +359,17 @@ def generate_tympan_sketch(
     output.write_text(sketch, encoding="utf-8")
 
     # Print summary
-    _print_summary(ear, thresholds, gain_per_band, comp_ratios, mpo_per_band,
-                   pta, severity, noise_level, output_path)
+    _print_summary(
+        ear,
+        thresholds,
+        gain_per_band,
+        comp_ratios,
+        mpo_per_band,
+        pta,
+        severity,
+        noise_level,
+        output_path,
+    )
 
     return sketch
 

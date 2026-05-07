@@ -42,16 +42,16 @@ class TestMainCli:
         assert "Right" in out
         assert "OpenHear MPO Calculator" in out
 
-    def test_main_respects_ear_and_margin_flags(
-        self, burgess_audiogram_path, monkeypatch, capsys
-    ):
+    def test_main_respects_ear_and_margin_flags(self, burgess_audiogram_path, monkeypatch, capsys):
         monkeypatch.setattr(
             "sys.argv",
             [
                 "mpo_calculator",
                 burgess_audiogram_path,
-                "--ear", "left",
-                "--margin", "10",
+                "--ear",
+                "left",
+                "--margin",
+                "10",
             ],
         )
         main()

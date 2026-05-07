@@ -90,34 +90,29 @@ class _Client:
 
 class TestOpenHearBLEClient:
     def test_send_packet_before_connect_raises(self):
-        client = OpenHearBLEClient(scanner=_ScannerWithMatch,
-                                   client_factory=lambda d: _Client(d))
+        client = OpenHearBLEClient(scanner=_ScannerWithMatch, client_factory=_Client)
         with pytest.raises(RuntimeError, match="not connected"):
             asyncio.run(client.send_packet(HapticPacket(0, 0, 0)))
 
     def test_is_connected_false_when_no_client(self):
-        client = OpenHearBLEClient(scanner=_ScannerWithMatch,
-                                   client_factory=lambda d: _Client(d))
+        client = OpenHearBLEClient(scanner=_ScannerWithMatch, client_factory=_Client)
         assert client.is_connected is False
 
     def test_discover_raises_when_device_missing(self):
-        client = OpenHearBLEClient(scanner=_ScannerOnlyOthers,
-                                   client_factory=lambda d: _Client(d))
+        client = OpenHearBLEClient(scanner=_ScannerOnlyOthers, client_factory=_Client)
         with pytest.raises(RuntimeError, match="Could not find"):
             asyncio.run(client.discover())
 
     def test_send_command_encodes_packet(self):
         fake = _Client(None)
-        client = OpenHearBLEClient(scanner=_ScannerWithMatch,
-                                   client_factory=lambda d: fake)
+        client = OpenHearBLEClient(scanner=_ScannerWithMatch, client_factory=lambda d: fake)
         asyncio.run(client.connect())
         asyncio.run(client.send_command(2, 100, 3))
         assert fake.writes[0][1] == bytes((2, 100, 3))
 
     def test_disconnect_resets_internal_client(self):
         fake = _Client(None)
-        client = OpenHearBLEClient(scanner=_ScannerWithMatch,
-                                   client_factory=lambda d: fake)
+        client = OpenHearBLEClient(scanner=_ScannerWithMatch, client_factory=lambda d: fake)
         asyncio.run(client.connect())
         assert client.is_connected is True
         asyncio.run(client.disconnect())
@@ -125,8 +120,7 @@ class TestOpenHearBLEClient:
         assert fake.disconnected is True
 
     def test_disconnect_safe_when_never_connected(self):
-        client = OpenHearBLEClient(scanner=_ScannerWithMatch,
-                                   client_factory=lambda d: _Client(d))
+        client = OpenHearBLEClient(scanner=_ScannerWithMatch, client_factory=_Client)
         # Should not raise.
         asyncio.run(client.disconnect())
 

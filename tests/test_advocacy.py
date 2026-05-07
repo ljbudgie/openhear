@@ -50,8 +50,9 @@ def _sign(digest: str) -> str:
     return hmac.new(_KEY, digest.encode("ascii"), hashlib.sha256).hexdigest()
 
 
-def _make_receipt(commitment, *, human: bool, sig: str | None = None,
-                  digest_override: str | None = None) -> Receipt:
+def _make_receipt(
+    commitment, *, human: bool, sig: str | None = None, digest_override: str | None = None
+) -> Receipt:
     digest = digest_override if digest_override is not None else commitment.digest
     return Receipt(
         record_id=commitment.record_id,
@@ -65,6 +66,7 @@ def _make_receipt(commitment, *, human: bool, sig: str | None = None,
 
 # ---- round‑trip -------------------------------------------------------------
 
+
 def test_audiogram_roundtrip_to_sovereign(sample_audiogram_dict):
     gate = PersonGate(verifier=hmac_verifier(_KEY))
     commitment = audiogram_commitment(sample_audiogram_dict, tags=("gp-triage",))
@@ -75,7 +77,8 @@ def test_audiogram_roundtrip_to_sovereign(sample_audiogram_dict):
 
     # Commit in the gate so we can receive against it.
     record_id = gate.commit(
-        "audiogram", sample_audiogram_dict,
+        "audiogram",
+        sample_audiogram_dict,
         tags=commitment.tags,
     ).record_id
 
@@ -104,13 +107,13 @@ def test_tampered_digest_is_null(sample_audiogram_dict):
     gate = PersonGate(verifier=hmac_verifier(_KEY))
     c = gate.commit("audiogram", sample_audiogram_dict)
     forged_digest = "f" * 64
-    bad = _make_receipt(c, human=True, digest_override=forged_digest,
-                        sig=_sign(forged_digest))
+    bad = _make_receipt(c, human=True, digest_override=forged_digest, sig=_sign(forged_digest))
     record = gate.receive(c.record_id, bad)
     assert record.tag == NULL
 
 
 # ---- sovereign handling -----------------------------------------------------
+
 
 def test_adapter_rejects_raw_pcm_bytes():
     with pytest.raises(RawAudioRejectedError):
@@ -119,8 +122,7 @@ def test_adapter_rejects_raw_pcm_bytes():
 
 def test_adapter_rejects_raw_pcm_in_nested_list():
     with pytest.raises(RawAudioRejectedError):
-        fitting_commitment({"programs": [{"clip": bytearray(b"\x00\x01"),
-                                           "name": "quiet"}]})
+        fitting_commitment({"programs": [{"clip": bytearray(b"\x00\x01"), "name": "quiet"}]})
 
 
 def test_adapter_rejects_numpy_array():
@@ -136,6 +138,7 @@ def test_adapter_rejects_non_mapping():
 
 # ---- determinism ------------------------------------------------------------
 
+
 def test_canonical_digest_is_order_independent(sample_audiogram_dict):
     # Build a reordered copy — same content, different dict order.
     reordered = dict(reversed(list(sample_audiogram_dict.items())))
@@ -147,10 +150,10 @@ def test_canonical_digest_is_order_independent(sample_audiogram_dict):
 
 # ---- export bundle ----------------------------------------------------------
 
+
 def test_export_bundle_has_disclaimers_and_no_facts(sample_audiogram_dict):
     gate = PersonGate(verifier=hmac_verifier(_KEY))
-    c = gate.commit("audiogram", sample_audiogram_dict,
-                    tags=("audiogram", "openhear-audiogram-v1"))
+    c = gate.commit("audiogram", sample_audiogram_dict, tags=("audiogram", "openhear-audiogram-v1"))
     receipt = _make_receipt(c, human=True)
     gate.receive(c.record_id, receipt)
 
@@ -189,6 +192,7 @@ def test_export_bundle_digest_matches_recomputed_digest(sample_audiogram_dict):
 
 # ---- gate guardrails --------------------------------------------------------
 
+
 def test_receive_without_verifier_raises(sample_audiogram_dict):
     gate = PersonGate()  # no verifier
     c = gate.commit("audiogram", sample_audiogram_dict)
@@ -199,8 +203,11 @@ def test_receive_without_verifier_raises(sample_audiogram_dict):
 def test_receive_unknown_record_raises():
     gate = PersonGate(verifier=hmac_verifier(_KEY))
     fake = Receipt(
-        record_id="nope", digest="0" * 64, signature="x",
-        reviewer="x", human_review_claimed=True,
+        record_id="nope",
+        digest="0" * 64,
+        signature="x",
+        reviewer="x",
+        human_review_claimed=True,
         received_at="2026-01-01T00:00:00+00:00",
     )
     with pytest.raises(KeyError):
@@ -210,15 +217,21 @@ def test_receive_unknown_record_raises():
 def test_module_level_commit_and_verify_roundtrip():
     c = commit("note", {"k": "v"}, tags=("misc",))
     good = Receipt(
-        record_id=c.record_id, digest=c.digest, signature=_sign(c.digest),
-        reviewer="x", human_review_claimed=True,
+        record_id=c.record_id,
+        digest=c.digest,
+        signature=_sign(c.digest),
+        reviewer="x",
+        human_review_claimed=True,
         received_at="2026-01-01T00:00:00+00:00",
     )
     assert verify(c, good, hmac_verifier(_KEY)) is True
 
     wrong = Receipt(
-        record_id=c.record_id, digest=c.digest, signature="deadbeef",
-        reviewer="x", human_review_claimed=True,
+        record_id=c.record_id,
+        digest=c.digest,
+        signature="deadbeef",
+        reviewer="x",
+        human_review_claimed=True,
         received_at="2026-01-01T00:00:00+00:00",
     )
     assert verify(c, wrong, hmac_verifier(_KEY)) is False

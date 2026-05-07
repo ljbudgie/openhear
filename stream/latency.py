@@ -79,9 +79,7 @@ def synthesise_impulse(
     if duration_samples <= 0:
         raise ValueError("duration_samples must be positive.")
     if not (0 <= impulse_at < duration_samples):
-        raise ValueError(
-            f"impulse_at must be in [0, {duration_samples}), got {impulse_at}."
-        )
+        raise ValueError(f"impulse_at must be in [0, {duration_samples}), got {impulse_at}.")
     out = np.zeros(duration_samples, dtype=np.float32)
     out[impulse_at] = float(amplitude)
     return out
@@ -155,8 +153,7 @@ def format_report(report: LatencyReport) -> str:
     """Render *report* as a single human-readable line."""
     if report.impulse_index < 0:
         return (
-            "No impulse detected — check that the output device is "
-            "looped back to the input device."
+            "No impulse detected — check that the output device is looped back to the input device."
         )
     return (
         f"latency={report.latency_ms:6.2f} ms  "
@@ -178,14 +175,20 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Measure round-trip audio latency.",
     )
-    parser.add_argument("--target", type=float, default=20.0,
-                        help="Target latency in ms (default: 20).")
-    parser.add_argument("--sample-rate", type=int, default=16_000,
-                        help="Sample rate in Hz (default: 16000).")
+    parser.add_argument(
+        "--target", type=float, default=20.0, help="Target latency in ms (default: 20)."
+    )
+    parser.add_argument(
+        "--sample-rate", type=int, default=16_000, help="Sample rate in Hz (default: 16000)."
+    )
     parser.add_argument("--input-device", type=int, default=None)
     parser.add_argument("--output-device", type=int, default=None)
-    parser.add_argument("--duration-ms", type=float, default=200.0,
-                        help="Total capture window in ms (default: 200).")
+    parser.add_argument(
+        "--duration-ms",
+        type=float,
+        default=200.0,
+        help="Total capture window in ms (default: 200).",
+    )
     parser.add_argument("--threshold-db", type=float, default=-20.0)
     args = parser.parse_args(argv)
 
@@ -194,20 +197,29 @@ def main(argv: list[str] | None = None) -> int:
     try:  # pragma: no cover - hardware path, not exercised by unit tests
         import pyaudio
     except Exception as exc:
-        logger.error("PyAudio not available: %s.  Plug in audio hardware "
-                     "or install PyAudio to use --measure.", exc)
+        logger.error(
+            "PyAudio not available: %s.  Plug in audio hardware "
+            "or install PyAudio to use --measure.",
+            exc,
+        )
         return 2
 
     pa = pyaudio.PyAudio()
     try:
         in_stream = pa.open(
-            rate=args.sample_rate, channels=1, format=pyaudio.paInt16,
-            input=True, frames_per_buffer=duration_samples,
+            rate=args.sample_rate,
+            channels=1,
+            format=pyaudio.paInt16,
+            input=True,
+            frames_per_buffer=duration_samples,
             input_device_index=args.input_device,
         )
         out_stream = pa.open(
-            rate=args.sample_rate, channels=1, format=pyaudio.paInt16,
-            output=True, frames_per_buffer=duration_samples,
+            rate=args.sample_rate,
+            channels=1,
+            format=pyaudio.paInt16,
+            output=True,
+            frames_per_buffer=duration_samples,
             output_device_index=args.output_device,
         )
         impulse = synthesise_impulse(duration_samples, impulse_at=0)
@@ -217,15 +229,19 @@ def main(argv: list[str] | None = None) -> int:
         raw = in_stream.read(duration_samples, exception_on_overflow=False)
         recording = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0
         report = measure_latency(
-            recording, args.sample_rate,
-            target_ms=args.target, threshold_db=args.threshold_db,
+            recording,
+            args.sample_rate,
+            target_ms=args.target,
+            threshold_db=args.threshold_db,
         )
         print(format_report(report))
         return 0 if report.within_target else 1
     finally:  # pragma: no cover
         try:
-            in_stream.stop_stream(); in_stream.close()
-            out_stream.stop_stream(); out_stream.close()
+            in_stream.stop_stream()
+            in_stream.close()
+            out_stream.stop_stream()
+            out_stream.close()
         except Exception:
             pass
         pa.terminate()

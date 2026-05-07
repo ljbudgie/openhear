@@ -21,30 +21,34 @@ from typing import List
 
 # ── Shared sub-structures ────────────────────────────────────────────────────
 
+
 @dataclass
 class GainTable:
     """Frequency-specific gain values (dB SPL) at a set of standard audiometric
     frequencies.  The `frequencies_hz` and `gains_db` lists must have the same
     length.
     """
-    frequencies_hz: List[int] = field(default_factory=lambda: [
-        250, 500, 1000, 1500, 2000, 3000, 4000, 6000, 8000
-    ])
+
+    frequencies_hz: List[int] = field(
+        default_factory=lambda: [250, 500, 1000, 1500, 2000, 3000, 4000, 6000, 8000]
+    )
     gains_db: List[float] = field(default_factory=lambda: [0.0] * 9)
 
 
 @dataclass
 class CompressionChannel:
     """WDRC parameters for a single frequency channel."""
+
     center_frequency_hz: int = 1000
-    compression_ratio: float = 2.0    # linear ratio, e.g. 2.0 = 2:1
-    knee_point_db: float = 50.0       # input SPL at which compression engages
-    attack_ms: float = 5.0            # attack time in milliseconds
-    release_ms: float = 50.0          # release time in milliseconds
-    max_output_db: float = 110.0      # output SPL ceiling (MPO)
+    compression_ratio: float = 2.0  # linear ratio, e.g. 2.0 = 2:1
+    knee_point_db: float = 50.0  # input SPL at which compression engages
+    attack_ms: float = 5.0  # attack time in milliseconds
+    release_ms: float = 50.0  # release time in milliseconds
+    max_output_db: float = 110.0  # output SPL ceiling (MPO)
 
 
 # ── Device-specific fitting profiles ────────────────────────────────────────
+
 
 @dataclass
 class PhonakFittingProfile:
@@ -68,13 +72,13 @@ class PhonakFittingProfile:
                              'super-cardioid').
         bluetooth_enabled:   Whether Marvel Bluetooth Classic streaming is active.
     """
+
     device_serial: str = ""
     program_name: str = "AutoSense OS 4.0"
     gain_table: GainTable = field(default_factory=GainTable)
     compression_channels: List[CompressionChannel] = field(
         default_factory=lambda: [
-            CompressionChannel(center_frequency_hz=f)
-            for f in [500, 1000, 2000, 4000, 6000]
+            CompressionChannel(center_frequency_hz=f) for f in [500, 1000, 2000, 4000, 6000]
         ]
     )
     treble_boost_db: float = 0.0
@@ -108,13 +112,13 @@ class SigniaFittingProfile:
         vent_type:           Vent configuration of the custom mould ('closed',
                              'small', 'medium', 'large', 'open').
     """
+
     device_serial: str = ""
     program_name: str = "Universal"
     gain_table: GainTable = field(default_factory=GainTable)
     compression_channels: List[CompressionChannel] = field(
         default_factory=lambda: [
-            CompressionChannel(center_frequency_hz=f)
-            for f in [500, 1000, 2000, 4000, 6000]
+            CompressionChannel(center_frequency_hz=f) for f in [500, 1000, 2000, 4000, 6000]
         ]
     )
     own_voice_processing: bool = True
@@ -125,6 +129,7 @@ class SigniaFittingProfile:
 
 
 # ── Factory helpers ──────────────────────────────────────────────────────────
+
 
 def phonak_profile_from_dict(data: dict) -> PhonakFittingProfile:
     """Deserialise a plain dict (e.g. loaded from JSON) into a

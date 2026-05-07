@@ -48,9 +48,7 @@ class VoiceClarityEnhancer:
         gain: float = 1.6,
     ) -> None:
         if low_hz >= high_hz:
-            raise ValueError(
-                f"low_hz ({low_hz}) must be less than high_hz ({high_hz})"
-            )
+            raise ValueError(f"low_hz ({low_hz}) must be less than high_hz ({high_hz})")
         if gain < 1.0:
             raise ValueError(f"gain ({gain}) should be >= 1.0 for emphasis")
 

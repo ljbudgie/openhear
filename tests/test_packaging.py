@@ -27,9 +27,7 @@ def _load() -> dict:
 
 
 def test_pyproject_exists():
-    assert PYPROJECT.exists(), (
-        "pyproject.toml must exist to enable `pip install -e .`"
-    )
+    assert PYPROJECT.exists(), "pyproject.toml must exist to enable `pip install -e .`"
 
 
 def test_project_metadata_is_complete():
@@ -89,6 +87,5 @@ def test_ci_workflow_exists():
 
 
 def test_phase5_docs_present():
-    for name in ("ARCHITECTURE.md", "TUNING_GUIDE.md", "CONTRIBUTING.md",
-                 "PROTOCOL_NOTES.md"):
+    for name in ("ARCHITECTURE.md", "TUNING_GUIDE.md", "CONTRIBUTING.md", "PROTOCOL_NOTES.md"):
         assert (ROOT / "docs" / name).exists(), f"docs/{name} is missing"

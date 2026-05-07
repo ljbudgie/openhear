@@ -32,8 +32,7 @@ PACKET_LENGTH = len(PACKET_FIELDS)
 def _require_bleak() -> None:
     if BleakClient is None or BleakScanner is None:
         raise RuntimeError(
-            "BLE support requires the 'bleak' package. "
-            "Install it with 'pip install bleak'."
+            "BLE support requires the 'bleak' package. Install it with 'pip install bleak'."
         )
 
 

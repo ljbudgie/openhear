@@ -62,14 +62,16 @@ class TestSubtraction:
             s.process(noise)
         out = s.process(noise)
         # Output energy of pure noise should be lower than input energy.
-        assert np.sum(out ** 2) < np.sum(noise ** 2)
+        assert np.sum(out**2) < np.sum(noise**2)
 
     def test_spectral_floor_prevents_total_silence(self):
         """Applying subtraction with an aggressive multiplier should not
         zero the signal out below the spectral floor."""
         s = SpectralSubtractor(
-            frame_length=256, noise_floor_multiplier=100.0,
-            spectral_floor=0.1, noise_estimation_frames=2,
+            frame_length=256,
+            noise_floor_multiplier=100.0,
+            spectral_floor=0.1,
+            noise_estimation_frames=2,
         )
         rng = np.random.default_rng(3)
         noise = rng.standard_normal(256).astype(np.float32) * 0.05
@@ -77,7 +79,7 @@ class TestSubtraction:
             s.process(noise)
         out = s.process(noise)
         # Floor of 0.1 × original magnitude means ~1 % of energy preserved.
-        assert np.sum(out ** 2) > 0.0
+        assert np.sum(out**2) > 0.0
 
     def test_preserves_speech_above_noise(self):
         """A strong tone added on top of the profiled noise should still

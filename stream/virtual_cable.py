@@ -47,8 +47,8 @@ VIRTUAL_CABLE_HINTS: tuple[str, ...] = (
     "virtual cable",
     "null sink",
     "null-sink",
-    ".monitor",     # PulseAudio/PipeWire monitor sources
-    "openhear",     # any user-named OpenHear bridge
+    ".monitor",  # PulseAudio/PipeWire monitor sources
+    "openhear",  # any user-named OpenHear bridge
 )
 
 
@@ -159,11 +159,13 @@ def main(argv: list[str] | None = None) -> int:
     )
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
-        "--list", action="store_true",
+        "--list",
+        action="store_true",
         help="Print every detected virtual-cable endpoint.",
     )
     group.add_argument(
-        "--best", choices=("input", "output"),
+        "--best",
+        choices=("input", "output"),
         help="Print the index of the recommended cable for the given direction.",
     )
     args = parser.parse_args(argv)

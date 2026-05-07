@@ -47,10 +47,16 @@ class TestGenerateTestTone:
     def test_phase_continuity(self):
         # Continuous phase across two consecutive blocks.
         block1, phase = pipeline.generate_test_tone(
-            128, 16_000, frequency_hz=1000.0, phase=0.0,
+            128,
+            16_000,
+            frequency_hz=1000.0,
+            phase=0.0,
         )
         block2, _ = pipeline.generate_test_tone(
-            128, 16_000, frequency_hz=1000.0, phase=phase,
+            128,
+            16_000,
+            frequency_hz=1000.0,
+            phase=phase,
         )
         # The boundary should be smooth — no large jump.
         boundary_jump = abs(float(block2[0]) - float(block1[-1]))
@@ -59,7 +65,10 @@ class TestGenerateTestTone:
 
     def test_amplitude_respected(self):
         samples, _ = pipeline.generate_test_tone(
-            512, 16_000, amplitude=0.1, frequency_hz=2000.0,
+            512,
+            16_000,
+            amplitude=0.1,
+            frequency_hz=2000.0,
         )
         assert float(np.max(np.abs(samples))) <= 0.1 + 1e-6
 
@@ -78,9 +87,15 @@ class TestBuildArgParser:
         assert ns.metrics_csv is None
 
     def test_all_flags_set(self):
-        ns = pipeline._build_arg_parser().parse_args([
-            "--bypass", "--test-tone", "--latency", "--metrics-csv", "/tmp/m.csv",
-        ])
+        ns = pipeline._build_arg_parser().parse_args(
+            [
+                "--bypass",
+                "--test-tone",
+                "--latency",
+                "--metrics-csv",
+                "/tmp/m.csv",
+            ]
+        )
         assert ns.bypass is True
         assert ns.test_tone is True
         assert ns.latency is True
@@ -166,7 +181,8 @@ class TestRunPipeline:
                 self._terminated = True
 
         monkeypatch.setattr(
-            pipeline, "pyaudio",
+            pipeline,
+            "pyaudio",
             types.SimpleNamespace(PyAudio=_BrokenPyAudio, paInt16=8),
         )
         with pytest.raises(SystemExit) as excinfo:
@@ -204,10 +220,13 @@ class TestRunPipeline:
         # Force the "1 second elapsed" branch by advancing monotonic.
         ticks = iter([0.0, 100.0, 100.0, 100.0])
         monkeypatch.setattr(
-            pipeline.time, "monotonic", lambda: next(ticks, 100.0),
+            pipeline.time,
+            "monotonic",
+            lambda: next(ticks, 100.0),
         )
 
         import logging
+
         with caplog.at_level(logging.INFO, logger=pipeline.logger.name):
             pipeline.run_pipeline(bypass=True, test_tone=True, measure_latency=True)
         assert any("latency=" in r.message for r in caplog.records)
@@ -218,7 +237,9 @@ class TestRunPipeline:
 
         metrics_path = tmp_path / "metrics.csv"
         pipeline.run_pipeline(
-            bypass=True, test_tone=True, metrics_path=str(metrics_path),
+            bypass=True,
+            test_tone=True,
+            metrics_path=str(metrics_path),
         )
         assert metrics_path.exists()
         # File should have a header + at least one data row.

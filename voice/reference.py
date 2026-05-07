@@ -39,6 +39,7 @@ from voice.analyser import _find_formants, _spectral_envelope
 
 # ── Data structures ──────────────────────────────────────────────────────────
 
+
 @dataclass
 class ReferenceProfile:
     """Average vocal frequency profile extracted from a reference recording.
@@ -54,15 +55,15 @@ class ReferenceProfile:
                                 Tuple (low_hz, high_hz) spanning the range
                                 where the reference voice has the most energy.
     """
+
     artist_name: str = ""
     avg_formants: list[float] = field(default_factory=list)
-    spectral_envelope: np.ndarray = field(
-        default_factory=lambda: np.array([], dtype=np.float32)
-    )
+    spectral_envelope: np.ndarray = field(default_factory=lambda: np.array([], dtype=np.float32))
     dominant_frequency_range: tuple[float, float] = (0.0, 0.0)
 
 
 # ── File I/O ─────────────────────────────────────────────────────────────────
+
 
 def _load_audio(path: Path) -> tuple[int, np.ndarray]:
     """Load an audio file and return (sample_rate, mono_float32_samples).
@@ -96,9 +97,7 @@ def _load_audio(path: Path) -> tuple[int, np.ndarray]:
         data, sr = sf.read(str(path), dtype="float32")
 
     else:
-        raise ValueError(
-            f"Unsupported audio format '{suffix}'.  Use .wav or .flac."
-        )
+        raise ValueError(f"Unsupported audio format '{suffix}'.  Use .wav or .flac.")
 
     # Mix to mono if stereo.
     if data.ndim == 2:
@@ -109,8 +108,10 @@ def _load_audio(path: Path) -> tuple[int, np.ndarray]:
 
 # ── Signal conditioning ──────────────────────────────────────────────────────
 
-def _bandpass(samples: np.ndarray, sample_rate: int,
-              low_hz: float, high_hz: float, order: int = 4) -> np.ndarray:
+
+def _bandpass(
+    samples: np.ndarray, sample_rate: int, low_hz: float, high_hz: float, order: int = 4
+) -> np.ndarray:
     """Apply a Butterworth bandpass filter to isolate vocal frequencies."""
     nyquist = sample_rate / 2.0
     low = max(low_hz / nyquist, 1e-5)
@@ -119,8 +120,7 @@ def _bandpass(samples: np.ndarray, sample_rate: int,
     return sosfilt(sos, samples).astype(np.float32)
 
 
-def _resample(samples: np.ndarray, orig_sr: int,
-              target_sr: int) -> np.ndarray:
+def _resample(samples: np.ndarray, orig_sr: int, target_sr: int) -> np.ndarray:
     """Resample *samples* from *orig_sr* to *target_sr* using polyphase
     resampling (integer ratio via GCD).
     """
@@ -134,8 +134,10 @@ def _resample(samples: np.ndarray, orig_sr: int,
 
 # ── Profile computation ─────────────────────────────────────────────────────
 
-def _dominant_range(envelope_db: np.ndarray, freqs: np.ndarray,
-                    threshold_db: float = 10.0) -> tuple[float, float]:
+
+def _dominant_range(
+    envelope_db: np.ndarray, freqs: np.ndarray, threshold_db: float = 10.0
+) -> tuple[float, float]:
     """Find the frequency range where the envelope is within *threshold_db*
     of the peak level.  Returns (low_hz, high_hz).
     """
@@ -146,12 +148,14 @@ def _dominant_range(envelope_db: np.ndarray, freqs: np.ndarray,
     return (float(above[0]), float(above[-1]))
 
 
-def load_reference(path: str | Path,
-                   artist_name: str = "",
-                   sample_rate: int = config.SAMPLE_RATE,
-                   frame_size: int = config.FRAME_BUFFER,
-                   bandpass: tuple[float, float] = config.REFERENCE_BANDPASS,
-                   n_formants: int = config.FORMANT_PEAKS) -> ReferenceProfile:
+def load_reference(
+    path: str | Path,
+    artist_name: str = "",
+    sample_rate: int = config.SAMPLE_RATE,
+    frame_size: int = config.FRAME_BUFFER,
+    bandpass: tuple[float, float] = config.REFERENCE_BANDPASS,
+    n_formants: int = config.FORMANT_PEAKS,
+) -> ReferenceProfile:
     """Load a reference recording and compute its average vocal profile.
 
     Args:
@@ -187,7 +191,7 @@ def load_reference(path: str | Path,
     n_frames = 0
 
     for start in range(0, len(samples) - frame_size, hop):
-        frame = samples[start:start + frame_size] * window
+        frame = samples[start : start + frame_size] * window
         spectrum = np.fft.rfft(frame)
         magnitude = np.abs(spectrum).astype(np.float32)
 

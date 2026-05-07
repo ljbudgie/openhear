@@ -40,7 +40,16 @@ from typing import Iterable, Mapping
 
 #: Standard audiometric test frequencies in Hz (ISO 8253-1).
 STANDARD_FREQUENCIES_HZ: tuple[int, ...] = (
-    250, 500, 750, 1000, 1500, 2000, 3000, 4000, 6000, 8000,
+    250,
+    500,
+    750,
+    1000,
+    1500,
+    2000,
+    3000,
+    4000,
+    6000,
+    8000,
 )
 
 #: Permitted dB HL range for a clinical audiogram (per ISO 8253-1).
@@ -48,13 +57,15 @@ MIN_THRESHOLD_DB_HL: int = -10
 MAX_THRESHOLD_DB_HL: int = 120
 
 #: Source labels recognised by :class:`Audiogram`.
-KNOWN_SOURCES: frozenset[str] = frozenset({
-    "manual_entry",
-    "imported_from_device",
-    "imported_from_pdf",
-    "synthetic",
-    "unknown",
-})
+KNOWN_SOURCES: frozenset[str] = frozenset(
+    {
+        "manual_entry",
+        "imported_from_device",
+        "imported_from_pdf",
+        "synthetic",
+        "unknown",
+    }
+)
 
 # Standard severity classification (BSA / WHO).  Each tuple is
 # (upper_bound_inclusive_db_hl, label).
@@ -192,9 +203,7 @@ class Audiogram:
         """
         thresholds = self._ear(ear)
         if freq_hz not in thresholds:
-            raise KeyError(
-                f"No threshold recorded at {freq_hz} Hz in the {ear} ear."
-            )
+            raise KeyError(f"No threshold recorded at {freq_hz} Hz in the {ear} ear.")
         return severity(thresholds[freq_hz])
 
     def pure_tone_average(self, ear: str) -> float:
@@ -251,8 +260,7 @@ class Audiogram:
             "left_ear": {
                 "symbol": "X",
                 "thresholds": [
-                    {"freq_hz": f, "db_hl": _to_int_if_whole(db)}
-                    for f, db in self.left_ear.items()
+                    {"freq_hz": f, "db_hl": _to_int_if_whole(db)} for f, db in self.left_ear.items()
                 ],
             },
         }
@@ -291,9 +299,7 @@ class Audiogram:
                 outside the permitted dB HL range.
         """
         if "right_ear" not in data or "left_ear" not in data:
-            raise ValueError(
-                "Audiogram dict must contain 'right_ear' and 'left_ear' keys."
-            )
+            raise ValueError("Audiogram dict must contain 'right_ear' and 'left_ear' keys.")
 
         right = _extract_threshold_map(data["right_ear"])
         left = _extract_threshold_map(data["left_ear"])
@@ -354,9 +360,7 @@ def _extract_threshold_map(ear_data: object) -> dict[int, float]:
         result: dict[int, float] = {}
         for entry in thresholds_list:
             if not isinstance(entry, Mapping) or "freq_hz" not in entry or "db_hl" not in entry:
-                raise ValueError(
-                    "Each thresholds entry must be a dict with 'freq_hz' and 'db_hl'."
-                )
+                raise ValueError("Each thresholds entry must be a dict with 'freq_hz' and 'db_hl'.")
             result[int(entry["freq_hz"])] = float(entry["db_hl"])
         return result
 
@@ -364,9 +368,7 @@ def _extract_threshold_map(ear_data: object) -> dict[int, float]:
     if isinstance(ear_data, Mapping):
         return {int(k): float(v) for k, v in ear_data.items()}
 
-    raise ValueError(
-        f"Unsupported ear data shape: expected dict, got {type(ear_data).__name__}."
-    )
+    raise ValueError(f"Unsupported ear data shape: expected dict, got {type(ear_data).__name__}.")
 
 
 def _to_int_if_whole(value: float) -> int | float:

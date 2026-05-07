@@ -47,7 +47,9 @@ def _format_diff_line(freq: int, diff: int) -> str:
     type=click.Path(exists=True, dir_okay=False, path_type=Path),
 )
 @click.option(
-    "--json", "as_json", is_flag=True,
+    "--json",
+    "as_json",
+    is_flag=True,
     help="Emit the comparison as JSON instead of a human-readable report.",
 )
 def main(old_path: Path, new_path: Path, as_json: bool) -> None:

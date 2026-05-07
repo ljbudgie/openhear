@@ -47,7 +47,9 @@ class TestProcess:
         """The first sample has zero feedback prediction, so output equals
         input × anti-feedback gain."""
         fc = FeedbackCanceller(
-            filter_length=8, mu=0.001, anti_feedback_gain_db=-6.0,
+            filter_length=8,
+            mu=0.001,
+            anti_feedback_gain_db=-6.0,
         )
         x = np.ones(1, dtype=np.float32)
         out = fc.process(x)

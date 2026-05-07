@@ -17,8 +17,7 @@ def _make_snapshot(envelope: np.ndarray) -> VoiceSnapshot:
     return VoiceSnapshot(spectral_envelope=envelope.astype(np.float32))
 
 
-def _make_reference(envelope: np.ndarray, formants: list[float] | None = None
-                    ) -> ReferenceProfile:
+def _make_reference(envelope: np.ndarray, formants: list[float] | None = None) -> ReferenceProfile:
     return ReferenceProfile(
         artist_name="test",
         avg_formants=formants or [],

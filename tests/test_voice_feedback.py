@@ -30,6 +30,7 @@ class TestBar:
         s = _bar(0.0, 0.0, 0.0, bar_width=30, match_tol=3.0, gap_thr=6.0)
         # Strip ANSI codes and count visible characters.
         import re
+
         plain = re.sub(r"\033\[[0-9;]*m", "", s)
         # Approx bar_width, possibly off by one for fractional block.
         assert len(plain) >= 30
@@ -82,15 +83,17 @@ class TestRenderFrame:
         snap = self._snapshot()
         snap.fundamental_frequency_hz = 0.0
         cmp = VoiceComparison()
-        out = render_frame(snap, np.array([], dtype=np.float32), cmp,
-                           sample_rate=44_100, frame_size=1024)
+        out = render_frame(
+            snap, np.array([], dtype=np.float32), cmp, sample_rate=44_100, frame_size=1024
+        )
         assert "F0:" in out
         assert "—" in out
 
     def test_empty_reference_envelope(self):
         snap = self._snapshot()
         cmp = VoiceComparison(similarity_score=0.0)
-        out = render_frame(snap, np.array([], dtype=np.float32), cmp,
-                           sample_rate=44_100, frame_size=1024)
+        out = render_frame(
+            snap, np.array([], dtype=np.float32), cmp, sample_rate=44_100, frame_size=1024
+        )
         # With no reference, the reference target marker line is blank.
         assert "F0:" in out

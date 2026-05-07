@@ -92,9 +92,7 @@ class SpectralSubtractor:
             self._noise_sum += magnitude.astype(np.float64)
             self._frames_collected += 1
             if self._frames_collected >= self._estimation_frames_needed:
-                self._noise_spectrum = (
-                    self._noise_sum / self._frames_collected
-                ).astype(np.float32)
+                self._noise_spectrum = (self._noise_sum / self._frames_collected).astype(np.float32)
             # Return original samples during warm-up phase.
             return samples
 

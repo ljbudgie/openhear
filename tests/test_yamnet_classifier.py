@@ -126,9 +126,7 @@ class TestLiveYamnetClassifier:
                 ClassifiedSound("alarm", 0.7, "Alarm"),
             ]
         )
-        classifier = LiveYamnetClassifier(
-            "unused.tflite", classifier=stub, sounddevice_module=sd
-        )
+        classifier = LiveYamnetClassifier("unused.tflite", classifier=stub, sounddevice_module=sd)
 
         results = []
         with pytest.raises(_StreamExhausted):
@@ -148,9 +146,7 @@ class TestLiveYamnetClassifier:
         frame = np.zeros(int(round(16_000 * 0.975)), dtype=np.float32)
         sd = _StubSounddevice([frame])
         stub = _StubClassifier(results=[ClassifiedSound("voice", 0.9, "Speech")])
-        classifier = LiveYamnetClassifier(
-            "unused.tflite", classifier=stub, sounddevice_module=sd
-        )
+        classifier = LiveYamnetClassifier("unused.tflite", classifier=stub, sounddevice_module=sd)
 
         with pytest.raises(_StreamExhausted):
             for _ in classifier.iter_classifications(input_device=3):
@@ -180,8 +176,16 @@ def test_main_iterates_until_limit(monkeypatch, capsys):
         ]
     )
 
-    def fake_init(self, model_path, *, labels_path=None, sample_rate=16_000,
-                  window_seconds=0.975, classifier=None, sounddevice_module=None):
+    def fake_init(
+        self,
+        model_path,
+        *,
+        labels_path=None,
+        sample_rate=16_000,
+        window_seconds=0.975,
+        classifier=None,
+        sounddevice_module=None,
+    ):
         self.sample_rate = sample_rate
         self.window_seconds = window_seconds
         self.labels_path = labels_path or bundled_labels_path()
@@ -193,17 +197,16 @@ def test_main_iterates_until_limit(monkeypatch, capsys):
         "sys.argv",
         [
             "yamnet_classifier",
-            "--model", "unused.tflite",
-            "--limit", "2",
+            "--model",
+            "unused.tflite",
+            "--limit",
+            "2",
         ],
     )
     main()
 
-    output_lines = [
-        line for line in capsys.readouterr().out.splitlines() if line.strip()
-    ]
+    output_lines = [line for line in capsys.readouterr().out.splitlines() if line.strip()]
     # --limit 2 means exactly two classification lines should be printed.
     assert len(output_lines) == 2
     assert "voice" in output_lines[0]
     assert "dog" in output_lines[1]
-

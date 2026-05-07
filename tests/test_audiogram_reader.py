@@ -97,7 +97,7 @@ class TestReadAudiogram:
         result = read_audiogram(device)
 
         # The first three command bytes are the audiogram opcode.
-        assert device.writes[0][1:1 + len(CMD_GET_AUDIOGRAM)] == CMD_GET_AUDIOGRAM
+        assert device.writes[0][1 : 1 + len(CMD_GET_AUDIOGRAM)] == CMD_GET_AUDIOGRAM
         assert "timestamp" in result
         assert all(v == 15.0 for v in result["left"].values())
         assert all(v == 25.0 for v in result["right"].values())

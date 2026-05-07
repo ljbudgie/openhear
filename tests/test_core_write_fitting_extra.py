@@ -130,14 +130,20 @@ class TestWriteSafeParameters:
         session = _make_session()
         with pytest.raises(ValueError, match="least one"):
             write_safe_parameters(
-                session, b"raw", [], backup_dir=tmp_path,
+                session,
+                b"raw",
+                [],
+                backup_dir=tmp_path,
             )
 
     def test_returns_backup_archive(self, tmp_path):
         session = _make_session()
         req = WriteRequest(programme_slot=0, parameter="programme_name", value="Test")
         archive = write_safe_parameters(
-            session, b"rawbytes", [req], backup_dir=tmp_path,
+            session,
+            b"rawbytes",
+            [req],
+            backup_dir=tmp_path,
         )
         assert archive.fitting_path.exists()
         assert archive.raw_path.exists()
@@ -148,7 +154,11 @@ class TestWriteSafeParameters:
         req = WriteRequest(programme_slot=0, parameter="programme_name", value="Env")
         with pytest.raises(NotImplementedError):
             write_safe_parameters(
-                session, b"raw", [req], backup_dir=tmp_path, transmit=True,
+                session,
+                b"raw",
+                [req],
+                backup_dir=tmp_path,
+                transmit=True,
             )
 
     def test_disallowed_parameter_raises_before_backup(self, tmp_path):

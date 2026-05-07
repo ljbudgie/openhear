@@ -90,14 +90,17 @@ class NoahlinkDevice:
                 self._device = dev
                 logger.info(
                     "Opened Noahlink Wireless 2 (VID=%#06x PID=%#06x).",
-                    self.vendor_id, self.product_id,
+                    self.vendor_id,
+                    self.product_id,
                 )
                 return self
             except OSError as exc:
                 last_exc = exc
                 logger.warning(
                     "Attempt %d/%d to open Noahlink failed: %s",
-                    attempt, self.retries, exc,
+                    attempt,
+                    self.retries,
+                    exc,
                 )
                 time.sleep(0.1 * attempt)
         raise OSError(
@@ -137,9 +140,7 @@ class NoahlinkDevice:
                 "`with NoahlinkDevice(...)` syntax."
             )
         if len(data) > HID_REPORT_LENGTH:
-            raise ValueError(
-                f"Frame is {len(data)} bytes; max {HID_REPORT_LENGTH}."
-            )
+            raise ValueError(f"Frame is {len(data)} bytes; max {HID_REPORT_LENGTH}.")
         padded = bytes([0x00]) + bytes(data) + bytes(HID_REPORT_LENGTH - len(data))
         n = self._device.write(padded)
         if n < 0:
@@ -160,9 +161,7 @@ class NoahlinkDevice:
             raise RuntimeError("Noahlink device is not open.")
         data = self._device.read(HID_REPORT_LENGTH, timeout_ms=timeout_ms)
         if not data:
-            raise TimeoutError(
-                f"No HID report received from Noahlink within {timeout_ms} ms."
-            )
+            raise TimeoutError(f"No HID report received from Noahlink within {timeout_ms} ms.")
         out = bytes(data)
         self._log("RX", out)
         return out
@@ -218,7 +217,9 @@ def sniff(
     Returns the log file path.
     """
     dev = NoahlinkDevice(
-        vendor_id=vendor_id, product_id=product_id, log_path=log_path,
+        vendor_id=vendor_id,
+        product_id=product_id,
+        log_path=log_path,
     ).open()
     end = time.monotonic() + max(0.0, float(duration_seconds))
     try:
@@ -247,10 +248,15 @@ def main(argv: list[str] | None = None) -> int:  # pragma: no cover - hardware p
     sub = parser.add_subparsers(dest="cmd", required=True)
     sub.add_parser("enumerate", help="List Noahlink devices currently visible.")
     sniff_p = sub.add_parser("sniff", help="Record HID traffic to a log file.")
-    sniff_p.add_argument("--duration", type=float, default=10.0,
-                         help="Seconds to listen (default: 10).")
-    sniff_p.add_argument("--log", type=Path, default=DEFAULT_LOG_PATH,
-                         help=f"Log path (default: {DEFAULT_LOG_PATH}).")
+    sniff_p.add_argument(
+        "--duration", type=float, default=10.0, help="Seconds to listen (default: 10)."
+    )
+    sniff_p.add_argument(
+        "--log",
+        type=Path,
+        default=DEFAULT_LOG_PATH,
+        help=f"Log path (default: {DEFAULT_LOG_PATH}).",
+    )
     args = parser.parse_args(argv)
 
     if args.cmd == "enumerate":

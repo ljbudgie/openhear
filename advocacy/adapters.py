@@ -97,8 +97,10 @@ def _merge_tags(base: Iterable[str], extra: Iterable[str] | None) -> tuple[str, 
 
 # ── Audiogram ──────────────────────────────────────────────────────────────
 
-def audiogram_commitment(audiogram: Mapping[str, Any],
-                         tags: Iterable[str] | None = None) -> Commitment:
+
+def audiogram_commitment(
+    audiogram: Mapping[str, Any], tags: Iterable[str] | None = None
+) -> Commitment:
     """Produce a :class:`Commitment` over an ``openhear-audiogram-v1`` dict.
 
     ``audiogram`` is the on‑disk JSON shape used throughout the
@@ -120,8 +122,8 @@ def audiogram_commitment(audiogram: Mapping[str, Any],
 
 # ── Fitting profile ────────────────────────────────────────────────────────
 
-def fitting_commitment(fitting: Mapping[str, Any],
-                       tags: Iterable[str] | None = None) -> Commitment:
+
+def fitting_commitment(fitting: Mapping[str, Any], tags: Iterable[str] | None = None) -> Commitment:
     """Produce a :class:`Commitment` over a fitting profile dict.
 
     The "fitting profile" is any structured description of the DSP
@@ -144,8 +146,8 @@ def fitting_commitment(fitting: Mapping[str, Any],
 
 # ── MPO safety calculation ─────────────────────────────────────────────────
 
-def mpo_commitment(mpo: Mapping[str, Any],
-                   tags: Iterable[str] | None = None) -> Commitment:
+
+def mpo_commitment(mpo: Mapping[str, Any], tags: Iterable[str] | None = None) -> Commitment:
     """Produce a :class:`Commitment` over an MPO safety calculation.
 
     MPO (maximum power output) calculations are the sovereign record

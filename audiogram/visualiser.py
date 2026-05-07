@@ -36,14 +36,14 @@ from audiogram.loader import (
 
 # ── ANSI colour codes ────────────────────────────────────────────────────────
 
-_BLUE = "\033[94m"       # Right ear
-_RED = "\033[91m"        # Left ear
-_DIM = "\033[2m"         # Dimmed text (severity bands)
-_BOLD = "\033[1m"        # Bold
-_RESET = "\033[0m"       # Reset all formatting
-_CYAN = "\033[96m"       # Headings
-_YELLOW = "\033[93m"     # Warnings / highlights
-_GREEN = "\033[92m"      # Normal severity
+_BLUE = "\033[94m"  # Right ear
+_RED = "\033[91m"  # Left ear
+_DIM = "\033[2m"  # Dimmed text (severity bands)
+_BOLD = "\033[1m"  # Bold
+_RESET = "\033[0m"  # Reset all formatting
+_CYAN = "\033[96m"  # Headings
+_YELLOW = "\033[93m"  # Warnings / highlights
+_GREEN = "\033[92m"  # Normal severity
 
 # Standard clinical audiogram frequency axis (Hz).
 PLOT_FREQUENCIES = [125, 250, 500, 1000, 2000, 4000, 8000]
@@ -58,11 +58,11 @@ _DB_MAX = 120
 
 # Severity zone boundaries (upper edge of zone in dB HL).
 _ZONES = [
-    (25,  "Normal"),
-    (40,  "Mild"),
-    (55,  "Moderate"),
-    (70,  "Mod-Severe"),
-    (90,  "Severe"),
+    (25, "Normal"),
+    (40, "Mild"),
+    (55, "Moderate"),
+    (70, "Mod-Severe"),
+    (90, "Severe"),
     (120, "Profound"),
 ]
 
@@ -76,6 +76,7 @@ def _db_to_row(db: int) -> int:
 def _freq_to_col(freq: int) -> int:
     """Map a frequency to a chart column using log spacing."""
     import math
+
     log_min = math.log2(PLOT_FREQUENCIES[0])
     log_max = math.log2(PLOT_FREQUENCIES[-1])
     log_freq = math.log2(max(PLOT_FREQUENCIES[0], min(PLOT_FREQUENCIES[-1], freq)))
@@ -108,9 +109,7 @@ def print_audiogram(path: str) -> None:
 
     # ── Build the grid ────────────────────────────────────────────────────────
     # Each cell is a single character.  We overlay ear markers on top.
-    grid: list[list[str]] = [
-        [" "] * _CHART_WIDTH for _ in range(_CHART_HEIGHT)
-    ]
+    grid: list[list[str]] = [[" "] * _CHART_WIDTH for _ in range(_CHART_HEIGHT)]
 
     # Place right ear markers (O) — blue
     right_positions: dict[tuple[int, int], int] = {}
@@ -186,9 +185,7 @@ def print_audiogram(path: str) -> None:
                 # Grid dots at frequency tick columns
                 is_freq_col = col in [_freq_to_col(f) for f in PLOT_FREQUENCIES]
                 # Horizontal zone boundary lines
-                is_zone_row = any(
-                    row == _db_to_row(z[0]) for z in _ZONES
-                )
+                is_zone_row = any(row == _db_to_row(z[0]) for z in _ZONES)
                 if is_freq_col and is_zone_row:
                     row_chars.append(f"{_DIM}+{_RESET}")
                 elif is_freq_col:
@@ -235,8 +232,7 @@ def print_audiogram(path: str) -> None:
 def main() -> None:
     """CLI entry point."""
     parser = argparse.ArgumentParser(
-        description="Display an audiogram in the terminal from an "
-                    "openhear-audiogram-v1 JSON file."
+        description="Display an audiogram in the terminal from an openhear-audiogram-v1 JSON file."
     )
     parser.add_argument(
         "input",
@@ -244,7 +240,8 @@ def main() -> None:
         help="Path to audiogram JSON file.",
     )
     parser.add_argument(
-        "--input", "-i",
+        "--input",
+        "-i",
         dest="input_flag",
         default=None,
         help="Path to audiogram JSON file (alternative to positional arg).",

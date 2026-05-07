@@ -100,7 +100,9 @@ def test_decode_session_yields_multiple_frames():
     frames = list(decode_session(a + b + c))
     assert [f.seq for f in frames] == [1, 2, 3]
     assert [f.msg_type for f in frames] == [
-        MessageType.HELLO, MessageType.ACK, MessageType.DEVICE_INFO,
+        MessageType.HELLO,
+        MessageType.ACK,
+        MessageType.DEVICE_INFO,
     ]
 
 
@@ -114,8 +116,7 @@ def test_message_type_name_handles_unknown():
 
 
 def test_known_message_type_name():
-    frame = ParsedFrame(seq=1, msg_type=MessageType.GET_FITTING, payload=b"",
-                        checksum_ok=True)
+    frame = ParsedFrame(seq=1, msg_type=MessageType.GET_FITTING, payload=b"", checksum_ok=True)
     assert frame.msg_type_name == "GET_FITTING"
 
 
@@ -123,8 +124,7 @@ def test_known_message_type_name():
 
 
 class _FakeHidDevice:
-    def __init__(self, *, response: bytes | None = None,
-                 open_error: Exception | None = None):
+    def __init__(self, *, response: bytes | None = None, open_error: Exception | None = None):
         self.response = response
         self.open_error = open_error
         self.open_calls: list[tuple[int, int]] = []
@@ -207,6 +207,7 @@ def test_noahlink_open_retries_on_oserror(monkeypatch):
         if attempts["n"] < 3:
             return _FakeHidDevice(open_error=OSError("transient"))
         return _FakeHidDevice(response=b"")
+
     monkeypatch.setattr(noahlink_mod.hid, "device", factory)
     dev = NoahlinkDevice(retries=5).open()
     assert attempts["n"] == 3
@@ -215,7 +216,8 @@ def test_noahlink_open_retries_on_oserror(monkeypatch):
 
 def test_noahlink_open_gives_up_after_retries(monkeypatch):
     monkeypatch.setattr(
-        noahlink_mod.hid, "device",
+        noahlink_mod.hid,
+        "device",
         lambda: _FakeHidDevice(open_error=OSError("nope")),
     )
     with pytest.raises(OSError, match="Cannot open Noahlink"):
@@ -235,10 +237,14 @@ def test_noahlink_traffic_log(monkeypatch, tmp_path):
 
 
 def test_enumerate_devices_filters(monkeypatch):
-    monkeypatch.setattr(noahlink_mod.hid, "enumerate", lambda: [
-        {"vendor_id": 0x0484, "product_id": 0x006E, "path": b"a"},
-        {"vendor_id": 0x046D, "product_id": 0xC52B, "path": b"b"},
-    ])
+    monkeypatch.setattr(
+        noahlink_mod.hid,
+        "enumerate",
+        lambda: [
+            {"vendor_id": 0x0484, "product_id": 0x006E, "path": b"a"},
+            {"vendor_id": 0x046D, "product_id": 0xC52B, "path": b"b"},
+        ],
+    )
     matches = enumerate_devices()
     assert len(matches) == 1
     assert matches[0]["product_id"] == 0x006E
@@ -361,18 +367,22 @@ def test_safe_label_handles_unsafe_serial(tmp_path):
 def test_allowed_parameters_kept_minimal():
     """Defence in depth: this test fails if someone broadens the
     allow-list without updating PROTOCOL_NOTES.md."""
-    assert ALLOWED_PARAMETERS == frozenset({
-        "programme_name",
-        "volume_offset_db",
-        "streaming_preference",
-    })
+    assert ALLOWED_PARAMETERS == frozenset(
+        {
+            "programme_name",
+            "volume_offset_db",
+            "streaming_preference",
+        }
+    )
 
 
 def test_write_safe_parameters_rejects_disallowed_field(tmp_path):
     session = _toy_session()
     with pytest.raises(PermissionError, match="Refusing"):
         write_safe_parameters(
-            session, b"raw", [WriteRequest(0, "gain_table", [0.0])],
+            session,
+            b"raw",
+            [WriteRequest(0, "gain_table", [0.0])],
             backup_dir=tmp_path,
         )
 
@@ -381,17 +391,22 @@ def test_write_safe_parameters_rejects_bad_value(tmp_path):
     session = _toy_session()
     with pytest.raises(ValueError, match="volume_offset_db"):
         write_safe_parameters(
-            session, b"raw", [WriteRequest(0, "volume_offset_db", 99.0)],
+            session,
+            b"raw",
+            [WriteRequest(0, "volume_offset_db", 99.0)],
             backup_dir=tmp_path,
         )
     with pytest.raises(ValueError, match="programme_name"):
         write_safe_parameters(
-            session, b"raw", [WriteRequest(0, "programme_name", "")],
+            session,
+            b"raw",
+            [WriteRequest(0, "programme_name", "")],
             backup_dir=tmp_path,
         )
     with pytest.raises(ValueError, match="streaming_preference"):
         write_safe_parameters(
-            session, b"raw",
+            session,
+            b"raw",
             [WriteRequest(0, "streaming_preference", "loud")],
             backup_dir=tmp_path,
         )
@@ -400,9 +415,12 @@ def test_write_safe_parameters_rejects_bad_value(tmp_path):
 def test_write_safe_parameters_writes_backup_and_mutates_session(tmp_path):
     session = _toy_session()
     archive = write_safe_parameters(
-        session, b"raw bytes",
-        [WriteRequest(0, "programme_name", "Quiet Restaurant"),
-         WriteRequest(0, "volume_offset_db", 3.0)],
+        session,
+        b"raw bytes",
+        [
+            WriteRequest(0, "programme_name", "Quiet Restaurant"),
+            WriteRequest(0, "volume_offset_db", 3.0),
+        ],
         backup_dir=tmp_path,
     )
     assert archive.directory.exists()
@@ -416,7 +434,8 @@ def test_write_safe_parameters_transmit_is_stub(tmp_path):
     session = _toy_session()
     with pytest.raises(NotImplementedError, match="WRITE_FITTING"):
         write_safe_parameters(
-            session, b"raw",
+            session,
+            b"raw",
             [WriteRequest(0, "programme_name", "Default")],
             backup_dir=tmp_path,
             transmit=True,

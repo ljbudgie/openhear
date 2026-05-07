@@ -16,8 +16,7 @@ def _make_snapshot(envelope: np.ndarray) -> VoiceSnapshot:
     return VoiceSnapshot(spectral_envelope=envelope.astype(np.float32))
 
 
-def _make_reference(envelope: np.ndarray, formants: list[float] | None = None
-                    ) -> ReferenceProfile:
+def _make_reference(envelope: np.ndarray, formants: list[float] | None = None) -> ReferenceProfile:
     return ReferenceProfile(
         artist_name="test",
         avg_formants=formants or [],
@@ -51,8 +50,14 @@ class TestCompare:
         ref_env = np.full(n_bins, -30.0, dtype=np.float32)
         snap = _make_snapshot(user_env)
         ref = _make_reference(ref_env, formants=[500.0, 1500.0])
-        result = compare(snap, ref, sample_rate=SR, frame_size=FRAME,
-                         match_tolerance_db=3.0, gap_threshold_db=6.0)
+        result = compare(
+            snap,
+            ref,
+            sample_rate=SR,
+            frame_size=FRAME,
+            match_tolerance_db=3.0,
+            gap_threshold_db=6.0,
+        )
         # Both formants should be flagged underused.
         assert 500.0 in result.underused_formants
         assert 1500.0 in result.underused_formants

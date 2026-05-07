@@ -139,12 +139,18 @@ class TestMetricsLoggerLogBlock:
         ml = MetricsLogger(path=tmp_path / "m.csv", keep_in_memory=True)
         with ml:
             ml.log_block(
-                block_samples=BLOCK, sample_rate=SR, process_seconds=0.001,
-                samples=np.zeros(BLOCK, dtype=np.float32), timestamp=1.0,
+                block_samples=BLOCK,
+                sample_rate=SR,
+                process_seconds=0.001,
+                samples=np.zeros(BLOCK, dtype=np.float32),
+                timestamp=1.0,
             )
             ml.log_block(
-                block_samples=BLOCK, sample_rate=SR, process_seconds=0.001,
-                samples=np.zeros(BLOCK, dtype=np.float32), timestamp=2.0,
+                block_samples=BLOCK,
+                sample_rate=SR,
+                process_seconds=0.001,
+                samples=np.zeros(BLOCK, dtype=np.float32),
+                timestamp=2.0,
             )
         assert len(ml.rows) == 2
         assert ml.rows[0].timestamp == pytest.approx(1.0)
@@ -154,7 +160,9 @@ class TestMetricsLoggerLogBlock:
         ml = _make_logger(tmp_path)
         with pytest.raises(RuntimeError, match="open"):
             ml.log_block(
-                block_samples=BLOCK, sample_rate=SR, process_seconds=0.001,
+                block_samples=BLOCK,
+                sample_rate=SR,
+                process_seconds=0.001,
                 samples=np.zeros(BLOCK, dtype=np.float32),
             )
 
@@ -162,7 +170,9 @@ class TestMetricsLoggerLogBlock:
         with _make_logger(tmp_path) as ml:
             with pytest.raises(ValueError, match="sample_rate"):
                 ml.log_block(
-                    block_samples=BLOCK, sample_rate=0, process_seconds=0.001,
+                    block_samples=BLOCK,
+                    sample_rate=0,
+                    process_seconds=0.001,
                     samples=np.zeros(BLOCK, dtype=np.float32),
                 )
 
@@ -170,7 +180,9 @@ class TestMetricsLoggerLogBlock:
         with _make_logger(tmp_path) as ml:
             with pytest.raises(ValueError, match="block_samples"):
                 ml.log_block(
-                    block_samples=0, sample_rate=SR, process_seconds=0.001,
+                    block_samples=0,
+                    sample_rate=SR,
+                    process_seconds=0.001,
                     samples=np.zeros(BLOCK, dtype=np.float32),
                 )
 
@@ -179,17 +191,23 @@ class TestMetricsLoggerLogBlock:
         ml = MetricsLogger(path=nested)
         with ml:
             ml.log_block(
-                block_samples=BLOCK, sample_rate=SR, process_seconds=0.001,
-                samples=np.zeros(BLOCK, dtype=np.float32), timestamp=0.0,
+                block_samples=BLOCK,
+                sample_rate=SR,
+                process_seconds=0.001,
+                samples=np.zeros(BLOCK, dtype=np.float32),
+                timestamp=0.0,
             )
         assert nested.exists()
 
     def test_timestamp_uses_time_if_not_provided(self, tmp_path):
         import time
+
         before = time.time()
         with _make_logger(tmp_path) as ml:
             row = ml.log_block(
-                block_samples=BLOCK, sample_rate=SR, process_seconds=0.001,
+                block_samples=BLOCK,
+                sample_rate=SR,
+                process_seconds=0.001,
                 samples=np.zeros(BLOCK, dtype=np.float32),
             )
         after = time.time()
@@ -199,8 +217,12 @@ class TestMetricsLoggerLogBlock:
 class TestFormatDashboardLine:
     def test_contains_expected_fields(self):
         row = MetricsRow(
-            timestamp=0.0, block_seconds=0.016, process_seconds=0.005,
-            latency_ms=16.0, cpu_percent=0.3125, rms_dbfs=-20.0,
+            timestamp=0.0,
+            block_seconds=0.016,
+            process_seconds=0.005,
+            latency_ms=16.0,
+            cpu_percent=0.3125,
+            rms_dbfs=-20.0,
         )
         line = format_dashboard_line(row)
         assert "latency=" in line

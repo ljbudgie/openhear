@@ -75,10 +75,7 @@ class OwnVoiceBypass:
         hysteresis_frames: int = 3,
     ) -> None:
         if f0_low_hz >= f0_high_hz:
-            raise ValueError(
-                f"f0_low_hz ({f0_low_hz}) must be less than "
-                f"f0_high_hz ({f0_high_hz})"
-            )
+            raise ValueError(f"f0_low_hz ({f0_low_hz}) must be less than f0_high_hz ({f0_high_hz})")
 
         self.sample_rate = sample_rate
         self.f0_low_hz = f0_low_hz
@@ -157,12 +154,12 @@ class OwnVoiceBypass:
 
         # Compute normalised autocorrelation in the lag range.
         autocorr = np.correlate(frame, frame, mode="full")
-        autocorr = autocorr[n - 1:]  # keep only non-negative lags
+        autocorr = autocorr[n - 1 :]  # keep only non-negative lags
         if autocorr[0] < 1e-10:
             return False
         autocorr = autocorr / autocorr[0]  # normalise
 
-        lag_range = autocorr[self._lag_low: self._lag_high + 1]
+        lag_range = autocorr[self._lag_low : self._lag_high + 1]
         if len(lag_range) == 0:
             return False
 
@@ -181,13 +178,9 @@ class OwnVoiceBypass:
             self._consecutive_ext += 1
             self._consecutive_own = 0
 
-        if (
-            self._state is _VoiceState.EXTERNAL
-            and self._consecutive_own >= self.hysteresis_frames
-        ):
+        if self._state is _VoiceState.EXTERNAL and self._consecutive_own >= self.hysteresis_frames:
             self._state = _VoiceState.OWN_VOICE
         elif (
-            self._state is _VoiceState.OWN_VOICE
-            and self._consecutive_ext >= self.hysteresis_frames
+            self._state is _VoiceState.OWN_VOICE and self._consecutive_ext >= self.hysteresis_frames
         ):
             self._state = _VoiceState.EXTERNAL

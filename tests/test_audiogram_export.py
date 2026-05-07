@@ -49,6 +49,7 @@ class TestToMarkdown:
 
     def test_handles_missing_notes(self, tmp_path: Path, sample_audiogram_dict):
         import json
+
         sample_audiogram_dict.pop("notes", None)
         p = tmp_path / "a.json"
         p.write_text(json.dumps(sample_audiogram_dict), encoding="utf-8")
@@ -57,10 +58,10 @@ class TestToMarkdown:
 
     def test_handles_pta_insufficient(self, tmp_path: Path, sample_audiogram_dict):
         import json
+
         # Remove 4000 Hz from right ear so PTA cannot be computed.
         sample_audiogram_dict["right_ear"]["thresholds"] = [
-            t for t in sample_audiogram_dict["right_ear"]["thresholds"]
-            if t["freq_hz"] != 4000
+            t for t in sample_audiogram_dict["right_ear"]["thresholds"] if t["freq_hz"] != 4000
         ]
         p = tmp_path / "a.json"
         p.write_text(json.dumps(sample_audiogram_dict), encoding="utf-8")
@@ -118,9 +119,7 @@ class TestToDspConfig:
         "pta_db,expected_knee",
         [(30, -35.0), (50, -40.0), (65, -45.0), (85, -50.0)],
     )
-    def test_knee_point_mapping(
-        self, tmp_path: Path, sample_audiogram_dict, pta_db, expected_knee
-    ):
+    def test_knee_point_mapping(self, tmp_path: Path, sample_audiogram_dict, pta_db, expected_knee):
         import json
 
         # Give every PTA frequency a threshold of pta_db.
@@ -137,8 +136,12 @@ class TestToDspConfig:
         [(30, 1.1, 1.4), (50, 1.2, 1.6), (65, 1.3, 1.8), (85, 1.4, 2.0)],
     )
     def test_noise_and_voice_mapping(
-        self, tmp_path: Path, sample_audiogram_dict, pta_db,
-        expected_mult, expected_voice_gain,
+        self,
+        tmp_path: Path,
+        sample_audiogram_dict,
+        pta_db,
+        expected_mult,
+        expected_voice_gain,
     ):
         import json
 

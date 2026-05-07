@@ -39,9 +39,7 @@ def _validate_freq(freq_hz: float, sample_rate: float) -> float:
     if sample_rate <= 0:
         raise ValueError(f"sample_rate must be positive, got {sample_rate}.")
     if not (0 < freq_hz < sample_rate / 2):
-        raise ValueError(
-            f"freq_hz must be in (0, Nyquist={sample_rate / 2}), got {freq_hz}."
-        )
+        raise ValueError(f"freq_hz must be in (0, Nyquist={sample_rate / 2}), got {freq_hz}.")
     return 2.0 * math.pi * freq_hz / sample_rate
 
 
@@ -64,8 +62,12 @@ class BiquadCoeffs:
     @classmethod
     def from_unnormalised(
         cls,
-        b0: float, b1: float, b2: float,
-        a0: float, a1: float, a2: float,
+        b0: float,
+        b1: float,
+        b2: float,
+        a0: float,
+        a1: float,
+        a2: float,
     ) -> "BiquadCoeffs":
         """Normalise raw cookbook coefficients by ``a0``."""
         if a0 == 0:
@@ -218,8 +220,11 @@ class Biquad:
         x = np.asarray(samples, dtype=np.float64)
         y = np.empty_like(x)
         b0, b1, b2, a1, a2 = (
-            self.coeffs.b0, self.coeffs.b1, self.coeffs.b2,
-            self.coeffs.a1, self.coeffs.a2,
+            self.coeffs.b0,
+            self.coeffs.b1,
+            self.coeffs.b2,
+            self.coeffs.a1,
+            self.coeffs.a2,
         )
         x1, x2, y1, y2 = self._x1, self._x2, self._y1, self._y2
         for i, xi in enumerate(x):

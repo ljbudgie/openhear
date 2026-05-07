@@ -18,26 +18,32 @@ from stream.virtual_cable import (
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("name", [
-    "VB-Audio Virtual Cable",
-    "VB-Cable Output",
-    "BlackHole 2ch",
-    "Loopback Audio",
-    "Voicemeeter Output",
-    "Soundflower (2ch)",
-    "openhear-virtual",
-    "alsa_output.OpenHear-virtual.monitor",
-    "null sink",
-])
+@pytest.mark.parametrize(
+    "name",
+    [
+        "VB-Audio Virtual Cable",
+        "VB-Cable Output",
+        "BlackHole 2ch",
+        "Loopback Audio",
+        "Voicemeeter Output",
+        "Soundflower (2ch)",
+        "openhear-virtual",
+        "alsa_output.OpenHear-virtual.monitor",
+        "null sink",
+    ],
+)
 def test_is_virtual_positive(name):
     assert _is_virtual(name) is True
 
 
-@pytest.mark.parametrize("name", [
-    "Built-in Microphone",
-    "Realtek HD",
-    "USB Audio CODEC",
-])
+@pytest.mark.parametrize(
+    "name",
+    [
+        "Built-in Microphone",
+        "Realtek HD",
+        "USB Audio CODEC",
+    ],
+)
 def test_is_virtual_negative(name):
     assert _is_virtual(name) is False
 
@@ -64,12 +70,24 @@ class _FakePyAudio:
 
 def test_detect_virtual_cables_finds_input_and_output():
     devices = [
-        {"name": "VB-Cable", "maxOutputChannels": 2,
-         "maxInputChannels": 2, "defaultSampleRate": 48000.0},
-        {"name": "Built-in", "maxOutputChannels": 2,
-         "maxInputChannels": 0, "defaultSampleRate": 48000.0},
-        {"name": "alsa_output.openhear.monitor", "maxOutputChannels": 0,
-         "maxInputChannels": 1, "defaultSampleRate": 16000.0},
+        {
+            "name": "VB-Cable",
+            "maxOutputChannels": 2,
+            "maxInputChannels": 2,
+            "defaultSampleRate": 48000.0,
+        },
+        {
+            "name": "Built-in",
+            "maxOutputChannels": 2,
+            "maxInputChannels": 0,
+            "defaultSampleRate": 48000.0,
+        },
+        {
+            "name": "alsa_output.openhear.monitor",
+            "maxOutputChannels": 0,
+            "maxInputChannels": 1,
+            "defaultSampleRate": 16000.0,
+        },
     ]
     pa = _FakePyAudio(devices)
     cables = detect_virtual_cables(pa=pa)
@@ -140,7 +158,8 @@ class TestBestVirtualCable:
 
     def test_uses_detect_when_no_cables_given(self, monkeypatch):
         monkeypatch.setattr(
-            virtual_cable, "detect_virtual_cables",
+            virtual_cable,
+            "detect_virtual_cables",
             lambda: [VirtualCable(7, "VB-Cable", "input", 48000.0)],
         )
         pick = best_virtual_cable("input")
@@ -162,7 +181,8 @@ class TestMainCli:
 
     def test_list_prints_table(self, monkeypatch, capsys):
         monkeypatch.setattr(
-            virtual_cable, "detect_virtual_cables",
+            virtual_cable,
+            "detect_virtual_cables",
             lambda: [
                 VirtualCable(1, "VB-Cable", "output", 48000.0),
                 VirtualCable(2, "BlackHole", "input", 48000.0),
@@ -176,7 +196,8 @@ class TestMainCli:
 
     def test_best_returns_index(self, monkeypatch, capsys):
         monkeypatch.setattr(
-            virtual_cable, "detect_virtual_cables",
+            virtual_cable,
+            "detect_virtual_cables",
             lambda: [VirtualCable(9, "VB-Cable", "output", 48000.0)],
         )
         rc = main(["--best", "output"])

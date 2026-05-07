@@ -68,9 +68,7 @@ def load_audiogram(path: str) -> dict:
 
     missing = _REQUIRED_FIELDS - set(data.keys())
     if missing:
-        raise ValueError(
-            f"Audiogram file is missing required fields: {', '.join(sorted(missing))}"
-        )
+        raise ValueError(f"Audiogram file is missing required fields: {', '.join(sorted(missing))}")
 
     if data.get("format_version") != "openhear-audiogram-v1":
         raise ValueError(
@@ -85,8 +83,7 @@ def load_audiogram(path: str) -> dict:
         for entry in ear["thresholds"]:
             if "freq_hz" not in entry or "db_hl" not in entry:
                 raise ValueError(
-                    f"Each threshold entry in '{ear_key}' must have "
-                    "'freq_hz' and 'db_hl' fields."
+                    f"Each threshold entry in '{ear_key}' must have 'freq_hz' and 'db_hl' fields."
                 )
 
     return data
@@ -107,9 +104,7 @@ def get_thresholds(audiogram: dict, ear: str) -> list[tuple[int, int]]:
     """
     ear_key = _resolve_ear_key(ear)
     thresholds = audiogram[ear_key]["thresholds"]
-    return sorted(
-        (int(t["freq_hz"]), int(t["db_hl"])) for t in thresholds
-    )
+    return sorted((int(t["freq_hz"]), int(t["db_hl"])) for t in thresholds)
 
 
 def get_pta(audiogram: dict, ear: str) -> float:
@@ -195,10 +190,7 @@ def get_gain_profile(audiogram: dict, ear: str) -> list[tuple[int, int]]:
         Sorted list of ``(freq_hz, gain_db)`` tuples.
     """
     thresholds = get_thresholds(audiogram, ear)
-    return [
-        (freq, max(0, db - _NORMAL_THRESHOLD_DB))
-        for freq, db in thresholds
-    ]
+    return [(freq, max(0, db - _NORMAL_THRESHOLD_DB)) for freq, db in thresholds]
 
 
 def compare_audiograms(path_a: str, path_b: str) -> dict:
@@ -233,9 +225,7 @@ def compare_audiograms(path_a: str, path_b: str) -> dict:
         thresh_a = dict(get_thresholds(ag_a, ear))
         thresh_b = dict(get_thresholds(ag_b, ear))
         common_freqs = sorted(set(thresh_a.keys()) & set(thresh_b.keys()))
-        result[ear] = [
-            (freq, thresh_b[freq] - thresh_a[freq]) for freq in common_freqs
-        ]
+        result[ear] = [(freq, thresh_b[freq] - thresh_a[freq]) for freq in common_freqs]
 
         pta_a: Optional[float] = None
         pta_b: Optional[float] = None
@@ -284,8 +274,7 @@ def _normalise_legacy_audiogram(data: dict) -> dict:
     missing_ears = {"left", "right"} - set(audiogram.keys())
     if missing_ears:
         raise ValueError(
-            "Legacy audiogram file is missing ear data for: "
-            f"{', '.join(sorted(missing_ears))}"
+            f"Legacy audiogram file is missing ear data for: {', '.join(sorted(missing_ears))}"
         )
 
     normalised = {

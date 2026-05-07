@@ -37,7 +37,13 @@ from audiogram.audiogram import Audiogram
 # Frequencies prescribed by this module.  Aligned with the four-band
 # WDRC layout and standard audiometric points.
 PRESCRIPTION_FREQUENCIES_HZ: tuple[int, ...] = (
-    250, 500, 1000, 2000, 4000, 6000, 8000,
+    250,
+    500,
+    1000,
+    2000,
+    4000,
+    6000,
+    8000,
 )
 
 # Heuristic constant from Byrne/Dillon NAL-R: roughly 0.31 of the
@@ -130,6 +136,7 @@ def _interpolate_threshold(
         return thresholds[sorted_freqs[-1]]
     # Linear interpolation in log-frequency.
     import math
+
     lower = max(f for f in sorted_freqs if f <= freq)
     upper = min(f for f in sorted_freqs if f >= freq)
     if lower == upper:
@@ -209,13 +216,15 @@ def _prescribe_ear(thresholds: dict[int, float]) -> list[BandPrescription]:
         thr = _interpolate_threshold(thresholds, freq)
         if thr is None:
             continue
-        bands.append(BandPrescription(
-            freq_hz=freq,
-            threshold_db_hl=float(thr),
-            gain_db=_band_gain(freq, thr, pta),
-            ratio=_ratio_for(thr),
-            knee_dbfs=knee,
-        ))
+        bands.append(
+            BandPrescription(
+                freq_hz=freq,
+                threshold_db_hl=float(thr),
+                gain_db=_band_gain(freq, thr, pta),
+                ratio=_ratio_for(thr),
+                knee_dbfs=knee,
+            )
+        )
     return bands
 
 

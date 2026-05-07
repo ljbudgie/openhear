@@ -32,7 +32,11 @@ class TestCalculateMpo:
     def test_returns_expected_keys(self, burgess_audiogram_path):
         result = calculate_mpo(burgess_audiogram_path, ear="right")
         assert set(result.keys()) == {
-            "ear", "safety_margin_db", "pta", "severity", "frequencies",
+            "ear",
+            "safety_margin_db",
+            "pta",
+            "severity",
+            "frequencies",
         }
 
     def test_per_frequency_keys(self, burgess_audiogram_path):
@@ -40,9 +44,13 @@ class TestCalculateMpo:
         assert len(result["frequencies"]) > 0
         freq_entry = result["frequencies"][0]
         expected_keys = {
-            "freq_hz", "threshold_db", "estimated_ucl_db",
-            "recommended_mpo_db", "zener_voltage",
-            "series_resistor_ohms", "expected_clamping_spl",
+            "freq_hz",
+            "threshold_db",
+            "estimated_ucl_db",
+            "recommended_mpo_db",
+            "zener_voltage",
+            "series_resistor_ohms",
+            "expected_clamping_spl",
         }
         assert set(freq_entry.keys()) == expected_keys
 
@@ -74,6 +82,4 @@ class TestCalculateMpo:
     def test_zener_voltages_are_standard(self, burgess_audiogram_path):
         result = calculate_mpo(burgess_audiogram_path, ear="right")
         for entry in result["frequencies"]:
-            assert entry["zener_voltage"] == _nearest_standard_zener(
-                entry["zener_voltage"] + 1e-9
-            )
+            assert entry["zener_voltage"] == _nearest_standard_zener(entry["zener_voltage"] + 1e-9)

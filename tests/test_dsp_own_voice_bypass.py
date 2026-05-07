@@ -53,7 +53,7 @@ class TestDetection:
     def test_noise_without_periodicity_not_detected(self):
         b = OwnVoiceBypass(energy_threshold_dbfs=-40.0)
         rng = np.random.default_rng(123)
-        noise = (rng.standard_normal(2048).astype(np.float32) * 0.3)
+        noise = rng.standard_normal(2048).astype(np.float32) * 0.3
         # White noise should not pass the periodicity check.
         assert b._detect(noise) is False
 
@@ -98,7 +98,8 @@ class TestProcess:
 
     def test_own_voice_attenuated(self):
         b = OwnVoiceBypass(
-            hysteresis_frames=1, bypass_gain=0.5,
+            hysteresis_frames=1,
+            bypass_gain=0.5,
             energy_threshold_dbfs=-20.0,
         )
         voice_like = _tone(150.0, amplitude=0.5)

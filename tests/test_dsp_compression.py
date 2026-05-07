@@ -119,7 +119,7 @@ class TestBlockBasedBehaviour:
         """A block whose peak is well below the knee must pass through at unity gain."""
         # Knee at −10 dBFS; input at ~0.01 (≈ −40 dBFS), safely below knee.
         c = _make_compressor(knee_dbfs=-10.0)
-        quiet = (0.01 * np.ones(256, dtype=np.float32))
+        quiet = 0.01 * np.ones(256, dtype=np.float32)
         out = c.process(quiet)
         np.testing.assert_allclose(out, quiet, atol=1e-6)
 

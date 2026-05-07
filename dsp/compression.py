@@ -97,13 +97,11 @@ class WDRCompressor:
         # ── 2. Update envelope follower once per block ──────────────────────
         if block_peak > self._envelope:
             self._envelope = (
-                self._attack_coeff * self._envelope
-                + (1.0 - self._attack_coeff) * block_peak
+                self._attack_coeff * self._envelope + (1.0 - self._attack_coeff) * block_peak
             )
         else:
             self._envelope = (
-                self._release_coeff * self._envelope
-                + (1.0 - self._release_coeff) * block_peak
+                self._release_coeff * self._envelope + (1.0 - self._release_coeff) * block_peak
             )
         # Guard against log(0) — maintain a small positive floor.
         self._envelope = max(self._envelope, 1e-10)

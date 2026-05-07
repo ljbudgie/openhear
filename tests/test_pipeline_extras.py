@@ -76,12 +76,17 @@ def test_demo_bypass_round_trips_wave_file(tmp_path: Path):
     out_path = tmp_path / "out.wav"
     _write_wav_file(in_path, sig, sr)
 
-    rc = demo.main([
-        "--input", str(in_path),
-        "--output", str(out_path),
-        "--bypass",
-        "--config", str(Path(__file__).resolve().parent.parent / "examples" / "config.yaml"),
-    ])
+    rc = demo.main(
+        [
+            "--input",
+            str(in_path),
+            "--output",
+            str(out_path),
+            "--bypass",
+            "--config",
+            str(Path(__file__).resolve().parent.parent / "examples" / "config.yaml"),
+        ]
+    )
     assert rc == 0
     assert out_path.exists()
 
@@ -104,12 +109,18 @@ def test_demo_processes_wave_file_through_chain(tmp_path: Path):
     out_path = tmp_path / "out.wav"
     _write_wav_file(in_path, sig, sr)
 
-    rc = demo.main([
-        "--input", str(in_path),
-        "--output", str(out_path),
-        "--block-size", "256",
-        "--config", str(Path(__file__).resolve().parent.parent / "examples" / "config.yaml"),
-    ])
+    rc = demo.main(
+        [
+            "--input",
+            str(in_path),
+            "--output",
+            str(out_path),
+            "--block-size",
+            "256",
+            "--config",
+            str(Path(__file__).resolve().parent.parent / "examples" / "config.yaml"),
+        ]
+    )
     assert rc == 0
     with wave.open(str(out_path), "rb") as wf:
         assert wf.getframerate() == sr
@@ -124,9 +135,14 @@ def test_demo_missing_config_returns_error(tmp_path: Path):
     out_path = tmp_path / "out.wav"
     _write_wav_file(in_path, np.zeros(1024, dtype=np.float32), 16_000)
 
-    rc = demo.main([
-        "--input", str(in_path),
-        "--output", str(out_path),
-        "--config", str(tmp_path / "nope.yaml"),
-    ])
+    rc = demo.main(
+        [
+            "--input",
+            str(in_path),
+            "--output",
+            str(out_path),
+            "--config",
+            str(tmp_path / "nope.yaml"),
+        ]
+    )
     assert rc != 0

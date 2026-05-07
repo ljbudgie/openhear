@@ -157,13 +157,15 @@ class Config:
         if data is None:
             return cls()
         if not isinstance(data, Mapping):
-            raise ValueError(
-                f"Config root must be a mapping, got {type(data).__name__}."
-            )
+            raise ValueError(f"Config root must be a mapping, got {type(data).__name__}.")
 
         known = {
-            "audiogram_path", "compression", "noise",
-            "voice", "beamforming", "system",
+            "audiogram_path",
+            "compression",
+            "noise",
+            "voice",
+            "beamforming",
+            "system",
         }
         for key in data.keys():
             if key not in known:
@@ -235,8 +237,7 @@ def _load_yaml(text: str, target: Path) -> Any:
         import yaml  # type: ignore[import-untyped]
     except ImportError as exc:
         raise RuntimeError(
-            f"Cannot load YAML config {target}: install PyYAML "
-            "(pip install pyyaml)."
+            f"Cannot load YAML config {target}: install PyYAML (pip install pyyaml)."
         ) from exc
     return yaml.safe_load(text) or {}
 
@@ -246,16 +247,15 @@ def _section(cls: type, data: Any) -> Any:
     if data is None:
         return cls()
     if not isinstance(data, Mapping):
-        raise ValueError(
-            f"{cls.__name__} section must be a mapping, got "
-            f"{type(data).__name__}."
-        )
+        raise ValueError(f"{cls.__name__} section must be a mapping, got {type(data).__name__}.")
     valid_fields = {f for f in cls.__dataclass_fields__}
     filtered = {k: v for k, v in data.items() if k in valid_fields}
     for key in data.keys():
         if key not in valid_fields:
             logger.warning(
-                "Ignoring unknown %s key: %r", cls.__name__, key,
+                "Ignoring unknown %s key: %r",
+                cls.__name__,
+                key,
             )
     return cls(**filtered)
 
@@ -265,25 +265,16 @@ def _voice_section(data: Any) -> VoiceConfig:
     if data is None:
         return VoiceConfig()
     if not isinstance(data, Mapping):
-        raise ValueError(
-            f"voice section must be a mapping, got {type(data).__name__}."
-        )
+        raise ValueError(f"voice section must be a mapping, got {type(data).__name__}.")
     boost_hz = data.get("boost_hz", VoiceConfig.boost_hz)
     if isinstance(boost_hz, (list, tuple)):
         if len(boost_hz) != 2:
-            raise ValueError(
-                "voice.boost_hz must be a 2-element list [low_hz, high_hz]."
-            )
+            raise ValueError("voice.boost_hz must be a 2-element list [low_hz, high_hz].")
         boost_hz = (float(boost_hz[0]), float(boost_hz[1]))
         if boost_hz[0] >= boost_hz[1]:
-            raise ValueError(
-                "voice.boost_hz low edge must be strictly below high edge."
-            )
+            raise ValueError("voice.boost_hz low edge must be strictly below high edge.")
     else:
-        raise ValueError(
-            "voice.boost_hz must be a list/tuple, got "
-            f"{type(boost_hz).__name__}."
-        )
+        raise ValueError(f"voice.boost_hz must be a list/tuple, got {type(boost_hz).__name__}.")
     return VoiceConfig(
         boost_hz=boost_hz,
         boost_db=float(data.get("boost_db", VoiceConfig.boost_db)),
@@ -295,9 +286,7 @@ def _system_section(data: Any) -> SystemConfig:
     if data is None:
         return SystemConfig()
     if not isinstance(data, Mapping):
-        raise ValueError(
-            f"system section must be a mapping, got {type(data).__name__}."
-        )
+        raise ValueError(f"system section must be a mapping, got {type(data).__name__}.")
     sample_rate = int(data.get("sample_rate", SystemConfig.sample_rate))
     buffer_size = int(data.get("buffer_size", SystemConfig.buffer_size))
     if sample_rate <= 0:

@@ -82,8 +82,8 @@ def parse_audiogram_response(raw: bytes) -> dict:
     # Byte 10..17 = right ear thresholds.
     # This layout is fictional — replace with real HIMSA offsets.
     n = len(STANDARD_FREQUENCIES_HZ)
-    left_bytes = raw[2: 2 + n]
-    right_bytes = raw[2 + n: 2 + 2 * n]
+    left_bytes = raw[2 : 2 + n]
+    right_bytes = raw[2 + n : 2 + 2 * n]
 
     for i, freq in enumerate(STANDARD_FREQUENCIES_HZ):
         thresholds["left"][freq] = float(left_bytes[i]) if i < len(left_bytes) else 0.0
@@ -110,21 +110,26 @@ def read_audiogram(device: hid.device) -> dict:
 
 def main() -> None:
     """CLI entry point."""
-    logging.basicConfig(level=logging.INFO,
-                        format="%(levelname)s %(name)s: %(message)s")
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 
     parser = argparse.ArgumentParser(
         description="Read audiogram thresholds from Noahlink Wireless 2."
     )
     parser.add_argument(
-        "--output", "-o", default="audiogram.json",
+        "--output",
+        "-o",
+        default="audiogram.json",
         help="Output JSON file path (default: audiogram.json).",
     )
     parser.add_argument(
-        "--vendor-id", type=lambda x: int(x, 0), default=NOAHLINK_VENDOR_ID,
+        "--vendor-id",
+        type=lambda x: int(x, 0),
+        default=NOAHLINK_VENDOR_ID,
     )
     parser.add_argument(
-        "--product-id", type=lambda x: int(x, 0), default=NOAHLINK_PRODUCT_ID,
+        "--product-id",
+        type=lambda x: int(x, 0),
+        default=NOAHLINK_PRODUCT_ID,
     )
     args = parser.parse_args()
 

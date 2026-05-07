@@ -38,6 +38,7 @@ from voice import config
 
 # ── Data structures ──────────────────────────────────────────────────────────
 
+
 @dataclass
 class VoiceSnapshot:
     """A single frame of vocal analysis data.
@@ -59,17 +60,17 @@ class VoiceSnapshot:
                                 mean a clearer, more periodic voice signal.
         energy_db:              RMS energy of the frame in dBFS.
     """
+
     timestamp: float = 0.0
     fundamental_frequency_hz: float = 0.0
     formants: list[float] = field(default_factory=list)
-    spectral_envelope: np.ndarray = field(
-        default_factory=lambda: np.array([], dtype=np.float32)
-    )
+    spectral_envelope: np.ndarray = field(default_factory=lambda: np.array([], dtype=np.float32))
     hnr_db: float = 0.0
     energy_db: float = -100.0
 
 
 # ── Internal helpers ─────────────────────────────────────────────────────────
+
 
 def _bytes_to_float32(raw: bytes) -> np.ndarray:
     """Convert raw int16 PCM bytes to normalised float32 [-1.0, 1.0]."""
@@ -80,7 +81,7 @@ def _bytes_to_float32(raw: bytes) -> np.ndarray:
 
 def _rms_db(samples: np.ndarray) -> float:
     """Return RMS energy in dBFS, floored at -100 dB."""
-    rms = np.sqrt(np.mean(samples ** 2))
+    rms = np.sqrt(np.mean(samples**2))
     if rms < 1e-10:
         return -100.0
     return float(20.0 * np.log10(rms))
@@ -97,8 +98,9 @@ def _spectral_envelope(magnitude: np.ndarray, smooth_width: int = 15) -> np.ndar
     return (20.0 * np.log10(smoothed)).astype(np.float32)
 
 
-def _find_fundamental(magnitude: np.ndarray, freqs: np.ndarray,
-                      low_hz: float = 50.0, high_hz: float = 500.0) -> float:
+def _find_fundamental(
+    magnitude: np.ndarray, freqs: np.ndarray, low_hz: float = 50.0, high_hz: float = 500.0
+) -> float:
     """Estimate the fundamental frequency (F0) as the strongest peak in the
     *low_hz*–*high_hz* range of the magnitude spectrum.
 
@@ -115,8 +117,9 @@ def _find_fundamental(magnitude: np.ndarray, freqs: np.ndarray,
     return float(freqs[peak_bin])
 
 
-def _find_formants(envelope_db: np.ndarray, freqs: np.ndarray,
-                   n_formants: int, min_freq: float = 200.0) -> list[float]:
+def _find_formants(
+    envelope_db: np.ndarray, freqs: np.ndarray, n_formants: int, min_freq: float = 200.0
+) -> list[float]:
     """Extract formant frequencies from the spectral envelope.
 
     Uses SciPy peak detection on the dB envelope, filtered to frequencies
@@ -133,9 +136,7 @@ def _find_formants(envelope_db: np.ndarray, freqs: np.ndarray,
     freq_resolution = freqs[1] - freqs[0] if len(freqs) > 1 else 1.0
     min_distance = max(1, int(100.0 / freq_resolution))
 
-    peak_indices, properties = find_peaks(
-        envelope_db, prominence=3.0, distance=min_distance
-    )
+    peak_indices, properties = find_peaks(envelope_db, prominence=3.0, distance=min_distance)
 
     # Filter to valid frequency range.
     peak_indices = peak_indices[valid[peak_indices]]
@@ -146,13 +147,9 @@ def _find_formants(envelope_db: np.ndarray, freqs: np.ndarray,
     # re-sort by frequency for conventional F1 < F2 < F3 ordering.
     prominences = properties["prominences"]
     # Re-index prominences to match filtered peaks.
-    orig_indices = np.where(np.isin(
-        np.arange(len(envelope_db)),
-        peak_indices
-    ))[0]
+    orig_indices = np.where(np.isin(np.arange(len(envelope_db)), peak_indices))[0]
     # Rebuild prominences for filtered set.
-    all_peak_indices_list = list(find_peaks(envelope_db, prominence=3.0,
-                                           distance=min_distance)[0])
+    all_peak_indices_list = list(find_peaks(envelope_db, prominence=3.0, distance=min_distance)[0])
     filtered_prominences = []
     for pi in peak_indices:
         if pi in all_peak_indices_list:
@@ -194,7 +191,7 @@ def _compute_hnr(samples: np.ndarray, sample_rate: int) -> float:
     if min_lag >= max_lag:
         return 0.0
 
-    search_region = acf[min_lag:max_lag + 1]
+    search_region = acf[min_lag : max_lag + 1]
     if len(search_region) == 0:
         return 0.0
 
@@ -211,9 +208,12 @@ def _compute_hnr(samples: np.ndarray, sample_rate: int) -> float:
 
 # ── Public API ───────────────────────────────────────────────────────────────
 
-def analyse_frame(samples: np.ndarray,
-                  sample_rate: int = config.SAMPLE_RATE,
-                  n_formants: int = config.FORMANT_PEAKS) -> VoiceSnapshot:
+
+def analyse_frame(
+    samples: np.ndarray,
+    sample_rate: int = config.SAMPLE_RATE,
+    n_formants: int = config.FORMANT_PEAKS,
+) -> VoiceSnapshot:
     """Analyse a single audio frame and return a VoiceSnapshot.
 
     This is the pure-computation entry point — it does not touch the
@@ -263,9 +263,11 @@ def analyse_frame(samples: np.ndarray,
     )
 
 
-def open_mic_stream(sample_rate: int = config.SAMPLE_RATE,
-                    frame_buffer: int = config.FRAME_BUFFER,
-                    device_index: int | None = config.MIC_DEVICE_INDEX):
+def open_mic_stream(
+    sample_rate: int = config.SAMPLE_RATE,
+    frame_buffer: int = config.FRAME_BUFFER,
+    device_index: int | None = config.MIC_DEVICE_INDEX,
+):
     """Open a PyAudio microphone input stream.
 
     Returns a (pyaudio_instance, stream) tuple.  The caller is responsible
@@ -305,10 +307,12 @@ def open_mic_stream(sample_rate: int = config.SAMPLE_RATE,
     return pa, stream
 
 
-def capture_snapshot(stream,
-                     sample_rate: int = config.SAMPLE_RATE,
-                     frame_buffer: int = config.FRAME_BUFFER,
-                     n_formants: int = config.FORMANT_PEAKS) -> VoiceSnapshot:
+def capture_snapshot(
+    stream,
+    sample_rate: int = config.SAMPLE_RATE,
+    frame_buffer: int = config.FRAME_BUFFER,
+    n_formants: int = config.FORMANT_PEAKS,
+) -> VoiceSnapshot:
     """Read one frame from *stream* and return a VoiceSnapshot.
 
     Args:

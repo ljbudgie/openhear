@@ -85,7 +85,7 @@ class TestSendCommand:
         # Leading byte is the HID report ID (0x00 on Windows).
         assert report[0] == 0x00
         # The payload begins immediately after the report ID byte.
-        assert report[1:1 + len(CMD_GET_FITTING)] == CMD_GET_FITTING
+        assert report[1 : 1 + len(CMD_GET_FITTING)] == CMD_GET_FITTING
 
     def test_truncates_oversized_command(self):
         device = _FakeHidDevice()
@@ -164,7 +164,7 @@ class TestReadFittingData:
         assert result["raw_payload"] == payload.hex()
         assert "timestamp" in result and result["timestamp"]
         # The fitting command must have been written verbatim (after report ID).
-        assert device.writes[0][1:1 + len(CMD_GET_FITTING)] == CMD_GET_FITTING
+        assert device.writes[0][1 : 1 + len(CMD_GET_FITTING)] == CMD_GET_FITTING
 
     def test_logs_payload_at_debug(self, caplog):
         device = _FakeHidDevice(responses=[bytes([0xAB, 0xCD])])
@@ -235,9 +235,12 @@ class TestMainCli:
             "sys.argv",
             [
                 "read_fitting",
-                "--output", str(tmp_path / "f.json"),
-                "--vendor-id", "0x1234",
-                "--product-id", "0x5678",
+                "--output",
+                str(tmp_path / "f.json"),
+                "--vendor-id",
+                "0x1234",
+                "--product-id",
+                "0x5678",
             ],
         )
         main()

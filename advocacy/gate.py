@@ -48,6 +48,7 @@ ReviewTag = str
 
 # ── Public dataclasses ─────────────────────────────────────────────────────
 
+
 @dataclass(frozen=True)
 class Commitment:
     """A SHA‑256 commitment over a sovereign record.
@@ -60,9 +61,9 @@ class Commitment:
 
     record_id: str
     label: str
-    digest: str                # hex‑encoded SHA‑256
+    digest: str  # hex‑encoded SHA‑256
     tags: tuple[str, ...]
-    created_at: str            # ISO‑8601 UTC
+    created_at: str  # ISO‑8601 UTC
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -90,10 +91,10 @@ class Receipt:
 
     record_id: str
     digest: str
-    signature: str             # opaque to this module; verified by caller
-    reviewer: str              # free‑text identifier (name, role, or "automated")
+    signature: str  # opaque to this module; verified by caller
+    reviewer: str  # free‑text identifier (name, role, or "automated")
     human_review_claimed: bool
-    received_at: str           # ISO‑8601 UTC
+    received_at: str  # ISO‑8601 UTC
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -154,9 +155,7 @@ def hmac_verifier(key: bytes) -> Verifier:
     key_bytes = bytes(key)
 
     def _verify(digest: str, signature: str) -> bool:
-        expected = hmac.new(
-            key_bytes, digest.encode("ascii"), hashlib.sha256
-        ).hexdigest()
+        expected = hmac.new(key_bytes, digest.encode("ascii"), hashlib.sha256).hexdigest()
         # ``compare_digest`` defends against timing attacks even though
         # the signatures we compare here are already digests.
         return hmac.compare_digest(expected, signature)
@@ -165,6 +164,7 @@ def hmac_verifier(key: bytes) -> Verifier:
 
 
 # ── Canonical serialisation ────────────────────────────────────────────────
+
 
 def _canonical_json(facts: Mapping[str, Any]) -> bytes:
     """Stable, sorted JSON bytes suitable for hashing.
@@ -194,8 +194,8 @@ def _utc_now_iso() -> str:
 
 # ── Module‑level convenience API ───────────────────────────────────────────
 
-def commit(label: str, facts: Mapping[str, Any],
-           tags: Iterable[str] | None = None) -> Commitment:
+
+def commit(label: str, facts: Mapping[str, Any], tags: Iterable[str] | None = None) -> Commitment:
     """Produce a :class:`Commitment` over ``facts``.
 
     This is the primitive Iris's ``personGate.commit`` documents.
@@ -222,8 +222,7 @@ def commit(label: str, facts: Mapping[str, Any],
     )
 
 
-def verify(commitment: Commitment, receipt: Receipt,
-           verifier: Verifier) -> bool:
+def verify(commitment: Commitment, receipt: Receipt, verifier: Verifier) -> bool:
     """Return ``True`` iff ``receipt`` is a valid response to ``commitment``.
 
     A receipt is valid when (a) it references the same ``record_id``
@@ -242,6 +241,7 @@ def verify(commitment: Commitment, receipt: Receipt,
 
 
 # ── Stateful gate ──────────────────────────────────────────────────────────
+
 
 class PersonGate:
     """In‑memory sovereign‑record store.
@@ -270,8 +270,9 @@ class PersonGate:
 
     # ---- mutation ---------------------------------------------------------
 
-    def commit(self, label: str, facts: Mapping[str, Any],
-               tags: Iterable[str] | None = None) -> Commitment:
+    def commit(
+        self, label: str, facts: Mapping[str, Any], tags: Iterable[str] | None = None
+    ) -> Commitment:
         """Create a local record and return its commitment."""
 
         c = commit(label, facts, tags=tags)
@@ -290,9 +291,7 @@ class PersonGate:
         """
 
         if self._verifier is None:
-            raise ValueError(
-                "PersonGate has no verifier configured; cannot tag receipts"
-            )
+            raise ValueError("PersonGate has no verifier configured; cannot tag receipts")
         if record_id not in self._records:
             raise KeyError(record_id)
 

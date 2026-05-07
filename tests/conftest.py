@@ -21,6 +21,7 @@ if str(_REPO_ROOT) not in sys.path:
 def _install_hid_stub() -> None:
     try:
         import hid as _real_hid  # noqa: F401
+
         if hasattr(_real_hid, "device"):
             return
     except Exception:  # pragma: no cover - defensive: covers ImportError + load failures
@@ -63,6 +64,7 @@ def _install_pyaudio_stub() -> None:
         return
     try:
         import pyaudio as _real  # type: ignore  # noqa: F401
+
         return
     except Exception:  # pragma: no cover - defensive
         pass
@@ -98,8 +100,10 @@ def _install_pyaudio_stub() -> None:
 
         def get_device_info_by_index(self, i):
             return {
-                "name": "stub", "maxOutputChannels": 0,
-                "maxInputChannels": 0, "defaultSampleRate": 16_000,
+                "name": "stub",
+                "maxOutputChannels": 0,
+                "maxInputChannels": 0,
+                "defaultSampleRate": 16_000,
             }
 
     mod.PyAudio = _DummyPyAudio

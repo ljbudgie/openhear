@@ -68,8 +68,12 @@ class MetricsLogger:
     _writer: csv.writer | None = field(default=None, init=False, repr=False)
 
     HEADER: tuple[str, ...] = (
-        "timestamp", "block_seconds", "process_seconds",
-        "latency_ms", "cpu_percent", "rms_dbfs",
+        "timestamp",
+        "block_seconds",
+        "process_seconds",
+        "latency_ms",
+        "cpu_percent",
+        "rms_dbfs",
     )
 
     def __post_init__(self) -> None:
@@ -127,9 +131,7 @@ class MetricsLogger:
         if sample_rate <= 0:
             raise ValueError(f"sample_rate must be positive, got {sample_rate}.")
         if block_samples <= 0:
-            raise ValueError(
-                f"block_samples must be positive, got {block_samples}."
-            )
+            raise ValueError(f"block_samples must be positive, got {block_samples}.")
 
         block_seconds = block_samples / sample_rate
         latency_ms = block_seconds * 1000.0 + extra_latency_ms
@@ -153,14 +155,16 @@ class MetricsLogger:
                 "MetricsLogger.log_block() called before open().  "
                 "Use the context manager or call .open() first."
             )
-        self._writer.writerow([
-            f"{row.timestamp:.6f}",
-            f"{row.block_seconds:.6f}",
-            f"{row.process_seconds:.6f}",
-            f"{row.latency_ms:.3f}",
-            f"{row.cpu_percent:.4f}",
-            f"{row.rms_dbfs:.2f}",
-        ])
+        self._writer.writerow(
+            [
+                f"{row.timestamp:.6f}",
+                f"{row.block_seconds:.6f}",
+                f"{row.process_seconds:.6f}",
+                f"{row.latency_ms:.3f}",
+                f"{row.cpu_percent:.4f}",
+                f"{row.rms_dbfs:.2f}",
+            ]
+        )
         if self.keep_in_memory:
             self.rows.append(row)
         return row
@@ -172,8 +176,4 @@ def format_dashboard_line(row: MetricsRow) -> str:
     Useful for ``dsp.pipeline --metrics-dashboard`` mode.
     """
     cpu_pct = row.cpu_percent * 100.0
-    return (
-        f"latency={row.latency_ms:6.2f} ms  "
-        f"CPU={cpu_pct:5.1f}%  "
-        f"level={row.rms_dbfs:6.1f} dBFS"
-    )
+    return f"latency={row.latency_ms:6.2f} ms  CPU={cpu_pct:5.1f}%  level={row.rms_dbfs:6.1f} dBFS"

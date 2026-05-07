@@ -146,8 +146,6 @@ def _find_formants(
     # Sort by prominence (strongest first), take top n_formants, then
     # re-sort by frequency for conventional F1 < F2 < F3 ordering.
     prominences = properties["prominences"]
-    # Re-index prominences to match filtered peaks.
-    orig_indices = np.where(np.isin(np.arange(len(envelope_db)), peak_indices))[0]
     # Rebuild prominences for filtered set.
     all_peak_indices_list = list(find_peaks(envelope_db, prominence=3.0, distance=min_distance)[0])
     filtered_prominences = []

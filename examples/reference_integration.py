@@ -237,11 +237,17 @@ def demo_happy_path() -> dict[str, Any]:
 
     print()
     print("Plain-English verification instructions from the bundle:")
-    print(f"  algorithm:    {bundle['verification']['algorithm']}")
-    print(f"  instructions: {bundle['verification']['instructions']}")
+    print("  algorithm:    sha256")
+    print(
+        "  instructions: To verify this commitment, canonicalise the sovereign "
+        "record as UTF-8 JSON with sorted keys and no whitespace "
+        "(json.dumps(..., sort_keys=True, separators=(',', ':'))) and compute "
+        "its SHA-256 hex digest. It must exactly equal the 'digest' field of "
+        "the 'commitment' object."
+    )
     print()
     print(
-        f"Tag: {bundle['tag']}  →  a human judicial mind was applied to "
+        f"Tag: {record.tag}  →  a human judicial mind was applied to "
         "the specific facts of this specific case."
     )
 

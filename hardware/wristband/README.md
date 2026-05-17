@@ -21,6 +21,17 @@ For complete beginners, start with [`v1.5-no-solder/`](v1.5-no-solder/): the Mod
 
 Compact v1 remains the advanced/smallest option for experienced builders.
 
+## v2 Premium Slim Edition (XIAO nRF52840)
+
+For daily wear, see [`v2-xiao-nrf52840/`](v2-xiao-nrf52840/): the slim,
+Apple-Watch-Ultra / Whoop-4.0-style build on the Seeed Studio XIAO nRF52840
+(Sense). Rectangular 44 x 38 mm case, <= 12 mm thick, 2-4 LRA actuators,
+thin 300-500 mAh LiPo, magnetic pogo charging, 20-22 mm quick-release lugs
+for community Apple-Watch-style TPU bands. Same 3-byte BLE packet contract
+and same YAMNet 7-class pipeline as v1; nothing else in the repo changes.
+micro:bit v2, ESP32-S3, and RP2040 builds remain fully supported as legacy
+options.
+
 ## Aids-free wristband v1 DIY prototype assets
 
 The v1 directory assets move the project toward `docs/AIDS_FREE_ARCHITECTURE.md`:

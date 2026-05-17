@@ -328,7 +328,3 @@ def _band_label(centres: Sequence[int], index: int) -> str:
     if 0 <= index < len(centres):
         return f"{centres[index]} Hz"
     return f"#{index}"
-
-
-# Sanity ensure exports are usable as Iterable[SafetyFlag] downstream:
-_FlagIter = Iterable[SafetyFlag]

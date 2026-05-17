@@ -17,7 +17,10 @@ This guide extends the v1 and v1.5-no-solder philosophy:
 ## 1. What you’ll print
 
 From `parametric_wristband_v2.scad`, generate two STLs by changing the
-`build_part` parameter:
+`build_part` parameter (or use the pre-oriented STLs in
+[`print_pack/stl/`](print_pack/stl/) and the one-page
+[`print_pack/PRINT_ME.md`](print_pack/PRINT_ME.md) if you just want to
+hand the files to a 3D-print service):
 
 ```bash
 # from hardware/wristband/v2-xiao-nrf52840/

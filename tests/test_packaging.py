@@ -63,10 +63,15 @@ def test_console_scripts_target_real_modules():
     scripts = data["project"]["scripts"]
     for name, target in scripts.items():
         module_path, _, attr = target.partition(":")
-        module_file = ROOT / Path(*module_path.split(".")).with_suffix(".py")
+        parts = module_path.split(".")
+        module_file = ROOT / Path(*parts).with_suffix(".py")
+        package_init = ROOT / Path(*parts) / "__init__.py"
+        if package_init.exists():
+            module_file = package_init
         assert module_file.exists(), (
             f"Script {name!r} points at {target!r} but "
-            f"{module_file.relative_to(ROOT)} does not exist."
+            f"neither {Path(*parts).with_suffix('.py')} nor "
+            f"{Path(*parts) / '__init__.py'} exists."
         )
         text = module_file.read_text(encoding="utf-8")
         assert f"def {attr}" in text, (

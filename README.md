@@ -149,7 +149,20 @@ and tune it with [`docs/TUNING_GUIDE.md`](docs/TUNING_GUIDE.md).
 
 ```bash
 python -m core.read_fitting --session --verbose
-python -m core.noahlink
+python -m core.noahlink enumerate
+```
+
+For the new versioned extraction workflow (schema-validated JSON,
+SHA-256 commitment, safety report, mock vendor adapters for development
+without hardware) see
+[`docs/NOAHLINK_EXTRACTION.md`](docs/NOAHLINK_EXTRACTION.md):
+
+```bash
+# Opt in to placeholder mock data — read the doc first.
+export OPENHEAR_ENABLE_PHONAK_MOCK=1
+python -m core.noahlink extract  --aid phonak --output fitting.json
+python -m core.noahlink backup   --aid phonak --output ./backups/
+python -m core.noahlink validate ./backups/*/extraction.json
 ```
 
 The Noahlink extraction path is still on a separate hardening track. Treat direct

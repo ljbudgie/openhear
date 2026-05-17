@@ -78,9 +78,9 @@ The sketch follows three rules to hit an all-day target on a 300–500 mAh cell:
 2. **`__WFE()` / `__SEV()` loop** when no BLE write has arrived for
    `IDLE_SLEEP_AFTER_MS` (8 s default). The nRF52840 BLE radio keeps
    advertising/listening in low-duty cycle.
-3. **TX power capped to −12 dBm** (`NimBLEDevice::setPower(ESP_PWR_LVL_N12)`
-   or `Bluefruit.setTxPower(-12)`). Companion is at arm’s length; full
-   +4 dBm is wasted current.
+3. **TX power capped to −12 dBm** (`NimBLEDevice::setPower(-12)` on
+   nRF52, or `Bluefruit.setTxPower(-12)`). Companion is at arm’s length;
+   full +4 dBm is wasted current.
 
 Optional next steps for power tuning:
 

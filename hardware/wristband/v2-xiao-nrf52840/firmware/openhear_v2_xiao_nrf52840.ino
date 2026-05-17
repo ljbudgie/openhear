@@ -197,7 +197,11 @@ class ConfigCallbacks : public NimBLECharacteristicCallbacks {
 
 static void ble_begin() {
     NimBLEDevice::init(DEVICE_NAME);
-    NimBLEDevice::setPower(ESP_PWR_LVL_N12);  // low TX power; companion is at arm's length
+    // Low TX power; companion is at arm's length. NimBLE-Arduino on nRF52
+    // accepts dBm directly (range roughly -40..+8). On the ESP32 build of
+    // NimBLE the same call accepts the ESP_PWR_LVL_* enum; using the dBm
+    // overload keeps this sketch platform-portable on the XIAO nRF52840.
+    NimBLEDevice::setPower(-12);
     NimBLEServer* server = NimBLEDevice::createServer();
     NimBLEService* svc   = server->createService(OPENHEAR_SVC_UUID);
 

@@ -63,7 +63,8 @@ class BackupArchive:
         )
 
 
-def _sha256_file(path: Path) -> str:
+def sha256_file(path: Path) -> str:
+    """Return the hex SHA-256 of the file at *path* (streaming, 64 KiB chunks)."""
     h = hashlib.sha256()
     with open(path, "rb") as fh:
         for chunk in iter(lambda: fh.read(64 * 1024), b""):
@@ -71,14 +72,22 @@ def _sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
-def _utc_now_iso() -> str:
+def utc_now_iso() -> str:
+    """Return the current UTC time as an ISO-8601 string."""
     return datetime.now(tz=timezone.utc).isoformat()
 
 
-def _safe_label(serial: str) -> str:
+def safe_label(serial: str) -> str:
     """Sanitise a serial number for use as a directory name."""
     safe = "".join(ch if ch.isalnum() or ch in "-_" else "_" for ch in serial)
     return safe or "unknown"
+
+
+# Backwards-compatible aliases for the previous private names; some
+# downstream tests historically reached in for these helpers.
+_sha256_file = sha256_file
+_utc_now_iso = utc_now_iso
+_safe_label = safe_label
 
 
 def write_backup(

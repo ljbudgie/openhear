@@ -27,7 +27,10 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import hid
+try:
+    import hid as hid  # noqa: PLC0414  (native hidapi may be missing outside tests)
+except Exception:  # pragma: no cover - depends on native libs
+    hid = None  # type: ignore[assignment]
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +75,7 @@ class NoahlinkDevice:
     product_id: int = NOAHLINK_PRODUCT_ID
     log_path: Path | None = None
     retries: int = 3
-    _device: hid.device | None = field(default=None, init=False, repr=False)
+    _device: "hid.device | None" = field(default=None, init=False, repr=False)
 
     # ------------------------------------------------------------------
 
@@ -81,6 +84,13 @@ class NoahlinkDevice:
 
         Returns ``self`` so the call can be chained.
         """
+        if hid is None:  # pragma: no cover - native hidapi missing
+            raise OSError(
+                "The native `hidapi` library is not available.  Install it "
+                "(`apt install libhidapi-hidraw0` or equivalent) before "
+                "talking to a Noahlink device."
+            )
+
         last_exc: Exception | None = None
         for attempt in range(1, max(1, self.retries) + 1):
             try:
@@ -195,6 +205,9 @@ def enumerate_devices() -> list[dict]:
     :func:`hid.enumerate` directly is the fastest way to confirm
     whether the OS sees the dongle at all.
     """
+    if hid is None:  # pragma: no cover - native hidapi missing
+        return []
+
     found = []
     for info in hid.enumerate():
         vid = info.get("vendor_id")
@@ -236,20 +249,29 @@ def sniff(
 # ── CLI ─────────────────────────────────────────────────────────────────────
 
 
-def main(argv: list[str] | None = None) -> int:  # pragma: no cover - hardware path
-    """CLI entry point: enumerate or sniff Noahlink traffic."""
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(levelname)s %(name)s: %(message)s",
-    )
+#: Banner shown before any output that came from a mock / unverified
+#: adapter, so users never mistake placeholder data for a real fitting.
+UNVERIFIED_BANNER: str = (
+    "*** UNVERIFIED MOCK DATA — DO NOT WRITE TO A REAL HEARING AID *** "
+    "OpenHear is not a medical device.  See docs/NOAHLINK_EXTRACTION.md."
+)
+
+
+def _build_parser() -> "argparse.ArgumentParser":
     parser = argparse.ArgumentParser(
+        prog="openhear-noahlink",
         description="Noahlink Wireless 2 HID wrapper utilities.",
     )
     sub = parser.add_subparsers(dest="cmd", required=True)
+
     sub.add_parser("enumerate", help="List Noahlink devices currently visible.")
+
     sniff_p = sub.add_parser("sniff", help="Record HID traffic to a log file.")
     sniff_p.add_argument(
-        "--duration", type=float, default=10.0, help="Seconds to listen (default: 10)."
+        "--duration",
+        type=float,
+        default=10.0,
+        help="Seconds to listen (default: 10).",
     )
     sniff_p.add_argument(
         "--log",
@@ -257,9 +279,180 @@ def main(argv: list[str] | None = None) -> int:  # pragma: no cover - hardware p
         default=DEFAULT_LOG_PATH,
         help=f"Log path (default: {DEFAULT_LOG_PATH}).",
     )
+
+    backup_p = sub.add_parser(
+        "backup",
+        help="Read a fitting and persist it as an openhear-extraction-v1 backup.",
+    )
+    backup_p.add_argument(
+        "--aid",
+        required=True,
+        help='Vendor adapter to use (e.g. "phonak").  See `--list-adapters`.',
+    )
+    backup_p.add_argument(
+        "--output",
+        type=Path,
+        required=True,
+        help="Directory under which a timestamped backup folder is created.",
+    )
+    backup_p.add_argument(
+        "--device-serial",
+        default="MOCK-PHONAK-000000",
+        help="Override the serial stored in the backup (mock adapter only).",
+    )
+    backup_p.add_argument(
+        "--list-adapters",
+        action="store_true",
+        help="List available vendor adapters and exit.",
+    )
+
+    extract_p = sub.add_parser(
+        "extract",
+        help="Read a fitting and write/print an openhear-extraction-v1 JSON.",
+    )
+    extract_p.add_argument("--aid", required=True, help='Vendor adapter (e.g. "phonak").')
+    extract_p.add_argument(
+        "--json",
+        action="store_true",
+        help="Print the JSON document to stdout (in addition to or instead of --output).",
+    )
+    extract_p.add_argument(
+        "--output",
+        type=Path,
+        default=None,
+        help="Optional path to write the JSON document.",
+    )
+    extract_p.add_argument(
+        "--device-serial",
+        default="MOCK-PHONAK-000000",
+        help="Override the serial stored in the document (mock adapter only).",
+    )
+
+    validate_p = sub.add_parser(
+        "validate",
+        help="Schema- and safety-check an existing extraction JSON file.",
+    )
+    validate_p.add_argument(
+        "path",
+        type=Path,
+        help="Path to a JSON file produced by `extract` or `backup`.",
+    )
+
+    return parser
+
+
+def _cmd_extract(args) -> int:
+    """Run a vendor adapter and emit an extraction JSON."""
+    extraction = _run_vendor_adapter(args.aid, device_serial=args.device_serial)
+
+    text = extraction.to_json(indent=2)
+    if args.output is not None:
+        Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+        Path(args.output).write_text(text, encoding="utf-8")
+        print(f"Wrote extraction to {args.output}")
+    if args.json or args.output is None:
+        print(text)
+
+    if not extraction.is_verified:
+        print(UNVERIFIED_BANNER, file=sys.stderr)
+    return 0
+
+
+def _cmd_backup(args) -> int:
+    """Run a vendor adapter and persist a full backup directory."""
+    from core.backup import safe_label, sha256_file, utc_now_iso
+
+    if args.list_adapters:
+        from core.noahlink.vendors import available_adapters
+
+        for name, desc in available_adapters().items():
+            print(f"{name}: {desc}")
+        return 0
+
+    extraction = _run_vendor_adapter(args.aid, device_serial=args.device_serial)
+
+    label = f"{safe_label(extraction.device.serial)}_{utc_now_iso().replace(':', '-')}"
+    backup_dir = Path(args.output) / label
+    backup_dir.mkdir(parents=True, exist_ok=True)
+
+    extraction_path = backup_dir / "extraction.json"
+    raw_path = backup_dir / "raw.bin"
+    manifest_path = backup_dir / "manifest.json"
+
+    extraction_path.write_text(extraction.to_json(indent=2), encoding="utf-8")
+    raw_bytes = bytes.fromhex(extraction.raw_payload_hex) if extraction.raw_payload_hex else b""
+    raw_path.write_bytes(raw_bytes)
+
+    import json as _json
+
+    manifest = {
+        "schema_version": "openhear-backup-v1",
+        "created_at": utc_now_iso(),
+        "extraction_schema_version": extraction.schema_version,
+        "vendor_adapter": extraction.vendor_adapter,
+        "is_verified": extraction.is_verified,
+        "device_serial": extraction.device.serial,
+        "extraction_filename": extraction_path.name,
+        "raw_filename": raw_path.name,
+        "extraction_sha256": sha256_file(extraction_path),
+        "raw_sha256": sha256_file(raw_path),
+        "raw_size_bytes": raw_path.stat().st_size,
+        "extraction_commitment_sha256": extraction.sha256_commitment(),
+    }
+    manifest_path.write_text(_json.dumps(manifest, indent=2), encoding="utf-8")
+
+    print(f"Wrote backup to {backup_dir}")
+    if not extraction.is_verified:
+        print(UNVERIFIED_BANNER, file=sys.stderr)
+    return 0
+
+
+def _cmd_validate(args) -> int:
+    """Schema + safety check an existing extraction JSON file."""
+    from core.safety import evaluate_extraction
+    from core.schema.extraction_v1 import ExtractedFitting
+
+    path = Path(args.path)
+    if not path.exists():
+        print(f"File not found: {path}", file=sys.stderr)
+        return 2
+    try:
+        extraction = ExtractedFitting.from_json(path.read_text(encoding="utf-8"))
+    except (ValueError, KeyError) as exc:
+        print(f"Schema validation failed: {exc}", file=sys.stderr)
+        return 2
+
+    report = evaluate_extraction(extraction)
+    print(f"Schema: OK ({extraction.schema_version})")
+    print(f"Safety: {report.summary()}")
+    for flag in report.flags:
+        print(f"  [{flag.level}] {flag.code}: {flag.message} (at {flag.location})")
+    return 0 if report.passed else 1
+
+
+def _run_vendor_adapter(aid: str, *, device_serial: str):
+    """Dispatch ``--aid`` to a vendor adapter and return an extraction."""
+    aid = aid.lower()
+    if aid == "phonak":
+        from core.noahlink.vendors.phonak import PhonakMockAdapter
+
+        return PhonakMockAdapter(device_serial=device_serial).read()
+    raise ValueError(
+        f"Unknown vendor adapter {aid!r}.  Known: phonak.  "
+        "Run with `--list-adapters` to see the full list."
+    )
+
+
+def main(argv: list[str] | None = None) -> int:
+    """CLI entry point: enumerate, sniff, extract, backup, or validate."""
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(levelname)s %(name)s: %(message)s",
+    )
+    parser = _build_parser()
     args = parser.parse_args(argv)
 
-    if args.cmd == "enumerate":
+    if args.cmd == "enumerate":  # pragma: no cover - hardware path
         devices = enumerate_devices()
         if not devices:
             print("No Noahlink Wireless 2 device found.", file=sys.stderr)
@@ -268,9 +461,20 @@ def main(argv: list[str] | None = None) -> int:  # pragma: no cover - hardware p
             print(info)
         return 0
 
-    log = sniff(args.duration, log_path=args.log)
-    print(f"Wrote HID traffic log to {log}")
-    return 0
+    if args.cmd == "sniff":  # pragma: no cover - hardware path
+        log = sniff(args.duration, log_path=args.log)
+        print(f"Wrote HID traffic log to {log}")
+        return 0
+
+    if args.cmd == "extract":
+        return _cmd_extract(args)
+    if args.cmd == "backup":
+        return _cmd_backup(args)
+    if args.cmd == "validate":
+        return _cmd_validate(args)
+
+    parser.error(f"Unhandled command: {args.cmd}")  # pragma: no cover
+    return 2  # pragma: no cover
 
 
 if __name__ == "__main__":  # pragma: no cover

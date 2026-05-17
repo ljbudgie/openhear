@@ -16,6 +16,10 @@ hardware/wristband/v2-xiao-nrf52840/
 ├── parametric_wristband_v2.scad       ← rectangular slim case, lid, strap
 ├── BOM_v2.csv                         ← XIAO-based bill of materials
 ├── assembly_v2.md                     ← print + no-solder assembly guide
+├── print_pack/                        ← drop-in pack for 3D-print services
+│   ├── PRINT_ME.md                    ←   one-page print-me card
+│   ├── README.md                      ←   pack overview
+│   └── stl/                           ←   pre-oriented case + lid STLs
 ├── firmware/
 │   ├── openhear_v2_xiao_nrf52840.ino  ← Arduino + NimBLE, DRV2605L, sleep
 │   └── README.md                      ← toolchain, GATT contract, Zephyr alt
@@ -88,7 +92,10 @@ edge device can drive any of them without code changes.
 
 1. Open `parametric_wristband_v2.scad` in OpenSCAD ≥ 2021.01, tweak the
    parameters at the top (default values are tuned for a 165–185 mm
-   wrist), and export the case + lid STLs.
+   wrist), and export the case + lid STLs. **Or skip this step entirely
+   and use the ready-to-print package in [`print_pack/`](print_pack/) —
+   pre-oriented STLs plus a one-page `PRINT_ME.md` for any FDM print
+   service.**
 2. Order the parts in `BOM_v2.csv` (no-solder kit is ~£40–£60).
 3. Follow `assembly_v2.md`.
 4. Flash `firmware/openhear_v2_xiao_nrf52840.ino` with the Arduino IDE.

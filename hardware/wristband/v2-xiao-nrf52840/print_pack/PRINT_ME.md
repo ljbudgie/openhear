@@ -96,7 +96,7 @@ contract are in `../assembly_v2.md` and `../firmware/README.md`.
 
 **Default recommendation:** PETG on FDM via a local maker or **JLCPCB** —
 under US $20 delivered, under 1 week, and a perfect match for the slim
-daily-wear daily-use case.
+daily-wear case.
 
 ---
 

@@ -360,7 +360,7 @@ def _cmd_extract(args) -> int:
 
 def _cmd_backup(args) -> int:
     """Run a vendor adapter and persist a full backup directory."""
-    from core.backup import _safe_label, _sha256_file, _utc_now_iso
+    from core.backup import safe_label, sha256_file, utc_now_iso
 
     if args.list_adapters:
         from core.noahlink.vendors import available_adapters
@@ -371,7 +371,7 @@ def _cmd_backup(args) -> int:
 
     extraction = _run_vendor_adapter(args.aid, device_serial=args.device_serial)
 
-    label = f"{_safe_label(extraction.device.serial)}_{_utc_now_iso().replace(':', '-')}"
+    label = f"{safe_label(extraction.device.serial)}_{utc_now_iso().replace(':', '-')}"
     backup_dir = Path(args.output) / label
     backup_dir.mkdir(parents=True, exist_ok=True)
 
@@ -387,15 +387,15 @@ def _cmd_backup(args) -> int:
 
     manifest = {
         "schema_version": "openhear-backup-v1",
-        "created_at": _utc_now_iso(),
+        "created_at": utc_now_iso(),
         "extraction_schema_version": extraction.schema_version,
         "vendor_adapter": extraction.vendor_adapter,
         "is_verified": extraction.is_verified,
         "device_serial": extraction.device.serial,
         "extraction_filename": extraction_path.name,
         "raw_filename": raw_path.name,
-        "extraction_sha256": _sha256_file(extraction_path),
-        "raw_sha256": _sha256_file(raw_path),
+        "extraction_sha256": sha256_file(extraction_path),
+        "raw_sha256": sha256_file(raw_path),
         "raw_size_bytes": raw_path.stat().st_size,
         "extraction_commitment_sha256": extraction.sha256_commitment(),
     }

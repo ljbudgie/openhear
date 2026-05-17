@@ -401,9 +401,6 @@ class TestCliExtract:
         rc = noahlink_main(["extract", "--aid", "phonak", "--json"])
         assert rc == 0
         out = capsys.readouterr().out
-        doc = json.loads(out.strip().split("\n", 0)[0] if "\n" not in out else out)
-        # Re-parse from the start of the printed JSON (the test above may have
-        # split incorrectly; do a safer parse):
         doc = json.loads(out[out.index("{") :])
         assert doc["schema_version"] == SCHEMA_VERSION
         assert doc["vendor_adapter"] == "phonak.mock"

@@ -24,8 +24,18 @@ _MAX_BEAT_HZ = 40.0
 _MIN_CARRIER_HZ = 200.0
 _MAX_CARRIER_HZ = 500.0
 _MAX_AMPLITUDE = 0.7
+# Conservative default: leaves headroom for audiogram compensation and any
+# existing hearing-path signal before the final 0.7 hard limiter.
 _BASE_TONE_AMPLITUDE = 0.12
+# Mask is intentionally much quieter than the carrier so it softens the tone
+# without dominating the entrainment signal.
 _MASK_AMPLITUDE = 0.025
+# Single-pole low-pass coefficient used to make deterministic white noise
+# spectrally tilt toward pink-ish masking while staying cheap per block.
+_PINK_FILTER_ALPHA = 0.98
+# 120 dB HL maps to a 1.5x threshold weight; denominator is doubled to keep
+# audiogram threshold influence conservative because gain_db is already applied.
+_THRESHOLD_WEIGHT_DENOMINATOR = 240.0
 _VALID_MASK_TYPES = {"pink_noise", "ambient", "none"}
 
 
@@ -162,12 +172,11 @@ class BinauralEntrainer(BaseStage):
             return (stereo * np.float32(0.05) * envelope[:, None]).astype(np.float32)
 
         white = self._rng.standard_normal(n)
-        alpha = 0.98
         pink_mono, _ = lfilter(
-            [1.0 - alpha],
-            [1.0, -alpha],
+            [1.0 - _PINK_FILTER_ALPHA],
+            [1.0, -_PINK_FILTER_ALPHA],
             white,
-            zi=[alpha * self._pink_state],
+            zi=[_PINK_FILTER_ALPHA * self._pink_state],
         )
         self._pink_state = float(pink_mono[-1])
         pink = np.column_stack((pink_mono, pink_mono))
@@ -204,7 +213,7 @@ class BinauralEntrainer(BaseStage):
         closest = min(bands, key=lambda band: abs(band.freq_hz - self.carrier_hz))
         gain_db = max(0.0, min(closest.gain_db, 35.0))
         threshold_db_hl = max(0.0, min(closest.threshold_db_hl, 120.0))
-        threshold_weight = 1.0 + (threshold_db_hl / 240.0)
+        threshold_weight = 1.0 + (threshold_db_hl / _THRESHOLD_WEIGHT_DENOMINATOR)
         scale = (10.0 ** (gain_db / 20.0)) * threshold_weight
         return float(min(scale, _MAX_AMPLITUDE / _BASE_TONE_AMPLITUDE))
 

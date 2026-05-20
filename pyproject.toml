@@ -80,6 +80,7 @@ packages = [
     "core.noahlink.vendors",
     "core.schema",
     "dsp",
+    "dsp.stages",
     "examples",
     "hardware",
     "hardware.sovereign_device",

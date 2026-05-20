@@ -193,6 +193,36 @@ OUTPUT_LIMITER_ATTACK_S: float = 0.001
 OUTPUT_LIMITER_RELEASE_S: float = 0.100
 
 
+# ── Binaural Entrainer (optional output-only research stage) ───────────────
+
+# Enable / disable the experimental binaural entrainer stage.
+# The stage is off by default and, when enabled, is inserted after the hearing
+# path and output limiter so generated tones cannot feed back into hearing DSP.
+BINAURAL_ENABLED: bool = False
+
+# Named local protocol label for user-owned session notes/configuration.
+BINAURAL_PROTOCOL: str = "theta_focus"
+
+# Binaural beat frequency in Hz. Safety-enforced range in the stage: 4–40 Hz.
+BINAURAL_BEAT_HZ: float = 6.0
+
+# Centre carrier frequency in Hz. Safety-enforced range in the stage: 200–500 Hz.
+BINAURAL_CARRIER_HZ: float = 300.0
+
+# Optional session duration in seconds. None = run until the pipeline stops.
+BINAURAL_DURATION_S: float | None = None
+
+# Fade-in/fade-out ramp in milliseconds.
+BINAURAL_RAMP_MS: float = 1000.0
+
+# Masking layer: "pink_noise", "ambient", or "none".
+BINAURAL_MASK_TYPE: str = "pink_noise"
+
+# Immediate bypass flag for sessions where own voice or other local context
+# should suppress generated entrainment tones.
+BINAURAL_OWN_VOICE_BYPASS: bool = False
+
+
 # ── Logging ─────────────────────────────────────────────────────────────────
 
 # Python logging level for the DSP pipeline.

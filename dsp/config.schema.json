@@ -52,6 +52,25 @@
         "direction_deg": {"type": "number", "minimum": -180.0, "maximum": 180.0, "default": 0.0}
       }
     },
+    "binaural": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {"type": "boolean", "default": false},
+        "protocol": {"type": "string", "default": "theta_focus"},
+        "beat_hz": {"type": "number", "minimum": 4.0, "maximum": 40.0, "default": 6.0},
+        "carrier_hz": {"type": "number", "minimum": 200.0, "maximum": 500.0, "default": 300.0},
+        "duration": {"type": ["number", "null"], "exclusiveMinimum": 0.0, "default": null},
+        "duration_s": {"type": ["number", "null"], "exclusiveMinimum": 0.0, "default": null},
+        "ramp_ms": {"type": "number", "minimum": 0.0, "default": 1000.0},
+        "mask_type": {
+          "type": "string",
+          "enum": ["pink_noise", "ambient", "none"],
+          "default": "pink_noise"
+        },
+        "own_voice_bypass": {"type": "boolean", "default": false}
+      }
+    },
     "system": {
       "type": "object",
       "additionalProperties": false,

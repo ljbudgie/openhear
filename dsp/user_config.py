@@ -92,6 +92,28 @@ class BeamformingConfig:
 
 
 @dataclass
+class BinauralConfig:
+    """Experimental binaural entrainer parameters.
+
+    Config files may use ``duration`` as the user-facing alias for the stored
+    ``duration_s`` field so YAML reads naturally while Python stays explicit.
+    """
+
+    enabled: bool = False
+    protocol: str = "theta_focus"
+    beat_hz: float = 6.0
+    carrier_hz: float = 300.0
+    duration_s: float | None = None
+    ramp_ms: float = 1000.0
+    mask_type: str = "pink_noise"
+    own_voice_bypass: bool = False
+
+
+_BINAURAL_DURATION_ALIAS = "duration"
+_BINAURAL_CONFIG_ALIASES = {_BINAURAL_DURATION_ALIAS: "duration_s"}
+
+
+@dataclass
 class SystemConfig:
     """Audio I/O and runtime parameters."""
 
@@ -116,6 +138,7 @@ class Config:
         noise: Noise gate / reduction sub-config.
         voice: Voice emphasis sub-config.
         beamforming: Beamformer sub-config.
+        binaural: Experimental binaural entrainer sub-config.
         system: Audio I/O sub-config.
     """
 
@@ -124,6 +147,7 @@ class Config:
     noise: NoiseConfig = field(default_factory=NoiseConfig)
     voice: VoiceConfig = field(default_factory=VoiceConfig)
     beamforming: BeamformingConfig = field(default_factory=BeamformingConfig)
+    binaural: BinauralConfig = field(default_factory=BinauralConfig)
     system: SystemConfig = field(default_factory=SystemConfig)
 
     # ── Serialisation ─────────────────────────────────────────────────────
@@ -165,6 +189,7 @@ class Config:
             "noise",
             "voice",
             "beamforming",
+            "binaural",
             "system",
         }
         for key in data.keys():
@@ -177,6 +202,7 @@ class Config:
             noise=_section(NoiseConfig, data.get("noise")),
             voice=_voice_section(data.get("voice")),
             beamforming=_section(BeamformingConfig, data.get("beamforming")),
+            binaural=_binaural_section(data.get("binaural")),
             system=_system_section(data.get("system")),
         )
 
@@ -278,6 +304,48 @@ def _voice_section(data: Any) -> VoiceConfig:
     return VoiceConfig(
         boost_hz=boost_hz,
         boost_db=float(data.get("boost_db", VoiceConfig.boost_db)),
+    )
+
+
+def _binaural_section(data: Any) -> BinauralConfig:
+    if data is None:
+        return BinauralConfig()
+    if not isinstance(data, Mapping):
+        raise ValueError(f"binaural section must be a mapping, got {type(data).__name__}.")
+    mask_type = str(data.get("mask_type", BinauralConfig.mask_type))
+    if mask_type not in {"pink_noise", "ambient", "none"}:
+        raise ValueError("binaural.mask_type must be one of: pink_noise, ambient, none.")
+    beat_hz = float(data.get("beat_hz", BinauralConfig.beat_hz))
+    carrier_hz = float(data.get("carrier_hz", BinauralConfig.carrier_hz))
+    duration_value = data.get(
+        "duration_s",
+        data.get(_BINAURAL_DURATION_ALIAS, BinauralConfig.duration_s),
+    )
+    duration_s = None if duration_value is None else float(duration_value)
+    ramp_ms = float(data.get("ramp_ms", BinauralConfig.ramp_ms))
+    if not 4.0 <= beat_hz <= 40.0:
+        raise ValueError(f"binaural.beat_hz must be 4–40 Hz, got {beat_hz}.")
+    if not 200.0 <= carrier_hz <= 500.0:
+        raise ValueError(f"binaural.carrier_hz must be 200–500 Hz, got {carrier_hz}.")
+    if duration_s is not None and duration_s <= 0:
+        raise ValueError(f"binaural.duration_s must be positive when set, got {duration_s}.")
+    if ramp_ms < 0:
+        raise ValueError(f"binaural.ramp_ms must be non-negative, got {ramp_ms}.")
+    # Accept "duration" as the user-facing YAML spelling requested in examples
+    # while storing it internally as the explicit dataclass field "duration_s".
+    valid_fields = {f for f in BinauralConfig.__dataclass_fields__} | set(_BINAURAL_CONFIG_ALIASES)
+    for key in data.keys():
+        if key not in valid_fields:
+            logger.warning("Ignoring unknown BinauralConfig key: %r", key)
+    return BinauralConfig(
+        enabled=bool(data.get("enabled", BinauralConfig.enabled)),
+        protocol=str(data.get("protocol", BinauralConfig.protocol)),
+        beat_hz=beat_hz,
+        carrier_hz=carrier_hz,
+        duration_s=duration_s,
+        ramp_ms=ramp_ms,
+        mask_type=mask_type,
+        own_voice_bypass=bool(data.get("own_voice_bypass", BinauralConfig.own_voice_bypass)),
     )
 
 

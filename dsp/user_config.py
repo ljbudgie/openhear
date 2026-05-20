@@ -320,6 +320,8 @@ def _binaural_section(data: Any) -> BinauralConfig:
         raise ValueError(f"binaural.duration_s must be positive when set, got {duration_s}.")
     if ramp_ms < 0:
         raise ValueError(f"binaural.ramp_ms must be non-negative, got {ramp_ms}.")
+    # Accept "duration" as the user-facing YAML spelling requested in examples
+    # while storing it internally as the explicit dataclass field "duration_s".
     valid_fields = {f for f in BinauralConfig.__dataclass_fields__} | {"duration"}
     for key in data.keys():
         if key not in valid_fields:

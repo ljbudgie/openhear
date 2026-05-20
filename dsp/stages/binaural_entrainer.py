@@ -11,6 +11,7 @@ from __future__ import annotations
 import logging
 
 import numpy as np
+from scipy.signal import lfilter
 
 from dsp.audiogram_profile import Prescription
 from dsp.stages.base import BaseStage
@@ -160,13 +161,16 @@ class BinauralEntrainer(BaseStage):
         if self.mask_type == "ambient":
             return (stereo * np.float32(0.05) * envelope[:, None]).astype(np.float32)
 
-        white = self._rng.standard_normal((n, 2))
-        pink = np.empty_like(white)
+        white = self._rng.standard_normal(n)
         alpha = 0.98
-        for idx in range(n):
-            self._pink_state = alpha * self._pink_state + (1.0 - alpha) * float(np.mean(white[idx]))
-            pink[idx, 0] = self._pink_state
-            pink[idx, 1] = self._pink_state
+        pink_mono, _ = lfilter(
+            [1.0 - alpha],
+            [1.0, -alpha],
+            white,
+            zi=[alpha * self._pink_state],
+        )
+        self._pink_state = float(pink_mono[-1])
+        pink = np.column_stack((pink_mono, pink_mono))
         peak = float(np.max(np.abs(pink))) if pink.size else 0.0
         if peak > 0.0:
             pink = pink / peak

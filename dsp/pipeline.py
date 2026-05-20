@@ -338,25 +338,19 @@ def _build_dsp_chain(
         )
 
     binaural_cfg = user_config.binaural if user_config is not None else None
-    binaural_enabled = binaural_cfg.enabled if binaural_cfg is not None else config.BINAURAL_ENABLED
+    binaural_enabled = getattr(binaural_cfg, "enabled", config.BINAURAL_ENABLED)
     if binaural_enabled:
-        beat_hz = binaural_cfg.beat_hz if binaural_cfg is not None else config.BINAURAL_BEAT_HZ
-        carrier_hz = (
-            binaural_cfg.carrier_hz if binaural_cfg is not None else config.BINAURAL_CARRIER_HZ
+        beat_hz = getattr(binaural_cfg, "beat_hz", config.BINAURAL_BEAT_HZ)
+        carrier_hz = getattr(binaural_cfg, "carrier_hz", config.BINAURAL_CARRIER_HZ)
+        duration_s = getattr(binaural_cfg, "duration_s", config.BINAURAL_DURATION_S)
+        ramp_ms = getattr(binaural_cfg, "ramp_ms", config.BINAURAL_RAMP_MS)
+        mask_type = getattr(binaural_cfg, "mask_type", config.BINAURAL_MASK_TYPE)
+        own_voice_bypass = getattr(
+            binaural_cfg,
+            "own_voice_bypass",
+            config.BINAURAL_OWN_VOICE_BYPASS,
         )
-        duration_s = (
-            binaural_cfg.duration_s if binaural_cfg is not None else config.BINAURAL_DURATION_S
-        )
-        ramp_ms = binaural_cfg.ramp_ms if binaural_cfg is not None else config.BINAURAL_RAMP_MS
-        mask_type = (
-            binaural_cfg.mask_type if binaural_cfg is not None else config.BINAURAL_MASK_TYPE
-        )
-        own_voice_bypass = (
-            binaural_cfg.own_voice_bypass
-            if binaural_cfg is not None
-            else config.BINAURAL_OWN_VOICE_BYPASS
-        )
-        protocol = binaural_cfg.protocol if binaural_cfg is not None else config.BINAURAL_PROTOCOL
+        protocol = getattr(binaural_cfg, "protocol", config.BINAURAL_PROTOCOL)
         chain.append(
             BinauralEntrainer(
                 sample_rate=config.SAMPLE_RATE,

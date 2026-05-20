@@ -197,7 +197,7 @@ class BinauralEntrainer(BaseStage):
         if self.prescription is None:
             return 1.0
 
-        bands = self.prescription._select(ear)
+        bands = self.prescription.bands(ear)
         if not bands:
             return 1.0
 

@@ -106,6 +106,10 @@ class Prescription:
         bands = self._select(ear)
         return {b.freq_hz: b.knee_dbfs for b in bands}
 
+    def bands(self, ear: str) -> list[BandPrescription]:
+        """Return a copy of the per-band prescriptions for the requested ear."""
+        return list(self._select(ear))
+
     def _select(self, ear: str) -> list[BandPrescription]:
         if ear == "right":
             return self.right

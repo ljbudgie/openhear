@@ -93,7 +93,11 @@ class BeamformingConfig:
 
 @dataclass
 class BinauralConfig:
-    """Experimental binaural entrainer parameters."""
+    """Experimental binaural entrainer parameters.
+
+    Config files may use ``duration`` as the user-facing alias for the stored
+    ``duration_s`` field so YAML reads naturally while Python stays explicit.
+    """
 
     enabled: bool = False
     protocol: str = "theta_focus"

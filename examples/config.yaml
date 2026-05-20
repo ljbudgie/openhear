@@ -36,6 +36,14 @@ beamforming:
   width_deg: 60         # directional focus angle
   direction_deg: 0      # 0 = forward
 
+# ── Experimental binaural entrainer ──────────────────────────────────
+binaural:
+  enabled: false
+  protocol: theta_focus
+  beat_hz: 6
+  carrier_hz: 300
+  mask_type: pink_noise
+
 # ── Audio I/O / runtime ──────────────────────────────────────────────
 system:
   sample_rate: 16000

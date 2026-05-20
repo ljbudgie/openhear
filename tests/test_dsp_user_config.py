@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from dsp.user_config import (
+    BinauralConfig,
     CompressionConfig,
     Config,
     NoiseConfig,
@@ -93,6 +94,10 @@ def test_load_config_yaml_supports_repository_example_file():
     assert cfg.noise.floor_db == -45
     assert cfg.voice.boost_hz == (1000.0, 4000.0)
     assert cfg.voice.boost_db == 6
+    assert cfg.binaural.enabled is False
+    assert cfg.binaural.beat_hz == 6
+    assert cfg.binaural.carrier_hz == 300
+    assert cfg.binaural.mask_type == "pink_noise"
     assert cfg.system.sample_rate == 16_000
     assert cfg.system.buffer_size == 256
 
@@ -115,6 +120,40 @@ def test_voice_section_rejects_wrong_arity_boost_hz():
 def test_voice_section_rejects_inverted_boost_band():
     with pytest.raises(ValueError, match="strictly below"):
         Config.from_dict({"voice": {"boost_hz": [4000, 1000]}})
+
+
+def test_binaural_section_loads_and_validates():
+    cfg = Config.from_dict(
+        {
+            "binaural": {
+                "enabled": True,
+                "protocol": "theta_focus",
+                "beat_hz": 8,
+                "carrier_hz": 320,
+                "duration": 60,
+                "ramp_ms": 500,
+                "mask_type": "none",
+            }
+        }
+    )
+    assert cfg.binaural == BinauralConfig(
+        enabled=True,
+        protocol="theta_focus",
+        beat_hz=8.0,
+        carrier_hz=320.0,
+        duration_s=60.0,
+        ramp_ms=500.0,
+        mask_type="none",
+    )
+
+
+def test_binaural_section_rejects_unsafe_ranges():
+    with pytest.raises(ValueError, match="beat_hz"):
+        Config.from_dict({"binaural": {"beat_hz": 80}})
+    with pytest.raises(ValueError, match="carrier_hz"):
+        Config.from_dict({"binaural": {"carrier_hz": 100}})
+    with pytest.raises(ValueError, match="mask_type"):
+        Config.from_dict({"binaural": {"mask_type": "invalid"}})
 
 
 def test_system_section_rejects_non_positive_sample_rate():

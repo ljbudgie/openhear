@@ -30,6 +30,7 @@ senses and their own audiological data.
 - [Current working modules](#current-working-modules)
 - [Quick start](#quick-start)
 - [Repository map](#repository-map)
+- [Binaural Entrainer](#binaural-entrainer)
 - [OpenHear Wristband](#openhear-wristband)
 - [Aids-free vision](#aids-free-vision)
 - [Documentation map](#documentation-map)
@@ -223,6 +224,34 @@ openhear/
 ```
 
 For the longer architecture map, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+## Binaural Entrainer
+
+OpenHear includes an optional, local-only binaural entrainer research stage that
+generates phase-accurate stereo sine carriers with a small left/right offset
+(for example, a 6 Hz theta-focus beat around a 300 Hz carrier). It can use the
+loaded audiogram prescription to scale each ear conservatively, applies ramping,
+and hard-limits output to 0.7 so it never reaches digital full scale.
+
+Enable it in your user config, then pass that config to the pipeline:
+
+```yaml
+binaural:
+  enabled: true
+  protocol: theta_focus
+  beat_hz: 6
+  carrier_hz: 300
+  mask_type: pink_noise
+```
+
+```bash
+python -m dsp.pipeline --config ~/.openhear/config.yaml --audiogram ~/.openhear/my_audiogram.json
+python examples/neuroplasticity_demo.py --output binaural_demo.wav
+```
+
+**Safety:** Experimental feature. Not a medical device. Consult a professional
+before use. Keep volume low, stop if uncomfortable, and do not treat binaural
+entrainment as clinical care.
 
 ## OpenHear Wristband
 

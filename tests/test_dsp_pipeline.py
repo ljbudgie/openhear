@@ -91,6 +91,7 @@ class TestBuildDspChain:
         monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", True)
         monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", True)
         monkeypatch.setattr(config, "OUTPUT_LIMITER_ENABLED", True)
+        monkeypatch.setattr(config, "BINAURAL_ENABLED", False)
 
         chain = pipeline.build_dsp_chain()
         assert len(chain) == 7
@@ -119,6 +120,7 @@ class TestBuildDspChain:
         monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", False)
         monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", False)
         monkeypatch.setattr(config, "OUTPUT_LIMITER_ENABLED", False)
+        monkeypatch.setattr(config, "BINAURAL_ENABLED", False)
 
         import logging
 
@@ -135,6 +137,7 @@ class TestBuildDspChain:
         monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", False)
         monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", False)
         monkeypatch.setattr(config, "OUTPUT_LIMITER_ENABLED", False)
+        monkeypatch.setattr(config, "BINAURAL_ENABLED", False)
 
         chain = pipeline.build_dsp_chain()
         assert len(chain) == 1
@@ -147,6 +150,7 @@ class TestBuildDspChain:
         monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", True)
         monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", True)
         monkeypatch.setattr(config, "OUTPUT_LIMITER_ENABLED", True)
+        monkeypatch.setattr(config, "BINAURAL_ENABLED", False)
 
         chain = pipeline.build_dsp_chain()
         samples = np.zeros(config.FRAMES_PER_BUFFER, dtype=np.float32)
@@ -154,6 +158,25 @@ class TestBuildDspChain:
             samples = stage.process(samples)
         assert samples.shape == (config.FRAMES_PER_BUFFER,)
         assert samples.dtype == np.float32
+
+    def test_binaural_enabled_from_user_config_appends_output_stage(self, monkeypatch):
+        monkeypatch.setattr(config, "OCCLUSION_REDUCTION_ENABLED", False)
+        monkeypatch.setattr(config, "NOISE_REDUCTION_ENABLED", False)
+        monkeypatch.setattr(config, "COMPRESSION_ENABLED", False)
+        monkeypatch.setattr(config, "VOICE_CLARITY_ENABLED", False)
+        monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", False)
+        monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", False)
+        monkeypatch.setattr(config, "OUTPUT_LIMITER_ENABLED", False)
+
+        from dsp.stages.binaural_entrainer import BinauralEntrainer
+        from dsp.user_config import BinauralConfig, Config
+
+        user_cfg = Config(binaural=BinauralConfig(enabled=True, mask_type="none"))
+        chain = pipeline.build_dsp_chain(user_config=user_cfg)
+        assert len(chain) == 1
+        assert isinstance(chain[0], BinauralEntrainer)
+        out = chain[0].process(np.zeros(config.FRAMES_PER_BUFFER, dtype=np.float32))
+        assert out.shape == (config.FRAMES_PER_BUFFER, 2)
 
 
 class TestBuildDspChainWithPrescription:

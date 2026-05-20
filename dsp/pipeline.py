@@ -47,6 +47,9 @@ from dsp.noise_reduction import SpectralSubtractor
 from dsp.occlusion_reduction import OcclusionReducer
 from dsp.output_limiter import PeakLimiter
 from dsp.own_voice_bypass import OwnVoiceBypass
+from dsp.stages.binaural_entrainer import BinauralEntrainer
+from dsp.user_config import Config as UserConfig
+from dsp.user_config import load_config
 from dsp.voice_clarity import VoiceClarityEnhancer
 
 logging.basicConfig(
@@ -69,10 +72,19 @@ def _bytes_to_float32(raw: bytes) -> np.ndarray:
 def _float32_to_bytes(samples: np.ndarray, channels: int) -> bytes:
     """Convert normalised float32 samples to int16 PCM bytes.
 
-    If *channels* > 1 the mono signal is duplicated to fill all channels
-    (interleaved layout expected by PyAudio).
+    Mono input is duplicated when *channels* > 1.  Stereo ``(n, 2)`` input
+    is written as interleaved left/right samples.
     """
-    clipped = np.clip(samples, -1.0, 1.0)
+    arr = np.asarray(samples, dtype=np.float32)
+    clipped = np.clip(arr, -1.0, 1.0)
+    if clipped.ndim == 2:
+        if clipped.shape[1] != channels:
+            raise ValueError(
+                f"Stereo samples have {clipped.shape[1]} channels, output is configured for {channels}."
+            )
+        int16 = (clipped.reshape(-1) * 32767).astype(np.int16)
+        return int16.tobytes()
+
     int16 = (clipped * 32767).astype(np.int16)
     if channels > 1:
         int16 = np.repeat(int16, channels)
@@ -179,7 +191,10 @@ def _mean_prescription_values(
     return ratio, knee, speech_gain
 
 
-def build_dsp_chain(prescription: "Prescription | None" = None) -> list:
+def build_dsp_chain(
+    prescription: "Prescription | None" = None,
+    user_config: UserConfig | None = None,
+) -> list:
     """Construct and return the ordered list of active DSP processors.
 
     Args:
@@ -193,6 +208,13 @@ def build_dsp_chain(prescription: "Prescription | None" = None) -> list:
             When ``None``, the static ``dsp/config.py`` defaults are used and
             behaviour is identical to before this parameter was added.
     """
+    return _build_dsp_chain(prescription=prescription, user_config=user_config)
+
+
+def _build_dsp_chain(
+    prescription: "Prescription | None" = None,
+    user_config: UserConfig | None = None,
+) -> list:
     chain = []
 
     if config.OCCLUSION_REDUCTION_ENABLED:
@@ -315,6 +337,43 @@ def build_dsp_chain(prescription: "Prescription | None" = None) -> list:
             config.OUTPUT_LIMITER_RELEASE_S * 1000,
         )
 
+    binaural_cfg = user_config.binaural if user_config is not None else None
+    binaural_enabled = binaural_cfg.enabled if binaural_cfg is not None else config.BINAURAL_ENABLED
+    if binaural_enabled:
+        chain.append(
+            BinauralEntrainer(
+                sample_rate=config.SAMPLE_RATE,
+                beat_hz=binaural_cfg.beat_hz if binaural_cfg is not None else config.BINAURAL_BEAT_HZ,
+                carrier_hz=(
+                    binaural_cfg.carrier_hz
+                    if binaural_cfg is not None
+                    else config.BINAURAL_CARRIER_HZ
+                ),
+                duration_s=(
+                    binaural_cfg.duration_s
+                    if binaural_cfg is not None
+                    else config.BINAURAL_DURATION_S
+                ),
+                ramp_ms=binaural_cfg.ramp_ms if binaural_cfg is not None else config.BINAURAL_RAMP_MS,
+                mask_type=(
+                    binaural_cfg.mask_type if binaural_cfg is not None else config.BINAURAL_MASK_TYPE
+                ),
+                prescription=prescription,
+                own_voice_bypass=(
+                    binaural_cfg.own_voice_bypass
+                    if binaural_cfg is not None
+                    else config.BINAURAL_OWN_VOICE_BYPASS
+                ),
+            )
+        )
+        protocol = binaural_cfg.protocol if binaural_cfg is not None else config.BINAURAL_PROTOCOL
+        logger.info(
+            "Stage added: BinauralEntrainer (protocol=%s, beat=%.1f Hz, carrier=%.1f Hz)",
+            protocol,
+            binaural_cfg.beat_hz if binaural_cfg is not None else config.BINAURAL_BEAT_HZ,
+            binaural_cfg.carrier_hz if binaural_cfg is not None else config.BINAURAL_CARRIER_HZ,
+        )
+
     if not chain:
         logger.warning("All DSP stages disabled – audio will be passed through unchanged.")
 
@@ -328,6 +387,7 @@ def run_pipeline(
     measure_latency: bool = False,
     metrics_path: str | None = None,
     audiogram_path: str | None = None,
+    config_path: str | None = None,
 ) -> None:
     """Open audio streams and run the processing loop until interrupted.
 
@@ -341,6 +401,8 @@ def run_pipeline(
         audiogram_path: If set, load the audiogram JSON at this path and
             derive DSP parameters from the individual's hearing profile.
             When ``None``, static ``dsp/config.py`` defaults are used.
+        config_path: Optional YAML/JSON config path.  Currently used for
+            runtime-only optional stages such as ``binaural.enabled``.
     """
     pa = pyaudio.PyAudio()
 
@@ -369,13 +431,13 @@ def run_pipeline(
         pa.terminate()
         sys.exit(1)
 
-    dsp_chain = (
-        []
-        if bypass
-        else build_dsp_chain(
+    runtime_cfg = load_config(config_path) if config_path is not None else None
+    dsp_chain = []
+    if not bypass:
+        dsp_chain = _build_dsp_chain(
             prescription=_load_prescription(audiogram_path) if audiogram_path else None,
+            user_config=runtime_cfg,
         )
-    )
     if bypass:
         logger.info("Bypass mode: DSP chain skipped.")
     if test_tone:
@@ -477,6 +539,12 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         "compression ratio/knee and voice-clarity gain are derived from "
         "the individual's audiogram rather than the static config defaults.",
     )
+    parser.add_argument(
+        "--config",
+        default=None,
+        metavar="PATH",
+        help="Optional OpenHear YAML/JSON config path. Enables runtime sections such as binaural.",
+    )
     return parser
 
 
@@ -488,4 +556,5 @@ if __name__ == "__main__":
         measure_latency=args.latency,
         metrics_path=args.metrics_csv,
         audiogram_path=args.audiogram,
+        config_path=args.config,
     )

@@ -51,7 +51,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--duration", type=float, default=10.0, help="Session duration in seconds.")
     parser.add_argument("--beat-hz", type=float, default=6.0)
     parser.add_argument("--carrier-hz", type=float, default=300.0)
-    parser.add_argument("--mask-type", choices=["pink_noise", "ambient", "none"], default="pink_noise")
+    parser.add_argument(
+        "--mask-type", choices=["pink_noise", "ambient", "none"], default="pink_noise"
+    )
     args = parser.parse_args(argv)
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")

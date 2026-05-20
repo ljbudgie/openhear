@@ -343,7 +343,9 @@ def _build_dsp_chain(
         chain.append(
             BinauralEntrainer(
                 sample_rate=config.SAMPLE_RATE,
-                beat_hz=binaural_cfg.beat_hz if binaural_cfg is not None else config.BINAURAL_BEAT_HZ,
+                beat_hz=binaural_cfg.beat_hz
+                if binaural_cfg is not None
+                else config.BINAURAL_BEAT_HZ,
                 carrier_hz=(
                     binaural_cfg.carrier_hz
                     if binaural_cfg is not None
@@ -354,9 +356,13 @@ def _build_dsp_chain(
                     if binaural_cfg is not None
                     else config.BINAURAL_DURATION_S
                 ),
-                ramp_ms=binaural_cfg.ramp_ms if binaural_cfg is not None else config.BINAURAL_RAMP_MS,
+                ramp_ms=binaural_cfg.ramp_ms
+                if binaural_cfg is not None
+                else config.BINAURAL_RAMP_MS,
                 mask_type=(
-                    binaural_cfg.mask_type if binaural_cfg is not None else config.BINAURAL_MASK_TYPE
+                    binaural_cfg.mask_type
+                    if binaural_cfg is not None
+                    else config.BINAURAL_MASK_TYPE
                 ),
                 prescription=prescription,
                 own_voice_bypass=(

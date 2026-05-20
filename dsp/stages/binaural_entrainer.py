@@ -9,7 +9,6 @@ are never fed back into compression, feedback cancellation, or voice stages.
 from __future__ import annotations
 
 import logging
-import math
 
 import numpy as np
 
@@ -68,7 +67,9 @@ class BinauralEntrainer(BaseStage):
         if ramp_ms < 0:
             raise ValueError(f"ramp_ms must be non-negative, got {ramp_ms}.")
         if mask_type not in _VALID_MASK_TYPES:
-            raise ValueError(f"mask_type must be one of {sorted(_VALID_MASK_TYPES)}, got {mask_type!r}.")
+            raise ValueError(
+                f"mask_type must be one of {sorted(_VALID_MASK_TYPES)}, got {mask_type!r}."
+            )
 
         self.sample_rate = int(sample_rate)
         self.beat_hz = float(beat_hz)

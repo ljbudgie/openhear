@@ -109,6 +109,10 @@ class BinauralConfig:
     own_voice_bypass: bool = False
 
 
+_BINAURAL_DURATION_ALIAS = "duration"
+_BINAURAL_CONFIG_ALIASES = {_BINAURAL_DURATION_ALIAS: "duration_s"}
+
+
 @dataclass
 class SystemConfig:
     """Audio I/O and runtime parameters."""
@@ -313,7 +317,10 @@ def _binaural_section(data: Any) -> BinauralConfig:
         raise ValueError("binaural.mask_type must be one of: pink_noise, ambient, none.")
     beat_hz = float(data.get("beat_hz", BinauralConfig.beat_hz))
     carrier_hz = float(data.get("carrier_hz", BinauralConfig.carrier_hz))
-    duration_value = data.get("duration_s", data.get("duration", BinauralConfig.duration_s))
+    duration_value = data.get(
+        "duration_s",
+        data.get(_BINAURAL_DURATION_ALIAS, BinauralConfig.duration_s),
+    )
     duration_s = None if duration_value is None else float(duration_value)
     ramp_ms = float(data.get("ramp_ms", BinauralConfig.ramp_ms))
     if not 4.0 <= beat_hz <= 40.0:
@@ -326,7 +333,7 @@ def _binaural_section(data: Any) -> BinauralConfig:
         raise ValueError(f"binaural.ramp_ms must be non-negative, got {ramp_ms}.")
     # Accept "duration" as the user-facing YAML spelling requested in examples
     # while storing it internally as the explicit dataclass field "duration_s".
-    valid_fields = {f for f in BinauralConfig.__dataclass_fields__} | {"duration"}
+    valid_fields = {f for f in BinauralConfig.__dataclass_fields__} | set(_BINAURAL_CONFIG_ALIASES)
     for key in data.keys():
         if key not in valid_fields:
             logger.warning("Ignoring unknown BinauralConfig key: %r", key)

@@ -36,6 +36,8 @@ def _example_prescription() -> Prescription:
 
 
 def _write_stereo_wav(path: Path, samples: np.ndarray, sample_rate: int) -> None:
+    if samples.ndim != 2 or samples.shape[1] != 2:
+        raise ValueError(f"Expected stereo samples shaped (n, 2), got {samples.shape}.")
     clipped = np.clip(samples, -0.7, 0.7)
     int16 = (clipped.reshape(-1) * 32767).astype(np.int16)
     with wave.open(str(path), "wb") as wf:

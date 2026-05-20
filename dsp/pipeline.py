@@ -350,6 +350,8 @@ def _build_dsp_chain(
             "own_voice_bypass",
             config.BINAURAL_OWN_VOICE_BYPASS,
         )
+        # Protocol is a user-facing session label for logs/config inspection;
+        # generation is fully determined by the explicit numeric parameters.
         protocol = getattr(binaural_cfg, "protocol", config.BINAURAL_PROTOCOL)
         chain.append(
             BinauralEntrainer(

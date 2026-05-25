@@ -12,6 +12,14 @@ directory gives the prototype one canonical path for firmware and setup docs.
 - End-to-end runtime: `stream/wristband_runtime.py`
 - Legacy firmware mirror retained for compatibility: `hardware/wristband/firmware.py`
 
+> **Canonical pattern registry.** The pattern IDs and semantics
+> below are summarised here for convenience. The single canonical
+> registry — including the Burgess Principle SOVEREIGN/NULL
+> patterns, safety/discomfort patterns, and reserved ID ranges — is
+> [`docs/HAPTIC_PATTERN_LIBRARY.md`](../docs/HAPTIC_PATTERN_LIBRARY.md).
+> Any implementation that uses pattern IDs must remain consistent
+> with that document.
+
 ## Frozen v1.0.0 scope
 
 The clinic prototype intentionally ships with seven sound classes only:

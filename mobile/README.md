@@ -121,6 +121,42 @@ hearing-assistance tool. Incorrect settings can damage hearing.
 - The planned safety limiter stage does **not** guarantee safe output levels
   for every listener; validate the full output chain on your own hardware.
 
+## Accessibility expectations (WCAG 2.2 / EN 301 549)
+
+The OpenHear mobile scaffold is an accessibility surface as much as a
+DSP surface. Any contribution must keep the following expectations
+in scope; the full standards mapping is in
+[`docs/ACCESSIBILITY_STANDARDS.md`](../docs/ACCESSIBILITY_STANDARDS.md)
+and the matching audit checklist is in
+[`docs/EVIDENCE_AND_VALIDATION.md`](../docs/EVIDENCE_AND_VALIDATION.md)
+§3.
+
+- **Screen reader labels.** Every interactive Compose control must
+  expose a meaningful `contentDescription` / semantic role for
+  Android TalkBack.
+- **Scalable text.** Use `sp` units, respect system font scale, and
+  ensure layouts reflow without truncation at 200 % text size.
+- **High contrast.** Body text ≥ 4.5:1 contrast ratio; large text
+  and UI ≥ 3:1. Verify against both light and dark themes.
+- **Haptic plus visual alerts.** Every critical UI alert (e.g.
+  loud-sound warning, feedback warning, mute confirmation) must
+  render visually *and* haptically — never audio-only.
+- **No audio-only critical warnings.** The target audience may not
+  hear an audio-only alert; treat audio as a complement to, not a
+  substitute for, the visual and haptic channels.
+- **Large touch targets.** Aim for ≥ 44 × 44 dp on every interactive
+  control.
+- **Clear emergency mute.** A visible, high-contrast, single-tap
+  emergency mute must be reachable from every screen; it should also
+  be triggerable by a long-press hardware affordance where the
+  platform allows.
+
+See
+[`docs/ACCESSIBILITY_STANDARDS.md`](../docs/ACCESSIBILITY_STANDARDS.md)
+§5 for the conformance vocabulary contributors must use when
+describing this scaffold (e.g. *aligned with* WCAG 2.2, never
+*compliant with*).
+
 ## License
 
 MIT — see [LICENSE](../LICENSE) in the repository root.

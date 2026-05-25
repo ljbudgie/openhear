@@ -113,6 +113,27 @@ These prohibitions are not bureaucratic. They are the operational
 form of the Burgess Principle: a participant's data sovereignty
 cannot survive a single careless cloud upload.
 
+A suspected breach of any of the above is logged as an **AE-P**
+adverse event per
+[`docs/EVIDENCE_AND_VALIDATION.md`](../docs/EVIDENCE_AND_VALIDATION.md)
+§5 and reported to the CI within 24 hours.
+
+## 7a. Standards posture
+
+This SOP is *aligned with* — not certified against — the standards
+catalogued in
+[`docs/ACCESSIBILITY_STANDARDS.md`](../docs/ACCESSIBILITY_STANDARDS.md).
+In particular:
+
+* It supports UK GDPR / GCP-aligned research practice for data
+  handling.
+* It uses **ISO 13485** only as a forward reference; OpenHear does
+  not operate a certified quality management system.
+* The clinical/research validation checklist in
+  [`docs/EVIDENCE_AND_VALIDATION.md`](../docs/EVIDENCE_AND_VALIDATION.md)
+  §4 (C1–C7) is the self-audit instrument every Data Manager applies
+  before database lock.
+
 ## 8. Database lock and publication
 
 * When the final participant has completed the day-7 follow-up, the

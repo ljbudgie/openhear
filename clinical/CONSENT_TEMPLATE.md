@@ -74,6 +74,18 @@ In practice, this means:
 * As with any new device, there is a small chance of an unexpected
   loud sound. The output limiter is the primary safeguard; the mute
   button is the backup; the study audiologist is present throughout.
+* If any wristband or haptic accessory is used alongside the study,
+  there is a small chance of skin irritation, thermal warmth, or
+  pulses that feel too strong; tell the audiologist immediately so
+  the device can be removed and the event recorded.
+* If at any point you suspect that your data has not been handled
+  as described above (for example a lost USB stick or an unexpected
+  copy of your data), tell the audiologist — this is recorded as a
+  privacy event and reviewed by the Chief Investigator.
+* If you feel a critical sound (such as an alarm or a named voice)
+  was missed or misidentified by the system in a way that worries
+  you, tell the audiologist — this is recorded as a
+  misclassification event.
 * No serious risk to your health is anticipated. Any unexpected
   problem will be reported to the Ethics Committee per standard
   research practice.

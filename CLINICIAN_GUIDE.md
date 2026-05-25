@@ -4,6 +4,66 @@
 
 ---
 
+## Standards and safety context — read this first
+
+OpenHear is an **experimental research platform**, not a regulated
+medical device, and not a certified fitting system. Both the
+Noahlink Wireless 2 reading path and the DSP pipeline you will run
+in this guide are research tools; they may produce unexpected
+output, contain undiscovered bugs, and lack the calibration
+guarantees a commercial fitting system provides.
+
+The project is *aligned with* — never *certified against* — the
+standards summarised in
+[`docs/ACCESSIBILITY_STANDARDS.md`](docs/ACCESSIBILITY_STANDARDS.md).
+In particular:
+
+- Output level, MPO, frequency response, distortion, latency, and
+  feedback stability are designed so they can be measured in **IEC
+  60118-compatible** ways. There is no formal IEC 60118 measurement
+  report — if you intend to clinically interpret an OpenHear
+  output, verify it on a 2 cc coupler per the project's
+  [`docs/EVIDENCE_AND_VALIDATION.md`](docs/EVIDENCE_AND_VALIDATION.md)
+  §1 checklist.
+- The hardware paths are *personal-use assistive product research
+  artefacts* in **ISO 9999** terms, not classified hearing aids.
+- The project does **not** operate an **ISO 13485** quality
+  management system. The forward references in
+  [`docs/ACCESSIBILITY_STANDARDS.md`](docs/ACCESSIBILITY_STANDARDS.md)
+  describe what would be required if it ever did.
+- Adverse events should be recorded against the categories in
+  [`docs/EVIDENCE_AND_VALIDATION.md`](docs/EVIDENCE_AND_VALIDATION.md)
+  §5 (AE-A acoustic, AE-H haptic, AE-P privacy, AE-M
+  misclassification, AE-G general).
+
+### Clinician checklist (every session)
+
+Before using OpenHear with a patient:
+
+- [ ] Verify the source of the audiogram — measured today, imported
+      from the patient's clinical record, or supplied as a JSON
+      file. Record provenance.
+- [ ] Confirm informed consent for the use of an experimental
+      research tool; if part of a study, use
+      [`clinical/CONSENT_TEMPLATE.md`](clinical/CONSENT_TEMPLATE.md)
+      after site adaptation and REC approval.
+- [ ] Start at **conservative gain**; never start at the
+      audiogram-derived target unless the patient is in a
+      reproducible, monitored fitting context.
+- [ ] If any wearer-contacting hardware is involved, measure output
+      on a 2 cc coupler before listening — never trust the software
+      limiter alone. Use the
+      [`docs/EVIDENCE_AND_VALIDATION.md`](docs/EVIDENCE_AND_VALIDATION.md)
+      §1 checklist.
+- [ ] Document any adverse event (acoustic discomfort, haptic
+      discomfort, privacy concern, misclassification of a critical
+      sound, or general medical event) per the categories above.
+- [ ] Do **not** treat OpenHear's output as certified fitting
+      software, and do **not** record OpenHear-derived parameters
+      in clinical notes without flagging their research origin.
+
+---
+
 ## Before You Start
 
 You do not need to be technical to use this guide.

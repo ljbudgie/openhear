@@ -53,3 +53,19 @@ are bound by.
 The complete v1.0.0 specification of the advocacy layer: public API,
 record shapes, canonical serialisation, verification semantics, and
 the boundaries the layer enforces.
+
+## I am an accessibility reviewer or standards reviewer
+
+→ [`docs/ACCESSIBILITY_STANDARDS.md`](ACCESSIBILITY_STANDARDS.md) *(standards map, feature matrix, conformance language)*
+→ [`docs/EVIDENCE_AND_VALIDATION.md`](EVIDENCE_AND_VALIDATION.md) *(electroacoustic, haptic, accessibility, and clinical checklists)*
+→ [`docs/HAPTIC_PATTERN_LIBRARY.md`](HAPTIC_PATTERN_LIBRARY.md) *(canonical haptic pattern registry, SOVEREIGN/NULL semantics)*
+→ [`hardware/safety/README.md`](../hardware/safety/README.md) *(hearing-safety design, MPO limiter, calibration, risk register)*
+→ [`clinical/README.md`](../clinical/README.md) *(pilot protocol, consent template, data management SOP)*
+→ [`docs/HAPTIC_PRIOR_ART.md`](HAPTIC_PRIOR_ART.md) *(haptic evidence rubric and prior-art anchor)*
+
+How OpenHear *aligns with* — never claims certification against —
+WCAG 2.2, EN 301 549, ISO 9999, IEC 60118, ISO 13485, and ADA
+assistive listening principles, what evidence is required to back
+each alignment, and the canonical haptic patterns (including
+SOVEREIGN/NULL) used to render Burgess Principle outcomes on the
+skin.

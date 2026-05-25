@@ -167,6 +167,26 @@ sovereignty questionnaire summary score; safety event rate.
 * The Chief Investigator may halt the study at any time; an
   Independent Safety Monitor (TBC) reviews after the first 5
   participants.
+* **Adverse-event categories.** Every contact records AEs against
+  the standard project categories defined in
+  [`docs/EVIDENCE_AND_VALIDATION.md`](../docs/EVIDENCE_AND_VALIDATION.md)
+  §5:
+  * **AE-A** — acoustic discomfort (sudden loudness, distortion,
+    transient whistle, perceived over-amplification).
+  * **AE-H** — haptic discomfort (itching, pain, persistent
+    erythema, motor too strong, thermal sensation) for any
+    wristband or haptic accessory used alongside the pilot.
+  * **AE-P** — privacy concern (suspected raw-audio leak,
+    unexpected log file, unknown peer pairing, lost USB bundle).
+  * **AE-M** — misclassification of critical sounds (missed alarm,
+    missed doorbell, missed named voice, false alarm).
+  * **AE-G** — general medical event.
+* **Standards posture.** This pilot does not claim conformance with
+  any regulatory standard. It is *aligned with* the principles in
+  [`docs/ACCESSIBILITY_STANDARDS.md`](../docs/ACCESSIBILITY_STANDARDS.md)
+  and the validation expectations in
+  [`docs/EVIDENCE_AND_VALIDATION.md`](../docs/EVIDENCE_AND_VALIDATION.md)
+  §4 (clinical / research validation).
 
 ## 10. Data management — the Burgess Principle in practice
 

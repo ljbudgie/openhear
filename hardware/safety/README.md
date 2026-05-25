@@ -199,7 +199,30 @@ Every identified failure mode, its potential harm, and how OpenHear mitigates it
 
 ---
 
-## 6. Statement of Responsibility
+## 6. Standards alignment
+
+This module is **aligned with**, not certified against, hearing-device
+electroacoustic and assistive-product standards. See
+[`docs/ACCESSIBILITY_STANDARDS.md`](../../docs/ACCESSIBILITY_STANDARDS.md)
+for the full standards map and conformance vocabulary; the
+electroacoustic measurement checklist that operationalises these
+alignments lives in
+[`docs/EVIDENCE_AND_VALIDATION.md`](../../docs/EVIDENCE_AND_VALIDATION.md)
+§1.
+
+| Standard | How this module relates to it |
+|---|---|
+| IEC 60118 series | Output SPL, MPO, frequency response, distortion, latency, and feedback stability are designed so they can be *measured* in IEC-60118-compatible ways. No formal IEC 60118 measurement report is published yet. |
+| ISO 9999 | The hardware is a personal-use assistive product research artefact, not a classified hearing aid. |
+| ISO 13485 | Forward reference only — OpenHear does **not** operate an ISO 13485 quality management system. |
+| ADA assistive listening principles | Hardware design supports user control, effective communication, and interoperability. No ADA conformance claim is made. |
+
+When you publish bench measurements, place them under
+`output/electroacoustic/<git_sha>/` per
+[`docs/EVIDENCE_AND_VALIDATION.md`](../../docs/EVIDENCE_AND_VALIDATION.md)
+§6.
+
+## 7. Statement of Responsibility
 
 **OpenHear is not a regulated medical device.** It has not been submitted to or approved by any regulatory body including the FDA, CE/UKCA, or any equivalent authority. It is not sold, prescribed, dispensed, or fitted by a licensed professional.
 

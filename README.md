@@ -27,6 +27,7 @@ senses and their own audiological data.
 
 - [What OpenHear is](#what-openhear-is)
 - [Safety status](#safety-status)
+- [Accessibility and standards alignment](#accessibility-and-standards-alignment)
 - [Current working modules](#current-working-modules)
 - [Quick start](#quick-start)
 - [Repository map](#repository-map)
@@ -82,6 +83,31 @@ have validated it on your own hardware.
   [`SECURITY.md`](SECURITY.md) for private vulnerability and hearing-safety
   disclosure.
 - The repository does not claim FDA, MHRA, CE/UKCA, or equivalent clearance.
+
+## Accessibility and standards alignment
+
+OpenHear is a sovereign assistive-technology research project. It is
+*aligned with* — never *certified against* — a small set of
+accessibility, electroacoustic, and assistive-product standards. The
+full mapping, feature-to-standard matrix, conformance vocabulary, and
+known gaps live in
+[`docs/ACCESSIBILITY_STANDARDS.md`](docs/ACCESSIBILITY_STANDARDS.md);
+the matching evidence checklists live in
+[`docs/EVIDENCE_AND_VALIDATION.md`](docs/EVIDENCE_AND_VALIDATION.md);
+canonical haptic semantics live in
+[`docs/HAPTIC_PATTERN_LIBRARY.md`](docs/HAPTIC_PATTERN_LIBRARY.md).
+
+| Standard | How OpenHear treats it |
+|---|---|
+| WCAG 2.2 | UI, docs, and multimodal-access target for current and future surfaces. |
+| EN 301 549 | ICT accessibility target for the mobile scaffold and any future GUI. |
+| ISO 9999 | Informational vocabulary for placing OpenHear modules in the assistive-product taxonomy. |
+| IEC 60118 series | Electroacoustic measurement reference for the DSP pipeline, output limiter, and hardware MPO chain. |
+| ISO 13485 | Forward reference only; OpenHear does not operate a certified QMS today. |
+| ADA assistive listening principles | Design alignment for effective communication, user control, non-discrimination, venue compatibility, and interoperability. |
+
+A reference to a standard in this repository never implies
+certification or regulatory clearance against that standard.
 
 ## Current working modules
 
@@ -294,6 +320,7 @@ That deeper roadmap is intentionally moved out of this landing page:
 | User tuning processed audio | [`docs/TUNING_GUIDE.md`](docs/TUNING_GUIDE.md) |
 | Integrator or AI coding agent | [`docs/INTEGRATORS.md`](docs/INTEGRATORS.md), [`docs/ADVOCACY_INTEGRATION.md`](docs/ADVOCACY_INTEGRATION.md) |
 | Regulator or auditor | [`docs/BURGESS_PRINCIPLE.md`](docs/BURGESS_PRINCIPLE.md), [`docs/SOVEREIGN_PHILOSOPHY.md`](docs/SOVEREIGN_PHILOSOPHY.md), [`NOTICE`](NOTICE) |
+| Accessibility or standards reviewer | [`docs/ACCESSIBILITY_STANDARDS.md`](docs/ACCESSIBILITY_STANDARDS.md), [`docs/EVIDENCE_AND_VALIDATION.md`](docs/EVIDENCE_AND_VALIDATION.md), [`docs/HAPTIC_PATTERN_LIBRARY.md`](docs/HAPTIC_PATTERN_LIBRARY.md) |
 | Hardware builder | [`hardware/README.md`](hardware/README.md), [`hardware/safety/README.md`](hardware/safety/README.md), [`hardware/assembly/README.md`](hardware/assembly/README.md) |
 | Clinical pilot reader | [`clinical/README.md`](clinical/README.md) |
 | Mobile contributor | [`mobile/README.md`](mobile/README.md) |

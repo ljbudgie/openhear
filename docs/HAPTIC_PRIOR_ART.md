@@ -107,6 +107,13 @@ The honest framing for the project is:
 
 ## 5. Outstanding gaps in this anchor
 
+> **Cross-reference.** The canonical haptic pattern registry,
+> including the Burgess Principle SOVEREIGN/NULL semantics, lives in
+> [`HAPTIC_PATTERN_LIBRARY.md`](HAPTIC_PATTERN_LIBRARY.md). The
+> validation checklists that any haptic study here must satisfy
+> before claiming a result live in
+> [`EVIDENCE_AND_VALIDATION.md`](EVIDENCE_AND_VALIDATION.md) §2.
+
 Tracked as future work — pull requests welcomed.
 
 * Full-text retrieval and per-study notes for rows 1–10.

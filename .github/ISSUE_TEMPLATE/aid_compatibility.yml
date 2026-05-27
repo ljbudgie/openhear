@@ -1,0 +1,71 @@
+name: Hearing-aid compatibility report
+description: Report whether OpenHear works (or doesn't) with a specific hearing aid, fitting interface, or wristband.
+title: "[compat]: "
+labels: ["compatibility", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Compatibility reports — both successes and failures — help other users.
+        Please scrub any personally identifying or clinical data from logs and
+        screenshots before posting.
+  - type: input
+    id: aid-model
+    attributes:
+      label: Hearing aid model
+      placeholder: "Phonak Naída M70-SP / Signia Insio 7AX / ..."
+    validations:
+      required: true
+  - type: input
+    id: aid-firmware
+    attributes:
+      label: Aid firmware / platform version
+      placeholder: "Marvel 6.0 / AX 2.3 / unknown"
+  - type: input
+    id: fitting-interface
+    attributes:
+      label: Fitting interface
+      placeholder: "Noahlink Wireless 2 / iCube II / direct cable"
+  - type: input
+    id: openhear-version
+    attributes:
+      label: OpenHear version / commit SHA
+      placeholder: "0.1.0 or commit abc1234"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: "Windows 11 23H2"
+    validations:
+      required: true
+  - type: dropdown
+    id: result
+    attributes:
+      label: Result
+      options:
+        - Works fully
+        - Works partially (please describe)
+        - Does not work
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: What worked and what didn't?
+      description: Which modules did you exercise? (audiogram read, fitting write, streaming, wristband, etc.)
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs (optional, scrub personal data)
+      render: shell
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Confirmation
+      options:
+        - label: I have removed any personally identifying or clinical data from this report.
+          required: true

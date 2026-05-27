@@ -1,0 +1,53 @@
+OpenHear — Built on the Burgess Principle
+=========================================
+
+1. This software implements the Sovereign Advocacy Layer of the Burgess
+   Principle, a framework authored by Lewis James Burgess for ethical,
+   sovereign clinical data handling in audiology.
+
+2. Commercial integrators — including but not limited to hearing device
+   manufacturers, audiology software vendors, and AI system developers —
+   must obtain written permission from the author before deploying this
+   software in any production clinical environment. Cloning the repository
+   and experimenting locally is welcome and unrestricted; the permission
+   requirement applies to production clinical deployment.
+
+3. Integration must preserve the following invariants or it is not a valid
+   OpenHear integration:
+
+   - SOVEREIGN/NULL tagging semantics as defined in advocacy/gate.py must
+     not be altered, bypassed, or reinterpreted. SOVEREIGN means a human
+     personally reviewed the specific facts of the specific case; NULL
+     means automation, blanket policy, tampering, or an unverifiable
+     receipt. No third meaning may be introduced.
+
+   - RawAudioRejectedError is a hard domain boundary. Raw audio — bytes,
+     bytearray, memoryview, or NumPy ndarray — must never reach the
+     commitment layer under any circumstances. Audio must be reduced to
+     clinical facts on-device before any commitment is produced.
+
+   - The openhear-advocacy-v1 schema family
+     (openhear-advocacy-commitment-v1, openhear-advocacy-receipt-v1,
+     openhear-advocacy-bundle-v1) is owned by this repository. Integrators
+     must not fork or independently version it. Schema evolution happens
+     here, in coordination with the author.
+
+   - Sovereign facts must never be included in transmitted bundles. Only
+     the SHA-256 commitment, the receipt, the review tag, the disclaimers,
+     and the verification instructions produced by export_record() are
+     intended to leave the device.
+
+4. Iris (a companion AI agent within the Burgess Principle framework) is
+   not a dependency of this release. Iris will import OpenHear post-v1.0.0;
+   OpenHear will never import Iris. Integrators do not need to wait for
+   Iris and should not couple their integration to it.
+
+5. Contact for permission requests: [CONTACT — author to complete]
+
+----
+
+This product includes software developed by Lewis James Burgess and the
+OpenHear contributors, distributed under the Apache License, Version 2.0
+(see the LICENSE file). The Burgess Principle ethical framework, the
+SOVEREIGN/NULL tag vocabulary, and the openhear-advocacy-v1 schema family
+are authored by Lewis James Burgess.

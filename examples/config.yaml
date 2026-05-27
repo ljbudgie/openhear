@@ -1,0 +1,44 @@
+# OpenHear personal sound profile
+# Adjust these values to tune your hearing experience.
+#
+# Loaded by `dsp.user_config.load_config()` from this file (or
+# ~/.openhear/config.yaml by default).  Every section is optional —
+# omit a section to accept the built-in defaults.
+#
+# See dsp/config.schema.json for the full validation rules.
+
+# Path to your audiogram JSON file.  The DSP pipeline uses this to
+# tailor gain prescription to your specific hearing loss.
+# Use null (no quotes) to run with a flat, population-average curve.
+audiogram_path: ~/.openhear/my_audiogram.json
+
+# ── Wide Dynamic Range Compression (WDRC) ────────────────────────────
+compression:
+  ratio: 2.5            # 1.0 = linear, higher = more compression
+  knee_db: -40          # dBFS at which compression engages
+  attack_ms: 5          # how quickly the compressor responds
+  release_ms: 50        # how quickly the gain recovers
+
+# ── Noise gate / spectral subtraction ────────────────────────────────
+noise:
+  floor_db: -45         # audio below this is suppressed
+  reduction_strength: 0.6   # 0.0 = off, 1.0 = maximum
+  gate_enabled: true
+
+# ── Voice (speech band) emphasis ─────────────────────────────────────
+voice:
+  boost_hz: [1000, 4000]
+  boost_db: 6
+
+# ── Microphone-array beamforming ─────────────────────────────────────
+beamforming:
+  enabled: false
+  width_deg: 60         # directional focus angle
+  direction_deg: 0      # 0 = forward
+
+# ── Audio I/O / runtime ──────────────────────────────────────────────
+system:
+  sample_rate: 16000
+  buffer_size: 256      # frames per buffer (lower = less latency)
+  input_device: null    # null = system default
+  output_device: null   # null = system default

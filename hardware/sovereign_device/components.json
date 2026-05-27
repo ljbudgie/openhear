@@ -1,0 +1,113 @@
+{
+  "schema_version": "openhear-phase5-component-db-v1",
+  "version": "2026.05",
+  "currency": "GBP",
+  "quantity_basis": 100,
+  "components": [
+    {
+      "id": "printed_shell_pair",
+      "role": "shell",
+      "part": "OpenHear parametric ITE/BTE shell pair",
+      "category": "mechanical",
+      "unit_cost_gbp": 6.0,
+      "quantity": 1,
+      "proprietary": false,
+      "firmware_license": "none",
+      "suppliers": [
+        {"name": "Local resin printer", "region": "worldwide", "verified": true},
+        {"name": "Community print co-op", "region": "worldwide", "verified": true}
+      ],
+      "notes": "Generated from the open shell CAD and printed locally in biocompatible resin."
+    },
+    {
+      "id": "commodity_receiver_pair",
+      "role": "receiver",
+      "part": "Commodity balanced-armature receiver pair",
+      "category": "transducer",
+      "unit_cost_gbp": 18.0,
+      "quantity": 1,
+      "proprietary": false,
+      "firmware_license": "none",
+      "suppliers": [
+        {"name": "DigiKey", "region": "US/EU", "verified": true},
+        {"name": "Mouser", "region": "worldwide", "verified": true}
+      ],
+      "notes": "Supplier-specific SKUs are intentionally swappable if sensitivity and impedance are documented."
+    },
+    {
+      "id": "mems_mic_array_pair",
+      "role": "microphone",
+      "part": "Commodity digital MEMS microphone pair",
+      "category": "sensor",
+      "unit_cost_gbp": 12.0,
+      "quantity": 1,
+      "proprietary": false,
+      "firmware_license": "none",
+      "suppliers": [
+        {"name": "DigiKey", "region": "US/EU", "verified": true},
+        {"name": "LCSC", "region": "worldwide", "verified": true}
+      ],
+      "notes": "Must publish sensitivity, SNR, and acoustic overload point for calibration."
+    },
+    {
+      "id": "open_dsp_mcu_pair",
+      "role": "processor",
+      "part": "Open toolchain Cortex-M DSP controller pair",
+      "category": "compute",
+      "unit_cost_gbp": 28.0,
+      "quantity": 1,
+      "proprietary": false,
+      "firmware_license": "Apache-2.0-compatible",
+      "suppliers": [
+        {"name": "Pimoroni", "region": "UK/EU", "verified": true},
+        {"name": "Adafruit", "region": "US/worldwide", "verified": true}
+      ],
+      "notes": "Reference firmware is generated locally and built with an open toolchain."
+    },
+    {
+      "id": "battery_power_pair",
+      "role": "power",
+      "part": "Commodity LiPo cells, charger ICs, and protection pair",
+      "category": "power",
+      "unit_cost_gbp": 14.0,
+      "quantity": 1,
+      "proprietary": false,
+      "firmware_license": "none",
+      "suppliers": [
+        {"name": "RS Components", "region": "UK/EU", "verified": true},
+        {"name": "DigiKey", "region": "US/EU", "verified": true}
+      ],
+      "notes": "Cells must include over-current, over-charge, and thermal safety data."
+    },
+    {
+      "id": "passive_mpo_limiter_pair",
+      "role": "safety_limiter",
+      "part": "Passive MPO limiter components for both ears",
+      "category": "safety",
+      "unit_cost_gbp": 6.0,
+      "quantity": 1,
+      "proprietary": false,
+      "firmware_license": "none",
+      "suppliers": [
+        {"name": "DigiKey", "region": "US/EU", "verified": true},
+        {"name": "Mouser", "region": "worldwide", "verified": true}
+      ],
+      "notes": "Mandatory passive limiter; no software setting may bypass it."
+    },
+    {
+      "id": "programming_fixture",
+      "role": "programming",
+      "part": "Open SWD/USB programming fixture amortised per binaural build",
+      "category": "tooling",
+      "unit_cost_gbp": 8.0,
+      "quantity": 1,
+      "proprietary": false,
+      "firmware_license": "open",
+      "suppliers": [
+        {"name": "Raspberry Pi debug probe", "region": "worldwide", "verified": true},
+        {"name": "CMSIS-DAP compatible probe", "region": "worldwide", "verified": true}
+      ],
+      "notes": "One fixture can flash many devices; cost is amortised at quantity 100."
+    }
+  ]
+}

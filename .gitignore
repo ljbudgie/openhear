@@ -1,0 +1,43 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# Distribution / build
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Runtime outputs
+# Narrowly scoped so that new fixtures, schemas, and documentation media are
+# not silently ignored. If you generate audio/plots/PDFs into the repo, drop
+# them into one of these paths or extend this list explicitly.
+/output/
+/tmp/
+*.log
+**/*.tmp.json
+**/*.tmp.png
+**/*.tmp.pdf
+
+# Tooling caches
+.ruff_cache/
+.mypy_cache/
+
+# IDE / OS
+.idea/
+.vscode/
+*.DS_Store
+Thumbs.db
+
+# Test coverage
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/

@@ -85,6 +85,7 @@ packages = [
     "hardware.wristband.firmware",
     "learn",
     "stream",
+    "therapy",
     "voice",
     "wristband",
 ]

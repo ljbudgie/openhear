@@ -148,6 +148,25 @@ def test_falls_back_when_no_shared_data_in_range():
     assert "neutral" in rx.rationale.lower()
 
 
+def test_hearing_aids_mode_keeps_channels_balanced():
+    # Asymmetric loss that would boost one ear on headphones...
+    left = {500: 60}
+    right = {500: 20}
+    headphones = prescribe_binaural(_ag(left, right), 10.0, delivery="headphones")
+    aids = prescribe_binaural(_ag(left, right), 10.0, delivery="hearing_aids")
+    # Headphones rebalance; hearing aids stay equal (the aids correct each ear).
+    assert headphones.left_gain != headphones.right_gain
+    assert aids.left_gain == aids.right_gain == 1.0
+    # Same carrier region either way.
+    assert aids.carrier_hz == headphones.carrier_hz
+    assert "double-compensation" in aids.rationale.lower()
+
+
+def test_invalid_delivery_mode_rejected():
+    with pytest.raises(ValueError, match="delivery must be"):
+        prescribe_binaural(_ag({500: 20}, {500: 20}), 10.0, delivery="telepathy")
+
+
 def test_prescription_renders_and_round_trips_dict():
     rx = prescribe_binaural(_ag({500: 20}, {500: 20}), 10.0)
     sig = rx.render(0.5)

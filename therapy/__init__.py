@@ -20,6 +20,13 @@ disorders).  OpenHear is **not a medical device**; this is sovereign,
 inspectable tooling for evidence-led self-experimentation, not treatment.
 """
 
+from therapy.adapt import (  # noqa: F401
+    SessionOutcome,
+    Suggestion,
+    load_outcomes,
+    personalise,
+    record_outcome,
+)
 from therapy.binaural import (  # noqa: F401
     BinauralPrescription,
     dominant_frequencies,
@@ -56,4 +63,9 @@ __all__ = [
     "events_for_protocol",
     "Pulse",
     "EntrainmentEvent",
+    "SessionOutcome",
+    "Suggestion",
+    "record_outcome",
+    "load_outcomes",
+    "personalise",
 ]

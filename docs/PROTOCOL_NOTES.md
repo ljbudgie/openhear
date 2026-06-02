@@ -16,7 +16,7 @@ build on now.
 ## Transport
 
 * **Bus**: USB HID, single interface, no vendor extensions.
-* **VID/PID**: typically `0x0484 / 0x006E` (verify with
+* **VID/PID**: `0x16F0 / 0x0003` (verify with
   `hid.enumerate()` — some clones rebadge to other IDs).  ✅
 * **Report length**: 64 bytes per HID report.  Windows requires a
   leading `0x00` report-ID byte on writes.  ✅

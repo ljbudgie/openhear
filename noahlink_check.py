@@ -403,7 +403,7 @@ def main():
                         print(f"    RX: {raw[:24].hex()}  parsed={f}")
                         break
                 else:
-                    print(f"    (no reply)")
+                    print("    (no reply)")
 
             responses.extend(all_frames)
 

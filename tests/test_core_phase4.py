@@ -236,12 +236,12 @@ def test_noahlink_traffic_log(monkeypatch, tmp_path):
 
 def test_enumerate_devices_filters(monkeypatch):
     monkeypatch.setattr(noahlink_mod.hid, "enumerate", lambda: [
-        {"vendor_id": 0x0484, "product_id": 0x006E, "path": b"a"},
+        {"vendor_id": 0x16F0, "product_id": 0x0003, "path": b"a"},
         {"vendor_id": 0x046D, "product_id": 0xC52B, "path": b"b"},
     ])
     matches = enumerate_devices()
     assert len(matches) == 1
-    assert matches[0]["product_id"] == 0x006E
+    assert matches[0]["product_id"] == 0x0003
 
 
 # ── fitting_data dataclasses ───────────────────────────────────────────────

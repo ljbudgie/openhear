@@ -15,8 +15,16 @@ Key components:
   - audiogram.py   Canonical :class:`Audiogram` dataclass.
   - manual_entry.py CLI for entering thresholds at the keyboard.
   - compare.py     CLI front-end for longitudinal audiogram comparison.
+  - analyse.py     Plain-English interpretation (shape, symmetry, flags).
+  - analyse_cli.py CLI front-end for :mod:`audiogram.analyse`.
 """
 
+from audiogram.analyse import (  # noqa: E402,F401
+    AudiogramAnalysis,
+    EarAnalysis,
+    analyse,
+    summarise,
+)
 from audiogram.audiogram import (  # noqa: E402,F401
     MAX_THRESHOLD_DB_HL,
     MIN_THRESHOLD_DB_HL,
@@ -31,4 +39,8 @@ __all__ = [
     "MIN_THRESHOLD_DB_HL",
     "MAX_THRESHOLD_DB_HL",
     "severity",
+    "analyse",
+    "summarise",
+    "AudiogramAnalysis",
+    "EarAnalysis",
 ]

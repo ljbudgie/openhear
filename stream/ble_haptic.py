@@ -12,7 +12,17 @@ client for the Windows-side Python runtime.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+# The 3-byte wire format lives in stream.haptic_packet — the single source
+# of truth shared with the wristband firmware. Re-exported here so callers
+# that import from stream.ble_haptic keep working unchanged.
+from stream.haptic_packet import (  # noqa: F401
+    PACKET_FIELDS,
+    PACKET_LENGTH,
+    HapticPacket,
+    decode_packet,
+    encode_packet,
+    validate_uint8,
+)
 
 try:
     from bleak import BleakClient, BleakScanner
@@ -25,8 +35,9 @@ OPENHEAR_DEVICE_NAME = "OpenHear"
 NORDIC_UART_SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
 NORDIC_UART_RX_UUID = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
 NORDIC_UART_TX_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
-PACKET_FIELDS = ("sound_class_id", "intensity", "pattern_id")
-PACKET_LENGTH = len(PACKET_FIELDS)
+
+# Backwards-compatible private alias for the pre-extraction name.
+_validate_uint8 = validate_uint8
 
 
 def _require_bleak() -> None:
@@ -35,38 +46,6 @@ def _require_bleak() -> None:
             "BLE support requires the 'bleak' package. "
             "Install it with 'pip install bleak'."
         )
-
-
-def _validate_uint8(name: str, value: int) -> int:
-    if not isinstance(value, int):
-        raise TypeError(f"{name} must be an integer, got {type(value).__name__}.")
-    if not 0 <= value <= 255:
-        raise ValueError(f"{name} must be in the range 0..255, got {value}.")
-    return value
-
-
-@dataclass(frozen=True)
-class HapticPacket:
-    """BLE payload wrapper for one wristband command."""
-
-    sound_class_id: int
-    intensity: int
-    pattern_id: int
-
-    def to_bytes(self) -> bytes:
-        """Return the validated 3-byte payload."""
-        return encode_packet(self.sound_class_id, self.intensity, self.pattern_id)
-
-
-def encode_packet(sound_class_id: int, intensity: int, pattern_id: int) -> bytes:
-    """Pack the OpenHear 3-byte BLE command."""
-    return bytes(
-        (
-            _validate_uint8("sound_class_id", sound_class_id),
-            _validate_uint8("intensity", intensity),
-            _validate_uint8("pattern_id", pattern_id),
-        )
-    )
 
 
 class OpenHearBLEClient:

@@ -13,7 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 from dataclasses import asdict, dataclass
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
 
@@ -234,7 +234,7 @@ class Phase3OpenConversationSession:
             raise ValueError("duration_seconds must be positive.")
         event = Phase3PassiveEvent(
             session_id=self.session_id,
-            timestamp=datetime.now(UTC).isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
             environment_tag=environment_tag,
             predicted_sound_class=predicted_sound_class,
             source_label=source_label,
@@ -275,7 +275,7 @@ class Phase3OpenConversationSession:
         )
         event = Phase3RecallEvent(
             session_id=self.session_id,
-            timestamp=datetime.now(UTC).isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
             prompt_id=prompt.prompt_id,
             expected_sound_class=prompt.expected_sound_class,
             predicted_sound_class=predicted_sound_class,

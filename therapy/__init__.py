@@ -26,6 +26,13 @@ from therapy.binaural import (  # noqa: F401
     generate_binaural,
     prescribe_binaural,
 )
+from therapy.entrainment import (  # noqa: F401
+    EntrainmentEvent,
+    Pulse,
+    events_for_protocol,
+    haptic_events,
+    pulse_schedule,
+)
 from therapy.protocol import (  # noqa: F401
     BRAINWAVE_BANDS,
     BRAINWAVE_PROTOCOLS,
@@ -44,4 +51,9 @@ __all__ = [
     "dominant_frequencies",
     "prescribe_binaural",
     "BinauralPrescription",
+    "pulse_schedule",
+    "haptic_events",
+    "events_for_protocol",
+    "Pulse",
+    "EntrainmentEvent",
 ]

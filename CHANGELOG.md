@@ -9,6 +9,45 @@ release; they will be called out under a **Breaking** subsection.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-06-02
+
+### Added
+
+- **Plain-English audiogram interpretation** (`audiogram/analyse.py` +
+  `python -m audiogram.analyse_cli AG.json [--json]`). Derives, per ear, the
+  pure-tone average, severity band, and audiometric *configuration* (flat /
+  high-frequency sloping / reverse-sloping / cookie-bite / noise notch /
+  indeterminate); across ears, the inter-ear asymmetry plus non-diagnostic,
+  sovereign flags (asymmetry worth a professional check, possible noise
+  damage, output-safety for profound loss). Exported from the `audiogram`
+  package API.
+- **Plain-English fitting explanation** (`dsp/explain.py` +
+  `python -m dsp.explain_cli AG.json [--json]`). Joins the prescription
+  engine (`dsp.audiogram_profile.prescribe`) with the audiogram
+  configuration and explains *what the fitting does and why* — where it adds
+  the most gain, how that ties to the shape of the loss, and how hard
+  compression is working — the reasoning commercial fitting software shows
+  only to the clinician.
+- **Shared wristband haptic-packet codec** (`stream/haptic_packet.py`): a
+  dependency-free single source of truth for the 3-byte BLE packet
+  `[sound_class_id, intensity, pattern_id]` with `encode_packet` /
+  `decode_packet` and a `HapticPacket` dataclass. `stream/ble_haptic.py`
+  re-exports it unchanged. A golden contract test pins the wire format and a
+  behavioural parity test proves the v1 firmware decodes what the codec
+  encodes, so the Python, v2 Arduino, and app implementations cannot drift.
+- **Sound→haptic decision policy** (`stream/haptic_policy.py`): the layer
+  between classification and the wrist. `HapticPolicy.decide()` applies
+  actionability, a confidence gate, and per-class refractory/debounce, and
+  ranks classes by priority (safety sounds outrank ambient) so the wristband
+  surfaces one clear signal instead of false buzzes and bursts. `packet_for()`
+  bridges policy → mapper → wire via the shared codec.
+
+### Changed
+
+- `pyproject.toml` version is now `1.2.0`, aligned with the release tag.
+
+## [1.1.0]
+
 ### Added
 
 - Burgess Principle reference layer in `advocacy/` (gate, adapters,

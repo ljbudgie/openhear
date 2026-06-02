@@ -49,6 +49,16 @@ DEFAULT_CARRIER_RANGE: tuple[float, float] = (250.0, 1000.0)
 #: severe single-ear loss cannot demand an absurd gain.
 _MAX_BALANCE_DB: float = 30.0
 
+#: Where the beat will be played, which decides who does the per-ear
+#: correction:
+#:
+#: * ``"headphones"`` — nothing corrects your hearing, so the prescriber
+#:   rebalances the ears itself (default).
+#: * ``"hearing_aids"`` — your *fitted* aids already apply per-ear,
+#:   per-frequency gain, so the file stays balanced (equal gains) to avoid
+#:   double-compensation; the carrier is still placed in your best region.
+DELIVERY_MODES: tuple[str, ...] = ("headphones", "hearing_aids")
+
 
 def generate_binaural(
     carrier_hz: float,
@@ -228,14 +238,20 @@ def prescribe_binaural(
     amplitude: float = 0.2,
     sample_rate: int = DEFAULT_SAMPLE_RATE,
     carrier_range: tuple[float, float] = DEFAULT_CARRIER_RANGE,
+    delivery: str = "headphones",
 ) -> BinauralPrescription:
     """Tailor a binaural beat to ``audiogram`` so both ears actually hear it.
 
-    The carrier is placed where both ears hear best; per-ear gains rebalance
-    an asymmetric loss (the worse ear is boosted by the threshold difference,
-    capped at :data:`_MAX_BALANCE_DB`).  If that pushes the peak past the
-    :data:`SAFE_PEAK_AMPLITUDE` ceiling, both channels are scaled down
-    together so the *balance* is preserved under the safety limit.
+    The carrier is placed where both ears hear best.  How the ears are
+    balanced depends on ``delivery`` (see :data:`DELIVERY_MODES`):
+
+    * ``"headphones"`` — the prescriber rebalances the ears itself: the worse
+      ear is boosted by the threshold difference (capped at
+      :data:`_MAX_BALANCE_DB`).  If that pushes the peak past the
+      :data:`SAFE_PEAK_AMPLITUDE` ceiling, both channels scale down together
+      so the balance is preserved under the limit.
+    * ``"hearing_aids"`` — your *fitted* aids already apply per-ear correction,
+      so the channels stay equal (gain 1.0/1.0) to avoid double-compensation.
 
     Args:
         audiogram: The listener's audiogram.
@@ -243,12 +259,18 @@ def prescribe_binaural(
         amplitude: Base amplitude before per-ear gain.
         sample_rate: Output sample rate.
         carrier_range: Allowed carrier window in Hz.
+        delivery: One of :data:`DELIVERY_MODES`.
 
     Returns:
         A :class:`BinauralPrescription`.
+
+    Raises:
+        ValueError: On a non-positive ``beat_hz`` or an unknown ``delivery``.
     """
     if beat_hz <= 0:
         raise ValueError("beat_hz must be positive.")
+    if delivery not in DELIVERY_MODES:
+        raise ValueError(f"delivery must be one of {DELIVERY_MODES}, got {delivery!r}.")
 
     carrier = _best_mutual_carrier(audiogram, carrier_range)
     if carrier is None:
@@ -269,6 +291,24 @@ def prescribe_binaural(
 
     left_thr = audiogram.thresholds("left")[carrier]
     right_thr = audiogram.thresholds("right")[carrier]
+
+    if delivery == "hearing_aids":
+        # The fitted aids already correct each ear; keep the file balanced so
+        # we don't compensate twice. Carrier still sits in the best region.
+        return BinauralPrescription(
+            carrier_hz=float(carrier),
+            beat_hz=beat_hz,
+            left_gain=1.0,
+            right_gain=1.0,
+            amplitude=amplitude,
+            sample_rate=sample_rate,
+            rationale=(
+                f"Carrier {carrier} Hz, balanced for hearing aids: your fitted "
+                "aids already apply per-ear correction, so both channels play "
+                "equal to avoid double-compensation. Stream it on a low-"
+                "compression/music program so the beat is not smeared."
+            ),
+        )
 
     # Boost the worse (higher-threshold) ear by the capped difference.
     delta_db = min(abs(left_thr - right_thr), _MAX_BALANCE_DB)

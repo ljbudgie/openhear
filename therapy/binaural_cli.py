@@ -50,6 +50,12 @@ def _write_wav(path: Path, stereo: np.ndarray, sample_rate: int) -> None:
     default=None,
     help="Personalise carrier and per-ear levels from this audiogram.",
 )
+@click.option(
+    "--delivery",
+    type=click.Choice(["headphones", "hearing_aids"]),
+    default="headphones",
+    help="Who corrects each ear: 'headphones' (we do) or 'hearing_aids' (your aids do).",
+)
 @click.option("--duration", "duration_s", type=float, default=60.0, help="Length (s).")
 @click.option("--amplitude", type=float, default=0.2, help="Base amplitude (0-1].")
 @click.option("--sample-rate", type=int, default=DEFAULT_SAMPLE_RATE, help="Sample rate.")
@@ -58,6 +64,7 @@ def main(
     beat_hz: float,
     carrier_hz: float | None,
     audiogram_path: Path | None,
+    delivery: str,
     duration_s: float,
     amplitude: float,
     sample_rate: int,
@@ -72,7 +79,11 @@ def main(
         if audiogram_path is not None:
             audiogram = Audiogram.from_path(audiogram_path)
             rx = prescribe_binaural(
-                audiogram, beat_hz, amplitude=amplitude, sample_rate=sample_rate
+                audiogram,
+                beat_hz,
+                amplitude=amplitude,
+                sample_rate=sample_rate,
+                delivery=delivery,
             )
             click.echo(rx.rationale)
             stereo = rx.render(duration_s)

@@ -9,6 +9,42 @@ release; they will be called out under a **Breaking** subsection.
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-06-02
+
+### Added
+
+- **Therapeutic frequency delivery (Pillar 5)** — first implementation of
+  the therapy pillar, as a coherent, audiogram-aware, evidence-graded,
+  closed-loop system. New `therapy/` package:
+  - `therapy/protocol.py` — the `TherapeuticProtocol` data model with an
+    ordered `EvidenceGrade` (`anecdotal → preliminary → emerging →
+    established`) and explicit contraindication gates. Auditory entrainment
+    is barred for seizure disorders on every bundled protocol, and
+    `TherapeuticProtocol.gate()` refuses to run for matching conditions. The
+    bundled brainwave registry is graded conservatively — none claims
+    "established".
+  - `therapy/binaural.py` — deterministic binaural-beat generation plus the
+    novel part: `prescribe_binaural(audiogram, beat)` places the carrier
+    where *both* ears hear best and sets per-ear gains to rebalance an
+    asymmetric loss, under a safety amplitude ceiling. A binaural beat only
+    works if both tones arrive audible and balanced, which silently fails
+    for hearing-loss users on a fixed carrier. CLI:
+    `python -m therapy.binaural_cli --beat 10 --audiogram AG.json` (16-bit
+    WAV via the stdlib, no audio deps).
+  - `therapy/entrainment.py` — delivery-agnostic, cross-modal entrainment.
+    Renders a beat frequency as an isochronic pulse train emitted as
+    timestamped 3-byte wristband packets (via `stream.haptic_packet`), so a
+    rhythm can be *felt* on the wrist when it cannot be heard — the path for
+    profound loss. The same protocol can be delivered acoustically or
+    haptically; `events_for_protocol()` gates contraindications first.
+  - `therapy/adapt.py` — closed-loop, n-of-1 personalisation: a
+    deterministic, bounded, explainable controller (in the spirit of
+    `learn/`) that learns which entrainment frequency and session length
+    work for one person from their own `-1..+1` ratings. `personalise()`
+    averages toward liked settings (exploit) or nudges to a neighbouring
+    in-band frequency (explore); it stays inside the protocol's EEG band and
+    clamps session length to 5–60 minutes. Outcomes persist as JSONL.
+
 ## [1.2.0] - 2026-06-02
 
 ### Added

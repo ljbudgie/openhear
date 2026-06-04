@@ -72,7 +72,7 @@ jobs:
 
       - name: Upload coverage artefact
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-xml
           path: coverage.xml
@@ -107,7 +107,7 @@ jobs:
           /tmp/openhear-venv/bin/python -c "import dsp, core, audiogram, stream, voice, learn, wristband; print('import OK')"
 
       - name: Upload distributions
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dist
           path: dist/*

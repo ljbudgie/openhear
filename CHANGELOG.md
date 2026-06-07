@@ -9,6 +9,25 @@ release; they will be called out under a **Breaking** subsection.
 
 ## [Unreleased]
 
+### Added
+
+- **Parametrised haptic primitives** (`stream/haptic_primitive.py`) — replaces the
+  seven hard-coded v1 patterns with four composable axes: `pulse_rate_hz` (0.1–30 Hz),
+  `intensity` (0–255), `spatial_balance` (−1.0 left → +1.0 right), and `sharpness`
+  (soft envelope → sharp click). Each primitive renders to a timed `PrimitiveEvent`
+  schedule (`to_events()`) for continuous-channel use or collapses back to the closest
+  3-byte v1 packet (`to_packet()`) for backward compatibility. Factory helpers:
+  `calm()`, `alert()`, `directional(bearing)`. Spatial balance encodes left/centre/right
+  today; same axis carries angle-of-arrival in the multi-actuator v2 hardware path.
+- **Continuous crowd-energy estimation** (`stream/crowd_arousal.py`) — frame-by-frame
+  stateful estimator of acoustic crowd state. Three dimensions computed from raw audio:
+  `arousal` (0–1, log-scaled RMS), `tension` (0–1, half-wave rectified spectral flux),
+  `onset_rate_hz` (events/s over a rolling 2 s window). `to_primitive()` maps directly
+  to a `HapticPrimitive`: arousal → intensity, tension → pulse rate and sharpness,
+  spatial balance always 0.0 (crowd is omnidirectional). Pure numpy, no I/O, fully
+  unit-testable. Foundation for the athlete and performer personas described in the
+  Expanded Sensory Vocabulary v2 north-star document.
+
 ## [1.3.0] - 2026-06-02
 
 ### Added

@@ -56,6 +56,7 @@ OpenHear now has eight explicit pillars:
 - Go-to-market, mission, and showcase applications — [`docs/GO_TO_MARKET.md`](docs/GO_TO_MARKET.md)
 - Funding and partnerships — [`docs/FUNDING_AND_PARTNERSHIPS.md`](docs/FUNDING_AND_PARTNERSHIPS.md)
 - Regeneration vision and roadmap — [`REGEN_VISION.md`](REGEN_VISION.md)
+- Superior-hearing roadmap (functionally exceed natural hearing) — [`SUPERIOR_HEARING_ROADMAP.md`](SUPERIOR_HEARING_ROADMAP.md)
 
 ### Mission
 

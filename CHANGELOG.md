@@ -11,6 +11,26 @@ release; they will be called out under a **Breaking** subsection.
 
 ### Added
 
+- **`SUPERIOR_HEARING_ROADMAP.md`** — top-level phased roadmap (Short /
+  Medium / Long) for evolving OpenHear into a system that delivers
+  hearing *functionally and experientially superior* to pre-deafness
+  natural hearing across six named domains (social/relational,
+  conversation in noise, music, focus, emotional nuance, environmental
+  awareness). Includes a shared 10-metric scoreboard (M1–M10),
+  integration map to existing DSP / haptic / social / Iris / Whoop /
+  therapy / wristband / advocacy surfaces, a copy-paste-ready Phase S
+  minimal viable experiment (`SH-S-001` per-contact DSP profile),
+  Iris sub-agent prompt seeds (Plasticity Coach, Social Listener,
+  Music Enhancer, Fatigue Sentinel), and explicit BGSP/BSEP/Burgess
+  Principle alignment. Linked from `README.md` and `docs/index.md`.
+  - **v0.2** — §9 open questions resolved with repo-grounded defaults
+    (three-tier Whoop recovery scheme, per-skin-site haptic dose
+    budget on top of the committed firmware thermal envelope, social-
+    tier voice-fingerprint consent flow with scope-can-only-narrow
+    BSEP rule, `SH-S-001` contact roles with names assigned locally,
+    M1/M5 baselines tagged TBM with fixed measurement protocols).
+    Adds new §10 "Defaults summary" table for downstream agents and
+    `dsp/config.py` to anchor against.
 - **Performer's beat channel** (`stream/tempo_channel.py`) — `TempoChannel`
   adapts the rhythmic-scheduling idea from `therapy/entrainment.py` to live
   performance: each `update(bpm)` call drives a `HapticPrimitive` at the

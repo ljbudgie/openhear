@@ -59,6 +59,7 @@ the boundaries the layer enforces.
 → [`REGEN_VISION.md`](../REGEN_VISION.md)
 → [`docs/REGEN_LOGGING_SPEC.md`](REGEN_LOGGING_SPEC.md) *(technical spec)*
 → [`docs/REGEN_BACKLOG.md`](REGEN_BACKLOG.md) *(issue-ready short-term backlog)*
+→ [`SUPERIOR_HEARING_ROADMAP.md`](../SUPERIOR_HEARING_ROADMAP.md) *(phased roadmap: functionally exceed natural hearing)*
 
 An evidence-based (June 2026) account of where biological hearing
 regeneration actually stands — approved *OTOF* gene therapy versus

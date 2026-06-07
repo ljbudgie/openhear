@@ -63,7 +63,8 @@ in code makes them testable and validates §5 refusal rules.
 
 **Acceptance criteria.**
 - All four families validate at least one minimal valid example.
-- Every refusal case in §5 has a passing failing-input test.
+- Every refusal case in §5 has a test that verifies the adapter
+  correctly rejects the invalid input.
 - `make ci` passes.
 
 **Dependencies.** None.

@@ -73,8 +73,10 @@ A versioned wrapper around the existing audiogram JSON shape used by the
   (e.g. `"matrix"`, `"hint"`, `"quicksin"`, `"custom"`); free-form
   string, user-owned.
 - `snr_db` — the signal-to-noise ratio at which the score was measured.
-- `score` — percent-correct (`0.0`–`100.0`) **or** SRT in dB; one of
-  `score_percent` or `srt_db` must be present.
+- `score_percent` *or* `srt_db` — exactly one must be present.
+  `score_percent` is percent-correct in the range `0.0`–`100.0`;
+  `srt_db` is the speech-reception threshold in dB. The presence of one
+  field (and the absence of the other) acts as the type discriminator.
 - `ear` — `"left" | "right" | "binaural"`.
 - `conditions` — optional mapping for masker type, list length, etc.
 - `notes`.

@@ -10,7 +10,7 @@
 > means richer, more controllable, less fatiguing, and more relationally
 > powerful — not louder, not "normal."
 
-**Status:** Draft v0.1 · Author: Lewis James Burgess · Built on the
+**Status:** Draft v0.2 · Author: Lewis James Burgess · Built on the
 [Burgess Principle](docs/BURGESS_PRINCIPLE.md) · Governed by BGSP (Git /
 Iris / AI governance) and BSEP (Sovereign Exit Paths) · Complements
 [`REGEN_VISION.md`](REGEN_VISION.md) (regeneration as *complementary*
@@ -280,10 +280,158 @@ decision_rule:
 
 ---
 
-## 9. Open questions (answer before promoting from draft to v1)
+## 9. Open questions — Draft v0.2 resolutions
 
-1. Which 3 contacts seed SH-S-001 (D1)?
-2. Current documented v1.x baselines for M1 and M5 — anchor exactly.
-3. Whoop recovery floor for S3 / M6 (default 30 sufficient?).
-4. Haptic daily-dose budget per skin site (firmware default vs user-tunable).
-5. Consent UX for per-contact voice fingerprints (S1, L2) — opt-in flow.
+The five questions raised in Draft v0.1 are resolved here with defensible
+defaults. **Q1 (your contacts) and Q2 (your measured personal baselines)
+are facts only the user can confirm**; the values below are seed
+placeholders to unblock `SH-S-001` and are flagged as such. Q3, Q4, Q5
+are design defaults grounded in the existing repo and are ready to be
+promoted to v1 unless overridden.
+
+### Q1 — Three contacts to seed SH-S-001 (D1) — *user to confirm names*
+
+Use **roles**, not names, in committed records (names stay local per §5).
+
+| Slot | Role | Why this slot | Voice-sample target |
+|------|------|---------------|---------------------|
+| `contact_a` | Partner / closest daily speaker | Highest D1 leverage; most conversation minutes/week; easiest consent | ≥ 5 min clean speech + ≥ 5 min in-noise (kitchen, café) |
+| `contact_b` | Parent or sibling | Phone/video-call dominant; tests prosody under codec loss; relational weight | ≥ 5 min clean + ≥ 3 min over the call channel actually used |
+| `contact_c` | Close friend or frequent collaborator | Diversifies F0 / accent; tests schema generalises beyond family | ≥ 5 min clean + ≥ 3 min in a noisy social setting |
+
+Status: **placeholder roles accepted; names assigned by user at run time
+and never committed**. Consent flow per Q5.
+
+### Q2 — Personal v1.x baselines for M1 and M5 — *to be measured before SH-S-001 lands*
+
+The committed [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) v1 (May 2026) is
+a DSP-engineering benchmark (latency / `realtime_factor_p95` /
+bit-parity), **not** a user-outcome benchmark. There is no committed
+v1.x SRT or focus-session number to anchor to. So we explicitly capture
+both as `TBM` with a fixed protocol, rather than invent numbers:
+
+- **M1 — Speech-in-noise SRT (dB):** `baseline: TBM`. Protocol —
+  adaptive matrix-style sentence list (open Oldenburg-style list or
+  equivalent) at +10 / +5 / 0 / −5 dB SNR, 20 sentences per SNR,
+  generic profile only, single quiet session. Median SNR for 50 %
+  words-correct = baseline SRT. Captured *before* the `SH-S-001` change
+  set lands. Guardrail after `SH-S-001`: regression ≤ 1 dB (§6).
+- **M5 — Focus-session length to first interruption-by-sound (min):**
+  `baseline: TBM`. Protocol — 5 working sessions over 1 week on the 3
+  nominated focus tasks, current generic profile, current environment,
+  log time-to-first-self-reported-interruption. Median = baseline.
+  Phase M target (M4 acoustic "rooms"): ≥ 2× baseline median.
+
+If the user has private measurements taken outside the repo, those
+override these placeholders and get committed as a signed JSON in
+`experiments/superior_hearing/SH-S-000_baselines/`.
+
+### Q3 — Whoop recovery floor for S3 / M6 — three-tier, not a single number
+
+A single floor is insufficient. Default scheme, all three thresholds
+user-tunable in `dsp/config.py`:
+
+| Whoop recovery | DSP behaviour (S3) | Training behaviour (M6) | Rationale |
+|----------------|--------------------|--------------------------|-----------|
+| **≥ 67 (green)** | Full user-preset aggressiveness | Full training session permitted | Headroom for cognitive load |
+| **34–66 (yellow)** | Less noise reduction, gentler compression knee, slightly lower MPO ceiling | ≤ 50 % normal duration; prefer passive (music) over active (phonemic drills) | Reduce listening effort on partial-recovery days |
+| **≤ 33 (red)** | "Low-effort" preset; optional haptic-only focus room | **Skip active training entirely.** Passive only. | Protect against compounded fatigue + tinnitus risk |
+
+The `whoop_recovery_floor: 30` in §6 is rounded up to **34** to align
+with the standard Whoop yellow boundary.
+
+### Q4 — Haptic daily-dose budget per skin site
+
+Firmware already enforces the **thermal envelope and simultaneous
+duty-cycle cap**
+(`hardware/wristband/firmware/openhear_firmware_v1.py`: `MAX_INTENSITY =
+180`, `THERMAL_DERATE_C = 38.0`, `THERMAL_SHUTOFF_C = 40.0`;
+`hardware/wristband/power_budget_v1.md`: "Cap simultaneous duty cycle to
+25 % starter build", "derate at 38 °C", "hard-shutdown at 40 °C",
+"refuse charging while worn unless skin temperature below 36 °C"). What
+this roadmap **adds** is a per-skin-site **daily-dose** abstraction on
+top of that envelope.
+
+| Parameter | Default | Source |
+|-----------|---------|--------|
+| `max_intensity` (firmware floor) | **180 / 255** | `openhear_firmware_v1.py:21` (committed) |
+| `simultaneous_duty_cycle_pct` | **25 %** | `power_budget_v1.md` starter build (committed) |
+| `per_site_duty_cycle_24h_pct` | **40 %** (~9.6 h active per actuator site per 24 h) | New; conservative continuous-wear ceiling |
+| `per_site_continuous_max_min` | **20 min active, then ≥ 5 min rest** | New; gives 38 °C envelope time to settle |
+| `thermal_derate_c` | **38.0 °C** | `openhear_firmware_v1.py:22` (committed) |
+| `thermal_shutoff_c` | **40.0 °C** | `openhear_firmware_v1.py:23` (committed) |
+| `nightly_quiet_window` | **23:00–07:00 local; all haptics off except safety class** | New; sleep hygiene + tinnitus risk reduction |
+| `safety_class_override` | Whitelist (`door`, `name-call`, `alarm`) bypasses quiet window only; **never** bypasses thermal | New |
+| Tunability | All values **user-tunable in `dsp/config.py`**, but firmware refuses values that exceed the committed thermal envelope or `max_intensity` | BSEP-compatible: user can reduce, never exceed hardware-safe ceiling |
+
+Pattern: **firmware owns the hard envelope; `dsp/config.py` owns the
+soft user-tunable budget within it** — same shape as how `dsp/config.py`
+already wraps DSP parameters today.
+
+### Q5 — Consent UX for per-contact voice fingerprints (S1, L2)
+
+`clinical/CONSENT_TEMPLATE.md` is the correct *legal* base but is
+clinical-trial framed; a social-tier equivalent is needed.
+Sovereignty constraint (§5 + `docs/SOVEREIGN_PHILOSOPHY.md`): nothing
+leaves the device, everything is revocable, plain-JSON exit.
+
+**Five-step opt-in flow, all local, no cloud, no telemetry:**
+
+1. **Plain-language ask** (paper or in-person, not in-app): one-paragraph
+   script — *"I'd like to record about 5 minutes of you speaking so my
+   hearing system understands your voice better. The recording stays on
+   my device, nothing goes online, and you can ask me to delete it at
+   any time and I'll show you it's gone."*
+2. **On-device consent record** (signed JSON, BGSP-anchored) at
+   `contacts/<contact_id>/consent.json` with fields: `contact_id`
+   (locally-generated UUID, never the real identifier), `consent_granted_at`,
+   `consent_scope` ∈ {`voiceprint_only`, `voiceprint_plus_prosody`,
+   `voiceprint_plus_prosody_plus_relational_history`}, `revocation_method`
+   (`one_click_in_app` always present), `expiry` (default 12 months,
+   then re-ask), `signed_sha256` (canonical-JSON SHA-256, matching the
+   advocacy-layer pattern).
+3. **Visible capture session:** UI shows level meter + elapsed time +
+   hard stop. Mic indicator on the entire time. No background capture, ever.
+4. **Revoke = delete + prove:** one button. Deletes the voiceprint,
+   prosody delta, and relational-history slice. Emits
+   `consent_revoked.json` provenance record; shows the contact the
+   empty directory (or a hash-zero attestation).
+5. **Re-consent on scope widening:** if the `ContactProfile` schema
+   bumps in a way that widens scope, previous consent does **not**
+   auto-carry. BSEP rule: **scope can only narrow without re-consent,
+   never widen.**
+
+Fall-out defaults:
+
+- `default_scope = voiceprint_only` (narrowest)
+- `default_expiry_months = 12`
+- `cloud_sync = false` (no toggle to enable in Phase S/M)
+- `shared_with_other_contacts = false`
+
+---
+
+## 10. Defaults summary (Draft v0.2)
+
+Single table for downstream agents and `dsp/config.py` to anchor against:
+
+| Key | Default | Tunable? | Source |
+|-----|---------|----------|--------|
+| `SH-S-001.contacts` | `[contact_a, contact_b, contact_c]` (roles) | User assigns names locally | §9 Q1 |
+| `M1.baseline_db` | `TBM` (run baseline before SH-S-001) | n/a | §9 Q2 |
+| `M5.baseline_min` | `TBM` (5-session protocol) | n/a | §9 Q2 |
+| `whoop_recovery.green` | `≥ 67` | yes | §9 Q3 |
+| `whoop_recovery.yellow` | `34–66` | yes | §9 Q3 |
+| `whoop_recovery.red` | `≤ 33` | yes | §9 Q3 |
+| `whoop_recovery_floor` (training, §6) | `34` (was `30`) | yes | §9 Q3 |
+| `haptic.max_intensity` | `180 / 255` | no (firmware floor) | §9 Q4 |
+| `haptic.simultaneous_duty_cycle_pct` | `25` | yes, ≤ firmware cap | §9 Q4 |
+| `haptic.per_site_duty_cycle_24h_pct` | `40` | yes | §9 Q4 |
+| `haptic.per_site_continuous_max_min` | `20` (then ≥ 5 rest) | yes | §9 Q4 |
+| `haptic.thermal_derate_c` | `38.0` | no (firmware) | §9 Q4 |
+| `haptic.thermal_shutoff_c` | `40.0` | no (firmware) | §9 Q4 |
+| `haptic.nightly_quiet_window` | `23:00–07:00 local` | yes | §9 Q4 |
+| `haptic.safety_class_override` | `[door, name-call, alarm]` | yes (cannot bypass thermal) | §9 Q4 |
+| `consent.default_scope` | `voiceprint_only` | yes (narrow only without re-consent) | §9 Q5 |
+| `consent.default_expiry_months` | `12` | yes | §9 Q5 |
+| `consent.cloud_sync` | `false` | no in Phase S/M | §9 Q5 |
+| `consent.shared_with_other_contacts` | `false` | no in Phase S/M | §9 Q5 |

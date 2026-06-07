@@ -315,7 +315,8 @@ class TempoChannel:
             last_onset = t
             t += period_ms
             if accenting:
-                beat_in_bar = (beat_in_bar + 1) % self._beats_per_bar  # type: ignore[operator]
+                assert self._beats_per_bar is not None  # guarded by `accenting`
+                beat_in_bar = (beat_in_bar + 1) % self._beats_per_bar
 
         # Update persistent state so the next window picks up exactly where
         # this one left off, regardless of any tempo change in between.

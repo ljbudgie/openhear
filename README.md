@@ -55,6 +55,7 @@ OpenHear now has eight explicit pillars:
 - Immediate engagement list — [`docs/PRIOR_ART.md`](docs/PRIOR_ART.md)
 - Go-to-market, mission, and showcase applications — [`docs/GO_TO_MARKET.md`](docs/GO_TO_MARKET.md)
 - Funding and partnerships — [`docs/FUNDING_AND_PARTNERSHIPS.md`](docs/FUNDING_AND_PARTNERSHIPS.md)
+- Regeneration vision and roadmap — [`REGEN_VISION.md`](REGEN_VISION.md)
 
 ### Mission
 

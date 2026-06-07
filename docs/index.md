@@ -53,3 +53,13 @@ are bound by.
 The complete v1.0.0 specification of the advocacy layer: public API,
 record shapes, canonical serialisation, verification semantics, and
 the boundaries the layer enforces.
+
+## I want to understand OpenHear and the regenerative future of hearing
+
+→ [`REGEN_VISION.md`](../REGEN_VISION.md)
+
+An evidence-based (June 2026) account of where biological hearing
+regeneration actually stands — approved *OTOF* gene therapy versus
+research-stage approaches — and OpenHear's precise supportive role
+before and after any clinical intervention. OpenHear maximises,
+substitutes, trains, and monitors; it does not regenerate biology.

@@ -357,6 +357,12 @@ docs/UI strings unless accompanied by an approved scope tag.
    advocacy integration) or a feature backlog (issue-ready cards) produced
    next?
 
+> **Both produced.** See
+> [`docs/REGEN_LOGGING_SPEC.md`](docs/REGEN_LOGGING_SPEC.md) for the
+> baseline/outcome logging schema and advocacy integration, and
+> [`docs/REGEN_BACKLOG.md`](docs/REGEN_BACKLOG.md) for the issue-ready
+> short-term backlog.
+
 ---
 
 ## 11. Sources (evidence cut-off June 2026)

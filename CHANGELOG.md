@@ -11,6 +11,18 @@ release; they will be called out under a **Breaking** subsection.
 
 ### Added
 
+- **Performer's beat channel** (`stream/tempo_channel.py`) — `TempoChannel`
+  adapts the rhythmic-scheduling idea from `therapy/entrainment.py` to live
+  performance: each `update(bpm)` call drives a `HapticPrimitive` at the
+  current room tempo so a hard-of-hearing musician can feel the pulse
+  locked to the band. Phase is tracked across back-to-back
+  `events_for_window()` calls, so the beat train stays continuous even as
+  the tempo shifts. Optional `beats_per_bar` + `accent_intensity` make the
+  downbeat punch harder than the offbeats; optional EMA `smoothing` damps a
+  jittery tempo tracker. Helpers `bpm_to_pulse_rate_hz` /
+  `pulse_rate_hz_to_bpm` formalise the BPM ↔ Hz conversion. Pure Python on
+  top of the existing 3-byte `stream.haptic_packet` wire format, so any
+  firmware that already speaks v1 will respond without changes.
 - **Parametrised haptic primitives** (`stream/haptic_primitive.py`) — replaces the
   seven hard-coded v1 patterns with four composable axes: `pulse_rate_hz` (0.1–30 Hz),
   `intensity` (0–255), `spatial_balance` (−1.0 left → +1.0 right), and `sharpness`

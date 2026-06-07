@@ -9,6 +9,7 @@ Includes:
   - haptic_policy.py      Sound → haptic decision layer (confidence, refractory).
   - haptic_primitive.py   Parametrised haptic primitives (v2 continuous channels).
   - crowd_arousal.py      Continuous crowd-energy estimation for haptic rendering.
+  - tempo_channel.py      Performer's beat channel — live BPM → HapticPrimitive.
   - sound_classifier.py   YAMNet-oriented sound-class mapping helpers.
   - wristband_runtime.py  End-to-end Windows wristband prototype runner.
 """

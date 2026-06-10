@@ -143,3 +143,67 @@ def test_config_to_dict_round_trips():
     assert d["voice"]["boost_hz"] == [500.0, 6000.0]
     rebuilt = Config.from_dict(d)
     assert rebuilt == cfg
+
+
+# ── Phase 0: contact_profiles + fatigue extensions ─────────────────────────
+
+
+def test_contact_profiles_defaults_disabled():
+    """ContactProfilesConfig defaults to disabled, no path, no active id."""
+    from dsp.user_config import ContactProfilesConfig
+
+    cp = ContactProfilesConfig()
+    assert cp.enabled is False
+    assert cp.path is None
+    assert cp.active_contact_id is None
+
+
+def test_fatigue_defaults_match_roadmap_thresholds():
+    """FatigueConfig defaults match SUPERIOR_HEARING_ROADMAP §9 Q3.
+
+    green ≥ 67, red ≤ 33, yellow in between.
+    """
+    from dsp.user_config import FatigueConfig
+
+    f = FatigueConfig()
+    assert f.enabled is False
+    assert f.recovery_file is None
+    assert f.green_floor == 67
+    assert f.red_ceiling == 33
+
+
+def test_load_config_round_trip_with_new_sections(tmp_path):
+    cfg_path = tmp_path / "config.json"
+    cfg_path.write_text(
+        json.dumps(
+            {
+                "contact_profiles": {
+                    "enabled": True,
+                    "path": "~/.openhear/contacts.json",
+                    "active_contact_id": "partner",
+                },
+                "fatigue": {
+                    "enabled": True,
+                    "recovery_file": "~/.openhear/whoop_recovery.json",
+                    "green_floor": 67,
+                    "red_ceiling": 33,
+                },
+            }
+        )
+    )
+    cfg = load_config(cfg_path)
+    assert cfg.contact_profiles.enabled is True
+    assert cfg.contact_profiles.active_contact_id == "partner"
+    assert cfg.fatigue.enabled is True
+    assert cfg.fatigue.green_floor == 67
+    # Round-trip preserves everything.
+    rebuilt = Config.from_dict(cfg.to_dict())
+    assert rebuilt == cfg
+
+
+def test_load_config_unknown_section_warning_does_not_raise(tmp_path, caplog):
+    cfg_path = tmp_path / "config.json"
+    cfg_path.write_text(json.dumps({"made_up_section": {"x": 1}}))
+    cfg = load_config(cfg_path)
+    # Defaults preserved despite unknown key.
+    assert cfg == Config()

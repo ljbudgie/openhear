@@ -101,6 +101,55 @@ class SystemConfig:
     output_device: int | None = None
 
 
+@dataclass
+class ContactProfilesConfig:
+    """Per-contact DSP profile bank toggle (roadmap S1 → M2).
+
+    The actual profile data lives in a separate local file (default
+    ``~/.openhear/contacts.json``) so it can be deleted in one move when
+    consent is withdrawn.  This sub-config only switches the feature on
+    and remembers which contact is currently active.
+
+    Attributes:
+        enabled: Master switch.  ``False`` (default) means the pipeline
+            ignores any contacts.json and uses the generic profile only.
+        path: Override for the contacts file location.  ``None`` uses
+            the default in :mod:`dsp.contact_profiles`.
+        active_contact_id: Currently selected contact, or ``None`` for
+            the generic profile.  Set via ``python -m dsp.contact_cli set``.
+    """
+
+    enabled: bool = False
+    path: str | None = None
+    active_contact_id: str | None = None
+
+
+@dataclass
+class FatigueConfig:
+    """Fatigue-aware DSP hooks (roadmap S3 → M6).
+
+    All recovery data is read from a local JSON file; no network call is
+    ever made.  Bucket thresholds default to the three-tier scheme
+    pinned in §9 Q3 of ``SUPERIOR_HEARING_ROADMAP.md``
+    (green ≥ 67, yellow 34–66, red ≤ 33).
+
+    Attributes:
+        enabled: Master switch.  ``False`` (default) means the pipeline
+            ignores recovery data entirely.
+        recovery_file: Path to the local recovery JSON file, or ``None``
+            to use the default (``~/.openhear/whoop_recovery.json``).
+        green_floor: Inclusive lower bound for the "green" bucket.
+        red_ceiling: Inclusive upper bound for the "red" bucket.  Scores
+            strictly between ``red_ceiling`` and ``green_floor`` are
+            "yellow".
+    """
+
+    enabled: bool = False
+    recovery_file: str | None = None
+    green_floor: int = 67
+    red_ceiling: int = 33
+
+
 # ── Top-level Config ────────────────────────────────────────────────────────
 
 
@@ -125,6 +174,10 @@ class Config:
     voice: VoiceConfig = field(default_factory=VoiceConfig)
     beamforming: BeamformingConfig = field(default_factory=BeamformingConfig)
     system: SystemConfig = field(default_factory=SystemConfig)
+    contact_profiles: ContactProfilesConfig = field(
+        default_factory=ContactProfilesConfig
+    )
+    fatigue: FatigueConfig = field(default_factory=FatigueConfig)
 
     # ── Serialisation ─────────────────────────────────────────────────────
 
@@ -164,6 +217,7 @@ class Config:
         known = {
             "audiogram_path", "compression", "noise",
             "voice", "beamforming", "system",
+            "contact_profiles", "fatigue",
         }
         for key in data.keys():
             if key not in known:
@@ -176,6 +230,10 @@ class Config:
             voice=_voice_section(data.get("voice")),
             beamforming=_section(BeamformingConfig, data.get("beamforming")),
             system=_system_section(data.get("system")),
+            contact_profiles=_section(
+                ContactProfilesConfig, data.get("contact_profiles")
+            ),
+            fatigue=_section(FatigueConfig, data.get("fatigue")),
         )
 
 

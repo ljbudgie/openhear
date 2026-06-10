@@ -61,6 +61,39 @@
         "input_device": {"type": ["integer", "null"], "default": null},
         "output_device": {"type": ["integer", "null"], "default": null}
       }
+    },
+    "contact_profiles": {
+      "description": "Optional pointer to the per-contact DSP profile bank (roadmap S1).  When omitted, the pipeline runs with the user's generic profile only.  All contact profile data is stored locally; see dsp/CONTACT_PROFILES.md.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {"type": "boolean", "default": false},
+        "path": {
+          "description": "Path to the contacts.json file.  ~ is expanded.  When null, ~/.openhear/contacts.json is used.",
+          "type": ["string", "null"],
+          "default": null
+        },
+        "active_contact_id": {
+          "description": "Identifier of the currently active contact, or null for the generic profile.",
+          "type": ["string", "null"],
+          "default": null
+        }
+      }
+    },
+    "fatigue": {
+      "description": "Optional fatigue-aware DSP hooks (roadmap S3 → metric M6).  Local-only; never sends data anywhere.  See dsp/FATIGUE_AWARE.md.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {"type": "boolean", "default": false},
+        "recovery_file": {
+          "description": "Path to a local JSON file holding the most recent Whoop recovery score.  ~ is expanded.  When null, ~/.openhear/whoop_recovery.json is used.  No network call is ever made.",
+          "type": ["string", "null"],
+          "default": null
+        },
+        "green_floor": {"type": "integer", "minimum": 0, "maximum": 100, "default": 67},
+        "red_ceiling": {"type": "integer", "minimum": 0, "maximum": 100, "default": 33}
+      }
     }
   }
 }

@@ -101,6 +101,55 @@ class SystemConfig:
     output_device: int | None = None
 
 
+@dataclass
+class ContactProfilesConfig:
+    """Per-contact DSP profile bank toggle (roadmap S1 → M2).
+
+    The actual profile data lives in a separate local file (default
+    ``~/.openhear/contacts.json``) so it can be deleted in one move when
+    consent is withdrawn.  This sub-config only switches the feature on
+    and remembers which contact is currently active.
+
+    Attributes:
+        enabled: Master switch.  ``False`` (default) means the pipeline
+            ignores any contacts.json and uses the generic profile only.
+        path: Override for the contacts file location.  ``None`` uses
+            the default in :mod:`dsp.contact_profiles`.
+        active_contact_id: Currently selected contact, or ``None`` for
+            the generic profile.  Set via ``python -m dsp.contact_cli set``.
+    """
+
+    enabled: bool = False
+    path: str | None = None
+    active_contact_id: str | None = None
+
+
+@dataclass
+class FatigueConfig:
+    """Fatigue-aware DSP hooks (roadmap S3 → M6).
+
+    All recovery data is read from a local JSON file; no network call is
+    ever made.  Bucket thresholds default to the three-tier scheme
+    pinned in §9 Q3 of ``SUPERIOR_HEARING_ROADMAP.md``
+    (green ≥ 67, yellow 34–66, red ≤ 33).
+
+    Attributes:
+        enabled: Master switch.  ``False`` (default) means the pipeline
+            ignores recovery data entirely.
+        recovery_file: Path to the local recovery JSON file, or ``None``
+            to use the default (``~/.openhear/whoop_recovery.json``).
+        green_floor: Inclusive lower bound for the "green" bucket.
+        red_ceiling: Inclusive upper bound for the "red" bucket.  Scores
+            strictly between ``red_ceiling`` and ``green_floor`` are
+            "yellow".
+    """
+
+    enabled: bool = False
+    recovery_file: str | None = None
+    green_floor: int = 67
+    red_ceiling: int = 33
+
+
 # ── Top-level Config ────────────────────────────────────────────────────────
 
 
@@ -125,6 +174,8 @@ class Config:
     voice: VoiceConfig = field(default_factory=VoiceConfig)
     beamforming: BeamformingConfig = field(default_factory=BeamformingConfig)
     system: SystemConfig = field(default_factory=SystemConfig)
+    contact_profiles: ContactProfilesConfig = field(default_factory=ContactProfilesConfig)
+    fatigue: FatigueConfig = field(default_factory=FatigueConfig)
 
     # ── Serialisation ─────────────────────────────────────────────────────
 
@@ -157,13 +208,17 @@ class Config:
         if data is None:
             return cls()
         if not isinstance(data, Mapping):
-            raise ValueError(
-                f"Config root must be a mapping, got {type(data).__name__}."
-            )
+            raise ValueError(f"Config root must be a mapping, got {type(data).__name__}.")
 
         known = {
-            "audiogram_path", "compression", "noise",
-            "voice", "beamforming", "system",
+            "audiogram_path",
+            "compression",
+            "noise",
+            "voice",
+            "beamforming",
+            "system",
+            "contact_profiles",
+            "fatigue",
         }
         for key in data.keys():
             if key not in known:
@@ -176,6 +231,8 @@ class Config:
             voice=_voice_section(data.get("voice")),
             beamforming=_section(BeamformingConfig, data.get("beamforming")),
             system=_system_section(data.get("system")),
+            contact_profiles=_section(ContactProfilesConfig, data.get("contact_profiles")),
+            fatigue=_section(FatigueConfig, data.get("fatigue")),
         )
 
 
@@ -235,8 +292,7 @@ def _load_yaml(text: str, target: Path) -> Any:
         import yaml  # type: ignore[import-untyped]
     except ImportError as exc:
         raise RuntimeError(
-            f"Cannot load YAML config {target}: install PyYAML "
-            "(pip install pyyaml)."
+            f"Cannot load YAML config {target}: install PyYAML (pip install pyyaml)."
         ) from exc
     return yaml.safe_load(text) or {}
 
@@ -246,16 +302,15 @@ def _section(cls: type, data: Any) -> Any:
     if data is None:
         return cls()
     if not isinstance(data, Mapping):
-        raise ValueError(
-            f"{cls.__name__} section must be a mapping, got "
-            f"{type(data).__name__}."
-        )
+        raise ValueError(f"{cls.__name__} section must be a mapping, got {type(data).__name__}.")
     valid_fields = {f for f in cls.__dataclass_fields__}
     filtered = {k: v for k, v in data.items() if k in valid_fields}
     for key in data.keys():
         if key not in valid_fields:
             logger.warning(
-                "Ignoring unknown %s key: %r", cls.__name__, key,
+                "Ignoring unknown %s key: %r",
+                cls.__name__,
+                key,
             )
     return cls(**filtered)
 
@@ -265,25 +320,16 @@ def _voice_section(data: Any) -> VoiceConfig:
     if data is None:
         return VoiceConfig()
     if not isinstance(data, Mapping):
-        raise ValueError(
-            f"voice section must be a mapping, got {type(data).__name__}."
-        )
+        raise ValueError(f"voice section must be a mapping, got {type(data).__name__}.")
     boost_hz = data.get("boost_hz", VoiceConfig.boost_hz)
     if isinstance(boost_hz, (list, tuple)):
         if len(boost_hz) != 2:
-            raise ValueError(
-                "voice.boost_hz must be a 2-element list [low_hz, high_hz]."
-            )
+            raise ValueError("voice.boost_hz must be a 2-element list [low_hz, high_hz].")
         boost_hz = (float(boost_hz[0]), float(boost_hz[1]))
         if boost_hz[0] >= boost_hz[1]:
-            raise ValueError(
-                "voice.boost_hz low edge must be strictly below high edge."
-            )
+            raise ValueError("voice.boost_hz low edge must be strictly below high edge.")
     else:
-        raise ValueError(
-            "voice.boost_hz must be a list/tuple, got "
-            f"{type(boost_hz).__name__}."
-        )
+        raise ValueError(f"voice.boost_hz must be a list/tuple, got {type(boost_hz).__name__}.")
     return VoiceConfig(
         boost_hz=boost_hz,
         boost_db=float(data.get("boost_db", VoiceConfig.boost_db)),
@@ -295,9 +341,7 @@ def _system_section(data: Any) -> SystemConfig:
     if data is None:
         return SystemConfig()
     if not isinstance(data, Mapping):
-        raise ValueError(
-            f"system section must be a mapping, got {type(data).__name__}."
-        )
+        raise ValueError(f"system section must be a mapping, got {type(data).__name__}.")
     sample_rate = int(data.get("sample_rate", SystemConfig.sample_rate))
     buffer_size = int(data.get("buffer_size", SystemConfig.buffer_size))
     if sample_rate <= 0:

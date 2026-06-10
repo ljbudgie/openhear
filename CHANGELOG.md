@@ -11,6 +11,36 @@ release; they will be called out under a **Breaking** subsection.
 
 ### Added
 
+- **Fatigue-aware DSP hooks scaffold** (`dsp/fatigue.py`,
+  `dsp/fatigue_cli.py`) — implements roadmap item **S3** (→ metric **M6**,
+  subjective fatigue Δ vs Whoop strain / recovery). Reads a single
+  local JSON recovery file (default `~/.openhear/whoop_recovery.json`,
+  overridable via `--fatigue-recovery-file` or the
+  `OPENHEAR_WHOOP_FILE` environment variable) and produces a bounded
+  `ProfileDelta` from the three-tier §9 Q3 bucket scheme (green ≥ 67 /
+  yellow 34–66 / red ≤ 33). The red bucket *suggests* a low-effort
+  preset but never silently arms one (Burgess Principle). Composes
+  cleanly with per-contact `ProfileDelta`s; total bias is re-clipped to
+  the safe envelope. Disabled by default; enable per session with
+  `python -m dsp.pipeline --fatigue`. **No network call is ever made**;
+  cloud ingest remains a separate, opt-in PR (§4.5 of the roadmap).
+  The local recovery file is written with mode `0o600` on POSIX and
+  fully deletable via `python -m dsp.fatigue_cli clear`. See
+  `dsp/FATIGUE_AWARE.md`.
+
+- **Per-contact DSP profile bank scaffold** (`dsp/contact_profiles.py`,
+  `dsp/contact_cli.py`, `dsp/profile_delta.py`) — implements roadmap
+  item **S1** (→ metric **M2**, per-contact intelligibility). Stores a
+  bounded `ProfileDelta` per contact in a single local file
+  (`~/.openhear/contacts.json` by default), with explicit `consent` and
+  `enabled` flags and BSEP-style switches. Pipeline integration via
+  `python -m dsp.pipeline --contact CONTACT_ID`. All delta magnitudes
+  are clipped to a safe envelope; profiles without consent are loaded
+  for inspection but never applied. Voice-print fingerprinting is
+  intentionally deferred to a later consent-gated phase (§8 Q5 of
+  `SUPERIOR_HEARING_ROADMAP.md`). No network call is ever made. See
+  `dsp/CONTACT_PROFILES.md` for the storage layout and CLI usage.
+
 - **`SUPERIOR_HEARING_ROADMAP.md`** — top-level phased roadmap (Short /
   Medium / Long) for evolving OpenHear into a system that delivers
   hearing *functionally and experientially superior* to pre-deafness

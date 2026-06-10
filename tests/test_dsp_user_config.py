@@ -47,8 +47,12 @@ def test_load_config_from_json_file(tmp_path):
                 "audiogram_path": "~/audiogram.json",
                 "compression": {"ratio": 3.0, "knee_db": -45},
                 "voice": {"boost_hz": [800, 5000], "boost_db": 4},
-                "system": {"sample_rate": 48000, "buffer_size": 512,
-                           "input_device": 2, "output_device": None},
+                "system": {
+                    "sample_rate": 48000,
+                    "buffer_size": 512,
+                    "input_device": 2,
+                    "output_device": None,
+                },
             }
         )
     )
@@ -69,11 +73,7 @@ def test_load_config_from_yaml_file(tmp_path):
     pytest.importorskip("yaml")
     cfg_path = tmp_path / "config.yaml"
     cfg_path.write_text(
-        "audiogram_path: ~/me.json\n"
-        "compression:\n"
-        "  ratio: 2.0\n"
-        "noise:\n"
-        "  gate_enabled: false\n"
+        "audiogram_path: ~/me.json\ncompression:\n  ratio: 2.0\nnoise:\n  gate_enabled: false\n"
     )
     cfg = load_config(cfg_path)
     assert cfg.audiogram_path == "~/me.json"

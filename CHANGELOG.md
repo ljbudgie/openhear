@@ -11,6 +11,19 @@ release; they will be called out under a **Breaking** subsection.
 
 ### Added
 
+- **Per-contact DSP profile bank scaffold** (`dsp/contact_profiles.py`,
+  `dsp/contact_cli.py`, `dsp/profile_delta.py`) — implements roadmap
+  item **S1** (→ metric **M2**, per-contact intelligibility). Stores a
+  bounded `ProfileDelta` per contact in a single local file
+  (`~/.openhear/contacts.json` by default), with explicit `consent` and
+  `enabled` flags and BSEP-style switches. Pipeline integration via
+  `python -m dsp.pipeline --contact CONTACT_ID`. All delta magnitudes
+  are clipped to a safe envelope; profiles without consent are loaded
+  for inspection but never applied. Voice-print fingerprinting is
+  intentionally deferred to a later consent-gated phase (§8 Q5 of
+  `SUPERIOR_HEARING_ROADMAP.md`). No network call is ever made. See
+  `dsp/CONTACT_PROFILES.md` for the storage layout and CLI usage.
+
 - **`SUPERIOR_HEARING_ROADMAP.md`** — top-level phased roadmap (Short /
   Medium / Long) for evolving OpenHear into a system that delivers
   hearing *functionally and experientially superior* to pre-deafness

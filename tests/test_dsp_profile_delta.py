@@ -109,9 +109,7 @@ class TestApply:
         d = ProfileDelta(nr_aggressiveness_delta=-MAX_NR_AGGRESSIVENESS_DELTA)
         # Even with a low alpha, the result is floored at 1.0.
         assert d.apply_to_nr_alpha(1.1) == 1.0
-        assert d.apply_to_nr_alpha(1.5) == pytest.approx(
-            1.5 - MAX_NR_AGGRESSIVENESS_DELTA
-        )
+        assert d.apply_to_nr_alpha(1.5) == pytest.approx(1.5 - MAX_NR_AGGRESSIVENESS_DELTA)
 
 
 class TestExplain:

@@ -153,13 +153,11 @@ class ProfileDelta:
         """
         new_reason = " + ".join(r for r in (self.reason, other.reason) if r)
         return ProfileDelta(
-            compression_ratio_delta=self.compression_ratio_delta
-            + other.compression_ratio_delta,
+            compression_ratio_delta=self.compression_ratio_delta + other.compression_ratio_delta,
             compression_knee_delta_db=self.compression_knee_delta_db
             + other.compression_knee_delta_db,
             voice_gain_delta=self.voice_gain_delta + other.voice_gain_delta,
-            nr_aggressiveness_delta=self.nr_aggressiveness_delta
-            + other.nr_aggressiveness_delta,
+            nr_aggressiveness_delta=self.nr_aggressiveness_delta + other.nr_aggressiveness_delta,
             sources=self.sources + other.sources,
             reason=new_reason,
         )
@@ -177,9 +175,7 @@ class ProfileDelta:
 
     # ── Application ──────────────────────────────────────────────────────
 
-    def apply_to_compression(
-        self, *, ratio: float, knee_dbfs: float
-    ) -> tuple[float, float]:
+    def apply_to_compression(self, *, ratio: float, knee_dbfs: float) -> tuple[float, float]:
         """Return ``(ratio, knee_dbfs)`` with this delta applied.
 
         The ratio is floored at ``1.0`` (linear); the knee is left at

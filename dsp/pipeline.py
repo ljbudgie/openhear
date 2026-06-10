@@ -45,6 +45,7 @@ from dsp.compression import WDRCompressor
 from dsp.feedback_canceller import FeedbackCanceller
 from dsp.noise_reduction import SpectralSubtractor
 from dsp.own_voice_bypass import OwnVoiceBypass
+from dsp.profile_delta import ProfileDelta
 from dsp.voice_clarity import VoiceClarityEnhancer
 
 logging.basicConfig(
@@ -98,7 +99,7 @@ def generate_test_tone(
         A tuple ``(samples, next_phase)`` where ``next_phase`` should be
         passed back in for the following block.
     """
-    t = (np.arange(frame_count, dtype=np.float64) / sample_rate)
+    t = np.arange(frame_count, dtype=np.float64) / sample_rate
     samples = amplitude * np.sin(2.0 * np.pi * frequency_hz * t + phase)
     next_phase = (phase + 2.0 * np.pi * frequency_hz * frame_count / sample_rate) % (2.0 * np.pi)
     return samples.astype(np.float32), float(next_phase)
@@ -177,7 +178,11 @@ def _mean_prescription_values(
     return ratio, knee, speech_gain
 
 
-def build_dsp_chain(prescription: "Prescription | None" = None) -> list:
+def build_dsp_chain(
+    prescription: "Prescription | None" = None,
+    *,
+    delta: ProfileDelta | None = None,
+) -> list:
     """Construct and return the ordered list of active DSP processors.
 
     Args:
@@ -190,6 +195,12 @@ def build_dsp_chain(prescription: "Prescription | None" = None) -> list:
             the user can inspect them (sovereignty requirement).
             When ``None``, the static ``dsp/config.py`` defaults are used and
             behaviour is identical to before this parameter was added.
+        delta: Optional bounded :class:`~dsp.profile_delta.ProfileDelta` to
+            apply on top of the chosen base parameters.  Used to layer in
+            per-contact tuning (roadmap S1) and fatigue-aware bias
+            (roadmap S3) — see :mod:`dsp.contact_profiles` and
+            :mod:`dsp.fatigue`.  ``None`` (the default) is equivalent to
+            the identity delta and preserves prior behaviour.
     """
     chain = []
 
@@ -210,43 +221,65 @@ def build_dsp_chain(prescription: "Prescription | None" = None) -> list:
         comp_knee = config.COMPRESSION_KNEE_DBFS
         voice_gain = config.VOICE_CLARITY_GAIN
 
+    nr_alpha = config.NOISE_FLOOR_MULTIPLIER
+
+    # Apply the bounded delta (per-contact + fatigue bias).  All limits are
+    # enforced inside ProfileDelta; the apply_* helpers floor at safe values.
+    if delta is not None and not delta.is_identity():
+        comp_ratio, comp_knee = delta.apply_to_compression(ratio=comp_ratio, knee_dbfs=comp_knee)
+        voice_gain = delta.apply_to_voice_gain(voice_gain)
+        nr_alpha = delta.apply_to_nr_alpha(nr_alpha)
+        # BGSP-style audit line so the receipt is recoverable from logs.
+        logger.info("BGSP|dsp-delta-applied|%s", delta.explain())
+
     if config.NOISE_REDUCTION_ENABLED:
-        chain.append(SpectralSubtractor(
-            frame_length=config.FRAMES_PER_BUFFER,
-            noise_floor_multiplier=config.NOISE_FLOOR_MULTIPLIER,
-            spectral_floor=config.SPECTRAL_FLOOR,
-            noise_estimation_frames=config.NOISE_ESTIMATION_FRAMES,
-        ))
+        chain.append(
+            SpectralSubtractor(
+                frame_length=config.FRAMES_PER_BUFFER,
+                noise_floor_multiplier=nr_alpha,
+                spectral_floor=config.SPECTRAL_FLOOR,
+                noise_estimation_frames=config.NOISE_ESTIMATION_FRAMES,
+            )
+        )
         logger.info("Stage added: SpectralSubtractor")
 
     if config.COMPRESSION_ENABLED:
-        chain.append(WDRCompressor(
-            sample_rate=config.SAMPLE_RATE,
-            ratio=comp_ratio,
-            knee_dbfs=comp_knee,
-            attack_s=config.COMPRESSION_ATTACK_S,
-            release_s=config.COMPRESSION_RELEASE_S,
-        ))
+        chain.append(
+            WDRCompressor(
+                sample_rate=config.SAMPLE_RATE,
+                ratio=comp_ratio,
+                knee_dbfs=comp_knee,
+                attack_s=config.COMPRESSION_ATTACK_S,
+                release_s=config.COMPRESSION_RELEASE_S,
+            )
+        )
         logger.info("Stage added: WDRCompressor")
 
     if config.VOICE_CLARITY_ENABLED:
-        chain.append(VoiceClarityEnhancer(
-            frame_length=config.FRAMES_PER_BUFFER,
-            sample_rate=config.SAMPLE_RATE,
-            low_hz=config.VOICE_CLARITY_LOW_HZ,
-            high_hz=config.VOICE_CLARITY_HIGH_HZ,
-            gain=voice_gain,
-        ))
-        logger.info("Stage added: VoiceClarityEnhancer (%.0f–%.0f Hz)",
-                    config.VOICE_CLARITY_LOW_HZ, config.VOICE_CLARITY_HIGH_HZ)
+        chain.append(
+            VoiceClarityEnhancer(
+                frame_length=config.FRAMES_PER_BUFFER,
+                sample_rate=config.SAMPLE_RATE,
+                low_hz=config.VOICE_CLARITY_LOW_HZ,
+                high_hz=config.VOICE_CLARITY_HIGH_HZ,
+                gain=voice_gain,
+            )
+        )
+        logger.info(
+            "Stage added: VoiceClarityEnhancer (%.0f–%.0f Hz)",
+            config.VOICE_CLARITY_LOW_HZ,
+            config.VOICE_CLARITY_HIGH_HZ,
+        )
 
     if config.FEEDBACK_CANCELLATION_ENABLED:
-        chain.append(FeedbackCanceller(
-            filter_length=config.FEEDBACK_FILTER_LENGTH,
-            mu=config.FEEDBACK_MU,
-            sample_rate=config.SAMPLE_RATE,
-            anti_feedback_gain_db=config.ANTI_FEEDBACK_GAIN_DB,
-        ))
+        chain.append(
+            FeedbackCanceller(
+                filter_length=config.FEEDBACK_FILTER_LENGTH,
+                mu=config.FEEDBACK_MU,
+                sample_rate=config.SAMPLE_RATE,
+                anti_feedback_gain_db=config.ANTI_FEEDBACK_GAIN_DB,
+            )
+        )
         logger.info(
             "Stage added: FeedbackCanceller (length=%d, mu=%.4f, gain=%.1f dB)",
             config.FEEDBACK_FILTER_LENGTH,
@@ -255,13 +288,15 @@ def build_dsp_chain(prescription: "Prescription | None" = None) -> list:
         )
 
     if config.OWN_VOICE_BYPASS_ENABLED:
-        chain.append(OwnVoiceBypass(
-            sample_rate=config.SAMPLE_RATE,
-            f0_low_hz=config.OWN_VOICE_F0_LOW_HZ,
-            f0_high_hz=config.OWN_VOICE_F0_HIGH_HZ,
-            energy_threshold_dbfs=config.OWN_VOICE_ENERGY_THRESHOLD_DBFS,
-            bypass_gain=config.OWN_VOICE_BYPASS_GAIN,
-        ))
+        chain.append(
+            OwnVoiceBypass(
+                sample_rate=config.SAMPLE_RATE,
+                f0_low_hz=config.OWN_VOICE_F0_LOW_HZ,
+                f0_high_hz=config.OWN_VOICE_F0_HIGH_HZ,
+                energy_threshold_dbfs=config.OWN_VOICE_ENERGY_THRESHOLD_DBFS,
+                bypass_gain=config.OWN_VOICE_BYPASS_GAIN,
+            )
+        )
         logger.info(
             "Stage added: OwnVoiceBypass (F0 %.0f–%.0f Hz, threshold=%.1f dBFS, gain=%.2f)",
             config.OWN_VOICE_F0_LOW_HZ,
@@ -276,6 +311,37 @@ def build_dsp_chain(prescription: "Prescription | None" = None) -> list:
     return chain
 
 
+def _resolve_runtime_delta(
+    *,
+    contact_id: str | None = None,
+    contacts_path: str | None = None,
+    fatigue_enabled: bool = False,
+    fatigue_recovery_file: str | None = None,
+) -> ProfileDelta:
+    """Compose the runtime :class:`ProfileDelta` from active sources.
+
+    Currently combines:
+        * Per-contact tuning (roadmap S1) via
+          :func:`dsp.contact_profiles.active_delta`.
+        * Fatigue-aware bias (roadmap S3) via
+          :func:`dsp.fatigue.fatigue_delta_from_file` when enabled.
+
+    Every source is local-only and returns the identity delta when its
+    inputs are missing or disabled, so the composed result is safe to
+    pass to :func:`build_dsp_chain` in every case.
+    """
+    parts: list[ProfileDelta] = []
+    if contact_id:
+        from dsp.contact_profiles import active_delta as _contact_active_delta
+
+        parts.append(_contact_active_delta(contact_id, path=contacts_path))
+    if fatigue_enabled:
+        from dsp.fatigue import fatigue_delta_from_file
+
+        parts.append(fatigue_delta_from_file(fatigue_recovery_file))
+    return ProfileDelta.compose(parts)
+
+
 def run_pipeline(
     *,
     bypass: bool = False,
@@ -283,6 +349,10 @@ def run_pipeline(
     measure_latency: bool = False,
     metrics_path: str | None = None,
     audiogram_path: str | None = None,
+    contact_id: str | None = None,
+    contacts_path: str | None = None,
+    fatigue_enabled: bool = False,
+    fatigue_recovery_file: str | None = None,
 ) -> None:
     """Open audio streams and run the processing loop until interrupted.
 
@@ -296,6 +366,13 @@ def run_pipeline(
         audiogram_path: If set, load the audiogram JSON at this path and
             derive DSP parameters from the individual's hearing profile.
             When ``None``, static ``dsp/config.py`` defaults are used.
+        contact_id: Optional active contact id (roadmap S1).  When set,
+            the per-contact profile is looked up in the local contacts
+            bank and a bounded :class:`~dsp.profile_delta.ProfileDelta`
+            is layered on top of the audiogram-derived parameters.  No
+            network call is made; profiles without consent are ignored.
+        contacts_path: Override for the contacts.json file.  ``None``
+            uses :func:`dsp.contact_profiles.default_contacts_path`.
     """
     pa = pyaudio.PyAudio()
 
@@ -324,16 +401,25 @@ def run_pipeline(
         pa.terminate()
         sys.exit(1)
 
-    dsp_chain = [] if bypass else build_dsp_chain(
-        prescription=_load_prescription(audiogram_path) if audiogram_path else None,
+    dsp_chain = (
+        []
+        if bypass
+        else build_dsp_chain(
+            prescription=_load_prescription(audiogram_path) if audiogram_path else None,
+            delta=_resolve_runtime_delta(
+                contact_id=contact_id,
+                contacts_path=contacts_path,
+                fatigue_enabled=fatigue_enabled,
+                fatigue_recovery_file=fatigue_recovery_file,
+            ),
+        )
     )
     if bypass:
         logger.info("Bypass mode: DSP chain skipped.")
     if test_tone:
         logger.info("Test-tone mode: synthesising 1 kHz sine instead of mic input.")
     logger.info(
-        "Pipeline running — %d Hz, %d frames/buffer (~%.1f ms latency). "
-        "Press Ctrl+C to stop.",
+        "Pipeline running — %d Hz, %d frames/buffer (~%.1f ms latency). Press Ctrl+C to stop.",
         config.SAMPLE_RATE,
         config.FRAMES_PER_BUFFER,
         config.FRAMES_PER_BUFFER / config.SAMPLE_RATE * 1000,
@@ -342,6 +428,7 @@ def run_pipeline(
     metrics_logger = None
     if metrics_path is not None:
         from dsp.metrics import MetricsLogger
+
         metrics_logger = MetricsLogger(path=metrics_path).open()
 
     last_latency_log = time.monotonic()
@@ -351,12 +438,12 @@ def run_pipeline(
             block_start = time.perf_counter()
             if test_tone:
                 samples, tone_phase = generate_test_tone(
-                    config.FRAMES_PER_BUFFER, config.SAMPLE_RATE, phase=tone_phase,
+                    config.FRAMES_PER_BUFFER,
+                    config.SAMPLE_RATE,
+                    phase=tone_phase,
                 )
             else:
-                raw = input_stream.read(
-                    config.FRAMES_PER_BUFFER, exception_on_overflow=False
-                )
+                raw = input_stream.read(config.FRAMES_PER_BUFFER, exception_on_overflow=False)
                 samples = _bytes_to_float32(raw)
 
             for stage in dsp_chain:
@@ -400,27 +487,63 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         description="Run the OpenHear real-time DSP pipeline.",
     )
     parser.add_argument(
-        "--bypass", action="store_true",
+        "--bypass",
+        action="store_true",
         help="Skip the DSP chain (passthrough).  Useful for A/B testing.",
     )
     parser.add_argument(
-        "--test-tone", action="store_true",
+        "--test-tone",
+        action="store_true",
         help="Synthesise a 1 kHz sine wave instead of reading the mic. "
-             "Useful when no microphone is available.",
+        "Useful when no microphone is available.",
     )
     parser.add_argument(
-        "--latency", action="store_true",
+        "--latency",
+        action="store_true",
         help="Log per-block latency once per second.",
     )
     parser.add_argument(
-        "--metrics-csv", default=None,
+        "--metrics-csv",
+        default=None,
         help="Append per-block latency/CPU/level metrics to this CSV file.",
     )
     parser.add_argument(
-        "--audiogram", default=None, metavar="PATH",
+        "--audiogram",
+        default=None,
+        metavar="PATH",
         help="Path to an openhear-audiogram-v1 JSON file.  When provided, "
-             "compression ratio/knee and voice-clarity gain are derived from "
-             "the individual's audiogram rather than the static config defaults.",
+        "compression ratio/knee and voice-clarity gain are derived from "
+        "the individual's audiogram rather than the static config defaults.",
+    )
+    parser.add_argument(
+        "--contact",
+        default=None,
+        metavar="CONTACT_ID",
+        dest="contact_id",
+        help="Optional active contact id (roadmap S1).  Applies the bounded "
+        "per-contact ProfileDelta from the local contacts bank on top "
+        "of the audiogram-derived parameters.  Profiles without "
+        "consent are ignored.",
+    )
+    parser.add_argument(
+        "--contacts-path",
+        default=None,
+        metavar="PATH",
+        help="Override for the contacts.json file location.  Defaults to "
+        "~/.openhear/contacts.json.",
+    )
+    parser.add_argument(
+        "--fatigue",
+        action="store_true",
+        dest="fatigue_enabled",
+        help="Enable fatigue-aware DSP bias (roadmap S3).  Reads the local "
+        "Whoop recovery JSON only — no network call is made.",
+    )
+    parser.add_argument(
+        "--fatigue-recovery-file",
+        default=None,
+        metavar="PATH",
+        help="Override for the recovery JSON file.  Defaults to ~/.openhear/whoop_recovery.json.",
     )
     return parser
 
@@ -433,5 +556,8 @@ if __name__ == "__main__":
         measure_latency=args.latency,
         metrics_path=args.metrics_csv,
         audiogram_path=args.audiogram,
+        contact_id=args.contact_id,
+        contacts_path=args.contacts_path,
+        fatigue_enabled=args.fatigue_enabled,
+        fatigue_recovery_file=args.fatigue_recovery_file,
     )
-

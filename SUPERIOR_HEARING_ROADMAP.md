@@ -126,8 +126,10 @@ modules already in the repo plus thin extensions.
 | # | Extension | Touch points | MVE / success criterion |
 |---|-----------|--------------|-------------------------|
 | S1 | **Per-contact DSP profile bank** — extend `dsp/config.py` schema with a `ContactProfile` (contact_id, voice-print fingerprint, EQ delta, compression delta, noise-reduction aggressiveness) | `dsp/config.py`, social profile store | A/B: M2 improves ≥ 15 % on the user's top-3 contacts over generic profile, n ≥ 20 utterances each |
+| S1 — *scaffolded v0* | `dsp/contact_profiles.py`, `dsp/contact_cli.py`, `dsp/profile_delta.py`, `dsp/CONTACT_PROFILES.md`. Bounded delta + consent + BSEP disable + local-only `~/.openhear/contacts.json`. Voice-print fingerprinting deliberately deferred to §8 Q5. Pipeline: `python -m dsp.pipeline --contact CONTACT_ID`. |
 | S2 | **Haptic groove channel for music** — wire `stream/tempo_channel.py` + `stream/crowd_arousal.py` to a music source, expose a "music mode" in `haptic_commander.py` | `stream/`, `wristband/` | M4 with haptic-on rated ≥ +2 vs haptic-off over ≥ 10 listening sessions across ≥ 3 genres |
 | S3 | **Fatigue-aware auto-gain v0** — read Whoop recovery score at session start; bias compression knee and noise-reduction aggressiveness | `dsp/compression.py`, `dsp/noise_reduction.py`, Whoop ingest | M6: subjective fatigue at session end ≤ baseline on ≥ 70 % of low-recovery days |
+| S3 — *scaffolded v0* | `dsp/fatigue.py`, `dsp/fatigue_cli.py`, `dsp/FATIGUE_AWARE.md`. Local-file Whoop adapter (`~/.openhear/whoop_recovery.json`, env override `OPENHEAR_WHOOP_FILE`); §9 Q3 three-tier bucket scheme; bounded `ProfileDelta` composed cleanly with S1; red bucket *suggests* low-effort preset (Burgess: never auto-arms). No HTTP. Pipeline: `python -m dsp.pipeline --fatigue`. |
 | S4 | **BGSP-anchored experiment log** — minimal `experiments/superior_hearing/` directory; each experiment a signed JSON record (hypothesis, change set, metrics, decision) | `advocacy/`, `experiments/` | At least 4 experiments anchored, each verifiable end-to-end via the existing advocacy verify path |
 
 ### Phase M — Medium term (3–12 months) · [OPENHEAR-MED]

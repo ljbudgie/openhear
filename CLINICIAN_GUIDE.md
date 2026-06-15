@@ -107,6 +107,27 @@ The processed audio will stream to the aids in real time. Ask your patient what 
 
 ---
 
+## Output Safety Limiter (always on)
+
+OpenHear applies a final **output safety limiter** as the last stage of the processing chain. Whatever the compression, voice-clarity boost, feedback canceller, or a hand-edited value in `dsp/config.py` produces, the limiter caps the level that reaches the aids so the output cannot exceed a configured ceiling. It is the software counterpart of the hardware MPO clamp used on the sovereign device — a safety net against accidental over-amplification.
+
+You control it in `dsp/config.py`:
+
+- `OUTPUT_SAFETY_MAX_DBFS` — the ceiling in dBFS (must be `<= 0.0`). `-1.0` leaves a little headroom below full scale; set a **more negative** value (e.g. `-6.0` or `-12.0`) for a deliberately quieter, more conservative cap. Lower is always safer.
+- `OUTPUT_SAFETY_LIMITER_ENABLED` — leave this `True`. Only disable it if you are relying on a separate hardware limiter you trust instead.
+
+This is a coarse broadband ceiling, not a substitute for proper per-frequency MPO/UCL verification (see `hardware/safety/mpo_calculator.py`). Always validate real output on the patient's own hardware and start at a low volume.
+
+**Watch the activity readout.** The limiter is not silent about its work: when the pipeline stops it logs a one-line summary of how often it engaged and the deepest attenuation it applied, for example:
+
+```
+Output-safety limiter engaged on 38/12000 blocks (0.3%); deepest attenuation 4.2 dB (ceiling -1.0 dBFS).
+```
+
+Treat frequent engagement as a signal, not reassurance. The ceiling is a safety net, and a net that is hit often means the upstream chain — compression, voice-clarity boost, or a hand-edited gain — is running hotter than it should. The right fix is usually to bring that upstream level down so the audio sits comfortably below the ceiling on its own, rather than relying on the limiter to clamp it on every loud sound. A summary that says the limiter *never engaged* across a normal session is what you want to see.
+
+---
+
 ## What To Do Between Appointments
 
 Ask your patient to keep a simple note on their phone — voice notes are fine — logging:

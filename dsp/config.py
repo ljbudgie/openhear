@@ -168,6 +168,32 @@ OCCLUSION_REDUCTION_CORNER_HZ: float = 300.0
 OCCLUSION_REDUCTION_SLOPE_DB_OCT: float = 12.0
 
 
+# ── Output Safety Limiter (final output ceiling) ─────────────────────────────
+
+# Enable / disable the final output safety limiter.
+# This is the software equivalent of the hardware MPO clamp: it caps the level
+# that leaves the pipeline regardless of what every other stage (or a
+# hand-edited value in this file) does.  Keep this ON unless you have an
+# external hardware limiter you trust instead.  Disabling it removes the last
+# protection against accidental over-amplification.
+OUTPUT_SAFETY_LIMITER_ENABLED: bool = True
+
+# Maximum output level in dBFS (decibels relative to digital full scale).
+# 0.0 dBFS is the loudest representable level; this value MUST be <= 0.0.
+# -1.0 dBFS leaves a little headroom below full scale (prevents clipping).
+# Choose a more negative value (e.g. -6.0 or -12.0) for a deliberately
+# quieter, more conservative cap.  Lower is always safer.
+OUTPUT_SAFETY_MAX_DBFS: float = -1.0
+
+# Attack time (seconds) for the limiter to reduce gain when the signal
+# exceeds the ceiling.  Short so the ceiling is enforced promptly.
+OUTPUT_SAFETY_ATTACK_S: float = 0.001
+
+# Release time (seconds) for gain to recover after the signal drops below the
+# ceiling.  Longer = gentler recovery, less pumping.
+OUTPUT_SAFETY_RELEASE_S: float = 0.050
+
+
 # ── Logging ─────────────────────────────────────────────────────────────────
 
 # Python logging level for the DSP pipeline.

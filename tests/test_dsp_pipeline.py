@@ -89,13 +89,15 @@ class TestBuildDspChain:
         monkeypatch.setattr(config, "VOICE_CLARITY_ENABLED", True)
         monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", True)
         monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", True)
+        monkeypatch.setattr(config, "OUTPUT_SAFETY_LIMITER_ENABLED", True)
 
         chain = pipeline.build_dsp_chain()
-        assert len(chain) == 5
+        assert len(chain) == 6
 
         from dsp.compression import WDRCompressor
         from dsp.feedback_canceller import FeedbackCanceller
         from dsp.noise_reduction import SpectralSubtractor
+        from dsp.output_safety import OutputSafetyLimiter
         from dsp.own_voice_bypass import OwnVoiceBypass
         from dsp.voice_clarity import VoiceClarityEnhancer
 
@@ -104,6 +106,8 @@ class TestBuildDspChain:
         assert isinstance(chain[2], VoiceClarityEnhancer)
         assert isinstance(chain[3], FeedbackCanceller)
         assert isinstance(chain[4], OwnVoiceBypass)
+        # The output safety limiter must always be the final stage.
+        assert isinstance(chain[5], OutputSafetyLimiter)
 
     def test_all_stages_disabled(self, monkeypatch, caplog):
         monkeypatch.setattr(config, "NOISE_REDUCTION_ENABLED", False)
@@ -111,6 +115,7 @@ class TestBuildDspChain:
         monkeypatch.setattr(config, "VOICE_CLARITY_ENABLED", False)
         monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", False)
         monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", False)
+        monkeypatch.setattr(config, "OUTPUT_SAFETY_LIMITER_ENABLED", False)
 
         import logging
         with caplog.at_level(logging.WARNING):
@@ -118,12 +123,28 @@ class TestBuildDspChain:
         assert chain == []
         assert any("disabled" in r.message for r in caplog.records)
 
+    def test_output_safety_limiter_present_by_default(self, monkeypatch):
+        """Even with every processing stage off, the safety limiter remains."""
+        monkeypatch.setattr(config, "NOISE_REDUCTION_ENABLED", False)
+        monkeypatch.setattr(config, "COMPRESSION_ENABLED", False)
+        monkeypatch.setattr(config, "VOICE_CLARITY_ENABLED", False)
+        monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", False)
+        monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", False)
+        monkeypatch.setattr(config, "OUTPUT_SAFETY_LIMITER_ENABLED", True)
+
+        from dsp.output_safety import OutputSafetyLimiter
+
+        chain = pipeline.build_dsp_chain()
+        assert len(chain) == 1
+        assert isinstance(chain[0], OutputSafetyLimiter)
+
     def test_partial_enable(self, monkeypatch):
         monkeypatch.setattr(config, "NOISE_REDUCTION_ENABLED", False)
         monkeypatch.setattr(config, "COMPRESSION_ENABLED", True)
         monkeypatch.setattr(config, "VOICE_CLARITY_ENABLED", False)
         monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", False)
         monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", False)
+        monkeypatch.setattr(config, "OUTPUT_SAFETY_LIMITER_ENABLED", False)
 
         chain = pipeline.build_dsp_chain()
         assert len(chain) == 1
@@ -171,6 +192,7 @@ class TestBuildDspChainWithPrescription:
         monkeypatch.setattr(config, "VOICE_CLARITY_ENABLED", False)
         monkeypatch.setattr(config, "FEEDBACK_CANCELLATION_ENABLED", False)
         monkeypatch.setattr(config, "OWN_VOICE_BYPASS_ENABLED", False)
+        monkeypatch.setattr(config, "OUTPUT_SAFETY_LIMITER_ENABLED", False)
         # Pick a ratio clearly different from the config default.
         prescription_ratio = config.COMPRESSION_RATIO + 1.0
         rx = self._make_prescription(ratio=prescription_ratio, knee=-40.0, gain_1k=10.0)

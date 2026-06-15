@@ -11,6 +11,28 @@ release; they will be called out under a **Breaking** subsection.
 
 ### Added
 
+- **Always-on output-safety limiter** (`dsp/output_safety.py`) — adds a
+  final, unconditional output ceiling as the last stage of the DSP chain
+  (`build_dsp_chain` in `dsp/pipeline.py`). Whatever the upstream stages
+  produce — compression, voice-clarity boost, feedback cancellation, an
+  audiogram prescription, or a hand-edited `dsp/config.py` — the limiter
+  guarantees no sample leaving the pipeline exceeds the configured ceiling.
+  A smoothed attack/release gain envelope keeps limiting transparent during
+  normal speech, and a final hard clip enforces the ceiling exactly even
+  mid-transient. It is the software counterpart of the hardware MPO clamp on
+  the sovereign device (`hardware/safety/mpo_calculator.py`), guarding the
+  streaming path that feeds a user's own aids against accidental
+  over-amplification. Enabled by default and tunable via
+  `OUTPUT_SAFETY_LIMITER_ENABLED`, `OUTPUT_SAFETY_MAX_DBFS`,
+  `OUTPUT_SAFETY_ATTACK_S`, and `OUTPUT_SAFETY_RELEASE_S` in `dsp/config.py`.
+  The limiter also keeps lightweight **activity telemetry** (`LimiterStats`,
+  via `OutputSafetyLimiter.stats` / `.summary()`): blocks processed, blocks
+  actually attenuated, and the deepest attenuation applied. The pipeline logs
+  a one-line summary when it stops so the safety net's clamping is visible
+  rather than silent — frequent engagement is a signal that the upstream chain
+  is running too hot. See the *Output Safety Limiter* section of
+  `CLINICIAN_GUIDE.md`.
+
 - **Fatigue-aware DSP hooks scaffold** (`dsp/fatigue.py`,
   `dsp/fatigue_cli.py`) — implements roadmap item **S3** (→ metric **M6**,
   subjective fatigue Δ vs Whoop strain / recovery). Reads a single

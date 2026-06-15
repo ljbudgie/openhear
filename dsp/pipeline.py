@@ -493,6 +493,12 @@ def run_pipeline(
     except KeyboardInterrupt:
         logger.info("Pipeline stopped by user.")
     finally:
+        # Surface the safety limiter's activity so its clamping is never silent:
+        # frequent engagement is a signal that the upstream chain is running hot.
+        for stage in dsp_chain:
+            if isinstance(stage, OutputSafetyLimiter):
+                logger.info("%s", stage.summary())
+                break
         if input_stream is not None:
             input_stream.stop_stream()
             input_stream.close()

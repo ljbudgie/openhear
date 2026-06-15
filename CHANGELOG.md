@@ -25,7 +25,13 @@ release; they will be called out under a **Breaking** subsection.
   over-amplification. Enabled by default and tunable via
   `OUTPUT_SAFETY_LIMITER_ENABLED`, `OUTPUT_SAFETY_MAX_DBFS`,
   `OUTPUT_SAFETY_ATTACK_S`, and `OUTPUT_SAFETY_RELEASE_S` in `dsp/config.py`.
-  See the *Output Safety Limiter* section of `CLINICIAN_GUIDE.md`.
+  The limiter also keeps lightweight **activity telemetry** (`LimiterStats`,
+  via `OutputSafetyLimiter.stats` / `.summary()`): blocks processed, blocks
+  actually attenuated, and the deepest attenuation applied. The pipeline logs
+  a one-line summary when it stops so the safety net's clamping is visible
+  rather than silent — frequent engagement is a signal that the upstream chain
+  is running too hot. See the *Output Safety Limiter* section of
+  `CLINICIAN_GUIDE.md`.
 
 - **Fatigue-aware DSP hooks scaffold** (`dsp/fatigue.py`,
   `dsp/fatigue_cli.py`) — implements roadmap item **S3** (→ metric **M6**,

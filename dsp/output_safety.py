@@ -38,13 +38,51 @@ Tunable parameters (from ``dsp/config.py``):
   - OUTPUT_SAFETY_MAX_DBFS:         output ceiling in dBFS.
   - OUTPUT_SAFETY_ATTACK_S:         attack time constant (gain reduction).
   - OUTPUT_SAFETY_RELEASE_S:        release time constant (gain recovery).
+
+The limiter also keeps lightweight **activity telemetry** (:class:`LimiterStats`,
+exposed via :attr:`OutputSafetyLimiter.stats` and :meth:`OutputSafetyLimiter.summary`):
+how many blocks it processed, how many it actually attenuated, and the deepest
+attenuation it applied. A safety net that is hit often is a useful signal that
+the upstream chain is running too hot, so the pipeline logs a one-line summary
+when it stops rather than letting the clamping happen silently.
 """
 
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 
 import numpy as np
+
+
+@dataclass(frozen=True)
+class LimiterStats:
+    """Immutable snapshot of the limiter's activity since the last reset.
+
+    The limiter is a safety net, and a net that is hit often is telling you
+    something: the upstream chain (or a hand-edited gain) is running hot enough
+    to need clamping. Surfacing these numbers keeps that action visible rather
+    than silent, so a clinician or user can decide whether to bring the upstream
+    level down instead of leaning on the ceiling.
+
+    Attributes:
+        blocks_processed: Total number of non-empty blocks seen.
+        blocks_limited: Number of blocks whose output was actually attenuated
+            (smoothed gain reduction and/or the hard-clip safety net).
+        max_gain_reduction_db: Deepest attenuation applied to any single block,
+            in dB (``0.0`` means the limiter never engaged). Always ``>= 0``.
+    """
+
+    blocks_processed: int
+    blocks_limited: int
+    max_gain_reduction_db: float
+
+    @property
+    def limited_fraction(self) -> float:
+        """Fraction of processed blocks that were attenuated (0.0–1.0)."""
+        if self.blocks_processed == 0:
+            return 0.0
+        return self.blocks_limited / self.blocks_processed
 
 
 class OutputSafetyLimiter:
@@ -94,6 +132,12 @@ class OutputSafetyLimiter:
         # Smoothed gain, starts at unity (no reduction).
         self._gain: float = 1.0
 
+        # Activity telemetry (see :class:`LimiterStats`). These only ever
+        # accumulate observations about the audio; they never alter it.
+        self._blocks_processed: int = 0
+        self._blocks_limited: int = 0
+        self._max_gain_reduction_db: float = 0.0
+
     # ------------------------------------------------------------------
     # Public API
 
@@ -106,6 +150,37 @@ class OutputSafetyLimiter:
     def current_gain(self) -> float:
         """The most recent smoothed gain (1.0 = no reduction, < 1.0 = limiting)."""
         return self._gain
+
+    @property
+    def stats(self) -> LimiterStats:
+        """Snapshot of limiter activity since construction or the last reset."""
+        return LimiterStats(
+            blocks_processed=self._blocks_processed,
+            blocks_limited=self._blocks_limited,
+            max_gain_reduction_db=self._max_gain_reduction_db,
+        )
+
+    def summary(self) -> str:
+        """Human-readable, one-line description of the limiter's activity.
+
+        Intended for an end-of-session log line so the safety net's behaviour
+        is visible rather than silent.
+        """
+        s = self.stats
+        ceiling = self.max_output_dbfs
+        if s.blocks_processed == 0:
+            return f"Output-safety limiter saw no audio (ceiling {ceiling:.1f} dBFS)."
+        if s.blocks_limited == 0:
+            return (
+                "Output-safety limiter never engaged: no block exceeded the "
+                f"{ceiling:.1f} dBFS ceiling across {s.blocks_processed} blocks."
+            )
+        return (
+            "Output-safety limiter engaged on "
+            f"{s.blocks_limited}/{s.blocks_processed} blocks "
+            f"({s.limited_fraction * 100.0:.1f}%); deepest attenuation "
+            f"{s.max_gain_reduction_db:.1f} dB (ceiling {ceiling:.1f} dBFS)."
+        )
 
     def process(self, samples: np.ndarray) -> np.ndarray:
         """Apply the output ceiling to a block of samples.
@@ -150,11 +225,28 @@ class OutputSafetyLimiter:
         # state.  This makes the safety bound unconditional even while the
         # attack envelope is still catching up to a sudden transient.
         np.clip(out, -self._ceiling_linear, self._ceiling_linear, out=out)
+
+        # Record activity telemetry from the *effective* attenuation (smoothed
+        # gain and hard clip combined), so the readout reflects what actually
+        # reached the output rather than just the envelope state.  This never
+        # alters the audio; it only observes it.
+        self._blocks_processed += 1
+        if peak > 0.0:
+            out_peak = float(np.max(np.abs(out)))
+            if out_peak < peak:
+                reduction_db = -20.0 * math.log10(out_peak / peak) if out_peak > 0.0 else math.inf
+                self._blocks_limited += 1
+                if reduction_db > self._max_gain_reduction_db:
+                    self._max_gain_reduction_db = reduction_db
+
         return out
 
     def reset(self) -> None:
-        """Reset the smoothed gain back to unity."""
+        """Reset the smoothed gain back to unity and clear activity telemetry."""
         self._gain = 1.0
+        self._blocks_processed = 0
+        self._blocks_limited = 0
+        self._max_gain_reduction_db = 0.0
 
     # ------------------------------------------------------------------
     # Internal helpers

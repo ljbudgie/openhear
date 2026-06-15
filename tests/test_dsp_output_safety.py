@@ -108,3 +108,75 @@ class TestStageContract:
         limiter.process(_tone(1000.0, amplitude=0.99))
         limiter.reset()
         assert limiter.current_gain == 1.0
+
+
+class TestActivityTelemetry:
+    def test_fresh_limiter_has_empty_stats(self):
+        limiter = OutputSafetyLimiter()
+        stats = limiter.stats
+        assert stats.blocks_processed == 0
+        assert stats.blocks_limited == 0
+        assert stats.max_gain_reduction_db == 0.0
+        assert stats.limited_fraction == 0.0
+
+    def test_quiet_audio_never_counts_as_limited(self):
+        limiter = OutputSafetyLimiter(max_output_dbfs=-1.0)
+        for _ in range(5):
+            limiter.process(_tone(1000.0, amplitude=0.1))
+        stats = limiter.stats
+        assert stats.blocks_processed == 5
+        assert stats.blocks_limited == 0
+        assert stats.max_gain_reduction_db == 0.0
+
+    def test_loud_audio_records_limiting(self):
+        limiter = OutputSafetyLimiter(max_output_dbfs=-6.0)
+        for _ in range(10):
+            limiter.process(_tone(1000.0, amplitude=0.99))
+        stats = limiter.stats
+        assert stats.blocks_processed == 10
+        assert stats.blocks_limited >= 1
+        assert stats.max_gain_reduction_db > 0.0
+        assert 0.0 < stats.limited_fraction <= 1.0
+
+    def test_full_scale_spike_reports_expected_attenuation(self):
+        # A full-scale spike against a -6 dBFS ceiling must be attenuated by
+        # ~6 dB on the very first block (hard clip), so the deepest recorded
+        # reduction should be at least ~6 dB.
+        limiter = OutputSafetyLimiter(max_output_dbfs=-6.0)
+        limiter.process(np.ones(256, dtype=np.float32))
+        stats = limiter.stats
+        assert stats.blocks_limited == 1
+        assert stats.max_gain_reduction_db >= 5.9
+
+    def test_empty_blocks_do_not_count(self):
+        limiter = OutputSafetyLimiter()
+        limiter.process(np.zeros(0, dtype=np.float32))
+        assert limiter.stats.blocks_processed == 0
+
+    def test_reset_clears_telemetry(self):
+        limiter = OutputSafetyLimiter(max_output_dbfs=-6.0)
+        limiter.process(_tone(1000.0, amplitude=0.99))
+        assert limiter.stats.blocks_processed == 1
+        limiter.reset()
+        stats = limiter.stats
+        assert stats.blocks_processed == 0
+        assert stats.blocks_limited == 0
+        assert stats.max_gain_reduction_db == 0.0
+
+    def test_summary_when_never_engaged_mentions_no_engagement(self):
+        limiter = OutputSafetyLimiter()
+        limiter.process(_tone(1000.0, amplitude=0.1))
+        summary = limiter.summary()
+        assert "never engaged" in summary
+
+    def test_summary_when_engaged_reports_counts(self):
+        limiter = OutputSafetyLimiter(max_output_dbfs=-6.0)
+        for _ in range(3):
+            limiter.process(_tone(1000.0, amplitude=0.99))
+        summary = limiter.summary()
+        assert "engaged" in summary
+        assert "dB" in summary
+
+    def test_summary_with_no_audio(self):
+        limiter = OutputSafetyLimiter()
+        assert "no audio" in limiter.summary()

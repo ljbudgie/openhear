@@ -118,6 +118,14 @@ You control it in `dsp/config.py`:
 
 This is a coarse broadband ceiling, not a substitute for proper per-frequency MPO/UCL verification (see `hardware/safety/mpo_calculator.py`). Always validate real output on the patient's own hardware and start at a low volume.
 
+**Watch the activity readout.** The limiter is not silent about its work: when the pipeline stops it logs a one-line summary of how often it engaged and the deepest attenuation it applied, for example:
+
+```
+Output-safety limiter engaged on 38/12000 blocks (0.3%); deepest attenuation 4.2 dB (ceiling -1.0 dBFS).
+```
+
+Treat frequent engagement as a signal, not reassurance. The ceiling is a safety net, and a net that is hit often means the upstream chain — compression, voice-clarity boost, or a hand-edited gain — is running hotter than it should. The right fix is usually to bring that upstream level down so the audio sits comfortably below the ceiling on its own, rather than relying on the limiter to clamp it on every loud sound. A summary that says the limiter *never engaged* across a normal session is what you want to see.
+
 ---
 
 ## What To Do Between Appointments

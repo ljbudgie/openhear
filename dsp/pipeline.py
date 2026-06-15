@@ -14,6 +14,7 @@ streamer by the OS).
         → VoiceClarityEnhancer (voice_clarity.py)
         → FeedbackCanceller   (feedback_canceller.py)
         → OwnVoiceBypass      (own_voice_bypass.py)
+        → OutputSafetyLimiter (output_safety.py)  ← always-on output ceiling
         → Bluetooth output
 
 Latency budget:
@@ -44,6 +45,7 @@ from dsp.audiogram_profile import Prescription, prescribe
 from dsp.compression import WDRCompressor
 from dsp.feedback_canceller import FeedbackCanceller
 from dsp.noise_reduction import SpectralSubtractor
+from dsp.output_safety import OutputSafetyLimiter
 from dsp.own_voice_bypass import OwnVoiceBypass
 from dsp.profile_delta import ProfileDelta
 from dsp.voice_clarity import VoiceClarityEnhancer
@@ -307,6 +309,25 @@ def build_dsp_chain(
 
     if not chain:
         logger.warning("All DSP stages disabled – audio will be passed through unchanged.")
+
+    # Final, always-on safety stage: cap the output level so nothing above the
+    # configured ceiling can reach the user's aids/ears, regardless of what the
+    # upstream stages (or a hand-edited config) produced.  This is the software
+    # equivalent of the hardware MPO clamp and must be the LAST stage so it
+    # constrains everything before it.
+    if config.OUTPUT_SAFETY_LIMITER_ENABLED:
+        chain.append(
+            OutputSafetyLimiter(
+                sample_rate=config.SAMPLE_RATE,
+                max_output_dbfs=config.OUTPUT_SAFETY_MAX_DBFS,
+                attack_s=config.OUTPUT_SAFETY_ATTACK_S,
+                release_s=config.OUTPUT_SAFETY_RELEASE_S,
+            )
+        )
+        logger.info(
+            "Stage added: OutputSafetyLimiter (ceiling=%.1f dBFS)",
+            config.OUTPUT_SAFETY_MAX_DBFS,
+        )
 
     return chain
 

@@ -234,10 +234,14 @@ class OutputSafetyLimiter:
         if peak > 0.0:
             out_peak = float(np.max(np.abs(out)))
             if out_peak < peak:
-                reduction_db = -20.0 * math.log10(out_peak / peak) if out_peak > 0.0 else math.inf
                 self._blocks_limited += 1
-                if reduction_db > self._max_gain_reduction_db:
-                    self._max_gain_reduction_db = reduction_db
+                # ``out_peak`` is only ever zero here for a degenerate ceiling;
+                # guard against it so a ``log10(0)`` cannot poison the readout
+                # with a non-finite value.
+                if out_peak > 0.0:
+                    reduction_db = -20.0 * math.log10(out_peak / peak)
+                    if reduction_db > self._max_gain_reduction_db:
+                        self._max_gain_reduction_db = reduction_db
 
         return out
 

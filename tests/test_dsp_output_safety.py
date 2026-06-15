@@ -164,10 +164,13 @@ class TestActivityTelemetry:
         assert stats.max_gain_reduction_db == 0.0
 
     def test_summary_when_never_engaged_mentions_no_engagement(self):
-        limiter = OutputSafetyLimiter()
+        limiter = OutputSafetyLimiter(max_output_dbfs=-1.0)
         limiter.process(_tone(1000.0, amplitude=0.1))
         summary = limiter.summary()
         assert "never engaged" in summary
+        # The full message should also surface the block count and ceiling.
+        assert "1 blocks" in summary
+        assert "-1.0 dBFS" in summary
 
     def test_summary_when_engaged_reports_counts(self):
         limiter = OutputSafetyLimiter(max_output_dbfs=-6.0)

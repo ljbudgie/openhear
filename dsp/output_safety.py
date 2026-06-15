@@ -121,7 +121,7 @@ class OutputSafetyLimiter:
         if samples.size == 0:
             return samples
 
-        peak = float(np.max(np.abs(samples.astype(np.float64))))
+        peak = float(np.max(np.abs(samples)))
 
         # Target gain needed to bring this block's peak down to the ceiling.
         # If the block is already under the ceiling, the target is unity.
@@ -150,7 +150,7 @@ class OutputSafetyLimiter:
         # state.  This makes the safety bound unconditional even while the
         # attack envelope is still catching up to a sudden transient.
         np.clip(out, -self._ceiling_linear, self._ceiling_linear, out=out)
-        return out.astype(np.float32, copy=False)
+        return out
 
     def reset(self) -> None:
         """Reset the smoothed gain back to unity."""

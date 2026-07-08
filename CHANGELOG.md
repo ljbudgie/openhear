@@ -9,6 +9,8 @@ release; they will be called out under a **Breaking** subsection.
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-07-08
+
 ### Added
 
 - **Always-on output-safety limiter** (`dsp/output_safety.py`) — adds a

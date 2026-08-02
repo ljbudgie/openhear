@@ -9,6 +9,33 @@ release; they will be called out under a **Breaking** subsection.
 
 ## [Unreleased]
 
+### Added
+
+- **Accessibility profiles** (`accessibility/`) — OpenHear now fits the user's
+  body as well as their ears, starting with **cerebral palsy**. Every other
+  tuning path in the repo begins with an audiogram; that says nothing about a
+  limb whose muscle tone shifts through the day, a startle response,
+  involuntary movement at the controls, or dysarthric speech — all of which
+  change what a good fit actually is. `AccessProfile`
+  (`accessibility/profiles.py`) captures those motor and sensory access needs
+  as bounded values (haptic intensity damping, minimum onset ramp, alert
+  spacing, confidence floor, hold-to-confirm dwell and repeat lockout, voice
+  match tolerance), clipped into a safe envelope on construction so a
+  hand-edited profile can never push the wristband outside it.
+  `accessibility/adapt.py` is the single place a profile becomes behaviour:
+  `policy_config_for()` adapts `stream.haptic_policy.PolicyConfig`,
+  `scale_intensity()` damps the wristband drive byte **without ever taking a
+  safety-critical alert below a perceptible floor**, `voice_match_tolerance_db()`
+  widens the voice window for dysarthria, and `InputGate` provides
+  hold-to-confirm control handling over a monotonic clock so tremor or
+  dyskinesia cannot toggle a setting by accident. The bundled `cerebral_palsy`
+  profile is a conservative starting point, not a prescription — every value is
+  overridable via `AccessProfile.replace()`. Co-occurring conditions (e.g.
+  epilepsy) are surfaced as `screening_prompts` for the user to answer, never
+  assumed; the answer is what reaches `TherapeuticProtocol.gate()`. Nothing is
+  inferred, stored, or transmitted: the user declares a profile or there is
+  none. See [`accessibility/README.md`](accessibility/README.md).
+
 ## [1.4.0] - 2026-07-08
 
 ### Added

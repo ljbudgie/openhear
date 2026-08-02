@@ -695,6 +695,12 @@ For a runnable, self-contained walkthrough of the full integration — happy pat
 python examples/reference_integration.py
 ```
 
+### Accessibility profiles — fitting the body, not just the ears
+
+Every other tuning path here starts from an audiogram. That is only half the fit. If your muscle tone shifts through the day, if vibration can trigger a spasm or a startle, if an involuntary movement can press a control you never meant to press, or if your speech varies widely between repetitions, the "correct" audiogram-derived settings can still be the wrong settings for you.
+
+`accessibility/` holds that second half as bounded, user-declared data. The first bundled profile is **cerebral palsy** — hearing loss is common alongside it, so a substantial part of OpenHear's audience is navigating both at once. It damps and ramps the haptics, spaces alerts out, raises the confidence floor so there are fewer false buzzes, adds hold-to-confirm input handling so a tremor or a brush cannot toggle a setting, and widens the voice module's match tolerance for dysarthric speech — while never letting comfort damping take a safety-critical alert below a perceptible level. It is a starting point, not a prescription: every value is overridable, nothing is inferred or stored, and co-occurring conditions such as epilepsy are *screened for*, never assumed. See [`accessibility/README.md`](accessibility/README.md).
+
 
 ---
 

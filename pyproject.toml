@@ -73,6 +73,7 @@ Issues = "https://github.com/ljbudgie/openhear/issues"
 [tool.setuptools]
 # Ship the existing top-level package directories as installable packages.
 packages = [
+    "accessibility",
     "advocacy",
     "audiogram",
     "core",
@@ -107,6 +108,7 @@ filterwarnings = [
 [tool.coverage.run]
 branch = true
 source = [
+    "accessibility",
     "advocacy",
     "audiogram",
     "core",

@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/0857d69a-a8ad-45cd-87c1-6dadb0097708" alt="OpenHear hero" width="100%">
+</p>
+
 # OpenHear 🦻
 
 ### Your senses. Your data. Your world.

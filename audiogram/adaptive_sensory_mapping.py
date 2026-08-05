@@ -2,7 +2,7 @@
 
 The mapping is deliberately data-driven: a Living Hearing Profile owns the
 starting encoding and each bounded refinement.  This module never sends data
-off-device and records only user-approved, aggregate observations -- never
+off-device and records only user-approved, aggregate observations — never
 raw audio or continuous sensor traces.
 """
 
@@ -39,7 +39,7 @@ class AcousticFeatures:
     confidence: float = 1.0
     urgency: float = 0.0
     direction: float = 0.0
-    intensity: float = 1.0
+    intensity_scale: float = 1.0
 
 
 @dataclass(frozen=True)
@@ -105,7 +105,9 @@ class AdaptiveSensoryMapper:
             intensity=scale_intensity(
                 round(
                     _clip(
-                        _value(encoding, "intensity") * confidence * max(0.0, features.intensity)
+                        _value(encoding, "intensity")
+                        * confidence
+                        * _clip(features.intensity_scale, 0.0, 1.0)
                         + urgency * _value(encoding, "urgency_intensity_delta"),
                         *_BOUNDS["intensity"],
                     )
@@ -154,13 +156,15 @@ class AdaptiveSensoryMapper:
         history.append({"sound_class": observation.sound_class, **scores})
         policy = mapping.get("adaptation_policy", {})
         minimum = max(1, int(policy.get("minimum_observations", 3)))
-        if len([item for item in history if item["sound_class"] == observation.sound_class]) < minimum:
+        if sum(1 for item in history if item["sound_class"] == observation.sound_class) < minimum:
             self.profile.set_adaptive_sensory_mapping(mapping)
             return False
 
         learning_rate = _clip(float(policy.get("learning_rate", 0.05)), 0.0, 0.1)
         changed = False
         if scores["comfort"] < 0.5:
+            # Discomfort takes precedence: never compensate for a weak cue by
+            # making an already uncomfortable cue stronger.
             changed = self._adjust(encoding, "intensity", -learning_rate * (0.5 - scores["comfort"]) * 255.0)
         elif min(scores["perceptibility"], scores["usefulness"]) < 0.5:
             missed = 1.0 - ((scores["perceptibility"] + scores["usefulness"]) / 2.0)

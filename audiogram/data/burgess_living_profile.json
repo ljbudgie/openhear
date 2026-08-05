@@ -1,4 +1,6 @@
 {
+  "schema": "openhear-living-profile-v1",
+  "schema_version": 1,
   "format_version": "openhear-living-profile-v1",
   "schema_description": "Living Hearing Profile — sovereign, user-owned, versioned hearing data. Extends openhear-audiogram-v1 with preference, context, haptic and history layers.",
   "subject": "Lewis Burgess",

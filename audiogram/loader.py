@@ -38,8 +38,9 @@ from typing import Optional
 # Frequencies used for the standard Pure Tone Average calculation.
 _PTA_FREQUENCIES = {500, 1000, 2000, 4000}
 
-# Living profile v2 format version string.
-_LIVING_PROFILE_VERSION = "openhear-living-profile-v1"
+# Living profile schema identity (also used as legacy format_version).
+_LIVING_PROFILE_SCHEMA = "openhear-living-profile-v1"
+_LIVING_PROFILE_VERSION = _LIVING_PROFILE_SCHEMA  # backward-compatible alias
 
 # Normal hearing threshold — the target for gain compensation.
 _NORMAL_THRESHOLD_DB = 20
@@ -69,10 +70,13 @@ def load_audiogram(path: str) -> dict:
     if _looks_like_legacy_audiogram(data):
         return _normalise_legacy_audiogram(data)
 
-    # Transparently support the Living Hearing Profile v2 format by
+    # Transparently support the Living Hearing Profile format by
     # extracting its immutable clinical core and surfacing it as a
     # standard v1 audiogram dict.  This keeps all existing callers working.
-    if data.get("format_version") == _LIVING_PROFILE_VERSION:
+    if (
+        data.get("schema") == _LIVING_PROFILE_SCHEMA
+        or data.get("format_version") == _LIVING_PROFILE_VERSION
+    ):
         return _extract_v1_from_living_profile(data)
 
     missing = _REQUIRED_FIELDS - set(data.keys())

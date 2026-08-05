@@ -2,7 +2,7 @@
   <img src="https://github.com/user-attachments/assets/0857d69a-a8ad-45cd-87c1-6dadb0097708" alt="OpenHear hero" width="100%">
 </p>
 
-# OpenHear 🦻
+# OpenHear
 
 ### Your senses. Your data. Your world.
 
@@ -16,13 +16,33 @@
 > Start at low volume, validate every configuration on your own hardware, and do
 > not treat any module in this repository as a substitute for clinical care.
 
-### OpenHear is a human sensory sovereignty platform — not a hearing aid, not a wellness device, not a consumer gadget. It is an open-source sovereign audio pipeline, haptic environment engine, therapeutic delivery layer, and future aids-free sensory system.
+OpenHear is a human sensory sovereignty platform — not a hearing aid, not a wellness device, not a consumer gadget. It is an open-source sovereign audio pipeline, haptic environment engine, therapeutic delivery layer, and future aids-free sensory system.
 
-### North star: human sensory sovereignty. The user decides what they hear, when they hear it, how they hear it, and what their acoustic environment does to their body and mind. The long-term configuration is still direct: no hearing aid, no behind-the-ear receiver, no bone conduction implant, no ear canal device of any kind. The wristband IS the hearing system. See **[Vision — Aids-Free Hearing](#openhear-vision-2--aids-free-hearing-the-wristband-is-the-hearing-system)** below, the full eight-pillar platform architecture in [`docs/HUMAN_SENSORY_SOVEREIGNTY_ARCHITECTURE.md`](docs/HUMAN_SENSORY_SOVEREIGNTY_ARCHITECTURE.md), and the aids-free subsystem document in [`docs/AIDS_FREE_ARCHITECTURE.md`](docs/AIDS_FREE_ARCHITECTURE.md).
+**North star: human sensory sovereignty.** The user decides what they hear, when they hear it, how they hear it, and what their acoustic environment does to their body and mind. The long-term configuration is still direct: no hearing aid, no behind-the-ear receiver, no bone conduction implant, no ear canal device of any kind. The wristband IS the hearing system. See **[Vision — Aids-Free Hearing](#openhear-vision-2--aids-free-hearing-the-wristband-is-the-hearing-system)** below, the full eight-pillar platform architecture in [`docs/HUMAN_SENSORY_SOVEREIGNTY_ARCHITECTURE.md`](docs/HUMAN_SENSORY_SOVEREIGNTY_ARCHITECTURE.md), and the aids-free subsystem document in [`docs/AIDS_FREE_ARCHITECTURE.md`](docs/AIDS_FREE_ARCHITECTURE.md).
 
 > *The hearing aid industry charges £3,000–£8,000 for hardware, then locks you out of it.*
 > *Your audiogram is a measurement of your body. It belongs to you.*
 > *OpenHear gives it back.*
+
+---
+
+## Contents
+
+- [Why OpenHear in 2026](#why-openhear-in-2026)
+- [What this is](#what-this-is)
+- [The Burgess Principle](#the-burgess-principle)
+- [The problem](#the-problem)
+- [What OpenHear does](#what-openhear-does)
+- [OpenHear Wristband — Active Environmental Intelligence](#openhear-wristband--active-environmental-intelligence)
+- [OpenHear Vision — The Wristband as the Hearing System](#openhear-vision--the-wristband-as-the-hearing-system)
+- [OpenHear Vision 2 — Aids-Free Hearing](#openhear-vision-2--aids-free-hearing-the-wristband-is-the-hearing-system)
+- [Getting started — three paths](#getting-started--three-paths)
+- [Roadmap](#roadmap)
+- [Nine pillars](#openhear-expansion--nine-pillars)
+- [Sovereign philosophy](#sovereign-philosophy--enforced-at-every-layer)
+- [Contributing](#contributing)
+- [Legal](#legal)
+- [Author](#author)
 
 ---
 
@@ -40,16 +60,17 @@ It already works with aids you own and hardware you have. It is being extended i
 
 OpenHear is now both a software pipeline and a hardware concept. The pipeline gives you control over how your aids process sound. The hardware — the OpenHear Wristband (in development) — extends that control outwards into the environment itself, scanning for sounds your aids may not pick up and translating them into haptic awareness on the wrist. Software and hardware are unified by a single principle: the hearing aid user should have full sovereignty over how they perceive their acoustic environment.
 
-OpenHear now has eight explicit pillars:
+OpenHear has nine pillars:
 
-1. Peak hearing for all users
-2. Selective acoustic sovereignty
-3. Therapeutic frequency delivery
-4. Native iOS and Android integration
-5. Emotional and cognitive acoustic intelligence
-6. Social acoustic layer
-7. Beyond biological hearing
-8. Sovereign philosophy enforced at every layer
+1. The OpenHear Wristband — active environmental intelligence
+2. Aids-free architecture — the wristband as the complete hearing system
+3. Peak hearing for all users
+4. Selective acoustic sovereignty
+5. Therapeutic frequency delivery
+6. Native iOS and Android integration
+7. Emotional and cognitive acoustic intelligence
+8. Social acoustic layer
+9. Beyond biological hearing
 
 ### New north-star documents
 

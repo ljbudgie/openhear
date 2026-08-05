@@ -11,6 +11,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
+from uuid import uuid4
 
 from audiogram.adaptive_sensory_mapping import AdaptationObservation, AdaptiveSensoryMapper
 
@@ -91,7 +92,7 @@ class IrisSensoryGuardian:
             guardian["proposals"], observation.sound_class, adjustments
         ):
             proposal_data = {
-                "proposal_id": f"iris-{len(guardian['memory']) + 1}",
+                "proposal_id": f"iris-{uuid4()}",
                 "sound_class": observation.sound_class,
                 "adjustments": adjustments,
                 "explanation": _explanation(observation.sound_class, reasons),

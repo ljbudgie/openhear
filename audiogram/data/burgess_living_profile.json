@@ -1,0 +1,190 @@
+{
+  "format_version": "openhear-living-profile-v1",
+  "schema_description": "Living Hearing Profile — sovereign, user-owned, versioned hearing data. Extends openhear-audiogram-v1 with preference, context, haptic and history layers.",
+  "subject": "Lewis Burgess",
+  "created": "2021-10-20",
+  "last_updated": "2024-01-01",
+
+  "clinical_core": {
+    "locked": true,
+    "comment": "Immutable clinical measurements. Append only via history layer; never mutate in place.",
+    "source": "Dorothy Thomson Hearing Services, 12 Southend Ave, Darlington, DL3 7HL",
+    "date": "2021-10-20",
+    "notes": "Most recent verified clinical audiogram. ISQ (no significant change) from prior tests dating back to 2017-01-19.",
+    "right_ear": {
+      "symbol": "O",
+      "thresholds": [
+        {"freq_hz": 125,  "db_hl": 30},
+        {"freq_hz": 250,  "db_hl": 35},
+        {"freq_hz": 500,  "db_hl": 50},
+        {"freq_hz": 1000, "db_hl": 75},
+        {"freq_hz": 1500, "db_hl": 78},
+        {"freq_hz": 2000, "db_hl": 80},
+        {"freq_hz": 3000, "db_hl": 80},
+        {"freq_hz": 4000, "db_hl": 85},
+        {"freq_hz": 6000, "db_hl": 90},
+        {"freq_hz": 8000, "db_hl": 95}
+      ]
+    },
+    "left_ear": {
+      "symbol": "X",
+      "thresholds": [
+        {"freq_hz": 125,  "db_hl": 35},
+        {"freq_hz": 250,  "db_hl": 45},
+        {"freq_hz": 500,  "db_hl": 55},
+        {"freq_hz": 1000, "db_hl": 75},
+        {"freq_hz": 1500, "db_hl": 75},
+        {"freq_hz": 2000, "db_hl": 80},
+        {"freq_hz": 3000, "db_hl": 80},
+        {"freq_hz": 4000, "db_hl": 85},
+        {"freq_hz": 6000, "db_hl": 95},
+        {"freq_hz": 8000, "db_hl": 100}
+      ]
+    },
+    "classification": {
+      "type": "sensorineural",
+      "pattern": "high-frequency sloping",
+      "right_pta": 72.5,
+      "left_pta": 73.75,
+      "right_range": "mild-to-profound",
+      "left_range": "mild-to-profound"
+    }
+  },
+
+  "preference_layer": {
+    "comment": "User-defined loudness and comfort preferences. Evolves over time as the user fine-tunes their experience.",
+    "version": 1,
+    "loudness_growth": {
+      "comment": "Per-frequency gain offset applied on top of clinical prescription. Positive = louder, negative = quieter.",
+      "right_ear": [
+        {"freq_hz": 250,  "offset_db": 0},
+        {"freq_hz": 500,  "offset_db": 2},
+        {"freq_hz": 1000, "offset_db": 3},
+        {"freq_hz": 2000, "offset_db": 2},
+        {"freq_hz": 4000, "offset_db": 0},
+        {"freq_hz": 8000, "offset_db": -2}
+      ],
+      "left_ear": [
+        {"freq_hz": 250,  "offset_db": 0},
+        {"freq_hz": 500,  "offset_db": 2},
+        {"freq_hz": 1000, "offset_db": 3},
+        {"freq_hz": 2000, "offset_db": 2},
+        {"freq_hz": 4000, "offset_db": 0},
+        {"freq_hz": 8000, "offset_db": -2}
+      ]
+    },
+    "comfort_ceiling_db_spl": 85,
+    "preferred_compression_ratio": 2.0,
+    "music_mode_treble_boost_db": 3,
+    "voice_enhancement_enabled": true
+  },
+
+  "context_map": {
+    "comment": "Situational listening presets. Each context overrides specific processing parameters.",
+    "version": 1,
+    "contexts": [
+      {
+        "name": "quiet_conversation",
+        "label": "Quiet room, one-to-one conversation",
+        "noise_reduction_aggressiveness": 0.3,
+        "beamforming_enabled": false,
+        "voice_clarity_gain": 1.6,
+        "compression_ratio_override": 2.0
+      },
+      {
+        "name": "noisy_environment",
+        "label": "Pub, restaurant, crowded space",
+        "noise_reduction_aggressiveness": 0.8,
+        "beamforming_enabled": true,
+        "voice_clarity_gain": 2.0,
+        "compression_ratio_override": 2.5
+      },
+      {
+        "name": "music",
+        "label": "Music listening (headphones or speakers)",
+        "noise_reduction_aggressiveness": 0.1,
+        "beamforming_enabled": false,
+        "voice_clarity_gain": 1.0,
+        "compression_ratio_override": 1.5
+      },
+      {
+        "name": "outdoors",
+        "label": "Outdoors — wind, traffic, open space",
+        "noise_reduction_aggressiveness": 0.6,
+        "beamforming_enabled": true,
+        "voice_clarity_gain": 1.8,
+        "compression_ratio_override": 2.0
+      },
+      {
+        "name": "phone_call",
+        "label": "Telephone / video call",
+        "noise_reduction_aggressiveness": 0.5,
+        "beamforming_enabled": false,
+        "voice_clarity_gain": 2.0,
+        "compression_ratio_override": 2.0
+      }
+    ],
+    "active_context": "quiet_conversation"
+  },
+
+  "haptic_layer": {
+    "comment": "Haptic substitution weights. Higher weight = stronger haptic signal for that sound category. Derived from the audiogram but user-adjustable.",
+    "version": 1,
+    "strategy": "severity_weighted",
+    "comfort_scale": 1.0,
+    "ear_strategy": "worst",
+    "sound_classes": [
+      {"name": "voice",     "weight": 0.85, "dominant_freq_hz": 1000, "enabled": true,  "note": "Speech — most critical category for this profile"},
+      {"name": "alarm",     "weight": 1.0,  "dominant_freq_hz": 3150, "enabled": true,  "note": "Safety: maximum haptic at high-frequency alarm band where loss is most severe"},
+      {"name": "doorbell",  "weight": 0.9,  "dominant_freq_hz": 2000, "enabled": true,  "note": "High loss at 2 kHz drives strong substitution"},
+      {"name": "dog",       "weight": 0.6,  "dominant_freq_hz": 500,  "enabled": true,  "note": "Lower-frequency: moderate loss, moderate haptic"},
+      {"name": "traffic",   "weight": 0.6,  "dominant_freq_hz": 500,  "enabled": true,  "note": "Low-frequency traffic noise"},
+      {"name": "media",     "weight": 0.5,  "dominant_freq_hz": 1000, "enabled": true,  "note": "General media — user can adjust per preference"},
+      {"name": "silence",   "weight": 0.0,  "dominant_freq_hz": null,  "enabled": true,  "note": "No haptic for silence"}
+    ]
+  },
+
+  "history": {
+    "comment": "Append-only change log with SHA-256 content commitments (Burgess Principle compatible). Each entry records what changed and a hash of the profile state at that point.",
+    "entries": [
+      {
+        "version": 1,
+        "timestamp": "2021-10-20T12:00:00Z",
+        "author": "Lewis Burgess",
+        "change_type": "clinical_audiogram_loaded",
+        "description": "Initial profile created from Dorothy Thomson Hearing Services audiogram dated 2021-10-20.",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "layers_changed": ["clinical_core"]
+      },
+      {
+        "version": 2,
+        "timestamp": "2024-01-01T09:00:00Z",
+        "author": "Lewis Burgess",
+        "change_type": "preference_update",
+        "description": "Added loudness-growth offsets based on six months of real-world listening experience. Slight mid-frequency boost preferred in conversation.",
+        "sha256": "placeholder_hash_update_via_living_profile_commit",
+        "layers_changed": ["preference_layer"]
+      },
+      {
+        "version": 3,
+        "timestamp": "2024-01-01T09:05:00Z",
+        "author": "Lewis Burgess",
+        "change_type": "context_map_added",
+        "description": "Added five contextual listening presets. Active context set to quiet_conversation.",
+        "sha256": "placeholder_hash_update_via_living_profile_commit",
+        "layers_changed": ["context_map"]
+      },
+      {
+        "version": 4,
+        "timestamp": "2024-01-01T09:10:00Z",
+        "author": "Lewis Burgess",
+        "change_type": "haptic_layer_added",
+        "description": "Added severity-weighted haptic substitution map for wristband.",
+        "sha256": "placeholder_hash_update_via_living_profile_commit",
+        "layers_changed": ["haptic_layer"]
+      }
+    ]
+  },
+
+  "sovereignty_notice": "This profile is the personal data of Lewis Burgess. It is sovereign, local-first, and subject to the OpenHear Sovereign Use Addendum. No cloud sync, no telemetry, no medical inference will be performed without the subject's explicit written consent. Licensed Apache 2.0 + Sovereign Use Addendum."
+}

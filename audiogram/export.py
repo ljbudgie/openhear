@@ -5,6 +5,9 @@ Converts sovereign audiogram data into portable formats: CSV for
 spreadsheets, Markdown for documentation, and DSP config dicts that map
 directly to the parameters in dsp/config.py.
 
+Also supports the Living Hearing Profile v2 format via
+:func:`to_dsp_config_from_profile` and :func:`to_haptic_map_from_profile`.
+
 Your data, your format, your choice.
 
 Usage:
@@ -13,6 +16,14 @@ Usage:
     to_csv("audiogram/data/burgess_2021.json", "burgess_2021.csv")
     print(to_markdown("audiogram/data/burgess_2021.json"))
     config = to_dsp_config("audiogram/data/burgess_2021.json", "right")
+
+    # Living Hearing Profile API:
+    from audiogram.living_profile import LivingHearingProfile
+    from audiogram.export import to_dsp_config_from_profile, to_haptic_map_from_profile
+
+    profile = LivingHearingProfile.from_file("audiogram/data/burgess_living_profile.json")
+    dsp = to_dsp_config_from_profile(profile, "right")
+    haptic = to_haptic_map_from_profile(profile)
 """
 
 import csv
@@ -193,4 +204,128 @@ def to_dsp_config(path: str, ear: str) -> dict:
         "voice_clarity_high_hz": 4000.0,
         "pta": pta,
         "severity": severity,
+    }
+
+
+# ── Living Hearing Profile export functions ────────────────────────────────────
+
+
+def to_dsp_config_from_profile(profile: "object", ear: str) -> dict:
+    """Generate DSP configuration from a :class:`~audiogram.living_profile.LivingHearingProfile`.
+
+    Identical structure to :func:`to_dsp_config` but uses the profile's
+    preference-layer gain offsets on top of the clinical prescription.  Also
+    incorporates the active listening context's compression and noise-reduction
+    settings when available.
+
+    Args:
+        profile: A :class:`~audiogram.living_profile.LivingHearingProfile` instance.
+        ear:     ``"right"`` or ``"left"``.
+
+    Returns:
+        DSP config dict (same schema as :func:`to_dsp_config`).
+    """
+    from audiogram.living_profile import LivingHearingProfile  # local import to avoid cycle
+
+    if not isinstance(profile, LivingHearingProfile):
+        raise TypeError("profile must be a LivingHearingProfile instance.")
+
+    gain_profile = profile.get_gain_profile(ear, include_preference=True)
+    pta = profile.get_pta(ear)
+    severity = get_severity(int(pta))
+
+    # Context overrides
+    ctx = profile.get_active_context()
+    ctx_compression = ctx.get("compression_ratio_override")
+    ctx_voice_gain = ctx.get("voice_clarity_gain")
+    ctx_noise_mult = ctx.get("noise_reduction_aggressiveness")
+
+    # Compression ratios per band
+    compression_bands: list[tuple[int, float]] = []
+    for freq, gain in gain_profile:
+        if ctx_compression is not None:
+            ratio = float(ctx_compression)
+        elif gain <= 10:
+            ratio = 1.2
+        elif gain <= 25:
+            ratio = 1.5
+        elif gain <= 40:
+            ratio = 2.0
+        elif gain <= 55:
+            ratio = 2.5
+        elif gain <= 70:
+            ratio = 3.0
+        else:
+            ratio = 3.5
+        compression_bands.append((freq, ratio))
+
+    if pta <= 40:
+        knee = -35.0
+    elif pta <= 55:
+        knee = -40.0
+    elif pta <= 70:
+        knee = -45.0
+    else:
+        knee = -50.0
+
+    if ctx_noise_mult is not None:
+        noise_mult = 1.0 + float(ctx_noise_mult) * 0.5
+    elif pta <= 40:
+        noise_mult = 1.1
+    elif pta <= 55:
+        noise_mult = 1.2
+    elif pta <= 70:
+        noise_mult = 1.3
+    else:
+        noise_mult = 1.4
+
+    if ctx_voice_gain is not None:
+        voice_gain = float(ctx_voice_gain)
+    elif pta <= 40:
+        voice_gain = 1.4
+    elif pta <= 55:
+        voice_gain = 1.6
+    elif pta <= 70:
+        voice_gain = 1.8
+    else:
+        voice_gain = 2.0
+
+    return {
+        "gain_profile": gain_profile,
+        "compression_bands": compression_bands,
+        "compression_knee_dbfs": knee,
+        "noise_floor_multiplier": noise_mult,
+        "voice_clarity_gain": voice_gain,
+        "voice_clarity_low_hz": 1000.0,
+        "voice_clarity_high_hz": 4000.0,
+        "pta": pta,
+        "severity": severity,
+        "active_context": ctx.get("name", ""),
+    }
+
+
+def to_haptic_map_from_profile(profile: "object") -> dict:
+    """Generate a haptic intensity map from a Living Hearing Profile.
+
+    Returns a dict ready to feed into :class:`~stream.haptic_mapper.HapticMapper`
+    or the wristband packet builder.
+
+    Args:
+        profile: A :class:`~audiogram.living_profile.LivingHearingProfile` instance.
+
+    Returns:
+        Dict with keys ``{"sound_classes": {name: weight}, "comfort_scale": float,
+        "ear_strategy": str}``.
+    """
+    from audiogram.living_profile import LivingHearingProfile  # local import to avoid cycle
+
+    if not isinstance(profile, LivingHearingProfile):
+        raise TypeError("profile must be a LivingHearingProfile instance.")
+
+    haptic_layer = profile._data.get("haptic_layer", {})  # noqa: SLF001
+    return {
+        "sound_classes": profile.get_haptic_weights(),
+        "comfort_scale": float(haptic_layer.get("comfort_scale", 1.0)),
+        "ear_strategy": haptic_layer.get("ear_strategy", "worst"),
+        "strategy": haptic_layer.get("strategy", "severity_weighted"),
     }

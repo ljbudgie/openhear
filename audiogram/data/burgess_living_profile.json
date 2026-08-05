@@ -135,6 +135,27 @@
     "strategy": "severity_weighted",
     "comfort_scale": 1.0,
     "ear_strategy": "worst",
+    "adaptive_sensory_mapping": {
+      "version": 1,
+      "enabled": true,
+      "actuator_layout": {"kind": "single", "actuator_count": 1},
+      "adaptation_policy": {
+        "learning_rate": 0.05,
+        "minimum_observations": 3,
+        "local_only": true,
+        "require_user_inspection": true
+      },
+      "sound_classes": {
+        "voice": {"pulse_rate_hz": 3.0, "intensity": 150, "spatial_balance": 0.0, "sharpness": 0.3, "silence_ms": 100, "urgency_rate_delta_hz": 2.0, "urgency_intensity_delta": 25},
+        "doorbell": {"pulse_rate_hz": 5.0, "intensity": 200, "spatial_balance": 0.0, "sharpness": 0.8, "silence_ms": 150, "urgency_rate_delta_hz": 2.0, "urgency_intensity_delta": 30},
+        "alarm": {"pulse_rate_hz": 8.0, "intensity": 230, "spatial_balance": 0.0, "sharpness": 0.9, "silence_ms": 80, "urgency_rate_delta_hz": 4.0, "urgency_intensity_delta": 25},
+        "dog": {"pulse_rate_hz": 2.0, "intensity": 125, "spatial_balance": 0.5, "sharpness": 0.6, "silence_ms": 200},
+        "traffic": {"pulse_rate_hz": 1.5, "intensity": 125, "spatial_balance": -0.5, "sharpness": 0.2, "silence_ms": 300},
+        "media": {"pulse_rate_hz": 1.0, "intensity": 100, "spatial_balance": 0.0, "sharpness": 0.1, "silence_ms": 500},
+        "silence": {"pulse_rate_hz": 0.1, "intensity": 0, "spatial_balance": 0.0, "sharpness": 0.0, "silence_ms": 1000}
+      },
+      "adaptation_history": []
+    },
     "sound_classes": [
       {"name": "voice",     "weight": 0.85, "dominant_freq_hz": 1000, "enabled": true,  "note": "Speech — most critical category for this profile"},
       {"name": "alarm",     "weight": 1.0,  "dominant_freq_hz": 3150, "enabled": true,  "note": "Safety: maximum haptic at high-frequency alarm band where loss is most severe"},

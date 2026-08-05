@@ -72,3 +72,14 @@ def test_guardian_requires_permission_and_preserves_tactile_identity():
         guardian.mapper.profile.get_history()[-1]["change_type"]
         == "iris_sensory_guardian_adjustment"
     )
+
+
+def test_guardian_does_not_propose_a_clipped_noop():
+    guardian = _guardian()
+    mapping = guardian.mapper.profile.get_adaptive_sensory_mapping()
+    mapping["sound_classes"]["alarm"]["intensity"] = 0
+    guardian.mapper.profile.set_adaptive_sensory_mapping(mapping)
+
+    review = guardian.review(AdaptationObservation("alarm", 0.8, 0.8, 0.2))
+
+    assert review.proposal is None

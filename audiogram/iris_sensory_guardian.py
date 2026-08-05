@@ -214,14 +214,14 @@ def _protective_adjustments(
     if scores["perceptibility"] < 0.35 and scores["comfort"] >= 0.5:
         intensity += 15.0
         reasons.append("perceptibility fell below the protective threshold")
-    adjustments = {
+    adjusted_values = {
         "intensity": _clip(intensity, *_BOUNDS["intensity"]),
         "silence_ms": _clip(silence_ms, *_BOUNDS["silence_ms"]),
     }
-    return (
-        {field: value for field, value in adjustments.items() if value != float(encoding[field])},
-        reasons,
-    )
+    adjustments = {
+        field: value for field, value in adjusted_values.items() if value != float(encoding[field])
+    }
+    return adjustments, reasons if adjustments else []
 
 
 def _scores(observation: AdaptationObservation) -> dict[str, float]:

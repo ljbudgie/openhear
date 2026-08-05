@@ -83,3 +83,13 @@ def test_guardian_does_not_propose_a_clipped_noop():
     review = guardian.review(AdaptationObservation("alarm", 0.8, 0.8, 0.2))
 
     assert review.proposal is None
+
+
+def test_guardian_observe_runs_mapper_before_review():
+    guardian = _guardian()
+    observation = AdaptationObservation("alarm", 0, 0, 1)
+
+    review = guardian.observe(observation)
+
+    assert review.mapper_refined is False
+    assert len(guardian.mapper.profile.get_adaptive_sensory_mapping()["adaptation_history"]) == 1

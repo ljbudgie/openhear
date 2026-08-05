@@ -307,6 +307,22 @@ class LivingHearingProfile:
                 return
         raise KeyError(f"Sound class {sound_class!r} not found in haptic layer.")
 
+    def get_adaptive_sensory_mapping(self) -> dict[str, Any]:
+        """Return a deep copy of the profile-owned adaptive tactile mapping."""
+        mapping = self._data.get("haptic_layer", {}).get("adaptive_sensory_mapping", {})
+        return json.loads(json.dumps(mapping))
+
+    def set_adaptive_sensory_mapping(self, mapping: dict[str, Any]) -> None:
+        """Store a validated adaptive tactile mapping in the haptic layer."""
+        if not isinstance(mapping, dict):
+            raise ValueError("adaptive_sensory_mapping must be an object.")
+        classes = mapping.get("sound_classes", {})
+        if not isinstance(classes, dict):
+            raise ValueError("adaptive_sensory_mapping.sound_classes must be an object.")
+        self._data.setdefault("haptic_layer", {})["adaptive_sensory_mapping"] = (
+            json.loads(json.dumps(mapping))
+        )
+
     # ── Context map ───────────────────────────────────────────────────────────
 
     def get_active_context(self) -> dict[str, Any]:

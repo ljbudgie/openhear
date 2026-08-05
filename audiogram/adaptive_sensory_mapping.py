@@ -30,6 +30,9 @@ _BOUNDS: dict[str, tuple[float, float]] = {
     "sharpness": (0.0, 1.0),
     "silence_ms": (0.0, 5_000.0),
 }
+# Refinements are deliberately slow so transient motor state or adaptation
+# cannot materially change a user's tactile language in one observation.
+_MAX_LEARNING_RATE = 0.1
 
 
 @dataclass(frozen=True)
@@ -108,7 +111,7 @@ class AdaptiveSensoryMapper:
                         _value(encoding, "intensity")
                         * confidence
                         * _clip(features.intensity_scale, 0.0, 1.0)
-                        + urgency * _value(encoding, "urgency_intensity_delta"),
+                        + confidence * urgency * _value(encoding, "urgency_intensity_delta"),
                         *_BOUNDS["intensity"],
                     )
                 ),
@@ -160,7 +163,7 @@ class AdaptiveSensoryMapper:
             self.profile.set_adaptive_sensory_mapping(mapping)
             return False
 
-        learning_rate = _clip(float(policy.get("learning_rate", 0.05)), 0.0, 0.1)
+        learning_rate = _clip(float(policy.get("learning_rate", 0.05)), 0.0, _MAX_LEARNING_RATE)
         changed = False
         if scores["comfort"] < 0.5:
             # Discomfort takes precedence: never compensate for a weak cue by
@@ -170,9 +173,10 @@ class AdaptiveSensoryMapper:
             missed = 1.0 - ((scores["perceptibility"] + scores["usefulness"]) / 2.0)
             changed = self._adjust(encoding, "intensity", learning_rate * missed * 255.0)
         if scores["sensory_adaptation"] > 0.5:
-            changed = self._adjust(
+            adaptation_changed = self._adjust(
                 encoding, "silence_ms", learning_rate * scores["sensory_adaptation"] * 500.0
-            ) or changed
+            )
+            changed = changed or adaptation_changed
 
         self.profile.set_adaptive_sensory_mapping(mapping)
         if changed:

@@ -80,7 +80,7 @@ def test_guardian_does_not_propose_a_clipped_noop():
     mapping["sound_classes"]["alarm"]["intensity"] = 0
     guardian.mapper.profile.set_adaptive_sensory_mapping(mapping)
 
-    review = guardian.review(AdaptationObservation("alarm", 0.8, 0.8, 0.2))
+    review = guardian.review(AdaptationObservation("alarm", 0.8, 0.8, 0.2, motor_stability=1.0))
 
     assert review.proposal is None
 

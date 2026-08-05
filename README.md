@@ -230,7 +230,33 @@ Open source hardware and open source software, end to end. Schematics, RTL, firm
 - **DSP engineers** — compression, beamforming, feedback cancellation, and own-voice detection at sub-5ms latency budgets.
 - **Hearing aid users** — the people the system exists for. Lived experience is a design input, not a marketing line.
 
-The **Sharp Hearing collaboration enquiry of 20 April 2026** is recorded here as the first formal industry contact exploring this direction. It will not be the last.
+### Industry & Institutional Engagement
+
+**Industry engagement (active, July–August 2026)**
+
+Commercial integration conversations are active with multiple wellness technology and assistive device companies. The discussions cover acoustic environment classification, haptic rendering, and the governance wrapper.
+
+The commercial model is COSS (Commercial Open Source Software): the open core (Apache 2.0) is permanently free; the governance layer (UK Certification Mark UK00004343685) is licensed commercially per device at scale. A formal term sheet for a two-phase integration partnership — Phase 1 technical evaluation, Phase 2 paid integration pilot — has been prepared and is in circulation.
+
+Sharp Hearing (US audiology clinic) is recorded as the first formal industry contact, 20 April 2026.
+
+**Institutional partnerships (active)**
+
+- **Health Innovation North East and North Cumbria (HI NENC)**, funded by the UK Office of Life Sciences — Innovation Pathway ref 1643. A market analyst is conducting competitive landscape research across seven sections: competitor analysis, NHS landscape, regulatory pathway, patent/prior art, market sizing, pricing, and evidence base.
+- **RNID (Royal National Institute for Deaf People)** — confirmed participant recruitment from the Research Panel (~1,600 members, ~1,100 hearing aid users) launching 12 August 2026. Innovation Seed Fund application planned November 2026.
+- **UK Information Commissioner's Office** — IC-501417-W5W9: the ICO found Sonova/Phonak's response to a Subject Access Request regarding AutoSense OS algorithmic accountability inadequate (outcome letter 31 July 2026) and is writing to Sonova directly.
+- **MHRA** — CEC 253215: medical device safety concern regarding AutoSense OS automated clinical decision-making; FOI2026/00527 internal review requested regarding DSAR reclassification and substantive regulatory questions.
+
+**Regulatory and academic record**
+
+- UK Certification Mark UK00004343685 accepted 21 July 2026, published in Trade Marks Journal 24 July 2026, opposition period to 24 September 2026.
+- 7 papers publicly distributed on SSRN (author page: per\_id=11571908); lead paper: The Burgess Test v2.1 (SSRN 6759778).
+- 100 classified findings across 12 sectors: 78 NULL, 8 SOVEREIGN, 10 AMBIGUOUS, 4 confirmed resolutions.
+- First judicial validation: TPT DK00003-2605 ALLOWED, 14 June 2026.
+
+**Accessibility profiles (v1.4.0+)**
+
+A cerebral palsy accessibility profile layer is shipped: haptic intensity scaling for fluctuating muscle tone, InputGate for tremor/spasm filtering, and widened voice matching for dysarthric speech. A profile exists because the user declared it; nothing is detected, inferred, stored, or transmitted. The architecture supports additional conditions (autism, sensory processing) via the same profile registry pattern. See [`accessibility/README.md`](accessibility/README.md).
 
 ---
 
@@ -576,7 +602,7 @@ The OpenHear Wristband is a continuous-wear frequency scanner designed to work a
 - **Personalised adaptive AI models** — the classifier learns the user's actual environment over time. A barbershop, a stadium, a concert hall, a surgery, and a nursery do not sound the same and should not be treated the same.
 - **Proactive frequency scanning** — the wristband actively scans the spectrum and warns about sounds approaching detection threshold before they become relevant. Environmental sonar, not environmental amplification.
 
-The first formal US industry contact for this direction is **Sharp Hearing** on **20 April 2026**, exploring collaboration from an audiology context already adjacent to Neosensory Buzz. OpenHear goes significantly further.
+Sharp Hearing (US audiology clinic, 20 April 2026) is the first formal industry contact recorded for this direction. As of July–August 2026, commercial integration conversations are active with multiple wellness technology and assistive device companies, and institutional partnerships are in place with HI NENC, RNID, the ICO, and MHRA. See the Industry & Institutional Engagement section above for the current state.
 
 ## Pillar 2 — Aids-Free Architecture: The Wristband as the Complete Hearing System
 

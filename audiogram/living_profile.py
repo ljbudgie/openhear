@@ -55,8 +55,17 @@ from typing import Any
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-FORMAT_VERSION = "openhear-living-profile-v1"
+# Canonical schema identity for Living Hearing Profile files.
+SCHEMA_ID = "openhear-living-profile-v1"
+# Highest schema_version this code understands.  Files claiming a higher
+# version are rejected so callers never silently mis-read future formats.
+SCHEMA_VERSION = 1
+# Alias retained for existing imports / callers.
+FORMAT_VERSION = SCHEMA_ID
 _CLINICAL_V1_VERSION = "openhear-audiogram-v1"
+# Plain openhear-audiogram-v1 files are treated as clinical-core-only
+# (conceptual schema_version 0) and wrapped on load.
+_CLINICAL_SCHEMA_VERSION = 0
 
 _NORMAL_THRESHOLD_DB = 20
 _PTA_FREQUENCIES = {500, 1000, 2000, 4000}
@@ -86,8 +95,9 @@ class LivingHearingProfile:
         """Load a Living Hearing Profile from a JSON file.
 
         Also accepts a plain ``openhear-audiogram-v1`` file; the clinical
-        data is wrapped into the v2 structure automatically so users can
-        start their living profile from any existing audiogram.
+        data is wrapped into the living-profile structure automatically so
+        users can start their living profile from any existing audiogram
+        (treated as conceptual ``schema_version`` 0 / clinical-core only).
 
         Args:
             path: Path to the JSON file.
@@ -97,19 +107,49 @@ class LivingHearingProfile:
 
         Raises:
             FileNotFoundError: If *path* does not exist.
-            ValueError: If the file is not a recognised format.
+            ValueError: If the file is not a recognised format, is missing
+                required ``schema`` / ``schema_version`` fields, or claims
+                a future ``schema_version`` this build does not understand.
         """
         with open(path, encoding="utf-8") as fh:
             data = json.load(fh)
+        return cls.load(data)
 
-        version = data.get("format_version", "")
-        if version == FORMAT_VERSION:
-            return cls(data)
-        if version == _CLINICAL_V1_VERSION:
+    @classmethod
+    def load(cls, data: dict[str, Any]) -> "LivingHearingProfile":
+        """Validate and load a profile from an already-parsed dict.
+
+        Living profile documents must declare both ``schema`` and
+        ``schema_version``.  Plain ``openhear-audiogram-v1`` documents are
+        still accepted and wrapped as clinical-core-only profiles.
+
+        Args:
+            data: Parsed JSON object.
+
+        Returns:
+            A validated :class:`LivingHearingProfile`.
+
+        Raises:
+            ValueError: If the document is not a recognised format, lacks
+                required schema fields, or claims a future schema version.
+        """
+        if not isinstance(data, dict):
+            raise ValueError("Living profile data must be a JSON object.")
+
+        # Plain clinical audiogram → wrap (schema_version 0 / clinical-core).
+        if _is_clinical_v1_document(data):
             return cls(_wrap_v1_audiogram(data))
+
+        # Living profile path: require schema identity + version.
+        if _looks_like_living_profile(data):
+            _require_schema_fields(data)
+            return cls(data)
+
+        schema = data.get("schema", data.get("format_version", ""))
         raise ValueError(
-            f"Unsupported format version: {version!r}. "
-            f"Expected '{FORMAT_VERSION}' or '{_CLINICAL_V1_VERSION}'."
+            f"Unsupported format version: {schema!r}. "
+            f"Expected schema '{SCHEMA_ID}' (with schema_version) "
+            f"or format_version '{_CLINICAL_V1_VERSION}'."
         )
 
     @classmethod
@@ -462,12 +502,68 @@ def _resolve_ear(ear: str) -> str:
     raise ValueError(f"ear must be 'right' or 'left', got {ear!r}")
 
 
+def _is_clinical_v1_document(data: dict[str, Any]) -> bool:
+    """Return True if *data* is a plain openhear-audiogram-v1 file."""
+    if data.get("format_version") == _CLINICAL_V1_VERSION:
+        return True
+    # Clinical files never carry the living-profile schema id.
+    if data.get("schema") == SCHEMA_ID:
+        return False
+    return False
+
+
+def _looks_like_living_profile(data: dict[str, Any]) -> bool:
+    """Return True if *data* claims to be a living profile document."""
+    if data.get("schema") == SCHEMA_ID:
+        return True
+    if data.get("format_version") == FORMAT_VERSION:
+        return True
+    return "clinical_core" in data and data.get("format_version") != _CLINICAL_V1_VERSION
+
+
+def _require_schema_fields(data: dict[str, Any]) -> None:
+    """Ensure living-profile documents declare schema + schema_version."""
+    if "schema" not in data:
+        raise ValueError(
+            "Living profile is missing required field: 'schema'. "
+            f"Expected schema '{SCHEMA_ID}'."
+        )
+    if data.get("schema") != SCHEMA_ID:
+        raise ValueError(
+            f"Unsupported schema: {data.get('schema')!r}. "
+            f"Expected '{SCHEMA_ID}'."
+        )
+    if "schema_version" not in data:
+        raise ValueError(
+            "Living profile is missing required field: 'schema_version'."
+        )
+    version = data["schema_version"]
+    if not isinstance(version, int) or isinstance(version, bool):
+        raise ValueError(
+            f"schema_version must be an integer, got {version!r}."
+        )
+    if version < 1:
+        raise ValueError(
+            f"Invalid schema_version {version}: living profiles use "
+            f"schema_version >= 1 (plain audiograms are schema_version "
+            f"{_CLINICAL_SCHEMA_VERSION} and load via openhear-audiogram-v1)."
+        )
+    if version > SCHEMA_VERSION:
+        raise ValueError(
+            f"Unsupported schema_version {version}: this build understands "
+            f"up to schema_version {SCHEMA_VERSION}. "
+            "Upgrade OpenHear to read this file."
+        )
+
+
 def _validate(data: dict[str, Any]) -> None:
     """Raise :class:`ValueError` if *data* is not a valid living profile."""
-    if data.get("format_version") != FORMAT_VERSION:
+    _require_schema_fields(data)
+    # Keep format_version in sync when present (optional compat alias).
+    fmt = data.get("format_version")
+    if fmt is not None and fmt != FORMAT_VERSION:
         raise ValueError(
-            f"Expected format_version '{FORMAT_VERSION}', "
-            f"got {data.get('format_version')!r}."
+            f"Expected format_version '{FORMAT_VERSION}', got {fmt!r}."
         )
     for field in ("subject", "clinical_core"):
         if field not in data:
@@ -481,9 +577,16 @@ def _validate(data: dict[str, Any]) -> None:
 
 
 def _wrap_v1_audiogram(v1: dict[str, Any]) -> dict[str, Any]:
-    """Wrap a plain ``openhear-audiogram-v1`` dict into the v2 structure."""
+    """Wrap a plain ``openhear-audiogram-v1`` dict into living-profile shape.
+
+    Input files are treated as conceptual ``schema_version`` 0 (clinical-core
+    only).  The wrapped in-memory profile is emitted as the current living
+    schema so it can be saved and reloaded as a full profile.
+    """
     today = datetime.now(tz=timezone.utc).date().isoformat()
     return {
+        "schema": SCHEMA_ID,
+        "schema_version": SCHEMA_VERSION,
         "format_version": FORMAT_VERSION,
         "subject": v1.get("subject", "Unknown"),
         "created": v1.get("date", today),
@@ -543,6 +646,8 @@ def _make_empty_profile(
 
     today = datetime.now(tz=timezone.utc).date().isoformat()
     data: dict[str, Any] = {
+        "schema": SCHEMA_ID,
+        "schema_version": SCHEMA_VERSION,
         "format_version": FORMAT_VERSION,
         "subject": subject,
         "created": date,

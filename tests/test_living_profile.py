@@ -13,6 +13,8 @@ import pytest
 
 from audiogram.living_profile import (
     FORMAT_VERSION,
+    SCHEMA_ID,
+    SCHEMA_VERSION,
     LivingHearingProfile,
     load_living_profile,
 )
@@ -58,6 +60,70 @@ class TestLoading:
                 LivingHearingProfile.from_file(path)
         finally:
             os.unlink(path)
+
+    def test_living_profile_has_schema_fields(self):
+        profile = LivingHearingProfile.from_file(_PROFILE_PATH)
+        data = profile.to_dict()
+        assert data["schema"] == SCHEMA_ID
+        assert data["schema_version"] == SCHEMA_VERSION
+        assert data.get("format_version") == FORMAT_VERSION
+
+    def test_missing_schema_raises(self):
+        bad = {
+            "format_version": FORMAT_VERSION,
+            "schema_version": 1,
+            "subject": "X",
+            "clinical_core": {
+                "right_ear": {"thresholds": [{"freq_hz": 500, "db_hl": 40}]},
+                "left_ear": {"thresholds": [{"freq_hz": 500, "db_hl": 40}]},
+            },
+        }
+        with pytest.raises(ValueError, match="missing required field: 'schema'"):
+            LivingHearingProfile.load(bad)
+
+    def test_missing_schema_version_raises(self):
+        bad = {
+            "schema": SCHEMA_ID,
+            "format_version": FORMAT_VERSION,
+            "subject": "X",
+            "clinical_core": {
+                "right_ear": {"thresholds": [{"freq_hz": 500, "db_hl": 40}]},
+                "left_ear": {"thresholds": [{"freq_hz": 500, "db_hl": 40}]},
+            },
+        }
+        with pytest.raises(ValueError, match="missing required field: 'schema_version'"):
+            LivingHearingProfile.load(bad)
+
+    def test_future_schema_version_raises(self):
+        bad = {
+            "schema": SCHEMA_ID,
+            "schema_version": SCHEMA_VERSION + 99,
+            "format_version": FORMAT_VERSION,
+            "subject": "X",
+            "clinical_core": {
+                "right_ear": {"thresholds": [{"freq_hz": 500, "db_hl": 40}]},
+                "left_ear": {"thresholds": [{"freq_hz": 500, "db_hl": 40}]},
+            },
+        }
+        with pytest.raises(ValueError, match="Unsupported schema_version"):
+            LivingHearingProfile.load(bad)
+
+    def test_load_accepts_plain_audiogram_as_clinical_core(self):
+        """Plain v1 files remain loadable (schema_version 0 / clinical only)."""
+        profile = LivingHearingProfile.from_file(_V1_PATH)
+        assert profile.subject == "Lewis Burgess"
+        assert profile.to_dict()["schema"] == SCHEMA_ID
+        assert profile.to_dict()["schema_version"] == SCHEMA_VERSION
+
+    def test_manual_entry_writes_schema_fields(self):
+        profile = LivingHearingProfile.from_manual_entry(
+            subject="Test",
+            right_thresholds=[(500, 40), (1000, 50), (2000, 60), (4000, 70)],
+            left_thresholds=[(500, 45), (1000, 55), (2000, 65), (4000, 75)],
+        )
+        data = profile.to_dict()
+        assert data["schema"] == SCHEMA_ID
+        assert data["schema_version"] == SCHEMA_VERSION
 
 
 # ── Clinical core ──────────────────────────────────────────────────────────────

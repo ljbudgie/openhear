@@ -129,3 +129,91 @@ Copy this, fill in your values, and save as `your_name_year.json`:
 
 Replace the `0` values with your actual dB HL thresholds.  Add or remove
 frequency entries as needed to match what was tested.
+
+---
+
+# openhear-living-profile-v1 — Living Hearing Profile
+
+A Living Hearing Profile extends `openhear-audiogram-v1` with preference,
+context, haptic, and history layers.  Clinical thresholds live under
+`clinical_core` and remain layout-compatible with the plain audiogram format.
+
+## Schema identity and versioning
+
+Every living-profile document **must** declare these top-level fields:
+
+| Field             | Type   | Description |
+|-------------------|--------|-------------|
+| `schema`          | string | Always `"openhear-living-profile-v1"`. |
+| `schema_version`  | int    | Integer revision of this schema.  Current: `1`. |
+
+Optional compat alias (still written by OpenHear tools):
+
+| Field             | Type   | Description |
+|-------------------|--------|-------------|
+| `format_version`  | string | Same string as `schema` (`"openhear-living-profile-v1"`). |
+
+### Loader rules (`LivingHearingProfile.load` / `from_file`)
+
+1. **Living profiles** must include both `schema` and `schema_version`.
+2. If `schema_version` is **greater than** the version this OpenHear build
+   understands, the file is **rejected** (no silent partial reads of future
+   formats).
+3. Plain **`openhear-audiogram-v1`** files are still accepted.  They are
+   treated as conceptual `schema_version` **0** (clinical-core only) and
+   wrapped into a living profile in memory so existing audiograms can seed
+   a profile without conversion.
+
+`audiogram/loader.py` continues to accept living profiles (via `schema` or
+`format_version`) by extracting `clinical_core` as a standard v1 audiogram.
+
+## Minimal living-profile header
+
+```json
+{
+  "schema": "openhear-living-profile-v1",
+  "schema_version": 1,
+  "format_version": "openhear-living-profile-v1",
+  "subject": "Your Name",
+  "created": "YYYY-MM-DD",
+  "last_updated": "YYYY-MM-DD",
+  "clinical_core": {
+    "locked": true,
+    "source": "Clinic Name",
+    "date": "YYYY-MM-DD",
+    "notes": "",
+    "right_ear": {
+      "symbol": "O",
+      "thresholds": [
+        {"freq_hz": 500, "db_hl": 0},
+        {"freq_hz": 1000, "db_hl": 0},
+        {"freq_hz": 2000, "db_hl": 0},
+        {"freq_hz": 4000, "db_hl": 0}
+      ]
+    },
+    "left_ear": {
+      "symbol": "X",
+      "thresholds": [
+        {"freq_hz": 500, "db_hl": 0},
+        {"freq_hz": 1000, "db_hl": 0},
+        {"freq_hz": 2000, "db_hl": 0},
+        {"freq_hz": 4000, "db_hl": 0}
+      ]
+    }
+  },
+  "preference_layer": {
+    "version": 1,
+    "loudness_growth": {"right_ear": [], "left_ear": []}
+  },
+  "context_map": {"version": 1, "contexts": [], "active_context": ""},
+  "haptic_layer": {
+    "version": 1,
+    "strategy": "severity_weighted",
+    "comfort_scale": 1.0,
+    "sound_classes": []
+  },
+  "history": {"entries": []}
+}
+```
+
+See `burgess_living_profile.json` for a complete reference example.

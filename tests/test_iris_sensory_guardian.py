@@ -68,4 +68,7 @@ def test_guardian_requires_permission_and_preserves_tactile_identity():
     assert encoding["spatial_balance"] == 0
     assert encoding["sharpness"] == 0.8
     assert mapping["iris_sensory_guardian"]["proposals"][0]["burgess_status"] == "SOVEREIGN"
-    assert guardian.mapper.profile.get_history()[-1]["change_type"] == "iris_sensory_guardian_adjustment"
+    assert (
+        guardian.mapper.profile.get_history()[-1]["change_type"]
+        == "iris_sensory_guardian_adjustment"
+    )

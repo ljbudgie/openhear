@@ -83,7 +83,9 @@ class IrisSensoryGuardian:
         guardian = _guardian_state(mapping)
         scores = _scores(observation)
         context_values = _context_values(context)
-        adjustments, reasons = _protective_adjustments(mapping, observation.sound_class, scores, context_values)
+        adjustments, reasons = _protective_adjustments(
+            mapping, observation.sound_class, scores, context_values
+        )
         proposal = None
         if adjustments and not _has_matching_pending_proposal(
             guardian["proposals"], observation.sound_class, adjustments
@@ -122,7 +124,9 @@ class IrisSensoryGuardian:
     def apply(self, proposal_id: str, *, user_permission: bool) -> str:
         """Apply one proposal only after an explicit user-level permission."""
         if not user_permission:
-            raise PermissionError("Iris will not apply a sensory adjustment without user permission.")
+            raise PermissionError(
+                "Iris will not apply a sensory adjustment without user permission."
+            )
         mapping = self.mapper.profile.get_adaptive_sensory_mapping()
         guardian = _guardian_state(mapping)
         proposal = next(
@@ -132,7 +136,9 @@ class IrisSensoryGuardian:
         if proposal is None:
             raise KeyError(f"Unknown Iris sensory proposal {proposal_id!r}.")
         if proposal["status"] != "proposed":
-            raise ValueError(f"Iris sensory proposal {proposal_id!r} is already {proposal['status']!r}.")
+            raise ValueError(
+                f"Iris sensory proposal {proposal_id!r} is already {proposal['status']!r}."
+            )
         encoding = mapping.get("sound_classes", {}).get(proposal["sound_class"])
         if not isinstance(encoding, dict):
             raise KeyError(f"No adaptive sensory encoding for {proposal['sound_class']!r}.")
@@ -220,7 +226,13 @@ def _protective_adjustments(
 def _scores(observation: AdaptationObservation) -> dict[str, float]:
     return {
         field: _clip(float(getattr(observation, field)), 0.0, 1.0)
-        for field in ("perceptibility", "usefulness", "comfort", "motor_stability", "sensory_adaptation")
+        for field in (
+            "perceptibility",
+            "usefulness",
+            "comfort",
+            "motor_stability",
+            "sensory_adaptation",
+        )
     }
 
 
@@ -255,7 +267,9 @@ def _proposal(item: dict[str, Any]) -> ProtectiveProposal:
 
 
 def _explanation(sound_class: str, reasons: list[str]) -> str:
-    return f"{sound_class.replace('_', ' ').capitalize()} changed because " + "; ".join(reasons) + "."
+    return (
+        f"{sound_class.replace('_', ' ').capitalize()} changed because " + "; ".join(reasons) + "."
+    )
 
 
 def _clip(value: float, low: float, high: float) -> float:

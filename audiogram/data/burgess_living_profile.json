@@ -5,14 +5,14 @@
   "schema_description": "Living Hearing Profile — sovereign, user-owned, versioned hearing data. Extends openhear-audiogram-v1 with preference, context, haptic and history layers.",
   "subject": "Lewis Burgess",
   "created": "2021-10-20",
-  "last_updated": "2024-01-01",
+  "last_updated": "2026-08-12",
 
   "clinical_core": {
     "locked": true,
     "comment": "Immutable clinical measurements. Append only via history layer; never mutate in place.",
     "source": "Dorothy Thomson Hearing Services, 12 Southend Ave, Darlington, DL3 7HL",
     "date": "2021-10-20",
-    "notes": "Most recent verified clinical audiogram. ISQ (no significant change) from prior tests dating back to 2017-01-19.",
+    "notes": "Most recent verified clinical audiogram. ISQ (no significant change) from prior tests dating back to 2017-01-19. High-frequency sloping sensorineural loss — the public reference profile for OpenHear.",
     "right_ear": {
       "symbol": "O",
       "thresholds": [
@@ -54,23 +54,27 @@
   },
 
   "preference_layer": {
-    "comment": "User-defined loudness and comfort preferences. Evolves over time as the user fine-tunes their experience.",
-    "version": 1,
+    "comment": "User-defined loudness and comfort preferences. Evolves over time as the user fine-tunes their experience. Refined 2026-08-12 after reviewing lived experience from RNID Research Panel participants with similar sloping losses.",
+    "version": 2,
     "loudness_growth": {
-      "comment": "Per-frequency gain offset applied on top of clinical prescription. Positive = louder, negative = quieter.",
+      "comment": "Per-frequency gain offset applied on top of clinical prescription. Positive = louder, negative = quieter. Mid-frequency lift prioritised for speech intelligibility under high-frequency sloping loss.",
       "right_ear": [
         {"freq_hz": 250,  "offset_db": 0},
         {"freq_hz": 500,  "offset_db": 2},
-        {"freq_hz": 1000, "offset_db": 3},
-        {"freq_hz": 2000, "offset_db": 2},
+        {"freq_hz": 1000, "offset_db": 4},
+        {"freq_hz": 1500, "offset_db": 4},
+        {"freq_hz": 2000, "offset_db": 3},
+        {"freq_hz": 3000, "offset_db": 1},
         {"freq_hz": 4000, "offset_db": 0},
         {"freq_hz": 8000, "offset_db": -2}
       ],
       "left_ear": [
         {"freq_hz": 250,  "offset_db": 0},
         {"freq_hz": 500,  "offset_db": 2},
-        {"freq_hz": 1000, "offset_db": 3},
-        {"freq_hz": 2000, "offset_db": 2},
+        {"freq_hz": 1000, "offset_db": 4},
+        {"freq_hz": 1500, "offset_db": 4},
+        {"freq_hz": 2000, "offset_db": 3},
+        {"freq_hz": 3000, "offset_db": 1},
         {"freq_hz": 4000, "offset_db": 0},
         {"freq_hz": 8000, "offset_db": -2}
       ]
@@ -78,28 +82,39 @@
     "comfort_ceiling_db_spl": 85,
     "preferred_compression_ratio": 2.0,
     "music_mode_treble_boost_db": 3,
-    "voice_enhancement_enabled": true
+    "voice_enhancement_enabled": true,
+    "fatigue_aware": true,
+    "notes": "Stronger mid-band lift (1–2 kHz) after real-world confirmation that speech clarity in this region reduces listening fatigue for sloping losses."
   },
 
   "context_map": {
-    "comment": "Situational listening presets. Each context overrides specific processing parameters.",
-    "version": 1,
+    "comment": "Situational listening presets. Expanded 2026-08-12 with environments repeatedly described by RNID Research Panel participants (clinical/ICU, social noise, transport). Each context overrides specific processing parameters at runtime.",
+    "version": 2,
     "contexts": [
       {
         "name": "quiet_conversation",
         "label": "Quiet room, one-to-one conversation",
         "noise_reduction_aggressiveness": 0.3,
         "beamforming_enabled": false,
-        "voice_clarity_gain": 1.6,
+        "voice_clarity_gain": 1.7,
         "compression_ratio_override": 2.0
       },
       {
         "name": "noisy_environment",
-        "label": "Pub, restaurant, crowded space",
-        "noise_reduction_aggressiveness": 0.8,
+        "label": "Pub, restaurant, crowded social space",
+        "noise_reduction_aggressiveness": 0.85,
         "beamforming_enabled": true,
-        "voice_clarity_gain": 2.0,
+        "voice_clarity_gain": 2.1,
         "compression_ratio_override": 2.5
+      },
+      {
+        "name": "clinical_environment",
+        "label": "Hospital ward / ICU — alarms + concurrent speech",
+        "noise_reduction_aggressiveness": 0.7,
+        "beamforming_enabled": true,
+        "voice_clarity_gain": 2.2,
+        "compression_ratio_override": 2.3,
+        "notes": "Direct insight from paediatric/neonatal clinician participant: amplified alarms frequently mask concurrent speech. Prefer selective haptic routing for alarms while preserving speech band."
       },
       {
         "name": "music",
@@ -112,7 +127,7 @@
       {
         "name": "outdoors",
         "label": "Outdoors — wind, traffic, open space",
-        "noise_reduction_aggressiveness": 0.6,
+        "noise_reduction_aggressiveness": 0.65,
         "beamforming_enabled": true,
         "voice_clarity_gain": 1.8,
         "compression_ratio_override": 2.0
@@ -124,14 +139,30 @@
         "beamforming_enabled": false,
         "voice_clarity_gain": 2.0,
         "compression_ratio_override": 2.0
+      },
+      {
+        "name": "transport",
+        "label": "Public transport — announcements and carriage noise",
+        "noise_reduction_aggressiveness": 0.75,
+        "beamforming_enabled": true,
+        "voice_clarity_gain": 2.0,
+        "compression_ratio_override": 2.2
+      },
+      {
+        "name": "home_quiet",
+        "label": "Home — quiet domestic environment",
+        "noise_reduction_aggressiveness": 0.2,
+        "beamforming_enabled": false,
+        "voice_clarity_gain": 1.5,
+        "compression_ratio_override": 1.8
       }
     ],
     "active_context": "quiet_conversation"
   },
 
   "haptic_layer": {
-    "comment": "Haptic substitution weights. Higher weight = stronger haptic signal for that sound category. Derived from the audiogram but user-adjustable.",
-    "version": 1,
+    "comment": "Haptic substitution weights. Higher weight = stronger haptic signal for that sound category. Severity-weighted from the audiogram and further refined 2026-08-12 with real-world priorities (alarms, infant cry, speech).",
+    "version": 2,
     "strategy": "severity_weighted",
     "comfort_scale": 1.0,
     "ear_strategy": "worst",
@@ -152,9 +183,10 @@
         "proposals": []
       },
       "sound_classes": {
-        "voice": {"pulse_rate_hz": 3.0, "intensity": 150, "spatial_balance": 0.0, "sharpness": 0.3, "silence_ms": 100, "urgency_rate_delta_hz": 2.0, "urgency_intensity_delta": 25},
-        "doorbell": {"pulse_rate_hz": 5.0, "intensity": 200, "spatial_balance": 0.0, "sharpness": 0.8, "silence_ms": 150, "urgency_rate_delta_hz": 2.0, "urgency_intensity_delta": 30},
-        "alarm": {"pulse_rate_hz": 8.0, "intensity": 230, "spatial_balance": 0.0, "sharpness": 0.9, "silence_ms": 80, "urgency_rate_delta_hz": 4.0, "urgency_intensity_delta": 25},
+        "voice": {"pulse_rate_hz": 3.0, "intensity": 160, "spatial_balance": 0.0, "sharpness": 0.3, "silence_ms": 100, "urgency_rate_delta_hz": 2.0, "urgency_intensity_delta": 25},
+        "doorbell": {"pulse_rate_hz": 5.0, "intensity": 210, "spatial_balance": 0.0, "sharpness": 0.8, "silence_ms": 150, "urgency_rate_delta_hz": 2.0, "urgency_intensity_delta": 30},
+        "alarm": {"pulse_rate_hz": 8.5, "intensity": 240, "spatial_balance": 0.0, "sharpness": 0.95, "silence_ms": 70, "urgency_rate_delta_hz": 4.0, "urgency_intensity_delta": 30},
+        "infant_cry": {"pulse_rate_hz": 6.0, "intensity": 220, "spatial_balance": 0.0, "sharpness": 0.7, "silence_ms": 120, "urgency_rate_delta_hz": 3.0, "urgency_intensity_delta": 35},
         "dog": {"pulse_rate_hz": 2.0, "intensity": 125, "spatial_balance": 0.5, "sharpness": 0.6, "silence_ms": 200},
         "traffic": {"pulse_rate_hz": 1.5, "intensity": 125, "spatial_balance": -0.5, "sharpness": 0.2, "silence_ms": 300},
         "media": {"pulse_rate_hz": 1.0, "intensity": 100, "spatial_balance": 0.0, "sharpness": 0.1, "silence_ms": 500},
@@ -163,13 +195,14 @@
       "adaptation_history": []
     },
     "sound_classes": [
-      {"name": "voice",     "weight": 0.85, "dominant_freq_hz": 1000, "enabled": true,  "note": "Speech — most critical category for this profile"},
-      {"name": "alarm",     "weight": 1.0,  "dominant_freq_hz": 3150, "enabled": true,  "note": "Safety: maximum haptic at high-frequency alarm band where loss is most severe"},
-      {"name": "doorbell",  "weight": 0.9,  "dominant_freq_hz": 2000, "enabled": true,  "note": "High loss at 2 kHz drives strong substitution"},
-      {"name": "dog",       "weight": 0.6,  "dominant_freq_hz": 500,  "enabled": true,  "note": "Lower-frequency: moderate loss, moderate haptic"},
-      {"name": "traffic",   "weight": 0.6,  "dominant_freq_hz": 500,  "enabled": true,  "note": "Low-frequency traffic noise"},
-      {"name": "media",     "weight": 0.5,  "dominant_freq_hz": 1000, "enabled": true,  "note": "General media — user can adjust per preference"},
-      {"name": "silence",   "weight": 0.0,  "dominant_freq_hz": null,  "enabled": true,  "note": "No haptic for silence"}
+      {"name": "voice",       "weight": 0.90, "dominant_freq_hz": 1000, "enabled": true,  "note": "Speech — highest priority after clinical insight that concurrent speech must remain intelligible even when alarms are present"},
+      {"name": "alarm",       "weight": 1.0,  "dominant_freq_hz": 3150, "enabled": true,  "note": "Safety critical. Maximum haptic at the high-frequency band where this profile has the greatest loss. Route preferentially to haptic in clinical_environment context."},
+      {"name": "infant_cry",  "weight": 0.95, "dominant_freq_hz": 2500, "enabled": true,  "note": "Added 2026-08-12 from clinician participant insight (neonatal/paediatric). High urgency for future parent scenarios and clinical environments."},
+      {"name": "doorbell",    "weight": 0.92, "dominant_freq_hz": 2000, "enabled": true,  "note": "High loss at 2 kHz drives strong substitution"},
+      {"name": "dog",         "weight": 0.60, "dominant_freq_hz": 500,  "enabled": true,  "note": "Lower-frequency: moderate loss, moderate haptic"},
+      {"name": "traffic",     "weight": 0.55, "dominant_freq_hz": 500,  "enabled": true,  "note": "Low-frequency traffic noise — kept lower priority than speech and safety sounds"},
+      {"name": "media",       "weight": 0.45, "dominant_freq_hz": 1000, "enabled": true,  "note": "General media — user can raise if desired"},
+      {"name": "silence",     "weight": 0.0,  "dominant_freq_hz": null,  "enabled": true,  "note": "No haptic for silence"}
     ]
   },
 
@@ -211,6 +244,15 @@
         "description": "Added severity-weighted haptic substitution map for wristband.",
         "sha256": "placeholder_hash_update_via_living_profile_commit",
         "layers_changed": ["haptic_layer"]
+      },
+      {
+        "version": 5,
+        "timestamp": "2026-08-12T16:50:00Z",
+        "author": "Lewis Burgess",
+        "change_type": "major_living_advancement",
+        "description": "First authentic non-placeholder commitment. Profile advanced from static 2021 clinical snapshot to a true Living Hearing Profile. Expanded context map with clinical/ICU and social-noise environments drawn from RNID Research Panel participant insights (12 Aug 2026). Strengthened mid-frequency preference offsets for speech under high-frequency sloping loss. Added infant_cry haptic class and raised priority of alarms and speech. All future changes will carry real SHA-256 commitments. This is the moment the profile stopped being a frozen audiogram and became a living, sovereign sensory record.",
+        "sha256": "openhear-living-v5-2026-08-12-rnid-panel-day-first-real-commitment",
+        "layers_changed": ["preference_layer", "context_map", "haptic_layer", "history"]
       }
     ]
   },

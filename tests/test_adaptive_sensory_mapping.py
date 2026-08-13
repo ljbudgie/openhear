@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
+from accessibility import AUTISM, SAFETY_INTENSITY_FLOOR
 from audiogram.adaptive_sensory_mapping import (
     AcousticFeatures,
     AdaptationObservation,
     AdaptiveSensoryMapper,
 )
 from audiogram.living_profile import LivingHearingProfile
-from accessibility import AUTISM, SAFETY_INTENSITY_FLOOR
 
 
 def _profile() -> LivingHearingProfile:

@@ -9,8 +9,8 @@ from accessibility import (
     AUTISM,
     CEREBRAL_PALSY,
     NEUTRAL,
-    SENSORY_PROCESSING,
     SAFETY_INTENSITY_FLOOR,
+    SENSORY_PROCESSING,
     AccessProfile,
     InputGate,
     get_access_profile,
@@ -58,7 +58,7 @@ def test_sensory_profiles_are_registered_opt_in_starting_points(key, profile):
     assert profile.min_confidence_delta > 0
     assert profile.input_hold_ms > 0
     assert profile.screening_prompts
-    assert "starting point" in " ".join(profile.notes).lower()
+    assert "not a diagnos" in " ".join(profile.notes).lower()
 
 
 def test_cerebral_palsy_defaults_are_conservative():

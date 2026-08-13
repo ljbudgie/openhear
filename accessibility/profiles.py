@@ -259,8 +259,8 @@ AUTISM = AccessProfile(
         "comfortable? Adjust or disable any setting that does not.",
         "Are there sounds, vibration patterns, or contexts you prefer not to be "
         "alerted to? Configure those preferences explicitly.",
-        "Do you have epilepsy or any seizure disorder? Entrainment protocols in "
-        "therapy/ are gated on your answer and will refuse to run.",
+        "Do you have epilepsy or any seizure disorder? Entrainment therapy "
+        "protocols are gated on your answer and will refuse to run.",
     ),
     notes=(
         "Autism does not imply a particular sensory profile; this is an opt-in "
@@ -291,8 +291,8 @@ SENSORY_PROCESSING = AccessProfile(
         "comfortable? Adjust or disable any setting that does not.",
         "Which alerts are useful enough to keep, and which should be quieter or "
         "less frequent?",
-        "Do you have epilepsy or any seizure disorder? Entrainment protocols in "
-        "therapy/ are gated on your answer and will refuse to run.",
+        "Do you have epilepsy or any seizure disorder? Entrainment therapy "
+        "protocols are gated on your answer and will refuse to run.",
     ),
     notes=(
         "Sensory-processing needs are user-declared and can change by context; "

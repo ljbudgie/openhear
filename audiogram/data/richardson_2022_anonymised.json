@@ -1,0 +1,52 @@
+{
+  "subject": "Anonymised participant (consented)",
+  "source": "Clinical audiogram, 4 May 2022 (NHS)",
+  "date": "2022-05-04",
+  "notes": "Profound sensorineural loss. Total nerve deafness left ear; residual hearing right ear only. Explicit consent given 13 Aug 2026 for anonymised use in OpenHear Living Hearing Profile materials and public examples.",
+  "format_version": "openhear-audiogram-v1",
+  "right_ear": {
+    "symbol": "O",
+    "thresholds": [
+      {"freq_hz": 125,  "db_hl": 100},
+      {"freq_hz": 250,  "db_hl": 105},
+      {"freq_hz": 500,  "db_hl": 110},
+      {"freq_hz": 1000, "db_hl": 90},
+      {"freq_hz": 1500, "db_hl": 80},
+      {"freq_hz": 2000, "db_hl": 75},
+      {"freq_hz": 3000, "db_hl": 75},
+      {"freq_hz": 4000, "db_hl": 80},
+      {"freq_hz": 6000, "db_hl": 80},
+      {"freq_hz": 8000, "db_hl": 80}
+    ]
+  },
+  "left_ear": {
+    "symbol": "X",
+    "thresholds": [
+      {"freq_hz": 125,  "db_hl": 120},
+      {"freq_hz": 250,  "db_hl": 120},
+      {"freq_hz": 500,  "db_hl": 120},
+      {"freq_hz": 1000, "db_hl": 120},
+      {"freq_hz": 1500, "db_hl": 120},
+      {"freq_hz": 2000, "db_hl": 120},
+      {"freq_hz": 3000, "db_hl": 120},
+      {"freq_hz": 4000, "db_hl": 120},
+      {"freq_hz": 6000, "db_hl": 120},
+      {"freq_hz": 8000, "db_hl": 120}
+    ],
+    "notes": "No measurable response — total nerve deafness"
+  },
+  "classification": {
+    "type": "sensorineural",
+    "pattern": "profound asymmetric (left anacusis, right residual)",
+    "right_pta": 88.75,
+    "left_pta": 120,
+    "right_range": "profound",
+    "left_range": "total / anacusis"
+  },
+  "consent": {
+    "given": true,
+    "date": "2026-08-13",
+    "scope": "Anonymised public use in OpenHear documentation, Living Hearing Profile examples, and research materials",
+    "original_name_removed": true
+  }
+}

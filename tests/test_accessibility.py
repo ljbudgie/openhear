@@ -6,9 +6,11 @@ import pytest
 
 from accessibility import (
     ACCESS_PROFILES,
+    AUTISM,
     CEREBRAL_PALSY,
     NEUTRAL,
     SAFETY_INTENSITY_FLOOR,
+    SENSORY_PROCESSING,
     AccessProfile,
     InputGate,
     get_access_profile,
@@ -38,6 +40,25 @@ def test_cerebral_palsy_profile_is_registered():
     assert "cerebral_palsy" in ACCESS_PROFILES
     assert get_access_profile("cerebral_palsy") is CEREBRAL_PALSY
     assert get_access_profile("Cerebral-Palsy") is CEREBRAL_PALSY
+
+
+@pytest.mark.parametrize(
+    ("key", "profile"),
+    [
+        ("autism", AUTISM),
+        ("sensory_processing", SENSORY_PROCESSING),
+    ],
+)
+def test_sensory_profiles_are_registered_opt_in_starting_points(key, profile):
+    assert ACCESS_PROFILES[key] is profile
+    assert get_access_profile(key.replace("_", "-")) is profile
+    assert profile.haptic_intensity_scale < 1.0
+    assert profile.haptic_ramp_ms > 0
+    assert profile.haptic_refractory_scale > 1.0
+    assert profile.min_confidence_delta > 0
+    assert profile.input_hold_ms > 0
+    assert profile.screening_prompts
+    assert "not a diagnos" in " ".join(profile.notes).lower()
 
 
 def test_cerebral_palsy_defaults_are_conservative():
@@ -176,6 +197,18 @@ def test_adapted_policy_still_fires_and_then_spaces_repeats():
     assert policy.decide(_Detection("doorbell", 0.95), later).should_fire is True
 
 
+@pytest.mark.parametrize("profile", [AUTISM, SENSORY_PROCESSING])
+def test_sensory_profiles_use_the_shared_policy_and_input_adapters(profile):
+    base = PolicyConfig()
+    adapted = policy_config_for(profile, base)
+    assert adapted.min_confidence > base.min_confidence
+    assert adapted.refractory_for("doorbell") > base.refractory_for("doorbell")
+
+    gate = InputGate(profile)
+    assert gate.update(pressed=True, now_ms=0.0) is False
+    assert gate.update(pressed=True, now_ms=profile.input_hold_ms) is True
+
+
 # ── Intensity damping ───────────────────────────────────────────────────────
 
 
@@ -190,6 +223,12 @@ def test_safety_alerts_are_never_damped_below_the_floor():
     assert scale_intensity(255, CEREBRAL_PALSY, sound_key="alarm") >= SAFETY_INTENSITY_FLOOR
     # Non-safety classes are damped all the way.
     assert scale_intensity(200, CEREBRAL_PALSY, sound_key="media") == 140
+
+
+@pytest.mark.parametrize("profile", [AUTISM, SENSORY_PROCESSING])
+def test_sensory_profiles_preserve_the_safety_alert_floor(profile):
+    assert scale_intensity(200, profile, sound_key="alarm") == SAFETY_INTENSITY_FLOOR
+    assert scale_intensity(40, profile, sound_key="alarm") <= 40
 
 
 def test_a_quiet_alarm_command_is_never_amplified():

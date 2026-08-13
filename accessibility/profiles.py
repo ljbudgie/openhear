@@ -237,9 +237,75 @@ CEREBRAL_PALSY = AccessProfile(
 )
 
 
+#: Autism — an opt-in sensory starting point, not a statement about any
+#: individual autistic person.  Sensory preferences vary substantially, so
+#: these settings privilege fewer, gentler, more predictable alerts and are
+#: intended to be personalised or declined.
+AUTISM = AccessProfile(
+    key="autism",
+    label="Autism",
+    summary=(
+        "Gentler, ramped haptics with fewer low-confidence alerts and "
+        "hold-to-confirm input."
+    ),
+    haptic_intensity_scale=0.65,
+    haptic_ramp_ms=180.0,
+    haptic_refractory_scale=1.75,
+    min_confidence_delta=0.1,
+    input_hold_ms=250.0,
+    input_lockout_ms=600.0,
+    screening_prompts=(
+        "Would gentler vibration, fewer alerts, or a slower onset make cues more "
+        "comfortable? Adjust or disable any setting that does not.",
+        "Are there sounds, vibration patterns, or contexts you prefer not to be "
+        "alerted to? Configure those preferences explicitly.",
+        "Do you have epilepsy or any seizure disorder? Entrainment therapy "
+        "protocols are gated on your answer and will refuse to run.",
+    ),
+    notes=(
+        "Autism does not imply a particular sensory profile; this is an opt-in "
+        "starting point, not a diagnostic or behavioural inference.",
+        "Tune with the user and retain only settings they choose to declare.",
+    ),
+)
+
+
+#: Sensory-processing differences — an opt-in alternative for people whose
+#: haptic comfort needs do not map to a diagnosis, or who prefer this starting
+#: point over another bundled profile.
+SENSORY_PROCESSING = AccessProfile(
+    key="sensory_processing",
+    label="Sensory processing",
+    summary=(
+        "Gentler, ramped haptics with wider alert spacing and "
+        "hold-to-confirm input."
+    ),
+    haptic_intensity_scale=0.6,
+    haptic_ramp_ms=200.0,
+    haptic_refractory_scale=1.8,
+    min_confidence_delta=0.1,
+    input_hold_ms=150.0,
+    input_lockout_ms=500.0,
+    screening_prompts=(
+        "Would gentler vibration, fewer alerts, or a slower onset make cues more "
+        "comfortable? Adjust or disable any setting that does not.",
+        "Which alerts are useful enough to keep, and which should be quieter or "
+        "less frequent?",
+        "Do you have epilepsy or any seizure disorder? Entrainment therapy "
+        "protocols are gated on your answer and will refuse to run.",
+    ),
+    notes=(
+        "Sensory-processing needs are user-declared and can change by context; "
+        "this profile is not a diagnosis.",
+        "Tune with the user and retain only settings they choose to declare.",
+    ),
+)
+
+
 #: Bundled access profiles, keyed by :attr:`AccessProfile.key`.
 ACCESS_PROFILES: dict[str, AccessProfile] = {
-    profile.key: profile for profile in (NEUTRAL, CEREBRAL_PALSY)
+    profile.key: profile
+    for profile in (NEUTRAL, CEREBRAL_PALSY, AUTISM, SENSORY_PROCESSING)
 }
 
 
@@ -263,7 +329,9 @@ def get_access_profile(key: str | None) -> AccessProfile:
 __all__ = [
     "AccessProfile",
     "ACCESS_PROFILES",
+    "AUTISM",
     "CEREBRAL_PALSY",
     "NEUTRAL",
+    "SENSORY_PROCESSING",
     "get_access_profile",
 ]

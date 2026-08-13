@@ -8,8 +8,8 @@ right haptic, alerting and voice settings actually are.
 
 This package holds that second half of the fit as bounded, declared data
 (:mod:`accessibility.profiles`) and the single place it is turned into
-behaviour (:mod:`accessibility.adapt`).  The first bundled profile is
-``cerebral_palsy``.
+behaviour (:mod:`accessibility.adapt`).  Bundled starting profiles include
+``cerebral_palsy``, ``autism``, and ``sensory_processing``.
 
 Nothing in here is inferred, stored or transmitted: the user declares a
 profile or there is none.
@@ -24,16 +24,20 @@ from accessibility.adapt import (
 )
 from accessibility.profiles import (
     ACCESS_PROFILES,
+    AUTISM,
     CEREBRAL_PALSY,
     NEUTRAL,
+    SENSORY_PROCESSING,
     AccessProfile,
     get_access_profile,
 )
 
 __all__ = [
     "ACCESS_PROFILES",
+    "AUTISM",
     "CEREBRAL_PALSY",
     "NEUTRAL",
+    "SENSORY_PROCESSING",
     "AccessProfile",
     "InputGate",
     "SAFETY_INTENSITY_FLOOR",

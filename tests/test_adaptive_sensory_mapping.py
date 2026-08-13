@@ -8,6 +8,7 @@ from audiogram.adaptive_sensory_mapping import (
     AdaptiveSensoryMapper,
 )
 from audiogram.living_profile import LivingHearingProfile
+from accessibility import AUTISM, SAFETY_INTENSITY_FLOOR
 
 
 def _profile() -> LivingHearingProfile:
@@ -42,6 +43,13 @@ def test_render_uses_features_and_preserves_deliberate_silence():
     )
     assert cue.primitive.intensity == 240
     assert cue.silence_ms == 100
+
+
+def test_render_applies_access_profile_without_weakening_alarm_safety():
+    cue = AdaptiveSensoryMapper(_profile(), access_profile=AUTISM).render(
+        "alarm", features=AcousticFeatures(confidence=1, urgency=1)
+    )
+    assert cue.primitive.intensity == SAFETY_INTENSITY_FLOOR
 
 
 def test_observations_are_retained_and_refinement_is_committed():

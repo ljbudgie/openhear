@@ -34,11 +34,14 @@ envelope. Damping in particular is floored: `haptic_intensity_scale`
 cannot reach zero, and `accessibility.adapt.scale_intensity` refuses to
 take a safety-critical alert (an alarm) below a perceptible level.
 
-## The bundled cerebral palsy profile
+## Bundled starting profiles
 
-Hearing loss is common in cerebral palsy, so a substantial share of
-OpenHear's audience is navigating both at once. `CEREBRAL_PALSY` is a
-conservative starting point for that overlap:
+`CEREBRAL_PALSY`, `AUTISM`, and `SENSORY_PROCESSING` are optional starting
+points, not diagnoses or predictions. Select one only when the user chooses
+it, personalise every value, or start from `NEUTRAL`. Nothing in OpenHear
+infers a condition or sensory need from behaviour, audio, or device use.
+
+`CEREBRAL_PALSY` is a conservative starting point for users who choose it:
 
 - **damped, ramped haptics** — spasticity and dyskinesia mean an abrupt,
   hard buzz on a limb with fluctuating tone can provoke an involuntary
@@ -53,8 +56,14 @@ conservative starting point for that overlap:
 - **dysarthria-tolerant voice scoring** — ordinary variability between
   repetitions is not failure.
 
-**It is a starting point, not a prescription.** No two people with the
-same diagnosis need the same numbers. Override anything:
+`AUTISM` and `SENSORY_PROCESSING` start with gentler, ramped haptics, fewer
+low-confidence alerts, wider alert spacing, and hold-to-confirm input. They
+are deliberately separate: autism does not imply a particular sensory profile,
+and sensory needs do not require a diagnosis.
+
+**Every profile is a starting point, not a prescription.** No two people with
+the same diagnosis or sensory preference need the same numbers. Override
+anything:
 
 ```python
 from accessibility import CEREBRAL_PALSY
@@ -97,9 +106,9 @@ behaviour, so every adaptation rule is auditable in one file.
 
 ## Therapy protocols
 
-Cerebral palsy does **not** imply epilepsy — but the two co-occur often
-enough that it must be asked, never assumed. That is what
-`screening_prompts` is for. Whatever the user answers is what you pass to
+No profile implies epilepsy or any other condition. `screening_prompts` asks
+the user before gated therapy is considered; it never supplies an answer.
+Whatever the user consents to declare is what you pass to
 `TherapeuticProtocol.gate()`:
 
 ```python
@@ -113,10 +122,11 @@ this package weakens it.
 
 ## Sovereignty
 
-Nothing here is inferred, stored, or transmitted. An access profile
-exists because the user declared it, in memory, for that session. There
-is no detection of disability anywhere in this package and there will not
-be one.
+Nothing here is inferred, stored, or transmitted. An access profile exists
+only because the user declared it, in memory, for that session. Obtain the
+user's consent before selecting, personalising, or retaining a profile.
+There is no detection of disability anywhere in this package and there will
+not be one.
 
 ## Adding a profile
 

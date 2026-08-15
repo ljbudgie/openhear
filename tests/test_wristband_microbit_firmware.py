@@ -222,6 +222,16 @@ class TestPatterns:
         for handler in firmware.PATTERNS.values():
             assert callable(handler)
 
+    def test_configured_ramp_precedes_full_motor_drive(self, firmware):
+        _PIN0.values.clear()
+        _PIN1.values.clear()
+        firmware._haptic_ramp_ms = 120
+        firmware._motors(255, 0, 10)
+
+        assert _PIN0.values[0] < firmware._ANALOG_MAX
+        assert firmware._ANALOG_MAX in _PIN0.values
+        firmware._haptic_ramp_ms = 0
+
 
 @pytest.mark.parametrize("firmware", FIRMWARES)
 class TestReadPacket:
@@ -321,6 +331,25 @@ class TestAdvertise:
 
 @pytest.mark.parametrize("firmware", FIRMWARES)
 class TestFirmwareMain:
+    def test_ramp_control_packet_sets_session_ramp(self, firmware, monkeypatch):
+        uart = _FakeUART()
+        uart.queued.append(bytes([255, 60, 1]))
+
+        def _sleep(ms: int) -> None:
+            if ms == 20:
+                raise KeyboardInterrupt
+
+        firmware._haptic_ramp_ms = 0
+        monkeypatch.setattr(firmware, "UARTService", lambda: uart)
+        monkeypatch.setattr(firmware, "_advertise", lambda _uart: None)
+        monkeypatch.setattr(firmware, "sleep", _sleep)
+        try:
+            with pytest.raises(KeyboardInterrupt):
+                firmware.main()
+            assert firmware._haptic_ramp_ms == 120
+        finally:
+            firmware._haptic_ramp_ms = 0
+
     def test_idle_loop_turns_motors_off_and_sleeps(self, firmware, monkeypatch):
         uart = _FakeUART()
         sleep_calls: list[int] = []

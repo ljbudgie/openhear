@@ -281,7 +281,7 @@ Sharp Hearing (US audiology clinic) is recorded as the first formal industry con
 
 **Accessibility profiles (v1.4.0+)**
 
-A cerebral palsy accessibility profile layer is shipped: haptic intensity scaling for fluctuating muscle tone, InputGate for tremor/spasm filtering, and widened voice matching for dysarthric speech. A profile exists because the user declared it; nothing is detected, inferred, stored, or transmitted. The architecture supports additional conditions (autism, sensory processing) via the same profile registry pattern. See [`accessibility/README.md`](accessibility/README.md).
+Optional, user-declared accessibility profiles are shipped for cerebral palsy, autism, and sensory-processing needs. In the live wristband path they damp non-safety haptics, configure a firmware-enforced gradual onset, raise the confidence gate, and widen alert spacing; cerebral palsy also supplies hold-to-confirm and dysarthria-tolerant voice defaults. Alarm delivery remains subject to its perceptibility floor. Nothing is detected, inferred, stored, or transmitted. See [`accessibility/README.md`](accessibility/README.md).
 
 ---
 
@@ -750,7 +750,7 @@ python examples/reference_integration.py
 
 Every other tuning path here starts from an audiogram. That is only half the fit. If your muscle tone shifts through the day, if vibration can trigger a spasm or a startle, if an involuntary movement can press a control you never meant to press, or if your speech varies widely between repetitions, the "correct" audiogram-derived settings can still be the wrong settings for you.
 
-`accessibility/` holds that second half as bounded, user-declared data. The first bundled profile is **cerebral palsy** — hearing loss is common alongside it, so a substantial part of OpenHear's audience is navigating both at once. It damps and ramps the haptics, spaces alerts out, raises the confidence floor so there are fewer false buzzes, adds hold-to-confirm input handling so a tremor or a brush cannot toggle a setting, and widens the voice module's match tolerance for dysarthric speech — while never letting comfort damping take a safety-critical alert below a perceptible level. It is a starting point, not a prescription: every value is overridable, nothing is inferred or stored, and co-occurring conditions such as epilepsy are *screened for*, never assumed. See [`accessibility/README.md`](accessibility/README.md).
+`accessibility/` holds that second half as bounded, user-declared data. **Cerebral palsy**, **autism**, and **sensory processing** are equal opt-in starting points, not diagnoses. During a live wristband session, the selected profile dampens non-safety haptics, configures a firmware-enforced gradual onset, spaces alerts out, and rejects more low-confidence detections; cerebral palsy additionally supplies hold-to-confirm input defaults and dysarthria-tolerant voice scoring. Safety-critical alerts retain their perceptibility floor. Every value is overridable for the session, nothing is inferred or retained, and co-occurring conditions such as epilepsy are *screened for*, never assumed. See [`accessibility/README.md`](accessibility/README.md).
 
 
 ---

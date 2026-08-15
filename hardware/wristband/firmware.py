@@ -144,6 +144,7 @@ def _read_packet(uart):
 
 
 def main():
+    global _haptic_ramp_ms
     display.show("H")
     uart = UARTService()
     _advertise(uart)

@@ -91,6 +91,15 @@ basis for classifying hearing loss severity:
 The loader (`audiogram/loader.py`) will validate the file and compute the
 PTA and gain profile automatically.
 
+## Self-assessment records
+
+`openhear-self-assessment-v1` is a separate, non-clinical screening record
+created by the calibrated, consent-led Iris integration boundary. It records
+the calibration identity, expiration, safe output limit, and every explicit
+heard/not-heard response. It is not an `openhear-audiogram-v1` file and cannot
+be loaded as one or used for automatic fitting changes. A person must choose
+whether to review, repeat, or manually transcribe a result.
+
 ## Blank Template
 
 Copy this, fill in your values, and save as `your_name_year.json`:

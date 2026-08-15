@@ -52,9 +52,7 @@ class CalibratedTonePlayer(Protocol):
 
     calibration: Calibration
 
-    def play_tone(
-        self, frequency_hz: int, level_db_hl: float, ear: str, duration_ms: int
-    ) -> None:
+    def play_tone(self, frequency_hz: int, level_db_hl: float, ear: str, duration_ms: int) -> None:
         """Present one calibrated tone without exceeding the declared limit."""
 
 

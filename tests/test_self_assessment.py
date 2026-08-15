@@ -15,9 +15,7 @@ class FakePlayer:
     calibration: Calibration
     played: list[tuple[int, float, str]] = field(default_factory=list)
 
-    def play_tone(
-        self, frequency_hz: int, level_db_hl: float, ear: str, duration_ms: int
-    ) -> None:
+    def play_tone(self, frequency_hz: int, level_db_hl: float, ear: str, duration_ms: int) -> None:
         self.played.append((frequency_hz, level_db_hl, ear))
 
 
@@ -48,9 +46,7 @@ def test_stops_at_safe_limit_when_no_tone_is_heard():
 
 
 def test_export_labels_result_as_non_clinical_self_assessment():
-    session = SelfAssessment(
-        FakePlayer(Calibration("test-device", "2026-01-01", "2027-01-01", 70))
-    )
+    session = SelfAssessment(FakePlayer(Calibration("test-device", "2026-01-01", "2027-01-01", 70)))
     session.give_consent()
     session.measure_threshold("right", 1000, lambda level: level >= 35)
 

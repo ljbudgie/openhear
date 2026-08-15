@@ -278,7 +278,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--access-hold-ms",
-        type=float,
+        type=int,
         help="Session-only override for the selected profile's control hold time.",
     )
     parser.add_argument(

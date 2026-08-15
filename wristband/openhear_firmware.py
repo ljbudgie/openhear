@@ -42,10 +42,11 @@ def _ramp_motors(left, right, duration_ms):
     ramp_ms = min(_haptic_ramp_ms, max(0, duration_ms - 1))
     steps = min(4, max(1, ramp_ms // 20))
     step_ms = ramp_ms // steps
+    remainder_ms = ramp_ms % steps
     for step in range(1, steps + 1):
         pin0.write_analog(_scale_intensity((left * step) // steps))
         pin1.write_analog(_scale_intensity((right * step) // steps))
-        sleep(step_ms + (1 if step <= ramp_ms % steps else 0))
+        sleep(step_ms + (1 if step <= remainder_ms else 0))
     return ramp_ms
 
 

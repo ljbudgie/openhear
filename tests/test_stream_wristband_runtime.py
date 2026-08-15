@@ -386,5 +386,6 @@ def test_run_live_processes_one_frame_and_disconnects(audiogram_path, monkeypatc
     client = _FakeBLEClient.instances[0]
     assert client.connected is True
     assert client.disconnected is True
-    assert client.sent[0].sound_class_id == 1
+    assert client.sent[0].sound_class_id == 255
+    assert client.sent[1].sound_class_id == 1
     assert "voice" in capsys.readouterr().out

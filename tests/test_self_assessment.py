@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
+from datetime import date
 
 import pytest
 
@@ -86,3 +87,10 @@ def test_expired_calibration_prevents_playback():
         session.measure_threshold("right", 1000, lambda _: True)
 
     assert player.played == []
+
+
+def test_calibration_is_valid_on_its_expiration_date():
+    calibration = Calibration("test", "2026-01-01", "2026-12-31", 70)
+
+    assert calibration.valid_today(as_of=date(2026, 12, 31))
+    assert not calibration.valid_today(as_of=date(2027, 1, 1))

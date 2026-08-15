@@ -42,9 +42,9 @@ class Calibration:
                 f"{SAFE_MAX_TEST_LEVEL_DB_HL}."
             )
 
-    def valid_today(self) -> bool:
+    def valid_today(self, *, as_of: date | None = None) -> bool:
         """Whether this calibration is currently valid for a presentation."""
-        return date.today() <= date.fromisoformat(self.expires_on)
+        return (as_of or date.today()) <= date.fromisoformat(self.expires_on)
 
 
 class CalibratedTonePlayer(Protocol):
@@ -124,6 +124,7 @@ class SelfAssessment:
 
         level = float(start_db_hl)
         heard = present(level)
+        not_heard_seen = not heard
         while heard and level > 0:
             next_level = level - 10.0
             if next_level <= 0:
@@ -133,14 +134,18 @@ class SelfAssessment:
                 )
             level = next_level
             heard = present(level)
+            not_heard_seen = not_heard_seen or not heard
         while not heard and level < maximum:
             level = min(maximum, level + 5.0)
             heard = present(level)
+            not_heard_seen = not_heard_seen or not heard
         if not heard:
             raise ValueError(
                 f"No response at the safe calibrated limit ({maximum} dB HL); "
                 "do not increase level. Seek a clinical assessment."
             )
+        if not not_heard_seen:
+            raise RuntimeError("Threshold was not bracketed; no threshold was recorded.")
         return level
 
     def export(self, *, subject: str = "", notes: str = "") -> str:

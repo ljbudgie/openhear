@@ -118,7 +118,7 @@ explicitly choose to — whether:
    entrainment.
 
 The live wristband runtime accepts `--access-profile neutral|autism|sensory_processing|cerebral_palsy`
-and optional bounded `--access-*-` overrides for one session. It sends the
+and optional bounded `--access-*` overrides for one session. It sends the
 selected onset ramp to compatible firmware before live output; the setting is
 not persisted. Older firmware ignores the reserved configuration packet, so
 flash current firmware before relying on ramped haptics.

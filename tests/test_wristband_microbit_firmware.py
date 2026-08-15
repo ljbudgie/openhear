@@ -222,14 +222,19 @@ class TestPatterns:
         for handler in firmware.PATTERNS.values():
             assert callable(handler)
 
-    def test_configured_ramp_precedes_full_motor_drive(self, firmware):
+    def test_configured_ramp_precedes_full_motor_drive_without_extending_pulse(
+        self, firmware, monkeypatch
+    ):
         _PIN0.values.clear()
         _PIN1.values.clear()
+        sleep_calls: list[int] = []
+        monkeypatch.setattr(firmware, "sleep", sleep_calls.append)
         firmware._haptic_ramp_ms = 120
-        firmware._motors(255, 0, 10)
+        firmware._motors(255, 0, 100)
 
         assert _PIN0.values[0] < firmware._ANALOG_MAX
         assert firmware._ANALOG_MAX in _PIN0.values
+        assert sum(sleep_calls) == 100
         firmware._haptic_ramp_ms = 0
 
 

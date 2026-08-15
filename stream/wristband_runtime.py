@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import time
+from types import SimpleNamespace
 
 from accessibility import AccessProfile, get_access_profile, policy_config_for, scale_intensity
 from stream.ble_haptic import HapticPacket, OpenHearBLEClient
@@ -107,11 +108,10 @@ class WristbandRuntime:
             user_rating=user_rating,
         )
         packet = None
-        classified = type(
-            "ClassifiedPhase2",
-            (),
-            {"sound_key": event.predicted_sound_class, "confidence": event.confidence},
-        )()
+        classified = SimpleNamespace(
+            sound_key=event.predicted_sound_class,
+            confidence=event.confidence,
+        )
         if self.policy.decide(classified, time.monotonic() * 1000).should_fire:
             packet = self.packet_from_classification(event.predicted_sound_class, event.confidence)
             await self.ble_client.send_packet(packet)

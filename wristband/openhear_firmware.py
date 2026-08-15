@@ -27,22 +27,24 @@ def _scale_intensity(intensity_0_to_255):
 
 
 def _motors(left, right, duration_ms):
-    _ramp_motors(left, right)
+    ramp_ms = _ramp_motors(left, right, duration_ms)
     pin0.write_analog(_scale_intensity(left))
     pin1.write_analog(_scale_intensity(right))
-    sleep(duration_ms)
+    sleep(max(0, duration_ms - ramp_ms))
 
 
-def _ramp_motors(left, right):
+def _ramp_motors(left, right, duration_ms):
     """Ramp a motor onset in bounded steps before its full drive level."""
     if _haptic_ramp_ms <= 0 or (left <= 0 and right <= 0):
-        return
-    steps = min(4, max(1, _haptic_ramp_ms // 20))
-    step_ms = _haptic_ramp_ms // steps
+        return 0
+    ramp_ms = min(_haptic_ramp_ms, duration_ms)
+    steps = min(4, max(1, ramp_ms // 20))
+    step_ms = ramp_ms // steps
     for step in range(1, steps + 1):
         pin0.write_analog(_scale_intensity((left * step) // steps))
         pin1.write_analog(_scale_intensity((right * step) // steps))
         sleep(step_ms)
+    return ramp_ms
 
 
 def _off(duration_ms=0):

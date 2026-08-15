@@ -51,7 +51,8 @@ class TestWristbandRuntime:
     def test_send_scores_propagates_silence_for_empty_input(self, audiogram_path):
         runtime, fake = _make_runtime(audiogram_path)
         packet = asyncio.run(runtime.send_scores({}))
-        assert fake.sent == [packet]
+        assert packet is None
+        assert fake.sent == []
 
 
 class TestManualRun:

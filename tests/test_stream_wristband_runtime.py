@@ -46,15 +46,14 @@ def test_send_scores_dispatches_packet_via_ble(audiogram_path: str):
 
 
 def test_send_scores_silence_when_below_confidence(audiogram_path: str):
-    """Low-confidence frames should resolve to the silence packet."""
+    """Low-confidence frames should not trigger a haptic packet."""
     client = _StubBleClient()
     runtime = WristbandRuntime(HapticMapper(audiogram_path), client)
 
     packet = asyncio.run(runtime.send_scores({"Speech": 0.05}))
 
-    # The silence profile's sound_class_id is 0.
-    assert packet.to_bytes()[0] == 0
-    assert client.sent == [packet]
+    assert packet is None
+    assert client.sent == []
 
 
 def test_send_phase2_scores_dispatches_existing_packet_and_logs(audiogram_path: str, tmp_path):

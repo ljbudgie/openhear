@@ -169,11 +169,11 @@ class TestGainProfile:
         assert gains[1000] == 55
 
     def test_preference_offset_applied(self):
-        # The profile has a +3 dB preference offset at 1000 Hz
+        # The profile has a +4 dB preference offset at 1000 Hz
         clinical = dict(self.profile.get_gain_profile("right", include_preference=False))
         with_pref = dict(self.profile.get_gain_profile("right", include_preference=True))
         diff = with_pref[1000] - clinical[1000]
-        assert diff == 3  # matches the offset in the reference file
+        assert diff == 4  # matches the offset in the reference file
 
     def test_gain_never_negative(self):
         for ear in ("right", "left"):

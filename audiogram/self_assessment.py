@@ -124,8 +124,7 @@ class SelfAssessment:
 
         level = float(start_db_hl)
         heard = present(level)
-        not_heard_seen = not heard
-        while heard and level > 0:
+        while heard:
             next_level = level - 10.0
             if next_level <= 0:
                 raise ValueError(
@@ -134,18 +133,14 @@ class SelfAssessment:
                 )
             level = next_level
             heard = present(level)
-            not_heard_seen = not_heard_seen or not heard
         while not heard and level < maximum:
             level = min(maximum, level + 5.0)
             heard = present(level)
-            not_heard_seen = not_heard_seen or not heard
         if not heard:
             raise ValueError(
                 f"No response at the safe calibrated limit ({maximum} dB HL); "
                 "do not increase level. Seek a clinical assessment."
             )
-        if not not_heard_seen:
-            raise RuntimeError("Threshold was not bracketed; no threshold was recorded.")
         return level
 
     def export(self, *, subject: str = "", notes: str = "") -> str:

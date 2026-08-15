@@ -118,6 +118,11 @@ class SelfAssessment:
             level = max(0.0, level - 10.0)
             heard = self._present(ear, frequency_hz, level, response)
             presentations += 1
+        if heard and level == 0:
+            raise ValueError(
+                "Response remained audible at 0 dB HL; the threshold is below "
+                "this screening range and was not recorded."
+            )
         while not heard and level < maximum:
             if presentations >= MAX_PRESENTATIONS_PER_FREQUENCY:
                 raise RuntimeError("Presentation limit reached; no threshold was recorded.")

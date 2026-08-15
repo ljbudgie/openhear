@@ -45,6 +45,14 @@ def test_stops_at_safe_limit_when_no_tone_is_heard():
         session.measure_threshold("left", 1000, lambda _: False)
 
 
+def test_does_not_record_an_unbracketed_zero_db_hl_threshold():
+    session = SelfAssessment(FakePlayer(Calibration("test", "2026-01-01", "2027-01-01", 50)))
+    session.give_consent()
+
+    with pytest.raises(ValueError, match="below this screening range"):
+        session.measure_threshold("left", 1000, lambda _: True)
+
+
 def test_export_labels_result_as_non_clinical_self_assessment():
     session = SelfAssessment(FakePlayer(Calibration("test-device", "2026-01-01", "2027-01-01", 70)))
     session.give_consent()

@@ -53,6 +53,16 @@ def test_does_not_record_an_unbracketed_zero_db_hl_threshold():
         session.measure_threshold("left", 1000, lambda _: True)
 
 
+def test_rejects_an_unsafe_or_non_sensical_starting_level():
+    session = SelfAssessment(FakePlayer(Calibration("test", "2026-01-01", "2027-01-01", 50)))
+    session.give_consent()
+
+    with pytest.raises(ValueError, match="greater than 0"):
+        session.measure_threshold("left", 1000, lambda _: True, start_db_hl=0)
+
+    assert session.trials == []
+
+
 def test_export_labels_result_as_non_clinical_self_assessment():
     session = SelfAssessment(FakePlayer(Calibration("test-device", "2026-01-01", "2027-01-01", 70)))
     session.give_consent()

@@ -109,26 +109,32 @@ class SelfAssessment:
             raise ValueError(f"{frequency_hz} Hz is not a standard test frequency.")
 
         maximum = self.player.calibration.maximum_db_hl
-        level = min(max(float(start_db_hl), 0.0), maximum)
-        heard = self._present(ear, frequency_hz, level, response)
-        presentations = 1
-        while heard and level > 0:
+        if not 0 < start_db_hl <= maximum:
+            raise ValueError(
+                f"start_db_hl must be greater than 0 and no more than {maximum} dB HL."
+            )
+        presentations = 0
+
+        def present(level_db_hl: float) -> bool:
+            nonlocal presentations
             if presentations >= MAX_PRESENTATIONS_PER_FREQUENCY:
                 raise RuntimeError("Presentation limit reached; no threshold was recorded.")
-            level = max(0.0, level - 10.0)
-            heard = self._present(ear, frequency_hz, level, response)
             presentations += 1
+            return self._present(ear, frequency_hz, level_db_hl, response)
+
+        level = float(start_db_hl)
+        heard = present(level)
+        while heard and level > 0:
+            level = max(0.0, level - 10.0)
+            heard = present(level)
         if heard and level == 0:
             raise ValueError(
                 "Response remained audible at 0 dB HL; the threshold is below "
                 "this screening range and was not recorded."
             )
         while not heard and level < maximum:
-            if presentations >= MAX_PRESENTATIONS_PER_FREQUENCY:
-                raise RuntimeError("Presentation limit reached; no threshold was recorded.")
             level = min(maximum, level + 5.0)
-            heard = self._present(ear, frequency_hz, level, response)
-            presentations += 1
+            heard = present(level)
         if not heard:
             raise ValueError(
                 f"No response at the safe calibrated limit ({maximum} dB HL); "

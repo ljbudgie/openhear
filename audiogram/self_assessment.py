@@ -125,13 +125,14 @@ class SelfAssessment:
         level = float(start_db_hl)
         heard = present(level)
         while heard and level > 0:
-            level = max(0.0, level - 10.0)
+            next_level = level - 10.0
+            if next_level <= 0:
+                raise ValueError(
+                    "Response remained audible at the lowest screening level; "
+                    "the threshold is below this screening range and was not recorded."
+                )
+            level = next_level
             heard = present(level)
-        if heard and level == 0:
-            raise ValueError(
-                "Response remained audible at 0 dB HL; the threshold is below "
-                "this screening range and was not recorded."
-            )
         while not heard and level < maximum:
             level = min(maximum, level + 5.0)
             heard = present(level)

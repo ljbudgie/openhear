@@ -59,6 +59,8 @@ def test_rejects_an_unsafe_or_non_sensical_starting_level():
 
     with pytest.raises(ValueError, match="greater than 0"):
         session.measure_threshold("left", 1000, lambda _: True, start_db_hl=0)
+    with pytest.raises(ValueError, match="no more than 50"):
+        session.measure_threshold("left", 1000, lambda _: True, start_db_hl=55)
 
     assert session.trials == []
 

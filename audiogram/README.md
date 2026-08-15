@@ -15,6 +15,7 @@ open `openhear-audiogram-v1` JSON format.
 | `visualiser.py`  | Render an audiogram in the terminal using Unicode + ANSI.  |
 | `export.py`      | Export to CSV, Markdown, or DSP configuration dicts.       |
 | `reader.py`      | Read threshold data from a Noahlink Wireless 2 device.     |
+| `self_assessment.py` | Calibrated, consent-led self-assessment foundation for Iris. |
 | `data/`          | Audiogram data files in openhear-audiogram-v1 format.      |
 
 ## The JSON Format
@@ -24,6 +25,16 @@ belongs to you, not a clinic database.  Any user can create their own
 JSON file from their clinical audiogram.  See
 [`data/FORMAT.md`](data/FORMAT.md) for the full specification and a blank
 template.
+
+## Iris-guided self-assessment
+
+`audiogram.self_assessment` provides a deliberately narrow integration
+boundary for Iris: Iris collects explicit responses while a hardware adapter,
+not OpenHear or the LLM, produces calibrated tones. It refuses to run without
+consent, current calibration, caps test tones at 80 dB HL, and stops rather
+than raising level above the calibration limit. It exports a separate
+`openhear-self-assessment-v1` record rather than an audiogram, so it cannot
+silently drive fitting changes.
 
 ## The Loader → DSP Bridge
 

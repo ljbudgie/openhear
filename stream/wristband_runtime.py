@@ -351,14 +351,14 @@ def main() -> None:
 
 def _access_profile_from_args(args) -> AccessProfile:
     """Return a declared profile with bounded, non-persistent CLI overrides."""
-    profile = get_access_profile(args.access_profile)
+    profile = get_access_profile(getattr(args, "access_profile", "neutral"))
     overrides = {
         name: value
         for name, value in {
-            "haptic_intensity_scale": args.access_intensity_scale,
-            "haptic_ramp_ms": args.access_ramp_ms,
-            "haptic_refractory_scale": args.access_refractory_scale,
-            "input_hold_ms": args.access_hold_ms,
+            "haptic_intensity_scale": getattr(args, "access_intensity_scale", None),
+            "haptic_ramp_ms": getattr(args, "access_ramp_ms", None),
+            "haptic_refractory_scale": getattr(args, "access_refractory_scale", None),
+            "input_hold_ms": getattr(args, "access_hold_ms", None),
         }.items()
         if value is not None
     }

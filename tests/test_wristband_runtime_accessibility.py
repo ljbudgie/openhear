@@ -7,9 +7,15 @@ from types import SimpleNamespace
 
 import pytest
 
-from accessibility import AUTISM, CEREBRAL_PALSY, NEUTRAL, SAFETY_INTENSITY_FLOOR
+from accessibility import (
+    AUTISM,
+    CEREBRAL_PALSY,
+    NEUTRAL,
+    SAFETY_INTENSITY_FLOOR,
+    SENSORY_PROCESSING,
+)
 from stream.haptic_packet import ramp_config_packet
-from stream.wristband_runtime import WristbandRuntime
+from stream.wristband_runtime import WristbandRuntime, _access_profile_from_args
 
 
 class _Mapper:
@@ -66,3 +72,17 @@ def test_access_profile_policy_rejects_marginal_non_safety_detection(monkeypatch
 
     assert asyncio.run(runtime.send_scores({"Doorbell": 0.65})) is None
     assert client.packets == []
+
+
+def test_sensory_processing_profile_is_accepted_by_runtime_configuration():
+    profile = _access_profile_from_args(
+        SimpleNamespace(
+            access_profile="sensory_processing",
+            access_intensity_scale=None,
+            access_ramp_ms=None,
+            access_refractory_scale=None,
+            access_hold_ms=None,
+        )
+    )
+
+    assert profile == SENSORY_PROCESSING

@@ -268,7 +268,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--access-ramp-ms",
-        type=float,
+        type=int,
         help="Session-only override for the selected profile's haptic onset ramp.",
     )
     parser.add_argument(

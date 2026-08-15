@@ -43,6 +43,13 @@ PACKET_LENGTH: int = len(PACKET_FIELDS)
 #: Name → byte offset, the mapping the embedded firmware relies on.
 FIELD_INDEX: dict[str, int] = {name: i for i, name in enumerate(PACKET_FIELDS)}
 
+# Reserved control command understood by the micro:bit v1 firmware.  It keeps
+# the established three-byte framing intact: byte 1 is a ramp duration in
+# two-millisecond units and byte 2 identifies the control operation.
+CONTROL_SOUND_CLASS_ID: int = 255
+SET_RAMP_PATTERN_ID: int = 1
+RAMP_UNIT_MS: int = 2
+
 
 def validate_uint8(name: str, value: int) -> int:
     """Return *value* if it is a valid uint8, else raise.
@@ -131,3 +138,9 @@ def decode_packet(payload: bytes | bytearray) -> HapticPacket:
         intensity=payload[FIELD_INDEX["intensity"]],
         pattern_id=payload[FIELD_INDEX["pattern_id"]],
     )
+
+
+def ramp_config_packet(ramp_ms: float) -> HapticPacket:
+    """Return the bounded firmware command that sets the haptic onset ramp."""
+    encoded = max(0, min(255, int(round(float(ramp_ms) / RAMP_UNIT_MS))))
+    return HapticPacket(CONTROL_SOUND_CLASS_ID, encoded, SET_RAMP_PATTERN_ID)

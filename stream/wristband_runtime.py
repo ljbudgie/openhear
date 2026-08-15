@@ -10,9 +10,14 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import time
+from types import SimpleNamespace
 
+from accessibility import AccessProfile, get_access_profile, policy_config_for, scale_intensity
 from stream.ble_haptic import HapticPacket, OpenHearBLEClient
 from stream.haptic_mapper import HapticMapper
+from stream.haptic_packet import ramp_config_packet
+from stream.haptic_policy import HapticPolicy
 from stream.phase2_training import Phase2ProgressStore, Phase2TrainingSession
 from stream.phase3_open_conversation import (
     Phase3OpenConversationSession,
@@ -35,6 +40,8 @@ class WristbandRuntime:
         phase3_progress: Phase3ProgressStore | None = None,
         phase3_environment: str = "",
         phase3_passive_log: bool = False,
+        access_profile: AccessProfile | None = None,
+        policy: HapticPolicy | None = None,
     ) -> None:
         self.mapper = mapper
         self.ble_client = ble_client
@@ -44,15 +51,27 @@ class WristbandRuntime:
         self.phase3_progress = phase3_progress
         self.phase3_environment = phase3_environment
         self.phase3_passive_log = phase3_passive_log
+        self.access_profile = access_profile or get_access_profile(None)
+        self.policy = policy or HapticPolicy(policy_config_for(self.access_profile))
 
     def packet_from_classification(self, sound_key: str, confidence: float) -> HapticPacket:
         sound_class_id, intensity, pattern_id = self.mapper.build_command(
             sound_key, confidence=confidence
         )
-        return HapticPacket(sound_class_id, intensity, pattern_id)
+        return HapticPacket(
+            sound_class_id,
+            scale_intensity(intensity, self.access_profile, sound_key=sound_key),
+            pattern_id,
+        )
 
-    async def send_scores(self, scores_by_label: dict[str, float]) -> HapticPacket:
+    async def configure_access_profile(self) -> None:
+        """Configure the local firmware onset ramp for this session's profile."""
+        await self.ble_client.send_packet(ramp_config_packet(self.access_profile.haptic_ramp_ms))
+
+    async def send_scores(self, scores_by_label: dict[str, float]) -> HapticPacket | None:
         classified = classify_scores(scores_by_label)
+        if not self.policy.decide(classified, time.monotonic() * 1000).should_fire:
+            return None
         packet = self.packet_from_classification(classified.sound_key, classified.confidence)
         await self.ble_client.send_packet(packet)
         if self.phase3_passive_log:
@@ -78,7 +97,7 @@ class WristbandRuntime:
         *,
         reaction_time_ms: float | None = None,
         user_rating: int | None = None,
-    ) -> tuple[HapticPacket, object]:
+    ) -> tuple[HapticPacket | None, object]:
         """Score Phase 2 labels, send the existing BLE packet, and optionally log."""
         if self.phase2_session is None:
             self.phase2_session = Phase2TrainingSession()
@@ -88,8 +107,14 @@ class WristbandRuntime:
             reaction_time_ms=reaction_time_ms,
             user_rating=user_rating,
         )
-        packet = self.packet_from_classification(event.predicted_sound_class, event.confidence)
-        await self.ble_client.send_packet(packet)
+        packet = None
+        classified = SimpleNamespace(
+            sound_key=event.predicted_sound_class,
+            confidence=event.confidence,
+        )
+        if self.policy.decide(classified, time.monotonic() * 1000).should_fire:
+            packet = self.packet_from_classification(event.predicted_sound_class, event.confidence)
+            await self.ble_client.send_packet(packet)
         if self.phase2_progress is not None:
             self.phase2_progress.append(event)
         return packet, event
@@ -103,11 +128,13 @@ class WristbandRuntime:
         reaction_time_ms: float | None = None,
         user_rating: int | None = None,
         notes: str = "",
-    ) -> tuple[HapticPacket, object]:
+    ) -> tuple[HapticPacket | None, object]:
         """Score Phase 3 recall, send the existing BLE packet, and optionally log."""
         classified = classify_scores(scores_by_label)
-        packet = self.packet_from_classification(classified.sound_key, classified.confidence)
-        await self.ble_client.send_packet(packet)
+        packet = None
+        if self.policy.decide(classified, time.monotonic() * 1000).should_fire:
+            packet = self.packet_from_classification(classified.sound_key, classified.confidence)
+            await self.ble_client.send_packet(packet)
         if self.phase3_session is None:
             self.phase3_session = Phase3OpenConversationSession()
         event = self.phase3_session.record_recall(
@@ -138,6 +165,7 @@ async def _run_live(args) -> None:
     )
     classifier = YamnetClassifier(args.model, args.labels)
     client = OpenHearBLEClient()
+    access_profile = _access_profile_from_args(args)
     phase2_session = Phase2TrainingSession() if args.phase2_target else None
     phase2_progress = Phase2ProgressStore(args.phase2_progress) if args.phase2_progress else None
     phase3_session = (
@@ -155,11 +183,13 @@ async def _run_live(args) -> None:
         phase3_progress=phase3_progress,
         phase3_environment=args.phase3_environment,
         phase3_passive_log=args.phase3_passive_log,
+        access_profile=access_profile,
     )
     frame_samples = int(round(16_000 * WINDOW_SECONDS))
 
     await client.connect(timeout=args.scan_timeout)
     try:
+        await runtime.configure_access_profile()
         with sd.InputStream(
             samplerate=16_000,
             channels=1,
@@ -190,6 +220,8 @@ async def _run_live(args) -> None:
                         suffix = " phase3=passive-memory"
                     else:
                         suffix = ""
+                if packet is None:
+                    continue
                 print(
                     f"{classified.sound_key:<8} conf={classified.confidence:.2f} "
                     f"packet={list(packet.to_bytes())}{suffix}"
@@ -222,6 +254,32 @@ def main() -> None:
         choices=["worst", "average", "better"],
         default="worst",
         help="How to combine left/right thresholds into one intensity byte.",
+    )
+    parser.add_argument(
+        "--access-profile",
+        choices=["neutral", "autism", "sensory_processing", "cerebral_palsy"],
+        default="neutral",
+        help="Optional, session-only user-declared motor/sensory starting profile.",
+    )
+    parser.add_argument(
+        "--access-intensity-scale",
+        type=float,
+        help="Session-only override for the selected profile's haptic intensity scale.",
+    )
+    parser.add_argument(
+        "--access-ramp-ms",
+        type=int,
+        help="Session-only override for the selected profile's haptic onset ramp.",
+    )
+    parser.add_argument(
+        "--access-refractory-scale",
+        type=float,
+        help="Session-only override for the selected profile's alert spacing.",
+    )
+    parser.add_argument(
+        "--access-hold-ms",
+        type=int,
+        help="Session-only override for the selected profile's control hold time.",
     )
     parser.add_argument(
         "--manual-sound",
@@ -289,6 +347,22 @@ def main() -> None:
         parser.error("--model and --labels are required unless --manual-sound is used.")
 
     asyncio.run(_run_live(args))
+
+
+def _access_profile_from_args(args) -> AccessProfile:
+    """Return a declared profile with bounded, non-persistent CLI overrides."""
+    profile = get_access_profile(args.access_profile)
+    overrides = {
+        name: value
+        for name, value in {
+            "haptic_intensity_scale": args.access_intensity_scale,
+            "haptic_ramp_ms": args.access_ramp_ms,
+            "haptic_refractory_scale": args.access_refractory_scale,
+            "input_hold_ms": args.access_hold_ms,
+        }.items()
+        if value is not None
+    }
+    return profile.replace(**overrides)
 
 
 if __name__ == "__main__":

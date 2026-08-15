@@ -104,6 +104,25 @@ tolerance_db = voice_match_tolerance_db(MATCH_TOLERANCE_DB, CEREBRAL_PALSY)
 `accessibility/adapt.py` is the **only** place a profile becomes
 behaviour, so every adaptation rule is auditable in one file.
 
+## First session checklist
+
+Before enabling a profile, ask the user — and retain nothing unless they
+explicitly choose to — whether:
+
+1. the initial vibration strength is comfortable;
+2. abrupt vibration can cause startle, discomfort, or spasm;
+3. alerts should be less frequent or more selective;
+4. hold-to-confirm controls are preferable and, if so, what dwell feels
+   manageable;
+5. any therapy contraindication screen requires the therapy gate to refuse
+   entrainment.
+
+The live wristband runtime accepts `--access-profile neutral|autism|sensory_processing|cerebral_palsy`
+and optional bounded `--access-*` overrides for one session. It sends the
+selected onset ramp to compatible firmware before live output; the setting is
+not persisted. Older firmware ignores the reserved configuration packet, so
+flash current firmware before relying on ramped haptics.
+
 ## Therapy protocols
 
 No profile implies epilepsy or any other condition. `screening_prompts` asks

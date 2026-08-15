@@ -2,171 +2,179 @@
 
 **Status:** Draft / Experimental  
 **Depends on:** Living Hearing Profile v1+, haptic layer, local commitment history  
-**Non-goals:** Raw audio storage • Cloud attestation services • Overnight replacement of existing legal signature frameworks
+**Non-goals:** Raw audio storage • Cloud attestation services • Claiming current legal admissibility • Overnight replacement of existing signature frameworks
 
 ---
 
 ## 1. Motivation
 
-Current digital signature and liveness systems prove one of two things:
+Existing systems prove either:
 
-- A cryptographic key was used, or
-- A one-shot biometric check passed at a single moment.
+- that a cryptographic key was used, or
+- that a one-shot biometric check passed at a single instant.
 
-Neither proves continuous presence of a living body with a specific sensory profile. Neither keeps the resulting evidence under the sole control of the person.
+Neither proves continuous presence of a living body that carries a specific, user-controlled sensory identity. Neither keeps the resulting evidence under the sole control of the person.
 
-OpenHear already possesses the necessary substrate:
+OpenHear already contains the required substrate:
 
-- A wearable that samples the auditory environment and drives haptics.
-- A Living Hearing Profile that is versioned, user-owned, and cryptographically committed.
-- A local-first architecture that refuses to exfiltrate raw sensory data.
-- The Burgess Principle framework and the UK00004343685 certification mark.
+- Wearable hardware that samples the auditory environment and drives haptics
+- A versioned, user-owned Living Hearing Profile with cryptographic history
+- A local-first architecture that refuses to exfiltrate raw sensory data
+- The Burgess Principle evaluation framework and the UK00004343685 certification mark
 
-Residual Witness is the protocol layer that turns those existing pieces into continuous, sovereign presence attestation.
+Residual Witness is the thin protocol layer that turns those existing pieces into continuous, sovereign presence attestation.
 
 ---
 
-## 2. Core Mechanism
+## 2. What Makes This Novel
 
-### 2.1 What is hashed
+Residual Witness is the first design that simultaneously satisfies four conditions that have not previously been combined:
 
-The wristband never stores raw audio. It extracts compact features and hashes them.
+1. **Continuous** presence (not a one-shot liveness check)
+2. **Sensory identity** — the attestation can be bound to the active Living Hearing Profile
+3. **Local-only data minimisation** — feature hashes only; raw audio is never stored or transmitted
+4. **Explicit sovereignty framework** — Burgess Principle binary evaluation + certification mark under UK00004343685
 
-| Source                    | Content hashed                                      | Purpose                              |
-|---------------------------|-----------------------------------------------------|--------------------------------------|
-| Microphone features       | Environmental sound features (not waveform)         | Acoustic context of the moment       |
-| IMU (gyro + accelerometer)| Motion samples                                      | Continuity of a living body          |
-| Haptic drive state        | Motor pattern / intensity                           | Physiological engagement             |
-| Active Living Hearing Profile (optional) | Stable subset or commitment of current profile | Ties attestation to this specific sensory identity |
+No current system meets all four. Digital signatures prove key possession. Conventional liveness checks are momentary and platform-owned. Consumer wearables generate company-controlled telemetry. Content credentials (C2PA etc.) travel with the file and can be stripped. Residual Witness produces citizen-owned evidence that a particular body, carrying a particular hearing profile, was continuously present and physiologically engaged.
 
-### 2.2 Chain construction (target design)
+That combination can only be built on the OpenHear stack.
+
+---
+
+## 3. Core Mechanism
+
+### 3.1 What is hashed
+
+The wristband never stores raw audio. Compact features are extracted and immediately hashed; the feature vectors themselves are discarded.
+
+| Source | Content hashed | Purpose |
+|--------|----------------|---------|
+| Microphone features | Environmental sound features (not waveform) | Acoustic context of the moment |
+| IMU (gyro + accelerometer) | Motion samples | Continuity of a living body |
+| Haptic drive state | Motor pattern / intensity | Physiological engagement |
+| Active Living Hearing Profile | Stable commitment of current profile state | Binds attestation to this specific sensory identity |
+
+### 3.2 Chain construction (target design)
 
 ```
-Every sampling interval (adaptive, not fixed 100 ms):
+Every sampling interval (adaptive):
   acoustic_hash  = H(environmental_sound_features)
   motion_hash    = H(gyro_sample ⊕ accel_sample)
   haptic_hash    = H(motor_drive_pattern)
-  profile_hash   = H(active_living_profile_commitment)   // optional but distinctive
+  profile_hash   = H(active_living_profile_commitment)   // distinctive OpenHear element
   chain_link     = H(prev_link ⊕ acoustic_hash ⊕ motion_hash ⊕ haptic_hash ⊕ profile_hash ⊕ timestamp)
 
-Every commitment interval (e.g. 5 s, or on significant event):
+Every commitment interval (or on significant event):
   commitment = SHA-256(chain_segment)
-  → sent to paired phone over BLE
+  → transferred to paired phone over BLE
   → phone adds wall-clock time and user signature
   → written to local append-only log owned by the user
 ```
 
-Rates are deliberately left adaptive. Continuous high-rate hashing is a power and thermal concern on a wearable; production implementations MUST support duty-cycling and event-triggered commitment.
+Sampling and commitment rates MUST be adaptive. Continuous high-rate hashing is a power and thermal constraint on wearable hardware; production implementations are required to support duty-cycling and event-triggered commitment.
 
-### 2.3 Privacy boundary
+### 3.3 Privacy boundary (non-negotiable)
 
 - No raw audio is ever written to storage or transmitted.
-- Feature vectors are discarded after hashing.
-- The only persistent objects are cryptographic commitments and the user’s own signature over them.
-- This satisfies the same data-minimisation posture already expressed by `RawAudioRejectedError` elsewhere in the codebase.
+- Feature vectors are discarded after the hash is computed.
+- The only persistent objects are cryptographic commitments and the user’s own signatures over them.
+- This is the same data-minimisation posture already expressed by `RawAudioRejectedError` elsewhere in the codebase.
 
 ---
 
-## 3. Integration with the Living Hearing Profile
+## 4. Binding to the Living Hearing Profile
 
-The most distinctive element of Residual Witness is the optional inclusion of the active Living Hearing Profile state (or a stable commitment of it) inside the chain.
+The optional (but strongly recommended) inclusion of a commitment to the active Living Hearing Profile is the element that cannot be replicated by generic wearables or signature platforms.
 
-This means an attestation can carry:
+An attestation can therefore carry the statement:
 
-> “This commitment was produced by a body whose current, user-controlled hearing profile was X.”
+> “This commitment was produced while the following user-controlled Living Hearing Profile was active.”
 
-Because the Living Hearing Profile already contains clinical core + preference layer + context map + haptic priorities, the attestation is no longer a generic “a human was present.” It becomes “this specific sensory identity was present and engaged.”
+Because the profile already contains the locked clinical core, the preference layer, the context map, and the haptic priorities, the attestation moves from “a human was present” to “this specific sensory identity was present and engaged.”
 
-That linkage is unique to OpenHear.
+That binding is the unique contribution of OpenHear.
 
 ---
 
-## 4. First Applications
+## 5. First Applications
 
-### 4.1 Presence-attested actions (signatures, high-stakes confirmations)
+### 5.1 Presence-attested actions
 
-When the user performs a significant action (document signature, high-value confirmation, etc.), the system can attach a short witness bundle containing:
+When the user performs a high-stakes action (document signature, critical confirmation, etc.), the system may attach a short witness bundle containing:
 
-- Preceding chain links (continuity)
+- Recent chain links (continuity)
 - Acoustic context hash
 - Motion continuity hash
 - Haptic engagement hash
-- Optional Living Hearing Profile commitment
+- Living Hearing Profile commitment
 
-The result is stronger than a pure digital signature: it carries evidence of continuous biological presence tied to a specific sensory profile.
+This is positioned as a **presence layer** that can strengthen existing signature systems. It is not claimed as a drop-in replacement for them.
 
-This is positioned as a **presence layer** that can sit alongside existing signature systems, not as an overnight replacement for them.
+### 5.2 Media and likeness claims
 
-### 4.2 Media & likeness claims
+If synthetic media is later presented that asserts the user was present, the user’s local Residual Witness log can emit a **NULL attestation**:
 
-If synthetic media is later presented that claims the user was present, the user’s local Residual Witness log can produce a **NULL attestation**:
+- The wristband was operating.
+- The acoustic / motion / haptic hashes are inconsistent with the claimed context.
+- The presence claim therefore fails the sovereign record.
 
-- Wristband was running.
-- Acoustic / motion / haptic hashes do not match the claimed context.
-- Therefore the claim of presence is inconsistent with the sovereign record.
+This is the sensory analogue of likeness sovereignty.
 
-This is the acoustic / sensory analogue of likeness sovereignty.
+### 5.3 Advocacy boundary (Iris)
 
-### 4.3 Advocacy use (Iris boundary)
-
-Iris may read and verify Residual Witness logs. Iris may not generate them. The data originates from the body and the wristband; the advocacy layer only interprets and packages it.
+Iris may read, verify, and package Residual Witness logs.  
+Iris may never generate them.  
+Witness data originates from the body and the wristband; the advocacy layer only interprets it.
 
 ---
 
-## 5. Threat Model & Limitations
+## 6. Threat Model
 
-**Defends well against**
-- Remote account takeover (no cloud credential is sufficient)
-- Simple key theft without the physical device and living body
-- Post-hoc fabrication of presence claims when the log is intact
+**Strongly mitigates**
+- Remote account takeover (possession of cloud credentials is insufficient)
+- Pure key theft without the physical device and living wearer
+- Post-hoc fabrication of presence when the local log remains intact
 
-**Detects after the fact**
-- Physical coercion (chain may continue, but behavioural or contextual anomalies can later be examined)
-- Brief removal of the device (motion / haptic continuity breaks)
+**Detectable after the fact**
+- Physical removal of the device (motion and haptic continuity break)
+- Certain forms of coercion (chain may continue, but contextual or behavioural anomalies become visible on later inspection)
 
-**Does not prevent**
+**Out of scope / residual risk**
 - Sophisticated physical-layer sensor spoofing while the device remains on the body
-- Compelled production of the device itself under duress
+- Compelled production of the device under duress
 
-Residual Witness raises the cost and detectability of false presence claims; it does not create an unbreakable physical seal.
-
----
-
-## 6. Relationship to Existing OpenHear Components
-
-| Component                  | Role in Residual Witness                          |
-|----------------------------|---------------------------------------------------|
-| Living Hearing Profile     | Optional but distinctive identity component       |
-| Haptic layer               | Source of engagement / motor-state hashes         |
-| Local commitment history   | Existing SHA-256 pattern is reused and extended   |
-| Burgess Principle          | Supplies the SOVEREIGN / NULL binary evaluation   |
-| UK00004343685              | Certification / origin mark for issued commitments|
-| Iris                       | Read-only consumer and advocate, never generator  |
+Residual Witness raises both the cost and the detectability of false presence claims. It does not create an unbreakable physical seal, nor does it claim to.
 
 ---
 
-## 7. Implementation Notes & Open Questions
+## 7. Relationship to Existing Components
 
-- Exact feature extraction for the acoustic hash is deliberately unspecified at this draft stage; it must remain lossy enough that reconstruction of the original audio is information-theoretically implausible.
-- Power budget and adaptive sampling rates require measurement on real hardware before rates are fixed.
-- Recovery and audit procedures after a detected chain break need further design.
-- Legal recognition of Residual Witness bundles as evidence is a long-term goal, not a present claim. The protocol produces the raw material from which such recognition can later be sought.
-
----
-
-## 8. Summary
-
-Residual Witness is not a new app. It is the protocol that lets the OpenHear wristband turn continuous, body-bound, hearing-profile-weighted sensory data into citizen-owned cryptographic evidence of presence.
-
-It is novel because it is the first design that simultaneously satisfies:
-
-1. Continuous (not one-shot) presence,
-2. Sensory identity (via the Living Hearing Profile),
-3. Local-only data minimisation, and
-4. An explicit sovereignty framework (Burgess Principle + certification mark).
-
-That combination does not exist in DocuSign, C2PA, conventional wearables, or standard liveness detection.
+| Component | Role |
+|-----------|------|
+| Living Hearing Profile | Distinctive identity binding |
+| Haptic layer | Source of engagement / motor-state hashes |
+| Local commitment history | Existing SHA-256 pattern is extended |
+| Burgess Principle | Supplies the SOVEREIGN / NULL evaluation |
+| UK00004343685 | Certification / origin mark for issued commitments |
+| Iris | Read-only consumer and advocate; never a generator |
 
 ---
 
-*Draft for discussion. Comments and refinements welcome.*
+## 8. Open Questions
+
+- Concrete acoustic feature set (must remain lossy enough that reconstruction is information-theoretically implausible)
+- Measured power budget and safe adaptive rates on real hardware
+- Recovery and audit procedure after a detected chain break
+- Long-term path toward recognition of Residual Witness bundles as evidence (explicitly a future goal, not a present claim)
+
+---
+
+## 9. Summary
+
+Residual Witness is not a new application. It is the protocol that allows the OpenHear wristband to convert continuous, body-bound, hearing-profile-weighted sensory data into citizen-owned cryptographic evidence of presence.
+
+Its novelty lies in the simultaneous satisfaction of continuous presence, sensory identity, local-only minimisation, and an explicit sovereignty framework. That combination does not exist in digital signature platforms, conventional liveness detection, consumer wearables, or content-credential systems.
+
+---
+
+*Draft for discussion and refinement.*

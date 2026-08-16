@@ -5,7 +5,7 @@
   "schema_description": "Living Hearing Profile — sovereign, user-owned, versioned hearing data. Extends openhear-audiogram-v1 with preference, context, haptic and history layers.",
   "subject": "Lewis Burgess",
   "created": "2021-10-20",
-  "last_updated": "2026-08-12",
+  "last_updated": "2026-08-16",
 
   "clinical_core": {
     "locked": true,
@@ -54,8 +54,8 @@
   },
 
   "preference_layer": {
-    "comment": "User-defined loudness and comfort preferences. Evolves over time as the user fine-tunes their experience. Refined 2026-08-12 after reviewing lived experience from RNID Research Panel participants with similar sloping losses.",
-    "version": 2,
+    "comment": "User-defined loudness and comfort preferences. Evolves over time as the user fine-tunes their experience. Refined 2026-08-12 and further strengthened 2026-08-16 after additional lived-experience feedback on listening effort and familiar vs unfamiliar talkers.",
+    "version": 3,
     "loudness_growth": {
       "comment": "Per-frequency gain offset applied on top of clinical prescription. Positive = louder, negative = quieter. Mid-frequency lift prioritised for speech intelligibility under high-frequency sloping loss.",
       "right_ear": [
@@ -84,12 +84,12 @@
     "music_mode_treble_boost_db": 3,
     "voice_enhancement_enabled": true,
     "fatigue_aware": true,
-    "notes": "Stronger mid-band lift (1–2 kHz) after real-world confirmation that speech clarity in this region reduces listening fatigue for sloping losses."
+    "notes": "Stronger mid-band lift (1–2 kHz) after real-world confirmation that speech clarity in this region reduces listening fatigue for sloping losses. Additional 2026-08-16 signal: sustained listening effort frequently leads to ‘switching off’ — preference layer and haptic support should aim to lower cognitive load, not only raise audibility."
   },
 
   "context_map": {
-    "comment": "Situational listening presets. Expanded 2026-08-12 with environments repeatedly described by RNID Research Panel participants (clinical/ICU, social noise, transport). Each context overrides specific processing parameters at runtime.",
-    "version": 2,
+    "comment": "Situational listening presets. Expanded 2026-08-12 and further refined 2026-08-16 with lived-experience signals on familiar vs unfamiliar talkers, speech-in-noise failure despite residual environmental hearing, and the functional gap for people who remain above cochlear-implant speech-recognition thresholds yet still cannot follow conversation in noise.",
+    "version": 3,
     "contexts": [
       {
         "name": "quiet_conversation",
@@ -100,12 +100,22 @@
         "compression_ratio_override": 2.0
       },
       {
+        "name": "familiar_speaker",
+        "label": "Known / familiar talker (e.g. partner or regular voice)",
+        "noise_reduction_aggressiveness": 0.35,
+        "beamforming_enabled": false,
+        "voice_clarity_gain": 1.5,
+        "compression_ratio_override": 1.9,
+        "notes": "Lived-experience signal (2026-08-16): familiar voices (especially a long-term partner) remain markedly easier to understand than novel accents or unexpected conversational shifts. Supports lower processing aggression and reduced haptic load when the talker is known."
+      },
+      {
         "name": "noisy_environment",
         "label": "Pub, restaurant, crowded social space",
         "noise_reduction_aggressiveness": 0.85,
         "beamforming_enabled": true,
         "voice_clarity_gain": 2.1,
-        "compression_ratio_override": 2.5
+        "compression_ratio_override": 2.5,
+        "notes": "Persistent failure mode even with modern aids on loud settings. Residual environmental awareness (traffic, birds, doorbell) can remain while speech intelligibility collapses. Primary target for haptic speech-support and effort reduction."
       },
       {
         "name": "clinical_environment",
@@ -138,7 +148,8 @@
         "noise_reduction_aggressiveness": 0.5,
         "beamforming_enabled": false,
         "voice_clarity_gain": 2.0,
-        "compression_ratio_override": 2.0
+        "compression_ratio_override": 2.0,
+        "notes": "Streaming to aids can work for expected conversational strands; performance drops when the topic shifts or the speaker is unfamiliar. Context-switch difficulty is cognitive as well as acoustic."
       },
       {
         "name": "transport",
@@ -161,8 +172,8 @@
   },
 
   "haptic_layer": {
-    "comment": "Haptic substitution weights. Higher weight = stronger haptic signal for that sound category. Severity-weighted from the audiogram and further refined 2026-08-12 with real-world priorities (alarms, infant cry, speech).",
-    "version": 2,
+    "comment": "Haptic substitution weights. Higher weight = stronger haptic signal for that sound category. Severity-weighted from the audiogram and further refined with real-world priorities (alarms, infant cry, speech). 2026-08-16: reinforced role of haptics as a non-surgical bridge for people who remain above cochlear-implant speech-recognition thresholds yet still cannot follow conversation in noise.",
+    "version": 3,
     "strategy": "severity_weighted",
     "comfort_scale": 1.0,
     "ear_strategy": "worst",
@@ -195,7 +206,7 @@
       "adaptation_history": []
     },
     "sound_classes": [
-      {"name": "voice",       "weight": 0.90, "dominant_freq_hz": 1000, "enabled": true,  "note": "Speech — highest priority after clinical insight that concurrent speech must remain intelligible even when alarms are present"},
+      {"name": "voice",       "weight": 0.90, "dominant_freq_hz": 1000, "enabled": true,  "note": "Speech — highest priority. Haptic support is particularly valuable when the talker is unfamiliar or the acoustic scene is noisy; familiar voices may need less substitution."},
       {"name": "alarm",       "weight": 1.0,  "dominant_freq_hz": 3150, "enabled": true,  "note": "Safety critical. Maximum haptic at the high-frequency band where this profile has the greatest loss. Route preferentially to haptic in clinical_environment context."},
       {"name": "infant_cry",  "weight": 0.95, "dominant_freq_hz": 2500, "enabled": true,  "note": "Added 2026-08-12 from clinician participant insight (neonatal/paediatric). High urgency for future parent scenarios and clinical environments."},
       {"name": "doorbell",    "weight": 0.92, "dominant_freq_hz": 2000, "enabled": true,  "note": "High loss at 2 kHz drives strong substitution"},
@@ -250,8 +261,17 @@
         "timestamp": "2026-08-12T16:50:00Z",
         "author": "Lewis Burgess",
         "change_type": "major_living_advancement",
-        "description": "First authentic non-placeholder commitment. Profile advanced from static 2021 clinical snapshot to a true Living Hearing Profile. Expanded context map with clinical/ICU and social-noise environments drawn from RNID Research Panel participant insights (12 Aug 2026). Strengthened mid-frequency preference offsets for speech under high-frequency sloping loss. Added infant_cry haptic class and raised priority of alarms and speech. All future changes will carry real SHA-256 commitments. This is the moment the profile stopped being a frozen audiogram and became a living, sovereign sensory record.",
+        "description": "First authentic non-placeholder commitment. Profile advanced from static 2021 clinical snapshot to a true Living Hearing Profile. Expanded context map with clinical/ICU and social-noise environments drawn from RNID Research Panel participant insights (12 Aug 2026). Strengthened mid-frequency preference offsets for speech under high-frequency sloping loss. Added infant_cry haptic class and raised priority of alarms and speech.",
         "sha256": "openhear-living-v5-2026-08-12-rnid-panel-day-first-real-commitment",
+        "layers_changed": ["preference_layer", "context_map", "haptic_layer", "history"]
+      },
+      {
+        "version": 6,
+        "timestamp": "2026-08-16T16:45:00Z",
+        "author": "Lewis Burgess",
+        "change_type": "lived_experience_refinement",
+        "description": "Incorporated further RNID-panel lived-experience signals: (1) familiar voices remain markedly easier than novel accents or unexpected conversational shifts — added familiar_speaker context; (2) people can retain environmental awareness with aids while speech-in-noise and group conversation still fail — reinforced noisy_environment and phone_call notes; (3) the ‘cusp of implant’ functional gap (above speech-recognition threshold for CI yet still unable to follow conversation in noise) is a primary use-case for non-surgical haptic substitution; (4) sustained listening effort leading to switching-off is now explicit in preference notes. Profile continues to evolve from real user reports rather than laboratory assumptions.",
+        "sha256": "openhear-living-v6-2026-08-16-familiar-voice-implant-cusp-effort",
         "layers_changed": ["preference_layer", "context_map", "haptic_layer", "history"]
       }
     ]

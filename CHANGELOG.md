@@ -9,32 +9,18 @@ release; they will be called out under a **Breaking** subsection.
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-08-16
+
 ### Added
 
-- **Accessibility profiles** (`accessibility/`) — OpenHear now fits the user's
-  body as well as their ears, starting with **cerebral palsy**. Every other
-  tuning path in the repo begins with an audiogram; that says nothing about a
-  limb whose muscle tone shifts through the day, a startle response,
-  involuntary movement at the controls, or dysarthric speech — all of which
-  change what a good fit actually is. `AccessProfile`
-  (`accessibility/profiles.py`) captures those motor and sensory access needs
-  as bounded values (haptic intensity damping, minimum onset ramp, alert
-  spacing, confidence floor, hold-to-confirm dwell and repeat lockout, voice
-  match tolerance), clipped into a safe envelope on construction so a
-  hand-edited profile can never push the wristband outside it.
-  `accessibility/adapt.py` is the single place a profile becomes behaviour:
-  `policy_config_for()` adapts `stream.haptic_policy.PolicyConfig`,
-  `scale_intensity()` damps the wristband drive byte **without ever taking a
-  safety-critical alert below a perceptible floor**, `voice_match_tolerance_db()`
-  widens the voice window for dysarthria, and `InputGate` provides
-  hold-to-confirm control handling over a monotonic clock so tremor or
-  dyskinesia cannot toggle a setting by accident. The bundled `cerebral_palsy`
-  profile is a conservative starting point, not a prescription — every value is
-  overridable via `AccessProfile.replace()`. Co-occurring conditions (e.g.
-  epilepsy) are surfaced as `screening_prompts` for the user to answer, never
-  assumed; the answer is what reaches `TherapeuticProtocol.gate()`. Nothing is
-  inferred, stored, or transmitted: the user declares a profile or there is
-  none. See [`accessibility/README.md`](accessibility/README.md).
+- **Living Hearing Profile advancement** — the public reference profile moved from a static 2021 clinical snapshot to a true multi-layer, user-owned, versioned sensory record. Preference layer refined for mid-frequency speech under high-frequency sloping loss; context map expanded with clinical/ICU and social-noise environments drawn from RNID Research Panel feedback; haptic priorities strengthened (alarms, speech, infant cry). First authentic non-placeholder history commitment (v5) recorded 12 Aug 2026.
+- **Consented anonymised audiogram example** — profound asymmetric sensorineural loss (left anacusis + residual right) added as a public reference (`audiogram/data/richardson_2022_anonymised.json`) with explicit consent for Living Hearing Profile materials.
+- **Live wristband accessibility profiles** — opt-in autism, cerebral palsy, and sensory-processing profiles now effective in the live wristband path. Firmware-enforced gentler haptic onset, profile-adjusted confidence gates, refractory timing, intensity scaling, preserved safety-alert perceptibility floor, session-only selection, and bounded CLI overrides. Equal opt-in status for the three starting profiles.
+- **Residual Witness protocol (draft)** — `docs/RESIDUAL_WITNESS.md`. Continuous, local-only, Living-Hearing-Profile-weighted presence attestation. Feature hashes only (no raw audio), adaptive sampling, clear threat model, and explicit integration with the Living Hearing Profile and Burgess Principle. Produces citizen-owned cryptographic evidence of continuous biological presence.
+
+### Research & engagement
+
+- Active RNID Research Panel responses with detailed lived experience from adults with sensorineural loss (clinicians, audio engineers, cochlear-implant users, long-term aid users). Multiple real-world feedback threads already influencing preference offsets, context presets, and haptic prioritisation.
 
 ## [1.4.0] - 2026-07-08
 

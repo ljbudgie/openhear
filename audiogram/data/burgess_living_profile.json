@@ -5,7 +5,7 @@
   "schema_description": "Living Hearing Profile — sovereign, user-owned, versioned hearing data. Extends openhear-audiogram-v1 with preference, context, haptic and history layers.",
   "subject": "Lewis Burgess",
   "created": "2021-10-20",
-  "last_updated": "2026-08-16",
+  "last_updated": "2026-08-19",
 
   "clinical_core": {
     "locked": true,
@@ -84,12 +84,12 @@
     "music_mode_treble_boost_db": 3,
     "voice_enhancement_enabled": true,
     "fatigue_aware": true,
-    "notes": "Stronger mid-band lift (1–2 kHz) after real-world confirmation that speech clarity in this region reduces listening fatigue for sloping losses. Additional 2026-08-16 signal: sustained listening effort frequently leads to ‘switching off’ — preference layer and haptic support should aim to lower cognitive load, not only raise audibility."
+    "notes": "Stronger mid-band lift (1–2 kHz) after real-world confirmation that speech clarity in this region reduces listening fatigue for sloping losses. Additional 2026-08-16 signal: sustained listening effort frequently leads to ‘switching off’ — preference layer and haptic support should aim to lower cognitive load, not only raise audibility. When an Auracast clean feed is active, preference offsets still apply; aggressive room-noise strategies should step down."
   },
 
   "context_map": {
-    "comment": "Situational listening presets. Expanded 2026-08-12 and further refined 2026-08-16 with lived-experience signals on familiar vs unfamiliar talkers, speech-in-noise failure despite residual environmental hearing, and the functional gap for people who remain above cochlear-implant speech-recognition thresholds yet still cannot follow conversation in noise.",
-    "version": 3,
+    "comment": "Situational listening presets. Expanded 2026-08-12 and 2026-08-16 with lived-experience signals; 2026-08-19 added auracast_venue for Bluetooth LE Audio broadcast clean feeds in public spaces (see docs/AURACAST.md).",
+    "version": 4,
     "contexts": [
       {
         "name": "quiet_conversation",
@@ -166,14 +166,23 @@
         "beamforming_enabled": false,
         "voice_clarity_gain": 1.5,
         "compression_ratio_override": 1.8
+      },
+      {
+        "name": "auracast_venue",
+        "label": "Auracast / LE Audio broadcast — clean feed in a public space",
+        "noise_reduction_aggressiveness": 0.25,
+        "beamforming_enabled": false,
+        "voice_clarity_gain": 1.6,
+        "compression_ratio_override": 1.9,
+        "notes": "Bluetooth LE Audio Auracast delivers the original clean source (announcement, stage mic, TV channel, language track) rather than room acoustics. Prefer preference-layer shaping over aggressive room-noise strategies. Continuous stream speech should not drive continuous haptic voice pulses; haptic remains for discrete environmental events the broadcast does not cover, plus short join/leave cues. See docs/AURACAST.md."
       }
     ],
     "active_context": "quiet_conversation"
   },
 
   "haptic_layer": {
-    "comment": "Haptic substitution weights. Higher weight = stronger haptic signal for that sound category. Severity-weighted from the audiogram and further refined with real-world priorities (alarms, infant cry, speech). 2026-08-16: reinforced role of haptics as a non-surgical bridge for people who remain above cochlear-implant speech-recognition thresholds yet still cannot follow conversation in noise.",
-    "version": 3,
+    "comment": "Haptic substitution weights. Higher weight = stronger haptic signal for that sound category. Severity-weighted from the audiogram and further refined with real-world priorities (alarms, infant cry, speech). 2026-08-16: reinforced role of haptics as a non-surgical bridge for people who remain above cochlear-implant speech-recognition thresholds yet still cannot follow conversation in noise. 2026-08-19: when an Auracast clean feed is active, continuous stream speech should not generate continuous voice haptics; reserve haptic for discrete safety/environmental events and short broadcast join/leave cues.",
+    "version": 4,
     "strategy": "severity_weighted",
     "comfort_scale": 1.0,
     "ear_strategy": "worst",
@@ -206,8 +215,8 @@
       "adaptation_history": []
     },
     "sound_classes": [
-      {"name": "voice",       "weight": 0.90, "dominant_freq_hz": 1000, "enabled": true,  "note": "Speech — highest priority. Haptic support is particularly valuable when the talker is unfamiliar or the acoustic scene is noisy; familiar voices may need less substitution."},
-      {"name": "alarm",       "weight": 1.0,  "dominant_freq_hz": 3150, "enabled": true,  "note": "Safety critical. Maximum haptic at the high-frequency band where this profile has the greatest loss. Route preferentially to haptic in clinical_environment context."},
+      {"name": "voice",       "weight": 0.90, "dominant_freq_hz": 1000, "enabled": true,  "note": "Speech — highest priority in acoustic scenes. When an Auracast clean feed is carrying continuous speech, do not drive continuous haptic voice pulses; keep haptic for discrete events the broadcast does not replace."},
+      {"name": "alarm",       "weight": 1.0,  "dominant_freq_hz": 3150, "enabled": true,  "note": "Safety critical. Maximum haptic at the high-frequency band where this profile has the greatest loss. Route preferentially to haptic in clinical_environment context. Remains active even when an Auracast stream is joined."},
       {"name": "infant_cry",  "weight": 0.95, "dominant_freq_hz": 2500, "enabled": true,  "note": "Added 2026-08-12 from clinician participant insight (neonatal/paediatric). High urgency for future parent scenarios and clinical environments."},
       {"name": "doorbell",    "weight": 0.92, "dominant_freq_hz": 2000, "enabled": true,  "note": "High loss at 2 kHz drives strong substitution"},
       {"name": "dog",         "weight": 0.60, "dominant_freq_hz": 500,  "enabled": true,  "note": "Lower-frequency: moderate loss, moderate haptic"},
@@ -272,6 +281,15 @@
         "change_type": "lived_experience_refinement",
         "description": "Incorporated further RNID-panel lived-experience signals: (1) familiar voices remain markedly easier than novel accents or unexpected conversational shifts — added familiar_speaker context; (2) people can retain environmental awareness with aids while speech-in-noise and group conversation still fail — reinforced noisy_environment and phone_call notes; (3) the ‘cusp of implant’ functional gap (above speech-recognition threshold for CI yet still unable to follow conversation in noise) is a primary use-case for non-surgical haptic substitution; (4) sustained listening effort leading to switching-off is now explicit in preference notes. Profile continues to evolve from real user reports rather than laboratory assumptions.",
         "sha256": "openhear-living-v6-2026-08-16-familiar-voice-implant-cusp-effort",
+        "layers_changed": ["preference_layer", "context_map", "haptic_layer", "history"]
+      },
+      {
+        "version": 7,
+        "timestamp": "2026-08-19T10:50:00Z",
+        "author": "Lewis Burgess",
+        "change_type": "auracast_design_relationship",
+        "description": "Recorded complementary relationship with Bluetooth LE Audio Auracast. Added auracast_venue context for clean broadcast feeds in public spaces. Preference and haptic notes updated so continuous stream speech does not drive continuous voice haptics; discrete join/leave cues and residual environmental/safety events remain. See docs/AURACAST.md. Auracast delivers the clean source; OpenHear delivers personal, sovereign, context-aware shaping and haptic substitution on top of whatever the person can hear — including a clean feed when one is available.",
+        "sha256": "openhear-living-v7-2026-08-19-auracast-venue",
         "layers_changed": ["preference_layer", "context_map", "haptic_layer", "history"]
       }
     ]

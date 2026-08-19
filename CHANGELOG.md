@@ -9,6 +9,10 @@ release; they will be called out under a **Breaking** subsection.
 
 ## [Unreleased]
 
+### Added
+
+- **Auracast design relationship** (`docs/AURACAST.md`) — records how Bluetooth LE Audio Auracast (clean one-to-many broadcast in public venues) complements OpenHear. Auracast delivers the clean source; OpenHear delivers personal, sovereign, context-aware shaping and haptic substitution on top of whatever the person can hear — including a clean feed when one is available. Living Hearing Profile v7 adds `auracast_venue` context and updates preference/haptic notes so continuous stream speech does not drive continuous voice haptics; discrete join/leave cues and residual safety/environmental events remain.
+
 ## [1.5.0] - 2026-08-16
 
 ### Added

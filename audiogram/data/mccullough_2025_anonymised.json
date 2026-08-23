@@ -1,0 +1,58 @@
+{
+  "subject": "Anonymised participant (consented)",
+  "source": "Clinical audiogram, 22 July 2025 (independent hearing care)",
+  "date": "2025-07-22",
+  "notes": "Bilateral moderate-to-severe sloping sensorineural loss. Pure-tone averages in the moderate-severe range, but QuickSIN speech-in-noise testing shows severe SNR loss on multiple conditions. Clinic notes maximum SNR improvement needed (directional/array microphones or FM-style system). Participant uses Phonak aids with Roger. Explicit consent given 23 Aug 2026 for anonymised use in OpenHear Living Hearing Profile materials and public examples. Demonstrates the pure-tone vs functional speech-in-noise gap that a Living Hearing Profile is designed to capture.",
+  "format_version": "openhear-audiogram-v1",
+  "right_ear": {
+    "symbol": "O",
+    "thresholds": [
+      {"freq_hz": 250,  "db_hl": 40},
+      {"freq_hz": 500,  "db_hl": 40},
+      {"freq_hz": 1000, "db_hl": 50},
+      {"freq_hz": 2000, "db_hl": 55},
+      {"freq_hz": 3000, "db_hl": 55},
+      {"freq_hz": 4000, "db_hl": 60},
+      {"freq_hz": 6000, "db_hl": 70},
+      {"freq_hz": 8000, "db_hl": 75}
+    ]
+  },
+  "left_ear": {
+    "symbol": "X",
+    "thresholds": [
+      {"freq_hz": 250,  "db_hl": 45},
+      {"freq_hz": 500,  "db_hl": 45},
+      {"freq_hz": 1000, "db_hl": 50},
+      {"freq_hz": 2000, "db_hl": 55},
+      {"freq_hz": 3000, "db_hl": 55},
+      {"freq_hz": 4000, "db_hl": 60},
+      {"freq_hz": 6000, "db_hl": 70},
+      {"freq_hz": 8000, "db_hl": 75}
+    ]
+  },
+  "classification": {
+    "type": "sensorineural",
+    "pattern": "bilateral moderate-to-severe sloping",
+    "right_pta": 58,
+    "left_pta": 58,
+    "right_range": "moderate-to-severe",
+    "left_range": "moderate-to-severe"
+  },
+  "speech_in_noise": {
+    "test": "QuickSIN",
+    "results": [
+      {"ear": "right", "snr_loss_db": 11, "category": "moderate SNR loss", "notes": "Directional microphones help. Consider array mic."},
+      {"ear": "left",  "snr_loss_db": 16, "category": "severe SNR loss", "notes": "Maximum SNR improvement needed. Consider FM system."},
+      {"ear": "right", "snr_loss_db": 24, "category": "severe SNR loss", "notes": "Maximum SNR improvement needed. Consider FM system."},
+      {"ear": "left",  "snr_loss_db": 20, "category": "severe SNR loss", "notes": "Maximum SNR improvement needed. Consider FM system."}
+    ],
+    "summary": "Severe speech-in-noise difficulty despite moderate-to-severe pure-tone averages. Functional SNR loss substantially exceeds what PTA alone would predict."
+  },
+  "consent": {
+    "given": true,
+    "date": "2026-08-23",
+    "scope": "Anonymised public use in OpenHear documentation, Living Hearing Profile examples, and research materials",
+    "original_name_removed": true,
+    "clinic_identifiers_removed": true
+  }
+}

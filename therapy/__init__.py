@@ -40,6 +40,14 @@ from therapy.entrainment import (  # noqa: F401
     haptic_events,
     pulse_schedule,
 )
+from therapy.dermal_profiles import (  # noqa: F401
+    DEFAULT_DUTY_CYCLE,
+    DERMAL_PROFILES,
+    MAX_AMPLITUDE,
+    MAX_SESSION_S,
+    DermalProfile,
+    get_dermal_profile,
+)
 from therapy.protocol import (  # noqa: F401
     BRAINWAVE_BANDS,
     BRAINWAVE_PROTOCOLS,
@@ -68,4 +76,10 @@ __all__ = [
     "record_outcome",
     "load_outcomes",
     "personalise",
+    "DermalProfile",
+    "DERMAL_PROFILES",
+    "get_dermal_profile",
+    "MAX_SESSION_S",
+    "MAX_AMPLITUDE",
+    "DEFAULT_DUTY_CYCLE",
 ]

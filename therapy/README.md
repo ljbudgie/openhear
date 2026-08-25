@@ -70,3 +70,59 @@ signal = rx.render(duration_s=60)               # (N, 2) float32, ready to play
   existing 3-byte haptic packet).
 - `carrier_shape` / `duty_cycle` rendering beyond pure sine.
 - n-of-1 outcome logging and an evidence registry, per the architecture doc.
+
+---
+
+## Dermal profiles — 30–100 Hz haptic exploration
+
+> **⚠️ EXPERIMENTAL — NOT A MEDICAL DEVICE.**
+> The profiles in `therapy/dermal_profiles.py` are sovereign, inspectable
+> parameters for self-experimentation. They do not diagnose, treat, or cure
+> any condition. The mechanoreceptor references are descriptive of the
+> published biophysics literature, not claims of therapeutic effect.
+> Consult a medical professional before using any frequency-delivery tool
+> for a health purpose.
+
+`DermalProfile` wraps the standard `TherapeuticProtocol` model with two
+extra constraints specific to skin-contact haptic delivery:
+
+| Constraint | Value | Rationale |
+|---|---|---|
+| `MAX_SESSION_S` | 1200 s (20 min) | Prolonged vibration at one site can cause adaptation / numbness |
+| `MAX_AMPLITUDE` | 120 / 255 | Prioritises comfort over intensity for sustained contact |
+
+All bundled profiles carry `EvidenceGrade.ANECDOTAL` and a set of
+skin-contact contraindications (open wounds, peripheral neuropathy,
+pregnancy, etc.).  `DermalProfile.gate()` refuses to run when a user
+declares a matching condition.
+
+### Bundled profiles
+
+| Key | Frequency | Receptor context (reference, not claim) |
+|---|---|---|
+| `gamma_low` | 30 Hz | Upper range of Meissner's corpuscle sensitivity (~20–50 Hz peak) |
+| `gamma_mid` | 50 Hz | Crossover: Meissner declining, Pacinian corpuscle beginning to respond |
+| `gamma_high` | 100 Hz | Rising slope of Pacinian corpuscle sensitivity |
+
+### Usage
+
+```python
+from therapy.dermal_profiles import get_dermal_profile, DERMAL_PROFILES
+from therapy.protocol import ContraindicationError
+
+profile = get_dermal_profile("gamma_mid")
+
+# Gate before any delivery — raises ContraindicationError if conditions match.
+try:
+    profile.gate(user_conditions)
+except ContraindicationError as err:
+    print(err)
+    raise SystemExit(1)
+
+# Integrate with the entrainment scheduler:
+from therapy.entrainment import events_for_protocol
+events = events_for_protocol(
+    profile.protocol,
+    intensity=profile.recommended_amplitude,
+)
+```

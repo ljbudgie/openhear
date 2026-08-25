@@ -5,7 +5,7 @@
   "schema_description": "Living Hearing Profile — sovereign, user-owned, versioned hearing data. Extends openhear-audiogram-v1 with preference, context, haptic and history layers.",
   "subject": "Lewis Burgess",
   "created": "2021-10-20",
-  "last_updated": "2026-08-19",
+  "last_updated": "2026-08-25",
 
   "clinical_core": {
     "locked": true,
@@ -54,8 +54,8 @@
   },
 
   "preference_layer": {
-    "comment": "User-defined loudness and comfort preferences. Evolves over time as the user fine-tunes their experience. Refined with lived-experience signals through 2026-08-19.",
-    "version": 4,
+    "comment": "User-defined loudness and comfort preferences. Evolves over time. Refined with lived-experience signals through 2026-08-25.",
+    "version": 5,
     "loudness_growth": {
       "comment": "Per-frequency gain offset applied on top of clinical prescription. Positive = louder, negative = quieter. Mid-frequency lift prioritised for speech intelligibility under high-frequency sloping loss.",
       "right_ear": [
@@ -84,12 +84,12 @@
     "music_mode_treble_boost_db": 3,
     "voice_enhancement_enabled": true,
     "fatigue_aware": true,
-    "notes": "Stronger mid-band lift (1–2 kHz) after real-world confirmation that speech clarity in this region reduces listening fatigue for sloping losses. Sustained listening effort frequently leads to ‘switching off’. Lived-experience signal (2026-08-19, long-term aid user): amplified loudness itself can become the problem (recruitment / loudness intolerance) — people regularly remove aids or change programmes because the volume is overwhelming, even when residual environmental awareness remains. Preference layer and comfort ceiling must treat overload as a first-class failure mode, not only under-amplification. When an Auracast clean feed is active, preference offsets still apply; aggressive room-noise strategies should step down."
+    "notes": "Mid-band lift for speech clarity under sloping loss. Sustained listening effort leads to switching-off. Loudness intolerance / recruitment: amplified sound can become the problem — people remove aids or change programmes even when residual environmental awareness remains. Lived-experience signal (2026-08-25): deliberate aid-out recovery time (first thing in the morning and before sleep) is a common self-management strategy; the profile and any haptic path must respect intentional quiet periods rather than treating aid-out as non-compliance. Poorly matched amplification and dual-earpiece / stereo content can trigger or worsen tinnitus — preference and media contexts should allow mono / single-sided friendly behaviour. When an Auracast clean feed is active, preference offsets still apply; aggressive room-noise strategies should step down."
   },
 
   "context_map": {
-    "comment": "Situational listening presets. Expanded through 2026-08-19 with lived-experience signals including multi-talker failure, background music, loudness overload leading to social avoidance, and medical appointment difficulty. See also docs/AURACAST.md and docs/HEARING_LOSS_AND_DEMENTIA.md.",
-    "version": 5,
+    "comment": "Situational listening presets. Expanded through 2026-08-25 with SSD spatial awareness, multi-talker processing lag, hard acoustic environments, and institutional pathway failure signals. See also docs/AURACAST.md and docs/HEARING_LOSS_AND_DEMENTIA.md.",
+    "version": 6,
     "contexts": [
       {
         "name": "quiet_conversation",
@@ -107,16 +107,16 @@
         "beamforming_enabled": false,
         "voice_clarity_gain": 1.5,
         "compression_ratio_override": 1.9,
-        "notes": "Lived-experience signal: familiar voices remain markedly easier than novel accents or unexpected conversational shifts. Supports lower processing aggression and reduced haptic load when the talker is known."
+        "notes": "Familiar voices remain markedly easier than novel accents or unexpected conversational shifts."
       },
       {
         "name": "noisy_environment",
-        "label": "Pub, restaurant, crowded social space",
+        "label": "Pub, restaurant, crowded social space, school / hard-surface room",
         "noise_reduction_aggressiveness": 0.85,
         "beamforming_enabled": true,
         "voice_clarity_gain": 2.1,
         "compression_ratio_override": 2.5,
-        "notes": "Persistent failure mode even with modern premium aids. Residual environmental awareness can remain while speech intelligibility collapses. Multi-talker scenes, background music, and strong accents are common break points: the person hears that someone is speaking but misses key words or has no idea what was said. Loudness intolerance can make the aids themselves unbearable, leading to removal and, over time, avoidance of restaurants, parties, shops, and even some family gatherings. Primary target for effort reduction and complementary haptic support — not only more gain."
+        "notes": "Persistent failure mode. Multi-talker scenes, background music, and strong accents: speech is present but not intelligible. Hard acoustic environments (high ceilings, tiled corridors, classrooms) amplify the problem; environmental modification (e.g. carpet) can matter as much as device settings. Loudness intolerance and social withdrawal over time. Primary target for effort reduction and complementary haptic support."
       },
       {
         "name": "clinical_environment",
@@ -125,7 +125,7 @@
         "beamforming_enabled": true,
         "voice_clarity_gain": 2.2,
         "compression_ratio_override": 2.3,
-        "notes": "Alarms frequently mask concurrent speech. Medical appointments remain difficult when quiet areas are absent and professionals do not adjust for hearing needs; people often rely on family to interpret. Prefer selective haptic routing for alarms while preserving speech band."
+        "notes": "Alarms mask concurrent speech. Appointments remain difficult without quiet space or professional adjustment."
       },
       {
         "name": "music",
@@ -133,7 +133,8 @@
         "noise_reduction_aggressiveness": 0.1,
         "beamforming_enabled": false,
         "voice_clarity_gain": 1.0,
-        "compression_ratio_override": 1.5
+        "compression_ratio_override": 1.5,
+        "notes": "Stereo content can drop dialogue or instruments on the non-hearing side for SSD users; dual-earpiece headphones may trigger tinnitus. Prefer mono-friendly or single-sided routing where the profile indicates asymmetric loss."
       },
       {
         "name": "outdoors",
@@ -141,16 +142,17 @@
         "noise_reduction_aggressiveness": 0.65,
         "beamforming_enabled": true,
         "voice_clarity_gain": 1.8,
-        "compression_ratio_override": 2.0
+        "compression_ratio_override": 2.0,
+        "notes": "Lived-experience signal (SSD): reduced spatial awareness — sound from the deaf side and from behind is harder to locate; people compensate with vision near roads and cycle paths. Haptic directional or traffic cues can support safety without adding more amplified noise."
       },
       {
         "name": "phone_call",
-        "label": "Telephone / video call",
+        "label": "Telephone / video call / multi-person meeting",
         "noise_reduction_aggressiveness": 0.5,
         "beamforming_enabled": false,
         "voice_clarity_gain": 2.0,
         "compression_ratio_override": 2.0,
-        "notes": "Streaming can work for expected conversational strands; performance drops when the topic shifts, the speaker is unfamiliar, or more than one person speaks (group calls / Teams). Context-switch difficulty is cognitive as well as acoustic."
+        "notes": "Streaming can work for expected strands; drops when topic shifts or multiple people speak. Lived-experience signal: processing lag — the listener works a beat behind, combining residual audio, lip-reading, and context; turn-taking is easily misjudged (uncomfortable pauses or accidental interruption). Group meetings are a common failure mode; email follow-up is sometimes the only workable alternative."
       },
       {
         "name": "transport",
@@ -158,7 +160,8 @@
         "noise_reduction_aggressiveness": 0.75,
         "beamforming_enabled": true,
         "voice_clarity_gain": 2.0,
-        "compression_ratio_override": 2.2
+        "compression_ratio_override": 2.2,
+        "notes": "Platform and carriage announcements are often unusable; people rely on visual boards. Auracast deployment in transport is a high-value complement when the user’s aid supports it."
       },
       {
         "name": "home_quiet",
@@ -175,15 +178,15 @@
         "beamforming_enabled": false,
         "voice_clarity_gain": 1.6,
         "compression_ratio_override": 1.9,
-        "notes": "Bluetooth LE Audio Auracast delivers the original clean source (announcement, stage mic, TV channel, language track) rather than room acoustics. Prefer preference-layer shaping over aggressive room-noise strategies. Continuous stream speech should not drive continuous haptic voice pulses; haptic remains for discrete environmental events the broadcast does not cover, plus short join/leave cues. See docs/AURACAST.md."
+        "notes": "Clean source (announcement, stage, TV, language track). Prefer preference-layer shaping over aggressive room-noise strategies. Continuous stream speech should not drive continuous haptic voice pulses. Chicken-and-egg: aids are increasingly Auracast-compatible; venue and transport deployment lag. See docs/AURACAST.md."
       }
     ],
     "active_context": "quiet_conversation"
   },
 
   "haptic_layer": {
-    "comment": "Haptic substitution weights. Higher weight = stronger haptic signal for that sound category. Severity-weighted from the audiogram and refined with real-world priorities. Role of haptics includes a non-surgical bridge when speech-in-noise fails and when amplified loudness itself becomes intolerable. When an Auracast clean feed is active, continuous stream speech should not generate continuous voice haptics.",
-    "version": 5,
+    "comment": "Haptic substitution weights. Role includes non-surgical bridge when speech-in-noise fails, when loudness is intolerable, and when spatial awareness is reduced (e.g. SSD). When an Auracast clean feed is active, continuous stream speech should not generate continuous voice haptics.",
+    "version": 6,
     "strategy": "severity_weighted",
     "comfort_scale": 1.0,
     "ear_strategy": "worst",
@@ -216,62 +219,35 @@
       "adaptation_history": []
     },
     "sound_classes": [
-      {"name": "voice",       "weight": 0.90, "dominant_freq_hz": 1000, "enabled": true,  "note": "Speech — highest priority in acoustic scenes. When an Auracast clean feed is carrying continuous speech, do not drive continuous haptic voice pulses; keep haptic for discrete events the broadcast does not replace. In overload / multi-talker scenes, short speech-onset cues can reduce the constant effort of catching the next word without adding more amplified noise."},
-      {"name": "alarm",       "weight": 1.0,  "dominant_freq_hz": 3150, "enabled": true,  "note": "Safety critical. Maximum haptic at the high-frequency band where this profile has the greatest loss. Route preferentially to haptic in clinical_environment context. Remains active even when an Auracast stream is joined."},
+      {"name": "voice",       "weight": 0.90, "dominant_freq_hz": 1000, "enabled": true,  "note": "Speech priority. Short onset cues in multi-talker overload can reduce the effort of catching the next word. Do not continuous-pulse on a clean Auracast stream."},
+      {"name": "alarm",       "weight": 1.0,  "dominant_freq_hz": 3150, "enabled": true,  "note": "Safety critical. Prefer haptic in clinical_environment."},
       {"name": "infant_cry",  "weight": 0.95, "dominant_freq_hz": 2500, "enabled": true,  "note": "High urgency for parent and clinical environments."},
-      {"name": "doorbell",    "weight": 0.92, "dominant_freq_hz": 2000, "enabled": true,  "note": "High loss at 2 kHz drives strong substitution"},
-      {"name": "dog",         "weight": 0.60, "dominant_freq_hz": 500,  "enabled": true,  "note": "Lower-frequency: moderate loss, moderate haptic"},
-      {"name": "traffic",     "weight": 0.55, "dominant_freq_hz": 500,  "enabled": true,  "note": "Low-frequency traffic noise — kept lower priority than speech and safety sounds"},
-      {"name": "media",       "weight": 0.45, "dominant_freq_hz": 1000, "enabled": true,  "note": "General media — user can raise if desired"},
-      {"name": "silence",     "weight": 0.0,  "dominant_freq_hz": null,  "enabled": true,  "note": "No haptic for silence"}
+      {"name": "doorbell",    "weight": 0.92, "dominant_freq_hz": 2000, "enabled": true,  "note": "Strong substitution where high-frequency loss is severe."},
+      {"name": "dog",         "weight": 0.60, "dominant_freq_hz": 500,  "enabled": true,  "note": "Moderate."},
+      {"name": "traffic",     "weight": 0.55, "dominant_freq_hz": 500,  "enabled": true,  "note": "Safety-relevant outdoors, especially where SSD reduces spatial awareness of vehicles approaching from the deaf side or from behind."},
+      {"name": "media",       "weight": 0.45, "dominant_freq_hz": 1000, "enabled": true,  "note": "User can raise; respect tinnitus and mono/single-sided preferences."},
+      {"name": "silence",     "weight": 0.0,  "dominant_freq_hz": null,  "enabled": true,  "note": "No haptic for silence. Respect intentional aid-out recovery periods."}
     ]
   },
 
   "history": {
-    "comment": "Append-only change log with SHA-256 content commitments (Burgess Principle compatible). Each entry records what changed and a hash of the profile state at that point.",
+    "comment": "Append-only change log with SHA-256 content commitments (Burgess Principle compatible).",
     "entries": [
       {
         "version": 1,
         "timestamp": "2021-10-20T12:00:00Z",
         "author": "Lewis Burgess",
         "change_type": "clinical_audiogram_loaded",
-        "description": "Initial profile created from Dorothy Thomson Hearing Services audiogram dated 2021-10-20.",
+        "description": "Initial profile from Dorothy Thomson Hearing Services audiogram 2021-10-20.",
         "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "layers_changed": ["clinical_core"]
-      },
-      {
-        "version": 2,
-        "timestamp": "2024-01-01T09:00:00Z",
-        "author": "Lewis Burgess",
-        "change_type": "preference_update",
-        "description": "Added loudness-growth offsets based on six months of real-world listening experience. Slight mid-frequency boost preferred in conversation.",
-        "sha256": "placeholder_hash_update_via_living_profile_commit",
-        "layers_changed": ["preference_layer"]
-      },
-      {
-        "version": 3,
-        "timestamp": "2024-01-01T09:05:00Z",
-        "author": "Lewis Burgess",
-        "change_type": "context_map_added",
-        "description": "Added five contextual listening presets. Active context set to quiet_conversation.",
-        "sha256": "placeholder_hash_update_via_living_profile_commit",
-        "layers_changed": ["context_map"]
-      },
-      {
-        "version": 4,
-        "timestamp": "2024-01-01T09:10:00Z",
-        "author": "Lewis Burgess",
-        "change_type": "haptic_layer_added",
-        "description": "Added severity-weighted haptic substitution map for wristband.",
-        "sha256": "placeholder_hash_update_via_living_profile_commit",
-        "layers_changed": ["haptic_layer"]
       },
       {
         "version": 5,
         "timestamp": "2026-08-12T16:50:00Z",
         "author": "Lewis Burgess",
         "change_type": "major_living_advancement",
-        "description": "First authentic non-placeholder commitment. Profile advanced from static 2021 clinical snapshot to a true Living Hearing Profile. Expanded context map with clinical/ICU and social-noise environments drawn from RNID Research Panel participant insights (12 Aug 2026). Strengthened mid-frequency preference offsets for speech under high-frequency sloping loss. Added infant_cry haptic class and raised priority of alarms and speech.",
+        "description": "First authentic non-placeholder commitment. Living Hearing Profile advanced from static clinical snapshot.",
         "sha256": "openhear-living-v5-2026-08-12-rnid-panel-day-first-real-commitment",
         "layers_changed": ["preference_layer", "context_map", "haptic_layer", "history"]
       },
@@ -280,7 +256,7 @@
         "timestamp": "2026-08-16T16:45:00Z",
         "author": "Lewis Burgess",
         "change_type": "lived_experience_refinement",
-        "description": "Incorporated further RNID-panel lived-experience signals: familiar voices vs novel accents; speech-in-noise failure despite residual environmental hearing; cusp-of-implant functional gap; sustained listening effort leading to switching-off.",
+        "description": "Familiar voices, speech-in-noise failure, cusp-of-implant gap, listening effort / switching-off.",
         "sha256": "openhear-living-v6-2026-08-16-familiar-voice-implant-cusp-effort",
         "layers_changed": ["preference_layer", "context_map", "haptic_layer", "history"]
       },
@@ -289,7 +265,7 @@
         "timestamp": "2026-08-19T10:50:00Z",
         "author": "Lewis Burgess",
         "change_type": "auracast_design_relationship",
-        "description": "Recorded complementary relationship with Bluetooth LE Audio Auracast. Added auracast_venue context. Continuous stream speech should not drive continuous voice haptics. See docs/AURACAST.md.",
+        "description": "Auracast complementary relationship; auracast_venue context. See docs/AURACAST.md.",
         "sha256": "openhear-living-v7-2026-08-19-auracast-venue",
         "layers_changed": ["preference_layer", "context_map", "haptic_layer", "history"]
       },
@@ -298,8 +274,17 @@
         "timestamp": "2026-08-19T18:00:00Z",
         "author": "Lewis Burgess",
         "change_type": "lived_experience_refinement",
-        "description": "Incorporated detailed RNID-panel lived experience (long-term aid user, multi-decade pathway): (1) recruitment / loudness intolerance — amplified sound becomes overwhelming and leads to aid removal even when residual environmental hearing remains; comfort ceiling treated as first-class failure mode; (2) multi-talker and background-music scenes where speech is present but not intelligible; (3) strong accents and group calls as repeated break points; (4) social and professional avoidance after overload, including some family gatherings and face-to-face work; (5) medical appointments remain difficult when quiet areas and professional adjustment are absent. Preference, noisy_environment, clinical_environment, and haptic notes strengthened accordingly. Parallel clinical-context note added: docs/HEARING_LOSS_AND_DEMENTIA.md (association vs causation; OpenHear justified by lived function, not dementia-prevention claims).",
+        "description": "Loudness intolerance, multi-talker failure, social/professional avoidance, medical appointment difficulty. docs/HEARING_LOSS_AND_DEMENTIA.md added.",
         "sha256": "openhear-living-v8-2026-08-19-loudness-intolerance-multitalker-overload",
+        "layers_changed": ["preference_layer", "context_map", "haptic_layer", "history"]
+      },
+      {
+        "version": 9,
+        "timestamp": "2026-08-25T13:00:00Z",
+        "author": "Lewis Burgess",
+        "change_type": "lived_experience_refinement",
+        "description": "Incorporated detailed RNID-panel lived experience (sudden-onset single-sided deafness, long NHS-then-private pathway): (1) spatial awareness loss — ‘bubble’, reduced rear/deaf-side localisation, visual compensation near roads; (2) conversation processing lag and turn-taking misjudgement in multi-person meetings; (3) tinnitus triggered by unmatched amplification and dual-earpiece/stereo content — mono/single-sided friendly media behaviour; (4) deliberate aid-out recovery time (morning / before sleep) as legitimate self-management, not non-compliance; (5) hard acoustic environments (schools, tiled corridors) where environmental modification matters; (6) institutional pattern of full needs review then ignore — reinforces citizen-owned Living Hearing Profile as the record that cannot be discarded between appointments; (7) Auracast chicken-and-egg and unusable platform announcements reinforced in transport and auracast_venue notes. Preference, context, and haptic layers updated.",
+        "sha256": "openhear-living-v9-2026-08-25-ssd-spatial-processing-lag-tinnitus-aidout",
         "layers_changed": ["preference_layer", "context_map", "haptic_layer", "history"]
       }
     ]

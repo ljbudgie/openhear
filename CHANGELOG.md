@@ -11,18 +11,10 @@ release; they will be called out under a **Breaking** subsection.
 
 ### Added
 
-- **Auracast design relationship** (`docs/AURACAST.md`) — records how Bluetooth LE Audio Auracast (clean one-to-many broadcast in public venues) complements OpenHear. Living Hearing Profile includes `auracast_venue` context; continuous stream speech does not drive continuous haptic voice pulses.
-- **Hearing loss and dementia — clinical context** (`docs/HEARING_LOSS_AND_DEMENTIA.md`) — association established; causation not proven; OpenHear justified by lived function, not dementia-prevention claims.
-- **Living Hearing Profile v8** — loudness intolerance, multi-talker failure, social/professional avoidance, medical appointment difficulty.
-- **Consented anonymised audiogram — moderate-severe bilateral with severe speech-in-noise loss** (`audiogram/data/mccullough_2025_anonymised.json`) — PTA ~58 both ears with QuickSIN severe SNR loss (11–24 dB); explicit consent 23 Aug 2026.
-- **Living Hearing Profile v9** — lived-experience refinement from detailed RNID-panel account (sudden-onset single-sided deafness, long NHS-then-private pathway):
-  - Spatial awareness loss (“bubble”, reduced rear/deaf-side localisation, visual compensation near roads) → outdoors/traffic and haptic notes
-  - Conversation processing lag and turn-taking misjudgement in multi-person meetings → phone_call / meeting context
-  - Tinnitus triggered by unmatched amplification and dual-earpiece/stereo content → preference and music context (mono/single-sided friendly)
-  - Deliberate aid-out recovery time (morning / before sleep) treated as legitimate self-management, not non-compliance
-  - Hard acoustic environments (schools, tiled corridors) where environmental modification matters
-  - Institutional pattern of full needs review then ignore — reinforces citizen-owned Living Hearing Profile as the record that cannot be discarded between appointments
-  - Auracast chicken-and-egg and unusable platform announcements reinforced in transport and `auracast_venue` notes
+- **Aids-out night safety and rear-approach awareness** (`docs/AIDS_OUT_AND_REAR_APPROACH.md`) — two gaps a booth fitting does not cover. (1) Once aids are out for sleep, building/hotel alarms and bedroom smoke alarms can be inaudible; statutory pillow-shakers and buzzing doorbells fail in the field and then become unrepairable — wristband alarm/doorbell classes stay first-class during `aids_out` / night quiet. (2) People approaching from behind are often unheard; reserve a short opt-in haptic class distinct from speech-in-front and from traffic. Related named gaps kept on the questionnaire list: shared Bluetooth/Zoom so a partner can also hear, venue loops that are off, interval storage when assistive headphones require aids out, Android Bluetooth dropouts mid-conversation, rechargeable end-of-day fade, watch-reachable kill switch for recruitment (drilling/sirens).
+- **Auracast design relationship** (`docs/AURACAST.md`).
+- **Hearing loss and dementia — clinical context** (`docs/HEARING_LOSS_AND_DEMENTIA.md`).
+- **Living Hearing Profile v8–v9** and consented anonymised audiogram examples (see prior unreleased notes).
 
 ## [1.5.0] - 2026-08-16
 

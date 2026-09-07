@@ -11,7 +11,7 @@ release; they will be called out under a **Breaking** subsection.
 
 ### Added
 
-- **Optional systemic context layer** (`docs/SYSTEMIC_CONTEXT_LAYER.md`) — Living Hearing Profile may hold *local, user-owned* general-health context that affects listening effort, fatigue, and appointment access (inflammation / metabolic / renal bands, energy-and-access). Identifiable lab PDFs stay with the person; they are not committed to the public tree. “View it on the NHS App” is not treated as equivalent to email possession of one’s own results.
+- **Systemic Context Layer with hard sensory-modulation boundary** (`docs/SYSTEMIC_CONTEXT_LAYER.md`) — optional sixth surface of `openhear-living-profile-v1`. A factor is included only if it directly modulates sensory experience or access to sensory healthcare. In: fatigue, housebound status, transport barriers, ototoxic / auditory-processing medications. Out: renal/metabolic/inflammatory labs as such; housing, finances, energy, and legal matters unless they create a direct sensory-access barrier. User-declared, never inferred. No identifiable results in the public tree.
 - **Aids-out night safety and rear-approach awareness** (`docs/AIDS_OUT_AND_REAR_APPROACH.md`).
 - **Auracast design relationship** (`docs/AURACAST.md`).
 - **Hearing loss and dementia — clinical context** (`docs/HEARING_LOSS_AND_DEMENTIA.md`).

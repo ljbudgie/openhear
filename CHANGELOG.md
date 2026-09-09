@@ -11,6 +11,7 @@ release; they will be called out under a **Breaking** subsection.
 
 ### Added
 
+- **Measurement context** (`docs/MEASUREMENT_CONTEXT.md`) — tinnitus, fatigue or illness on the test day is a first-class Living Profile field, so one worse booth session is not treated as the new person. Includes an anonymised flat-ish moderate-to-severe / 8 kHz-drop shape. No clinic prints, names or serials in the public tree.
 - **Systemic Context Layer with hard sensory-modulation boundary** (`docs/SYSTEMIC_CONTEXT_LAYER.md`) — optional sixth surface of `openhear-living-profile-v1`. A factor is included only if it directly modulates sensory experience or access to sensory healthcare. In: fatigue, housebound status, transport barriers, ototoxic / auditory-processing medications. Out: renal/metabolic/inflammatory labs as such; housing, finances, energy, and legal matters unless they create a direct sensory-access barrier. User-declared, never inferred. No identifiable results in the public tree.
 - **Aids-out night safety and rear-approach awareness** (`docs/AIDS_OUT_AND_REAR_APPROACH.md`).
 - **Auracast design relationship** (`docs/AURACAST.md`).

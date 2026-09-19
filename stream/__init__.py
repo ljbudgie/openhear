@@ -8,6 +8,7 @@ Includes:
   - haptic_packet.py      Single source-of-truth 3-byte BLE packet codec.
   - haptic_policy.py      Sound → haptic decision layer (confidence, refractory).
   - haptic_primitive.py   Parametrised haptic primitives (v2 continuous channels).
+  - haptic_playback.py    Phase-preserving texture playback with alert priority.
   - crowd_arousal.py      Continuous crowd-energy estimation for haptic rendering.
   - tempo_channel.py      Performer's beat channel — live BPM → HapticPrimitive.
   - sound_classifier.py   YAMNet-oriented sound-class mapping helpers.

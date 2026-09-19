@@ -16,13 +16,19 @@ rather than just *what*.
 
 Each primitive can be rendered as a timed event schedule (:meth:`to_events`)
 for continuous-channel use (crowd arousal, beat tracking, sustained textures)
-or collapsed to the closest 3-byte v1 packet (:meth:`to_packet`) for
-backward-compatible one-shot firing.
+or encoded as a 3-byte packet (:meth:`to_packet`). The packet framing matches v1,
+but reserved primitive IDs require supporting firmware: wire-format compatibility
+does not imply that legacy firmware can play them.
 
-Spatial balance encodes direction today via a simple left/centre/right
-zone (routed to the appropriate actuator pattern in v1 firmware).  In a
-multi-actuator v2 hardware revision the same axis carries angle-of-arrival
-for the full directional use case described in the REGEN_VISION doc.
+Spatial balance encodes an intended left/centre/right zone. Routing that zone
+requires firmware and actuators that implement these reserved IDs; the API alone
+does not provide physical directionality. A multi-actuator hardware revision
+could use the same axis for the directional use case in the REGEN_VISION doc.
+
+This is a library integration seam, not a legacy-firmware playback guarantee.
+Continuous rendering needs supported interruptible firmware and one serialized
+writer. Legacy blocking pattern handlers cannot guarantee host-timed preemption.
+Transport timing, actuator response and perception require hardware calibration.
 
 These primitives are the building blocks; callers assemble them from signals
 produced by :mod:`stream.crowd_arousal` (sustained crowd-texture channel) or
@@ -38,19 +44,18 @@ from stream.haptic_packet import encode_packet, validate_uint8
 
 # ── Parameter bounds ──────────────────────────────────────────────────────────
 
-#: Slowest meaningful pulse rate.  Below 0.1 Hz the human haptic system stops
-#: perceiving it as a rhythm.
+#: Chosen lower design bound, not a universal human rhythm-perception threshold.
 PULSE_RATE_MIN_HZ: float = 0.1
 
-#: Fastest haptic pulse rate the wristband actuators can render cleanly.
-#: At 30 Hz the mechanical lag of an LRA begins to smear individual pulses.
+#: Chosen upper design bound; clean pulse rendering depends on actuator,
+#: firmware and transport timing and must be calibrated on the actual hardware.
 PULSE_RATE_MAX_HZ: float = 30.0
 
 # ── Well-known v2 reserved sound-class IDs ────────────────────────────────────
 #
-# These IDs sit above the v1 range (0–6) so firmware can route them separately.
-# Firmware that does not recognise them should treat them as a generic alert —
-# that is a safe fallback and preserves haptic feedback even on old firmware.
+# These IDs sit above the v1 range (0–6) and require explicit firmware support.
+# Legacy wristband/openhear_firmware.py falls back to silence for unknown
+# pattern IDs, not a generic alert; these IDs must not be assumed playable.
 
 #: sound_class_id for a primitive that drives the *left* actuator zone.
 PRIMITIVE_CLASS_LEFT: int = 10
@@ -135,7 +140,7 @@ class HapticPrimitive:
 
     @property
     def spatial_zone(self) -> Literal["left", "centre", "right"]:
-        """Coarse spatial zone, used for v1 back-compat actuator routing.
+        """Intended coarse spatial zone; physical routing needs firmware support.
 
         ``left``   — spatial_balance < −0.33
         ``centre`` — −0.33 ≤ spatial_balance ≤ +0.33
@@ -150,11 +155,12 @@ class HapticPrimitive:
     # ── Rendering ─────────────────────────────────────────────────────────────
 
     def to_packet(self) -> bytes:
-        """Collapse this primitive to the closest 3-byte v1 wristband packet.
+        """Encode this primitive in the 3-byte wristband packet framing.
 
         The spatial zone selects the sound_class_id (v2 reserved range 10–12)
         and the sharpness selects the pattern_id so firmware can choose the
-        waveform that best matches, even without continuous-channel support.
+        waveform that best matches. These reserved IDs are a library/firmware
+        integration seam, not commands understood by unchanged legacy firmware.
         """
         sound_class_id = _ZONE_CLASS[self.spatial_zone]
         pattern_id = _sharpness_pattern(self.sharpness)
@@ -205,7 +211,10 @@ def calm() -> HapticPrimitive:
 
 
 def alert() -> HapticPrimitive:
-    """A fast, strong, sharp centred burst — high-urgency foreground event."""
+    """A fast, strong, sharp centred burst — a foreground-event starting point.
+
+    Amplitude alone does not confer priority; use explicit playback arbitration.
+    """
     return HapticPrimitive(
         pulse_rate_hz=8.0,
         intensity=200,
@@ -218,16 +227,16 @@ def directional(bearing: float, *, intensity: int = 140, rate_hz: float = 3.0) -
     """Create a spatially-cued primitive for directional awareness.
 
     The *bearing* maps directly to :attr:`HapticPrimitive.spatial_balance`.
-    On v1 hardware with two actuator zones (left/right) this drives the
-    closer motor.  On a future multi-actuator band the same axis encodes a
-    continuous angle of arrival.
+    Physical left/right routing requires compatible multi-actuator hardware and
+    firmware support for the reserved IDs. On a future multi-actuator band the
+    same axis could encode a continuous angle of arrival.
 
     Args:
         bearing:   Angle of arrival, −1.0 (hard left) to +1.0 (hard right).
-        intensity: Drive strength, 0–255.  Default 140 keeps headroom for
-                   simultaneous alert signals.
-        rate_hz:   Pulse rate, 0.1–30 Hz.  Default 3.0 Hz is noticeable but
-                   not intrusive.
+        intensity: Drive strength, 0–255.  Default 140 leaves amplitude headroom,
+                   but alert priority requires explicit playback arbitration.
+        rate_hz:   Pulse rate, 0.1–30 Hz.  Default 3.0 Hz is a starting point;
+                   perceptibility and comfort require individual calibration.
 
     Returns:
         A :class:`HapticPrimitive` whose :attr:`spatial_balance` = *bearing*.

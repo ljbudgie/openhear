@@ -263,6 +263,73 @@ If the micro:bit does not appear or connect on Windows:
    64-bit Python build and that Windows has Bluetooth permission enabled for
    desktop apps.
 
+### Experimental continuous texture: calibration required
+
+`stream.crowd_arousal.CrowdArousalEstimator` describes recorded audio, not
+emotion or crowd identity. Its compatibility names `arousal` and `tension`
+mean **log RMS level** and **smoothed spectral-shape change**. Microphone gain,
+distance, automatic gain control and compression all matter. The onset rate
+counts envelope-rise detections, not necessarily distinct real-world events,
+and remains diagnostic rather than driving a motor.
+
+Frames must be real, finite, one-dimensional and exactly the configured size.
+Frames at or below `silence_rms` (default **0.0001 RMS** in normalised audio)
+immediately clear spectral-change state and map to zero intensity. Zero
+arousal is always muted; active texture retains the provisional 40–160
+intensity and 0.5–12 Hz ranges. These are engineering defaults, **not measured
+comfort limits or universal perceptual thresholds**.
+
+For continuous playback use `stream.haptic_playback.HapticPlayback`, not a new
+one-second `HapticPrimitive.to_events()` schedule for every audio frame.
+Update its texture from the estimator, submit alerts to the same instance,
+and send only its polled events through a single serialised transport writer.
+Its phase persists across texture updates; alert priority protects the entire
+alert, including the gaps between alert pulses, from texture writes. The
+intensity ceiling alone provides no priority guarantee.
+
+Audio callbacks and playback must share one monotonic millisecond clock and
+serialise access. Poll substantially faster than the shortest pulse: the
+12 Hz/0.1-duty endpoint is only about **8.3 ms on**, so a 46 ms audio callback
+is not a playback clock. Late polls skip obsolete edges instead of replaying
+a backlog; this prevents stale output but cannot recover missed pulses.
+Send the events returned by `stop(now_ms)` before disconnecting. Transport
+failures, process stalls and physical motor shutoff still require device-side
+handling; this host library is not a safety-certified alert system.
+
+**Integration status:** this is an opt-in host-side API, not automatically
+enabled by the Windows classifier runtime. The seven-pattern prototype
+firmware above does not implement primitive pattern IDs 10–12 and falls back
+to silence for unknown patterns. Its blocking pattern handlers also cannot
+guarantee immediate preemption. Use primitive-capable, interruptible firmware
+before attempting continuous playback; host scheduling tests do not establish
+hardware compatibility.
+
+Before making claims about the resulting sensations:
+
+1. **Record the setup:** motor/driver model, supply voltage, firmware revision,
+   mounting/strap, sample rate/frame size, microphone gain and AGC settings.
+   Follow the electrical and short-duration bench limits above.
+2. **Calibrate the input gate:** capture microphone background noise with fixed
+   gain, choose `silence_rms` above that floor, and verify quiet target sounds
+   are not inadvertently removed. Check silence transitions, steady tones,
+   stationary noise, gain steps and sustained rises. Do not interpret digital
+   RMS as calibrated sound-pressure level.
+3. **Measure actual output:** verify centre routing and motor-off packets, then
+   measure pulse timing, duty cycle and transport jitter across the proposed
+   range. Test repeated frame updates without phase resets. Confirm missed
+   deadlines do not produce queued bursts.
+4. **Verify preemption on-device:** interrupt active texture with an alert,
+   update/mute texture during the alert, and confirm no texture packet ends
+   the alert early. Check expiry, stop, disconnect and device watchdog
+   behaviour. Record observed latency rather than promising immediacy.
+5. **Evaluate comfort and distinguishability with consenting wearers:** start
+   low, provide an immediate stop control, and stop for discomfort. Compare
+   level changes separately from texture changes and record suitable ranges;
+   do not label responses as joy, anger, psychological tension or excitement.
+
+Physical bench measurements and wearer calibration have **not** been performed
+for these defaults. Keep them experimental until those results are available.
+
 
 ---
 

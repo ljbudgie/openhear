@@ -4,6 +4,8 @@
 
 # OpenHear
 
+**First time here?** Start at <a href="START_HERE.md">START_HERE.md</a> — phone, audiogram, ten minutes. You do not need GitHub after that.
+
 ### Your senses. Your data. Your world.
 
 [![Licence: Apache 2.0 + Sovereign Use Addendum](https://img.shields.io/badge/licence-Apache%202.0%20%2B%20Sovereign%20Use%20Addendum-blue.svg)](LICENSE)
@@ -28,6 +30,7 @@ OpenHear is a human sensory sovereignty platform — not a hearing aid, not a we
 
 ## Contents
 
+- <a href="START_HERE.md">Start here</a>
 - [Why OpenHear in 2026](#why-openhear-in-2026)
 - [What this is](#what-this-is)
 - [The Burgess Principle](#the-burgess-principle)
@@ -92,6 +95,9 @@ OpenHear gives people control over their own senses. It lets you choose what you
 - Signia Insio 7AX (Augmented Xperience platform)
 
 **Required hardware:**
+
+Path 1 does not need this hardware. See START_HERE.md. Noahlink is only Path 2 (people who already own compatible aids and want to read their own fitting).
+
 - Noahlink Wireless 2 (~£80 on eBay)
 - Windows laptop (for fitting software)
 - iPhone or Android (for streaming)

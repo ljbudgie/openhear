@@ -2,9 +2,20 @@
 
 ## Start Here
 
+**If you have hearing loss and a copy of your audiogram:**
+→ [`START_HERE.md`](../START_HERE.md)
+
+Phone, ten minutes, no GitHub. That page is the front door.
+
 OpenHear is a sovereign audiology advocacy framework built on the
-Burgess Principle. This index routes you to the right document based
-on who you are.
+Burgess Principle. The rest of this index routes everyone else.
+
+## I am a person with hearing loss
+
+→ [`START_HERE.md`](../START_HERE.md)
+
+Turn the graph into a Living Hearing Profile in plain English. Email-only
+list if you want to stay in touch: lewisjames@theburgessprinciple.com.
 
 ## I am an industry leader or executive
 

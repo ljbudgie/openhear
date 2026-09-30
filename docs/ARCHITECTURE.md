@@ -12,7 +12,8 @@ openhear/
 ├── dsp/         ← Real-time DSP stages: noise reduction, WDRC
 │                  compression, voice clarity, feedback cancellation,
 │                  own-voice bypass, biquad filter bank, beamforming,
-│                  audiogram → prescription, runtime metrics.
+│                  audiogram → prescription, bone-conduction retarget
+│                  (dsp/bone_conduction.py), runtime metrics.
 │                  Entry point: python -m dsp.pipeline
 │
 ├── stream/      ← Audio I/O and transport: Bluetooth output, virtual
@@ -29,6 +30,8 @@ openhear/
 │                  integration, shell manufacturing notes, safety docs,
 │                  Phase 5 sovereign-device bundle generation.
 │
+├── modules/optional/oral_appliance/  ← FTO hold. No CAD. See docs/FTO_SONITUS.md.
+│
 ├── learn/       ← Listener preference capture, adaptive tuning,
 │                  JSONL learning-state persistence, and saved
 │                  per-environment profiles.
@@ -43,38 +46,40 @@ openhear/
 
 ```
 microphone
-   │
-   ▼
-┌──────────────────────┐
+   |
+   v
+┌─────────────────────┐
 │  stream.recorder     │─── optional raw.wav
-└──────────┬───────────┘
-           ▼
-┌──────────────────────────────────────────────┐
+└─────────────────────┘
+           v
+┌─────────────────────────────────────────────┐
 │  dsp.pipeline                                │
 │    SpectralSubtractor  → WDRCompressor       │
 │    → VoiceClarityEnhancer                    │
 │    → FeedbackCanceller → OwnVoiceBypass      │
-└──────────┬───────────────────────────────────┘
-           ▼ processed audio
-┌──────────────────────┐
+└─────────────────────────────────────────────┘
+           v processed audio
+┌─────────────────────┐
 │  stream.bluetooth    │──→ paired hearing aid (A2DP / MFi)
-└──────────────────────┘
+└─────────────────────┘
 ```
 
 The DSP chain is driven by a user `config.yaml` parsed by
 `dsp.user_config` against `dsp/config.schema.json`.  An
 `Audiogram` dataclass flows through `dsp.audiogram_profile.prescribe()`
-to produce per-band gains and compression ratios.
+to produce per-band gains and compression ratios.  Bone-conduction
+output is an optional retarget of that table
+(`dsp.bone_conduction.prescribe_bc`); it is not a second pipeline.
 
 ## Data flow (fitting read / write)
 
 ```
 core.noahlink.NoahlinkDevice
      │ send GET_FITTING frame
-     ▼
+     v
 core.protocol.decode_session
      │ produces ParsedFrame objects
-     ▼
+     v
 core.fitting_data.FittingSession
      │
      ├──→ core.backup.write_backup  (safety net)
@@ -88,7 +93,7 @@ core.fitting_data.FittingSession
 * Public API surface is the `Audiogram`, `FittingSession`,
   `DeviceInfo`, `GainTable`, `CompressionProfile`, `MPOProfile`,
   `ProgrammeSlot`, `MetricsLogger`, `BluetoothAudioOutput`,
-  `NoahlinkDevice`, and the CLI entry points registered in
-  `pyproject.toml`.
+  `NoahlinkDevice`, `BoneConductionPrescription`, and the CLI entry
+  points registered in `pyproject.toml`.
 * Anything in an internal `_helper` module or named with a leading
   underscore may change without notice.

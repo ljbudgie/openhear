@@ -2,7 +2,7 @@
 
 You do not need to install anything.
 
-OpenHear is a research project, not a certified hearing aid. It does not replace your audiologist. Start quiet if you later try any sound path. Your graph is yours. Nothing here should upload it to a company cloud unless *you* choose to paste it into a tool you already use.
+OpenHear is a research project, not a certified hearing aid, and not a medical device. It does not replace your audiologist or a cochlear implant. It does not amplify sound. It tells you a sound happened — doorbell, alarm, traffic, animal, media, or silence — through a vibration, if you later want that. Start quiet if you later try any sound path. Your graph is yours. Nothing here should upload it to a company cloud unless *you* choose to paste it into a tool you already use.
 
 ## What this is, in one sentence
 
@@ -49,7 +49,7 @@ That uses `dsp/explain.py`. It is an explanation of a fitting you own, not a med
 |---|---|
 | A person with hearing loss | This page. Then email lewisjames@theburgessprinciple.com if you want to be on the lived-experience list. Email only. |
 | Someone who writes code | `docs/ARCHITECTURE.md` then `docs/INTEGRATORS.md` |
-| Someone who funds or partners | `docs/FUNDING_AND_PARTNERSHIPS.md` and `docs/GO_TO_MARKET.md` |
+| Someone who funds or partners | `docs/FUNDING_AND_PARTNERSHIPS.md`, `docs/HI_NENC_2026.md`, `docs/EVALUATION.md` |
 
 The long README under this file is the build log and the vision. It is not the first step.
 

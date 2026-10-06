@@ -35,7 +35,14 @@ android {
 
     buildFeatures {
         compose = true
+        prefab = true
     }
+
+    // Package the repository's synthetic graph as a read-only app asset.
+    // The app copies the selected graph into internal private storage at runtime.
+    sourceSets.getByName("main").assets.srcDir(
+        layout.buildDirectory.dir("generated/sampleAudiogramAssets")
+    )
 
     externalNativeBuild {
         cmake {
@@ -62,6 +69,15 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+}
+
+val copySampleAudiogram by tasks.registering(org.gradle.api.tasks.Copy::class) {
+    from(rootProject.file("../examples/sample_audiogram.json"))
+    into(layout.buildDirectory.dir("generated/sampleAudiogramAssets"))
+}
+
+tasks.named("preBuild").configure {
+    dependsOn(copySampleAudiogram)
 }
 
 dependencies {

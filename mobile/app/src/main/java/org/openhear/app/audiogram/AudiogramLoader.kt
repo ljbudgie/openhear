@@ -4,12 +4,14 @@
 
 package org.openhear.app.audiogram
 
+import android.content.Context
 import org.json.JSONObject
+import java.io.FileNotFoundException
 
 /**
  * Audiogram data for both ears.
  *
- * Frequency keys are in Hz (250, 500, 1000, 2000, 4000, 8000).
+ * Frequency keys are in Hz.
  * Threshold values are in dB HL (hearing level).
  *
  * JSON format (matches Python audiogram/loader.py):
@@ -46,11 +48,15 @@ data class DspParams(
  */
 object AudiogramLoader {
 
-    /** Standard audiometric frequencies (Hz). */
-    private val STANDARD_FREQUENCIES = listOf(250, 500, 1000, 2000, 4000, 8000)
+    /** Frequencies supported by OpenHear's sample graph and legacy JSON format. */
+    private val SUPPORTED_FREQUENCIES =
+        listOf(250, 500, 750, 1000, 1500, 2000, 3000, 4000, 6000, 8000)
 
     /** Frequencies used for Pure Tone Average (PTA). */
     private val PTA_FREQUENCIES = listOf(500, 1000, 2000)
+
+    const val PRIVATE_GRAPH_FILENAME = "audiogram.json"
+    const val SAMPLE_ASSET_NAME = "sample_audiogram.json"
 
     // --- Public API ---------------------------------------------------------
 
@@ -63,10 +69,74 @@ object AudiogramLoader {
      */
     fun loadAudiogram(jsonString: String): Audiogram {
         val root = JSONObject(jsonString)
+        val left = parseEar(root, "left", "left_ear")
+        val right = parseEar(root, "right", "right_ear")
+        require(left.isNotEmpty() && right.isNotEmpty()) {
+            "A graph must include thresholds for both ears."
+        }
         return Audiogram(
-            left  = parseEar(root.getJSONObject("left")),
-            right = parseEar(root.getJSONObject("right"))
+            left = left,
+            right = right
         )
+    }
+
+    /**
+     * Load a previously selected graph from app-private internal storage.
+     * No external storage permission or network access is used.
+     */
+    fun loadStoredGraph(context: Context): Audiogram? {
+        return try {
+            context.openFileInput(PRIVATE_GRAPH_FILENAME)
+                .bufferedReader()
+                .use { loadAudiogram(it.readText()) }
+        } catch (_: FileNotFoundException) {
+            null
+        }
+    }
+
+    /**
+     * Validate a graph before replacing the app-private copy.
+     */
+    fun saveGraph(context: Context, jsonString: String): Audiogram {
+        val audiogram = loadAudiogram(jsonString)
+        context.openFileOutput(PRIVATE_GRAPH_FILENAME, Context.MODE_PRIVATE)
+            .bufferedWriter()
+            .use { it.write(jsonString) }
+        return audiogram
+    }
+
+    /**
+     * A short, approximate description of the graph and speech cues that may
+     * sit above its thresholds. This describes the graph; it is not a diagnosis.
+     */
+    fun describeGraph(audiogram: Audiogram): String {
+        val low = meanThreshold(audiogram, LOW_FREQUENCIES)
+        val high = meanThreshold(audiogram, HIGH_FREQUENCIES)
+        val slope = if (low != null && high != null) high - low else null
+        val shape = when {
+            slope == null -> "The graph needs more low- and high-pitch points to show its shape"
+            slope >= 10f -> "The graph slopes toward higher pitches"
+            slope <= -10f -> "The graph slopes toward lower pitches"
+            else -> "The graph is fairly level from low to high pitches"
+        }
+
+        val speechCues = mutableListOf<String>()
+        if (worseEarMean(audiogram, LOW_FREQUENCIES)?.let { it >= SPEECH_CUE_THRESHOLD_DB } == true) {
+            speechCues += "lower vowels and voice sounds"
+        }
+        if (worseEarMean(audiogram, MID_FREQUENCIES)?.let { it >= SPEECH_CUE_THRESHOLD_DB } == true) {
+            speechCues += "/sh/, /t/ and /k/"
+        }
+        if (worseEarMean(audiogram, HIGH_FREQUENCIES)?.let { it >= SPEECH_CUE_THRESHOLD_DB } == true) {
+            speechCues += "/s/, /f/ and /th/"
+        }
+
+        val cueDescription = if (speechCues.isEmpty()) {
+            "This simplified view doesn't flag a speech-sound group above the line"
+        } else {
+            "${speechCues.joinToString(", ")} may sit above the line"
+        }
+        return "$shape; $cueDescription (graph description only, not a diagnosis)."
     }
 
     /**
@@ -109,14 +179,59 @@ object AudiogramLoader {
 
     // --- Helpers ------------------------------------------------------------
 
-    private fun parseEar(obj: JSONObject): Map<Int, Float> {
+    private fun parseEar(root: JSONObject, legacyKey: String, sampleKey: String): Map<Int, Float> {
         val map = mutableMapOf<Int, Float>()
-        for (freq in STANDARD_FREQUENCIES) {
-            val key = freq.toString()
-            if (obj.has(key)) {
-                map[freq] = obj.getDouble(key).toFloat()
+        val legacy = root.optJSONObject(legacyKey)
+        if (legacy != null) {
+            for (freq in SUPPORTED_FREQUENCIES) {
+                val key = freq.toString()
+                if (legacy.has(key)) {
+                    map[freq] = validatedThreshold(freq, legacy.getDouble(key).toFloat())
+                }
+            }
+            return map
+        }
+
+        val sampleEar = root.optJSONObject(sampleKey)
+            ?: throw IllegalArgumentException("Graph is missing $legacyKey thresholds.")
+        val thresholds = sampleEar.optJSONArray("thresholds")
+            ?: throw IllegalArgumentException("$sampleKey is missing its thresholds list.")
+        for (index in 0 until thresholds.length()) {
+            val point = thresholds.getJSONObject(index)
+            val frequency = point.getInt("freq_hz")
+            if (frequency in SUPPORTED_FREQUENCIES) {
+                map[frequency] = validatedThreshold(frequency, point.getDouble("db_hl").toFloat())
             }
         }
         return map
     }
+
+    private fun validatedThreshold(frequency: Int, threshold: Float): Float {
+        require(frequency > 0 && threshold.isFinite() && threshold in -20f..140f) {
+            "Graph contains an invalid threshold."
+        }
+        return threshold
+    }
+
+    private fun meanThreshold(audiogram: Audiogram, frequencies: List<Int>): Float? {
+        val values = (audiogram.left.valuesFor(frequencies) + audiogram.right.valuesFor(frequencies))
+        return values.takeIf { it.isNotEmpty() }?.average()?.toFloat()
+    }
+
+    private fun worseEarMean(audiogram: Audiogram, frequencies: List<Int>): Float? {
+        return listOf(
+            audiogram.left.valuesFor(frequencies),
+            audiogram.right.valuesFor(frequencies)
+        ).mapNotNull { values ->
+            values.takeIf { it.isNotEmpty() }?.average()?.toFloat()
+        }.maxOrNull()
+    }
+
+    private fun Map<Int, Float>.valuesFor(frequencies: List<Int>): List<Float> =
+        frequencies.mapNotNull { this[it] }
+
+    private val LOW_FREQUENCIES = listOf(250, 500, 750)
+    private val MID_FREQUENCIES = listOf(1000, 1500, 2000, 3000)
+    private val HIGH_FREQUENCIES = listOf(4000, 6000, 8000)
+    private const val SPEECH_CUE_THRESHOLD_DB = 25f
 }

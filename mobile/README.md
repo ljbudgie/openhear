@@ -8,9 +8,14 @@
 > Consult an audiologist before using any hearing device.
 > Use at your own risk.
 
-Real-time hearing assistance on Android. Captures mic input, processes it
-through a sovereign DSP pipeline (no cloud, no telemetry), and streams the
-result to Bluetooth hearing devices or earbuds.
+OpenHear's Android research app. The first-run screen works without sound:
+choose the bundled sample graph or load a JSON graph from the phone, read a
+short graph description, and test three labelled vibration patterns.
+
+The selected graph is copied to the app's private internal files as
+`audiogram.json`. It is not uploaded, and this app does not request an account
+or network permission. The bundled `examples/sample_audiogram.json` is a
+synthetic sample, not a personal audiogram.
 
 **Current repo status:** the Android app is a public scaffold. The Compose UI,
 audio engine wiring, and audiogram loader exist, but most DSP and Bluetooth
@@ -28,9 +33,10 @@ hearing-aid processing.
 | **DSP** | On-device feedback cancellation (LMS) | ✅ skeleton |
 | **DSP** | Own-voice detection bypass | ✅ skeleton |
 | **DSP** | Safety limiter (hard clip at 0 dBFS) | ✅ skeleton |
-| **Audiogram** | JSON audiogram loader | ✅ skeleton |
+| **Audiogram** | Load sample or phone JSON graph; private local storage | ✅ first-run flow |
 | **Audiogram** | Visual audiogram editor | 🔲 planned |
 | **Learn** | Thumbs-up/down preference learner (v1) | ✅ skeleton |
+| **Haptics** | Door, Alarm, and Voice phone vibration test | ✅ first-run flow |
 | **Learn** | TinyML preference model (v2) | 🔲 roadmap |
 | **Bluetooth** | ASHA streaming | 🔲 planned |
 | **Bluetooth** | Classic A2DP / HFP streaming | 🔲 planned |
@@ -78,17 +84,29 @@ hearing-aid processing.
 | Kotlin | 2.0+ |
 | Jetpack Compose BOM | 2024.x |
 
-```bash
-# Clone and open in Android Studio
-git clone https://github.com/ljbudgie/openhear.git
-cd openhear/mobile
-# Open this directory in Android Studio — Gradle sync will pull Oboe and Compose.
-```
+### Import and run in Replit
 
-## Loading an Audiogram
+1. On **replit.com**, choose **Create Repl / Import from GitHub** and import
+   `ljbudgie/openhear`.
+2. In the Shell, enter the existing Android project: `cd mobile`.
+3. The Android module requires JDK 17, Android SDK 35, Android NDK r25+, and
+   CMake 3.22.1. With those installed and Gradle available, build the debug APK:
+   `gradle :app:assembleDebug`
+4. The APK is written to
+   `mobile/app/build/outputs/apk/debug/app-debug.apk`. To install and launch it
+   from a connected Android device or emulator, run
+   `gradle :app:installDebug`; Android Studio's **Run** button can also launch
+   `app` on a selected device.
 
-The app accepts audiogram data as a JSON file matching the format used by
-the Python `audiogram/loader.py` module in this repository:
+This repository does not include a Gradle wrapper. Replit's Run button alone
+does not create an Android emulator; a configured Android SDK/NDK and an
+attached device or emulator are needed to install and interact with the app.
+
+## Graph file format and local storage
+
+The phone import accepts either the legacy `left` / `right` object format or
+the `left_ear` / `right_ear` threshold-list format used by
+`examples/sample_audiogram.json`. For example:
 
 ```json
 {
@@ -103,13 +121,12 @@ the Python `audiogram/loader.py` module in this repository:
 }
 ```
 
-Load it from the app's **Audiogram** screen, or place the file at:
-```
-/sdcard/Android/data/org.openhear.app/files/audiogram.json
-```
+On first launch, choose **Use the sample graph** or **Load a graph from this
+phone**. A valid graph is copied into app-private internal storage. There is no
+network upload, account, or shared-storage access.
 
-The loader computes per-frequency insertion gains using a half-gain rule and
-a Pure Tone Average (PTA) from 500 / 1000 / 2000 Hz.
+The on-screen text is a simplified description of the graph and possible
+speech-sound cues; it is not a diagnosis or a hearing-aid fitting.
 
 ## Safety Disclaimer
 

@@ -5,15 +5,19 @@
 package org.openhear.app
 
 import android.os.Bundle
-import android.widget.Toast
+import android.os.VibrationEffect
+import android.os.Vibrator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -22,63 +26,32 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import org.openhear.app.audio.OboeEngine
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.openhear.app.audiogram.Audiogram
+import org.openhear.app.audiogram.AudiogramLoader
 
 /**
  * Main entry point for the OpenHear Android app.
- *
- * Architecture:
- *   MainActivity (Compose UI)
- *       └─► OboeEngine (Kotlin wrapper)
- *               └─► openhear_dsp.cpp via JNI (Oboe audio callback)
- *
- * Navigation stubs:
- *   - AudiogramScreen  → load / edit audiogram JSON
- *   - DspSettingsScreen → adjust compression, noise, voice emphasis
- *   - LearnScreen       → thumbs-up / thumbs-down preference learning
  */
 class MainActivity : ComponentActivity() {
 
-    private val engine = OboeEngine()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        showSafetyDisclaimerOnce()
-
         setContent {
             MaterialTheme {
-                OpenHearApp(engine)
+                OpenHearApp()
             }
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        engine.stop()
-    }
-
-    // --- Safety disclaimer shown exactly once per install -------------------
-
-    private fun showSafetyDisclaimerOnce() {
-        val prefs = getSharedPreferences("openhear", MODE_PRIVATE)
-        if (!prefs.getBoolean("disclaimer_shown", false)) {
-            Toast.makeText(
-                this,
-                "⚠️ EXPERIMENTAL — NOT a medical device. Consult an audiologist.",
-                Toast.LENGTH_LONG
-            ).show()
-            prefs.edit().putBoolean("disclaimer_shown", true).apply()
         }
     }
 }
@@ -89,106 +62,214 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OpenHearApp(engine: OboeEngine) {
-    // Current screen — swap this out for a real NavHost when adding navigation.
-    var currentScreen by remember { mutableStateOf("home") }
-    var isRunning by remember { mutableStateOf(false) }
-    var latencyMs by remember { mutableFloatStateOf(0f) }
+fun OpenHearApp() {
+    val context = LocalContext.current
+    var audiogram by remember(context) {
+        mutableStateOf(runCatching { AudiogramLoader.loadStoredGraph(context) }.getOrNull())
+    }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    // Poll latency every 500 ms while the engine is running.
-    LaunchedEffect(isRunning) {
-        while (isRunning) {
-            latencyMs = engine.latencyMs()
-            delay(500L)
+    val graphPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            try {
+                val json = context.contentResolver.openInputStream(uri)
+                    ?.bufferedReader()
+                    ?.use { it.readText() }
+                    ?: throw IllegalArgumentException("The selected file could not be opened.")
+                audiogram = AudiogramLoader.saveGraph(context, json)
+                errorMessage = null
+            } catch (_: Exception) {
+                errorMessage = "Couldn't load that file. Choose a JSON graph with left and right ear thresholds."
+            }
         }
     }
 
+    if (audiogram == null) {
+        FirstRunScreen(
+            errorMessage = errorMessage,
+            onUseSample = {
+                try {
+                    val json = context.assets.open(AudiogramLoader.SAMPLE_ASSET_NAME)
+                        .bufferedReader()
+                        .use { it.readText() }
+                    audiogram = AudiogramLoader.saveGraph(context, json)
+                    errorMessage = null
+                } catch (_: Exception) {
+                    errorMessage = "The bundled sample graph couldn't be opened."
+                }
+            },
+            onLoadFromPhone = {
+                graphPicker.launch(arrayOf("application/json", "text/json", "text/plain", "*/*"))
+            }
+        )
+    } else {
+        GraphReadyScreen(
+            audiogram = audiogram!!,
+            onLoadAnotherGraph = {
+                graphPicker.launch(arrayOf("application/json", "text/json", "text/plain", "*/*"))
+            },
+            errorMessage = errorMessage
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FirstRunScreen(
+    errorMessage: String?,
+    onUseSample: () -> Unit,
+    onLoadFromPhone: () -> Unit
+) {
     Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("OpenHear") })
-        }
+        topBar = { TopAppBar(title = { Text("OpenHear") }) }
     ) { innerPadding ->
-        when (currentScreen) {
-            // Placeholder screens — each will become its own @Composable file.
-            "audiogram" -> PlaceholderScreen("Audiogram") { currentScreen = "home" }
-            "dsp"       -> PlaceholderScreen("DSP Settings") { currentScreen = "home" }
-            "learn"     -> PlaceholderScreen("Learn") { currentScreen = "home" }
-            else        -> HomeScreen(
-                modifier    = Modifier.padding(innerPadding),
-                isRunning   = isRunning,
-                latencyMs   = latencyMs,
-                onToggle    = {
-                    if (isRunning) {
-                        engine.stop()
-                    } else {
-                        engine.start()
-                    }
-                    isRunning = engine.isRunning()
-                    latencyMs = engine.latencyMs()
-                },
-                onNavigate  = { currentScreen = it }
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(24.dp),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            Text("Choose a graph to begin.", style = MaterialTheme.typography.headlineMedium)
+            Text("Your graph stays in this app's private storage on this phone.")
+            Button(onClick = onUseSample, modifier = Modifier.fillMaxWidth()) {
+                Text("Use the sample graph")
+            }
+            Button(onClick = onLoadFromPhone, modifier = Modifier.fillMaxWidth()) {
+                Text("Load a graph from this phone")
+            }
+            if (errorMessage != null) {
+                Text(errorMessage, color = MaterialTheme.colorScheme.error)
+            }
+            Text(
+                "Research build. Not a hearing aid. Not a medical device.",
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
-    modifier: Modifier = Modifier,
-    isRunning: Boolean,
-    latencyMs: Float,
-    onToggle: () -> Unit,
-    onNavigate: (String) -> Unit
+private fun GraphReadyScreen(
+    audiogram: Audiogram,
+    onLoadAnotherGraph: () -> Unit,
+    errorMessage: String?
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        // --- Start / Stop button -------------------------------------------
-        Button(onClick = onToggle) {
-            Text(if (isRunning) "Stop Audio" else "Start Audio")
-        }
+    val context = LocalContext.current
+    val vibrator = context.getSystemService(Vibrator::class.java)
+    val scope = rememberCoroutineScope()
+    var isTesting by remember { mutableStateOf(false) }
+    var activePattern by remember { mutableStateOf<String?>(null) }
+    var vibrationUnavailable by remember { mutableStateOf(false) }
 
-        Spacer(modifier = Modifier.height(16.dp))
+    DisposableEffect(vibrator) {
+        onDispose { vibrator?.cancel() }
+    }
 
-        // --- Latency readout -----------------------------------------------
-        // Target: < 80 ms round-trip. Updated after each toggle.
-        Text(
-            text = "Latency: ${"%.1f".format(latencyMs)} ms",
-            style = MaterialTheme.typography.bodyLarge
-        )
+    Scaffold(
+        topBar = { TopAppBar(title = { Text("OpenHear") }) }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(24.dp),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.spacedBy(18.dp)
+        ) {
+            Text("Your graph is loaded", style = MaterialTheme.typography.headlineMedium)
+            Text(
+                AudiogramLoader.describeGraph(audiogram),
+                style = MaterialTheme.typography.bodyLarge
+            )
 
-        Spacer(modifier = Modifier.height(32.dp))
+            Button(
+                onClick = {
+                    if (vibrator == null || !vibrator.hasVibrator()) {
+                        vibrationUnavailable = true
+                    } else {
+                        vibrationUnavailable = false
+                        scope.launch {
+                            isTesting = true
+                            try {
+                                HAPTIC_PATTERNS.forEach { pattern ->
+                                    activePattern = pattern.label
+                                    vibrator.cancel()
+                                    vibrator.vibrate(pattern.toEffect())
+                                    delay(pattern.durationMs + HAPTIC_GAP_MS)
+                                }
+                            } finally {
+                                vibrator.cancel()
+                                activePattern = null
+                                isTesting = false
+                            }
+                        }
+                    }
+                },
+                enabled = !isTesting,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Test vibration")
+            }
 
-        // --- Navigation to sub-screens -------------------------------------
-        // TODO: Replace with Jetpack Navigation component.
-        TextButton(onClick = { onNavigate("audiogram") }) {
-            Text("Audiogram")
-        }
-        TextButton(onClick = { onNavigate("dsp") }) {
-            Text("DSP Settings")
-        }
-        TextButton(onClick = { onNavigate("learn") }) {
-            Text("Learn (thumbs up/down)")
+            Text("Door — one short pulse, then one long pulse")
+            Text("Alarm — three evenly spaced short pulses")
+            Text("Voice — one long pulse, then two short pulses")
+
+            Text(
+                text = activePattern?.let { "Now vibrating: $it" }
+                    ?: "The test plays Door, Alarm, then Voice.",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            if (vibrationUnavailable) {
+                Text("Vibration isn't available on this phone.", color = MaterialTheme.colorScheme.error)
+            }
+            if (errorMessage != null) {
+                Text(errorMessage, color = MaterialTheme.colorScheme.error)
+            }
+
+            TextButton(onClick = onLoadAnotherGraph) {
+                Text("Load a different graph from this phone")
+            }
         }
     }
 }
 
-/** Temporary placeholder for screens that haven't been built yet. */
-@Composable
-fun PlaceholderScreen(title: String, onBack: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(title, style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
-        TextButton(onClick = onBack) { Text("← Back") }
+private data class HapticPattern(
+    val label: String,
+    private val timingsMs: LongArray,
+    private val amplitude: Int = MODEST_HAPTIC_AMPLITUDE
+) {
+    val durationMs: Long = timingsMs.sum()
+
+    fun toEffect(): VibrationEffect {
+        val amplitudes = IntArray(timingsMs.size) { index ->
+            if (index % 2 == 0) 0 else amplitude
+        }
+        return VibrationEffect.createWaveform(timingsMs, amplitudes, -1)
     }
 }
+
+private const val MODEST_HAPTIC_AMPLITUDE = 40
+private const val HAPTIC_GAP_MS = 240L
+
+private val HAPTIC_PATTERNS = listOf(
+    HapticPattern(
+        label = "Door",
+        timingsMs = longArrayOf(0, 100, 100, 240)
+    ),
+    HapticPattern(
+        label = "Alarm",
+        timingsMs = longArrayOf(0, 70, 80, 70, 80, 70)
+    ),
+    HapticPattern(
+        label = "Voice",
+        timingsMs = longArrayOf(0, 220, 120, 90, 100, 90)
+    )
+)

@@ -10,7 +10,8 @@
 
 OpenHear's Android research app. The first-run screen works without sound:
 choose the bundled sample graph or load a JSON graph from the phone, read a
-short graph description, and test three labelled vibration patterns.
+short graph description, and test labelled Door, Traffic, and Alarm vibration
+patterns. A loaded graph can be cleared from the phone in one tap.
 
 The selected graph is copied to the app's private internal files as
 `audiogram.json`. It is not uploaded, and this app does not request an account
@@ -33,10 +34,10 @@ hearing-aid processing.
 | **DSP** | On-device feedback cancellation (LMS) | ✅ skeleton |
 | **DSP** | Own-voice detection bypass | ✅ skeleton |
 | **DSP** | Safety limiter (hard clip at 0 dBFS) | ✅ skeleton |
-| **Audiogram** | Load sample or phone JSON graph; private local storage | ✅ first-run flow |
+| **Audiogram** | Load sample or phone graph; private storage and one-tap clear | ✅ first-run flow |
 | **Audiogram** | Visual audiogram editor | 🔲 planned |
 | **Learn** | Thumbs-up/down preference learner (v1) | ✅ skeleton |
-| **Haptics** | Door, Alarm, and Voice phone vibration test | ✅ first-run flow |
+| **Haptics** | Door, Traffic, and Alarm phone vibration test | ✅ first-run flow |
 | **Learn** | TinyML preference model (v2) | 🔲 roadmap |
 | **Bluetooth** | ASHA streaming | 🔲 planned |
 | **Bluetooth** | Classic A2DP / HFP streaming | 🔲 planned |
@@ -121,12 +122,18 @@ the `left_ear` / `right_ear` threshold-list format used by
 }
 ```
 
-On first launch, choose **Use the sample graph** or **Load a graph from this
-phone**. A valid graph is copied into app-private internal storage. There is no
+On first launch, the app says it can vibrate for sounds the user cannot hear,
+then offers **Use the sample graph** or **Load a graph from this phone**. A
+valid graph is copied into app-private internal storage. **Clear graph from
+this phone** deletes that local copy and returns to first run. There is no
 network upload, account, or shared-storage access.
 
-The on-screen text is a simplified description of the graph and possible
-speech-sound cues; it is not a diagnosis or a hearing-aid fitting.
+The on-screen line is derived from the selected graph's thresholds and uses
+broad frequency bands to flag the requested sound groups. It does not predict
+real-world audibility, diagnose, or fit a hearing aid. Event groups are flagged
+when the worse-ear mean for their band is at least 25 dB HL. A complete worse-
+ear average at 500, 1000, and 2000 Hz of 90 dB HL or more uses the wording
+“most of these sit above the line.”
 
 ## Safety Disclaimer
 

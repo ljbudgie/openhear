@@ -110,6 +110,11 @@ fun OpenHearApp() {
             onLoadAnotherGraph = {
                 graphPicker.launch(arrayOf("application/json", "text/json", "text/plain", "*/*"))
             },
+            onClearGraph = {
+                AudiogramLoader.clearStoredGraph(context)
+                audiogram = null
+                errorMessage = null
+            },
             errorMessage = errorMessage
         )
     }
@@ -122,9 +127,7 @@ private fun FirstRunScreen(
     onUseSample: () -> Unit,
     onLoadFromPhone: () -> Unit
 ) {
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("OpenHear") }) }
-    ) { innerPadding ->
+    Scaffold { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -134,8 +137,11 @@ private fun FirstRunScreen(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            Text("Choose a graph to begin.", style = MaterialTheme.typography.headlineMedium)
-            Text("Your graph stays in this app's private storage on this phone.")
+            Text(
+                "Research build. Not a hearing aid. Not a medical device.",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text("This phone can vibrate for sounds you cannot hear.")
             Button(onClick = onUseSample, modifier = Modifier.fillMaxWidth()) {
                 Text("Use the sample graph")
             }
@@ -145,10 +151,6 @@ private fun FirstRunScreen(
             if (errorMessage != null) {
                 Text(errorMessage, color = MaterialTheme.colorScheme.error)
             }
-            Text(
-                "Research build. Not a hearing aid. Not a medical device.",
-                style = MaterialTheme.typography.bodyMedium
-            )
         }
     }
 }
@@ -158,6 +160,7 @@ private fun FirstRunScreen(
 private fun GraphReadyScreen(
     audiogram: Audiogram,
     onLoadAnotherGraph: () -> Unit,
+    onClearGraph: () -> Unit,
     errorMessage: String?
 ) {
     val context = LocalContext.current
@@ -219,12 +222,12 @@ private fun GraphReadyScreen(
             }
 
             Text("Door — one short pulse, then one long pulse")
-            Text("Alarm — three evenly spaced short pulses")
-            Text("Voice — one long pulse, then two short pulses")
+            Text("Traffic — a slow double pulse")
+            Text("Alarm — three short pulses")
 
             Text(
                 text = activePattern?.let { "Now vibrating: $it" }
-                    ?: "The test plays Door, Alarm, then Voice.",
+                    ?: "The test plays Door, Traffic, then Alarm.",
                 style = MaterialTheme.typography.bodyLarge
             )
             if (vibrationUnavailable) {
@@ -236,6 +239,9 @@ private fun GraphReadyScreen(
 
             TextButton(onClick = onLoadAnotherGraph) {
                 Text("Load a different graph from this phone")
+            }
+            TextButton(onClick = onClearGraph) {
+                Text("Clear graph from this phone")
             }
         }
     }
@@ -265,11 +271,11 @@ private val HAPTIC_PATTERNS = listOf(
         timingsMs = longArrayOf(0, 100, 100, 240)
     ),
     HapticPattern(
-        label = "Alarm",
-        timingsMs = longArrayOf(0, 70, 80, 70, 80, 70)
+        label = "Traffic",
+        timingsMs = longArrayOf(0, 180, 200, 180)
     ),
     HapticPattern(
-        label = "Voice",
-        timingsMs = longArrayOf(0, 220, 120, 90, 100, 90)
+        label = "Alarm",
+        timingsMs = longArrayOf(0, 70, 80, 70, 80, 70)
     )
 )

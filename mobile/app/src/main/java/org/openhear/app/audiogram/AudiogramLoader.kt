@@ -105,38 +105,45 @@ object AudiogramLoader {
         return audiogram
     }
 
+    /** Delete the selected graph from app-private internal storage. */
+    fun clearStoredGraph(context: Context): Boolean =
+        context.deleteFile(PRIVATE_GRAPH_FILENAME)
+
     /**
-     * A short, approximate description of the graph and speech cues that may
-     * sit above its thresholds. This describes the graph; it is not a diagnosis.
+     * Describe the graph and flag requested sound groups using only its
+     * thresholds. The frequency bands are a simplified graph reading, not a
+     * prediction of real-world audibility or a diagnosis.
      */
     fun describeGraph(audiogram: Audiogram): String {
         val low = meanThreshold(audiogram, LOW_FREQUENCIES)
         val high = meanThreshold(audiogram, HIGH_FREQUENCIES)
         val slope = if (low != null && high != null) high - low else null
         val shape = when {
-            slope == null -> "The graph needs more low- and high-pitch points to show its shape"
+            slope == null -> "The graph's shape can't be shown from the available points"
             slope >= 10f -> "The graph slopes toward higher pitches"
             slope <= -10f -> "The graph slopes toward lower pitches"
             else -> "The graph is fairly level from low to high pitches"
         }
 
-        val speechCues = mutableListOf<String>()
-        if (worseEarMean(audiogram, LOW_FREQUENCIES)?.let { it >= SPEECH_CUE_THRESHOLD_DB } == true) {
-            speechCues += "lower vowels and voice sounds"
-        }
-        if (worseEarMean(audiogram, MID_FREQUENCIES)?.let { it >= SPEECH_CUE_THRESHOLD_DB } == true) {
-            speechCues += "/sh/, /t/ and /k/"
-        }
-        if (worseEarMean(audiogram, HIGH_FREQUENCIES)?.let { it >= SPEECH_CUE_THRESHOLD_DB } == true) {
-            speechCues += "/s/, /f/ and /th/"
-        }
+        val cuesAboveLine = listOf(
+            "knock" to KNOCK_FREQUENCIES,
+            "traffic" to TRAFFIC_FREQUENCIES,
+            "a voice at the door" to VOICE_FREQUENCIES,
+            "/s/, /f/ and /th/" to FRICATIVE_FREQUENCIES
+        ).filter { (_, frequencies) ->
+            worseEarMean(audiogram, frequencies)
+                ?.let { it >= SPEECH_CUE_THRESHOLD_DB } == true
+        }.map { (label, _) -> label }
 
-        val cueDescription = if (speechCues.isEmpty()) {
-            "This simplified view doesn't flag a speech-sound group above the line"
-        } else {
-            "${speechCues.joinToString(", ")} may sit above the line"
+        val cueDescription = when {
+            worseEarPta(audiogram)?.let { it >= PROFOUND_PTA_DB } == true ->
+                "most of these sit above the line"
+            cuesAboveLine.isEmpty() ->
+                "none of these are flagged above the line"
+            else ->
+                "above the line: ${cuesAboveLine.joinToString(", ")}"
         }
-        return "$shape; $cueDescription (graph description only, not a diagnosis)."
+        return "$shape; $cueDescription; graph description only, not a diagnosis."
     }
 
     /**
@@ -227,11 +234,23 @@ object AudiogramLoader {
         }.maxOrNull()
     }
 
+    private fun worseEarPta(audiogram: Audiogram): Float? =
+        listOf(audiogram.left, audiogram.right).mapNotNull { ear ->
+            val values = PTA_FREQUENCIES.mapNotNull { ear[it] }
+            values.takeIf { it.size == PTA_FREQUENCIES.size }
+                ?.average()
+                ?.toFloat()
+        }.maxOrNull()
+
     private fun Map<Int, Float>.valuesFor(frequencies: List<Int>): List<Float> =
         frequencies.mapNotNull { this[it] }
 
     private val LOW_FREQUENCIES = listOf(250, 500, 750)
-    private val MID_FREQUENCIES = listOf(1000, 1500, 2000, 3000)
     private val HIGH_FREQUENCIES = listOf(4000, 6000, 8000)
+    private val KNOCK_FREQUENCIES = listOf(250, 500, 750)
+    private val TRAFFIC_FREQUENCIES = listOf(250, 500, 750, 1000)
+    private val VOICE_FREQUENCIES = listOf(500, 1000, 1500, 2000, 3000)
+    private val FRICATIVE_FREQUENCIES = listOf(2000, 3000, 4000, 6000, 8000)
     private const val SPEECH_CUE_THRESHOLD_DB = 25f
+    private const val PROFOUND_PTA_DB = 90f
 }

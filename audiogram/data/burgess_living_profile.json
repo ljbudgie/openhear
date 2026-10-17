@@ -5,7 +5,7 @@
   "schema_description": "Living Hearing Profile \u2014 sovereign, user-owned, versioned hearing data. Extends openhear-audiogram-v1 with preference, context, haptic and history layers.",
   "subject": "Lewis Burgess",
   "created": "2021-10-20",
-  "last_updated": "2026-08-25",
+  "last_updated": "2026-10-17",
   "clinical_core": {
     "locked": true,
     "comment": "Immutable clinical measurements. Append only via history layer; never mutate in place.",
@@ -521,6 +521,17 @@
           "preference_layer",
           "context_map",
           "haptic_layer",
+          "history"
+        ]
+      },
+      {
+        "version": 10,
+        "timestamp": "2026-10-17T22:00:00Z",
+        "author": "Lewis Burgess",
+        "change_type": "clinical_baseline_confirmation",
+        "description": "Dorothy Thomson confirmed in writing that the 2021-10-20 audiogram is a valid baseline. She retired in July 2026. The baseline is attributable to a named clinician. Clinical core left unchanged; this fact is recorded in the history layer only.",
+        "sha256": "f8f7b16fb54648ca4fe0ea42fceb9ad48dbc53c979a31afc1a8e7f867b271dd0",
+        "layers_changed": [
           "history"
         ]
       }

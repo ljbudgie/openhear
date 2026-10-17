@@ -248,7 +248,9 @@ The hearing aid industry's business model depends on the user not being able to 
 
 ### Regulatory pathway
 
-The only intended-purpose statement is in [`docs/INTENDED_PURPOSE.md`](docs/INTENDED_PURPOSE.md). OpenHear is a research platform that turns the wearer's own audiogram into haptic patterns for environmental sound awareness. It is not a certified medical device. This file does not assert a Class I or Class IIa classification. A future clinical claim would update the intended-purpose file first, and every other file would follow it.
+The system enters the world as a **companion device** — running alongside existing hearing aids, augmenting them, doing nothing the aids themselves do. This is the position the current OpenHear pipeline and wristband already occupy and it requires no clinical claim to be made.
+
+The standalone configuration — wristband plus bone conduction receiver, replacing the hearing aid entirely — is the longer pathway. The regulatory target for the standalone device in the United Kingdom is **UK MDR 2002 Class IIa**, the same classification carried by conventional air-conduction hearing aids. Clinical evidence accumulates first; the claim follows.
 
 ### Collaboration
 
@@ -438,9 +440,15 @@ Enforcement is not a policy promise; it is built in:
 
 ### Regulatory pathway — sensory substitution, not hearing aid
 
-The only intended-purpose statement is in [`docs/INTENDED_PURPOSE.md`](docs/INTENDED_PURPOSE.md). OpenHear is a research platform for environmental sound awareness through haptics. It is not a certified medical device. This file does not assert a classification. Neosensory Buzz and BrainPort are cited as prior art for sensory substitution, not as a claim that OpenHear shares their regulatory status.
+Regulatory classification follows mechanism, not indication. The aids-free OpenHear has the same mechanism as Neosensory Buzz and BrainPort, both of which are cleared as sensory substitution devices, not hearing aids.
 
-The fastest credible path: bench validation in months → single-user adaptation log (publicly, by the developer) → multi-user pilot (n≈20) in year 1 → controlled trial in year 2. Open data at every stage. A regulatory submission, if any, follows the intended-purpose file.
+| Jurisdiction | Likely classification                                              | Comparator predicate                                |
+|---|---|---|
+| **UK (MHRA)** | UK MDR 2002 — Class I (initial), Class IIa if claims tighten      | Neosensory Buzz                                     |
+| **US (FDA)**  | 510(k) Class II, sensory substitution                              | Neosensory Buzz, BrainPort Vision Pro              |
+| **EU (MDR)**  | Class I or IIa under MDR 2017/745                                  | Same                                                 |
+
+The fastest credible path: bench validation in months → single-user adaptation log (publicly, by the developer) → multi-user pilot (n≈20) in year 1 → controlled trial in year 2 → submission in year 3. Open data at every stage.
 
 ### Open hardware path
 
@@ -636,7 +644,7 @@ The wristband is not permanently a companion to hearing aids. It is the first st
 - **Somatosensory substitution** becomes the delivery path: the skin carries structured auditory information and the brain learns to read it.
 - Where a minimal early receiver is useful, the system supports a coin-sized bone-conduction transducer behind the ear, driven wirelessly from the wristband, with no ear canal blockage and no clinic-gated fitting lock.
 - The hardware stack is open from chip level upward: **RISC-V**, custom FPGA validation, and community-contributed hardware designs.
-- The regulatory path starts as a companion device beside existing aids and builds toward standalone replacement as evidence accumulates, Classification is not asserted here. See docs/INTENDED_PURPOSE.md.
+- The regulatory path starts as a companion device beside existing aids. Classification is not asserted here. See docs/INTENDED_PURPOSE.md.
 
 ## Pillar 3 — Peak Hearing for All Users
 

@@ -7,6 +7,9 @@
 
 Phone, ten minutes, no GitHub. That page is the front door.
 
+**The only intended-purpose statement:**
+→ [`docs/INTENDED_PURPOSE.md`](INTENDED_PURPOSE.md)
+
 OpenHear is a sovereign audiology advocacy framework built on the
 Burgess Principle. The rest of this index routes everyone else.
 
@@ -48,6 +51,7 @@ direction.
 
 ## I am a regulator or auditor
 
+→ [`docs/INTENDED_PURPOSE.md`](INTENDED_PURPOSE.md) *(the only claim)*
 → [`docs/BURGESS_PRINCIPLE.md`](BURGESS_PRINCIPLE.md) *(the five commitments)*
 → [`docs/SOVEREIGN_PHILOSOPHY.md`](SOVEREIGN_PHILOSOPHY.md) *(design rationale)*
 → [`NOTICE`](../NOTICE) *(legal attribution and integration invariants)*

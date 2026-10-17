@@ -97,4 +97,4 @@ The best contributions come from people who wear hearing aids and know what is b
 ---
 
 *OpenHear, 2026*
-*MIT Licensed — copy, share, translate, improve.*
+*Apache 2.0 Licensed — copy, share, translate, improve.*

@@ -241,7 +241,7 @@ A desktop pipeline requires a laptop, a USB dongle, and a room. It is sovereignt
 
 The phone is:
 - Owned by you (not leased, not subscribed)
-- Running open-source code (MIT licensed, inspectable)
+- Running open-source code (Apache 2.0 licensed, inspectable)
 - Processing audio locally (no network required)
 - Storing your audiogram in open JSON format (no proprietary lock)
 - Adjustable by you, at any time, in any place
@@ -304,5 +304,5 @@ Assert it.
 ---
 
 *Lewis Burgess, 2026*
-*MIT Licensed — copy, share, translate, assert.*
+*Apache 2.0 Licensed — copy, share, translate, assert.*
 *This document is a companion to <a href="https://github.com/ljbudgie/Burgessprinciple">The Burgess Principle</a> and an extension of `SOVEREIGN_AUDIO.md`.*

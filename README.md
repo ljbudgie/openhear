@@ -51,7 +51,7 @@ OpenHear is a human sensory sovereignty platform — not a hearing aid, not a we
 
 ## Why OpenHear in 2026
 
-Commercial aids from Phonak, Signia, and Starkey still ship with proprietary AI that mangles your own voice, whistles during hugs, and dies in sweat. Replacements cost £3,000–£8,000 and lock you into manufacturer fitting software. OpenHear is the sovereign alternative: an open-source DSP pipeline with adaptive feedback cancellation, own-voice bypass, and sweat-proof 3D-printed ITE shells you manufacture at home. Every algorithm is inspectable. Every parameter is yours. No cloud. No subscription. No lock-in. Licensed under Apache 2.0 with a Sovereign Use Addendum (see [`LICENSE`](LICENSE)).
+Commercial aids from Phonak, Signia, and Starkey still ship with proprietary AI that mangles your own voice, whistles during hugs, and dies in sweat. Replacements cost £3,000–£8,000 and lock you into manufacturer fitting software. OpenHear is a research platform for environmental sound awareness through haptics, shaped by your own audiogram. See [docs/INTENDED_PURPOSE.md](docs/INTENDED_PURPOSE.md). It is not a hearing aid. The open-source DSP pipeline, with adaptive feedback cancellation, own-voice bypass, and sweat-proof 3D-printed ITE shells you manufacture at home, is how the awareness is built. Every algorithm is inspectable. Every parameter is yours. No cloud. No subscription. No lock-in. Licensed under Apache 2.0 with a Sovereign Use Addendum (see [`LICENSE`](LICENSE)).
 
 ---
 

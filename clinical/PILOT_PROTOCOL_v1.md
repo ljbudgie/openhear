@@ -76,16 +76,22 @@ all analyses are estimative with 95 % CIs (see SAP §3).
 **Inclusion criteria.**
 
 1. Age ≥ 18.
-2. Self-reported, audiologist-confirmed bilateral mild-to-moderate
-   sensorineural hearing loss (PTA 26–55 dB HL), or profound loss with
-   residual tactile awareness.
-3. Capacity to give informed consent.
-4. Able to wear a wristband for the session duration.
+2. Self-reported, audiologist-confirmed severe-to-profound sensorineural
+   hearing loss (PTA ≥ 71 dB HL), or residual hearing where environmental
+   sounds such as a doorbell or alarm are not reliably heard without an
+   aid.
+3. People who remove their aids for part of the day (for example at
+   night) are included. That is the use case the wristband is for.
+4. Capacity to give informed consent.
+5. Able to wear a wristband for the session duration.
 
 **Exclusion criteria.**
 
-1. Active skin condition at the wrist that would make vibration unsafe.
-2. Inability to attend two in-person sessions in one week.
+1. Mild or moderate loss only (PTA < 71 dB HL), where environmental
+   sounds are already reliably heard without an aid. That group is not
+   the intended purpose.
+2. Active skin condition at the wrist that would make vibration unsafe.
+3. Inability to attend two in-person sessions in one week.
 
 **Sample size.** n = 20. This is a feasibility pilot, not a
 hypothesis-testing trial; n = 20 is sufficient to estimate hit rate and
@@ -191,3 +197,4 @@ before recruitment opens.
 |---------|------|--------|--------|
 | v1 (draft) | 2026-05-XX | OpenHear team | Initial public draft for partner review. |
 | v1 amended | 2026-10-17 | OpenHear team | Primary endpoint changed from QuickSIN vs own aid to hit rate and false-alert rate, to match docs/INTENDED_PURPOSE.md. |
+| v1 amended | 2026-10-17 | OpenHear team | Inclusion criteria changed to severe-to-profound (PTA ≥ 71 dB HL) and people who remove aids, matching the intended purpose. |

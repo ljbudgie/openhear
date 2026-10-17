@@ -1,6 +1,6 @@
 # Evaluation — awareness, not hearing restoration
 
-This page is for a funder or a clinic. A first-time user does not need it. Start at [START_HERE.md](../START_HERE.md).
+This page is for a funder or a clinic. A first-time user does not need it. Start at [START_HERE.md](../START_HERE.md). The claim these endpoints must match is [docs/INTENDED_PURPOSE.md](INTENDED_PURPOSE.md).
 
 Health Innovation NENC (September 2026) said the remaining job is evidence that this implementation delivers meaningful benefit in real use. This is the smallest study that answers that, without claiming treatment.
 
@@ -35,4 +35,4 @@ Classes only:
 
 A result is a count of hits, misses, and false alerts. It is not a clinical claim.
 
-OpenHear remains an environmental sound awareness tool. It is not a medical device.
+OpenHear remains an environmental sound awareness tool. It is not a certified medical device. See [docs/INTENDED_PURPOSE.md](INTENDED_PURPOSE.md).

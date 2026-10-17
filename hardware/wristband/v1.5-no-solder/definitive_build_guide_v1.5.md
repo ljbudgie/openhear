@@ -1,6 +1,6 @@
 # 🛠️ OpenHear v1.5 — The Definitive No-Solder Wristband Build Guide
 
-This is engineered so you succeed. Two profiles. One weekend. >95% first-try success rate, validated across 50,000 simulated builds.
+This is engineered so you succeed. Two profiles. One weekend. Modelled across simulated builds; real-world first-try success rate not yet measured.
 
 ## 📋 Before You Start (5-minute sanity check)
 

@@ -2,7 +2,7 @@
 
 You do not need to install anything.
 
-OpenHear is a research project, not a certified hearing aid, and not a medical device. It does not replace your audiologist or a cochlear implant. It does not amplify sound. It tells you a sound happened — doorbell, alarm, traffic, animal, media, or silence — through a vibration, if you later want that. Start quiet if you later try any sound path. Your graph is yours. Nothing here should upload it to a company cloud unless *you* choose to paste it into a tool you already use.
+**Intended purpose:** see [docs/INTENDED_PURPOSE.md](docs/INTENDED_PURPOSE.md). That file is the only claim. OpenHear is a research platform that turns your audiogram into haptic patterns for environmental sound awareness. It is not a certified medical device, not a hearing aid, and not a replacement for clinical care. It does not amplify sound. It tells you a sound happened — doorbell, alarm, traffic, animal, media, or silence — through a vibration, if you later want that. Start quiet if you later try any sound path. Your graph is yours. Nothing here should upload it to a company cloud unless *you* choose to paste it into a tool you already use.
 
 ## What this is, in one sentence
 
@@ -41,7 +41,7 @@ People who already use Python can run the open explainer on a JSON audiogram:
 python -m dsp.explain_cli examples/sample_audiogram.json
 ```
 
-That uses `dsp/explain.py`. It is an explanation of a fitting you own, not a medical device.
+That uses `dsp/explain.py`. It is an explanation of a fitting you own, not a medical device. See [docs/INTENDED_PURPOSE.md](docs/INTENDED_PURPOSE.md).
 
 ## Three doors after that
 

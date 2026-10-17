@@ -190,4 +190,4 @@ This is an open-source project. Every contribution makes the next person's shell
 ---
 
 *This module is part of [OpenHear](../../README.md) — sovereign audio for sovereign people.*
-*MIT Licensed. Copy, share, improve, assert.*
+*Apache 2.0 Licensed. Copy, share, improve, assert.*

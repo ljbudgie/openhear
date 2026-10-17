@@ -53,7 +53,7 @@ Move from the Tympan development board to a custom PCB designed specifically for
 - [ ] Integrated MPO limiter on-board (no external circuit needed)
 - [ ] Same Teensy 4.1 processor or equivalent ARM Cortex-M7
 - [ ] Lower power consumption through optimised power management
-- [ ] Open hardware licence: CERN OHL-P (permissive)
+- [ ] Open hardware licence: CERN-OHL-S (share-alike)
 - [ ] Gerber files published for community fabrication
 - [ ] PCB cost target: under £40 per board at quantity 10
 - [ ] Tympan Library compatibility maintained (same Arduino sketch runs on both)

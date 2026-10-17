@@ -2,7 +2,7 @@
 // This file is part of OpenHear, an open-source hearing aid project.
 // It has not been evaluated by any regulatory body. Consult an audiologist
 // before using any hearing device. Use at your own risk.
-// License: MIT
+// License: MIT OR Apache-2.0
 //
 // parametric_shell.scad — Parametric ITE (In-The-Ear) Hearing Aid Shell
 // =====================================================================

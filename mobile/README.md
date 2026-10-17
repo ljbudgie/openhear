@@ -2,7 +2,7 @@
 
 <!-- ⚠️ EXPERIMENTAL — NOT A MEDICAL DEVICE -->
 <!-- Consult an audiologist before using any hearing device. -->
-<!-- Use at your own risk. MIT Licensed. -->
+<!-- Use at your own risk. Apache 2.0 Licensed. -->
 
 > **⚠️ EXPERIMENTAL — NOT A MEDICAL DEVICE**
 > Consult an audiologist before using any hearing device.
@@ -123,4 +123,4 @@ hearing-assistance tool. Incorrect settings can damage hearing.
 
 ## License
 
-MIT — see [LICENSE](../LICENSE) in the repository root.
+Apache 2.0 — see [LICENSE](../LICENSE) in the repository root.

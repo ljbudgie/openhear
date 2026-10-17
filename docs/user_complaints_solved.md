@@ -73,9 +73,9 @@ You are not a patient. You are an engineer with a hearing loss. Act accordingly.
 >
 > Hearing loss is a medical condition. Consult a qualified audiologist before making any changes to your hearing aid configuration. Incorrect amplification settings can cause discomfort or, in extreme cases, further hearing damage. Always start with conservative gain values and increase gradually.
 >
-> The solutions described in this document are technical implementations, not clinical recommendations. They are provided as-is under the MIT licence. Use at your own risk.
+> The solutions described in this document are technical implementations, not clinical recommendations. They are provided as-is under the Apache 2.0 licence. Use at your own risk.
 
 ---
 
 *OpenHear, 2026*
-*MIT Licensed — copy, share, translate, improve.*
+*Apache 2.0 Licensed — copy, share, translate, improve.*

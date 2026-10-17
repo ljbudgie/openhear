@@ -197,4 +197,4 @@ Every data point makes the next person's shell better. That's the point.
 ---
 
 *This module is part of [OpenHear](../../README.md) — sovereign audio for sovereign people.*
-*MIT Licensed.*
+*Apache 2.0 Licensed.*

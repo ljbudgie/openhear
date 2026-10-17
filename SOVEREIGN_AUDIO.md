@@ -201,5 +201,5 @@ Assert it.
 ---
 
 *Lewis Burgess, 2026*
-*MIT Licensed — copy, share, translate, assert.*
+*Apache 2.0 Licensed — copy, share, translate, assert.*
 *This document is a companion to <a href="https://github.com/ljbudgie/Burgessprinciple">The Burgess Principle</a>.*

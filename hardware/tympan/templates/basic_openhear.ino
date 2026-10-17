@@ -36,7 +36,7 @@
  * Audiogram source: {{AUDIOGRAM_SOURCE}}
  * Generation date: {{GENERATION_DATE}}
  *
- * License: MIT — https://github.com/ljbudgie/openhear
+ * License: MIT OR Apache-2.0 — https://github.com/ljbudgie/openhear
  * ============================================================================
  */
 

@@ -5,13 +5,13 @@
   "schema_description": "Living Hearing Profile \u2014 sovereign, user-owned, versioned hearing data. Extends openhear-audiogram-v1 with preference, context, haptic and history layers.",
   "subject": "Lewis Burgess",
   "created": "2021-10-20",
-  "last_updated": "2026-10-17",
+  "last_updated": "2026-08-25",
   "clinical_core": {
     "locked": true,
     "comment": "Immutable clinical measurements. Append only via history layer; never mutate in place.",
     "source": "Dorothy Thomson Hearing Services, 12 Southend Ave, Darlington, DL3 7HL",
     "date": "2021-10-20",
-    "notes": "Most recent verified clinical audiogram. ISQ (no significant change) from prior tests dating back to 2017-01-19. High-frequency sloping sensorineural loss \u2014 the public reference profile for OpenHear. Dorothy Thomson confirmed in writing that the 2021-10-20 audiogram is a valid baseline. She retired in July 2026. No newer clinical audiogram is held.",
+    "notes": "Most recent verified clinical audiogram. ISQ (no significant change) from prior tests dating back to 2017-01-19. High-frequency sloping sensorineural loss \u2014 the public reference profile for OpenHear.",
     "right_ear": {
       "symbol": "O",
       "thresholds": [
@@ -521,18 +521,6 @@
           "preference_layer",
           "context_map",
           "haptic_layer",
-          "history"
-        ]
-      },
-      {
-        "version": 10,
-        "timestamp": "2026-10-17T22:00:00Z",
-        "author": "Lewis Burgess",
-        "change_type": "clinical_baseline_confirmation",
-        "description": "Dorothy Thomson confirmed in writing that the 2021-10-20 audiogram is a valid baseline. She retired in July 2026. The baseline is attributable to a named clinician.",
-        "sha256": "openhear-living-v10-2026-10-17-dorothy-baseline-confirmation",
-        "layers_changed": [
-          "clinical_core",
           "history"
         ]
       }

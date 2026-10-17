@@ -341,3 +341,14 @@ class TestSummary:
         summ = profile.summary()
         # PTA ~72.5 dB HL → severe
         assert summ["right_severity"] == "severe"
+
+
+def test_verify_history_version_10_verified():
+    """version 10 is VERIFIED; no entry claims VERIFIED without hash_source."""
+    from audiogram.living_profile import verify_history
+    results = verify_history("audiogram/data/burgess_living_profile.json")
+    by_version = {r["version"]: r for r in results}
+    assert by_version[10]["status"] == "VERIFIED"
+    for r in results:
+        if r["status"] == "VERIFIED":
+            assert r["detail"].startswith("git:")

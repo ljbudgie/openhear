@@ -178,3 +178,9 @@ Its novelty lies in the simultaneous satisfaction of continuous presence, sensor
 ---
 
 *Draft for discussion and refinement.*
+
+
+## Verifying a Living Hearing Profile history
+
+Run `python -m audiogram.living_profile --verify audiogram/data/burgess_living_profile.json`.
+Entries before hashing began are marked as labels, not hashes.

@@ -2,7 +2,7 @@
   "schema": "openhear-living-profile-v1",
   "schema_version": 1,
   "format_version": "openhear-living-profile-v1",
-  "schema_description": "Living Hearing Profile \u2014 sovereign, user-owned, versioned hearing data. Extends openhear-audiogram-v1 with preference, context, haptic and history layers.",
+  "schema_description": "Living Hearing Profile — sovereign, user-owned, versioned hearing data. Extends openhear-audiogram-v1 with preference, context, haptic and history layers.",
   "subject": "Lewis Burgess",
   "created": "2021-10-20",
   "last_updated": "2026-10-17",
@@ -11,7 +11,7 @@
     "comment": "Immutable clinical measurements. Append only via history layer; never mutate in place.",
     "source": "Dorothy Thomson Hearing Services, 12 Southend Ave, Darlington, DL3 7HL",
     "date": "2021-10-20",
-    "notes": "Most recent verified clinical audiogram. ISQ (no significant change) from prior tests dating back to 2017-01-19. High-frequency sloping sensorineural loss \u2014 the public reference profile for OpenHear.",
+    "notes": "Most recent verified clinical audiogram. ISQ (no significant change) from prior tests dating back to 2017-01-19. High-frequency sloping sensorineural loss — the public reference profile for OpenHear.",
     "right_ear": {
       "symbol": "O",
       "thresholds": [
@@ -190,7 +190,7 @@
     "music_mode_treble_boost_db": 3,
     "voice_enhancement_enabled": true,
     "fatigue_aware": true,
-    "notes": "Mid-band lift for speech clarity under sloping loss. Sustained listening effort leads to switching-off. Loudness intolerance / recruitment: amplified sound can become the problem \u2014 people remove aids or change programmes even when residual environmental awareness remains. Lived-experience signal (2026-08-25): deliberate aid-out recovery time (first thing in the morning and before sleep) is a common self-management strategy; the profile and any haptic path must respect intentional quiet periods rather than treating aid-out as non-compliance. Poorly matched amplification and dual-earpiece / stereo content can trigger or worsen tinnitus \u2014 preference and media contexts should allow mono / single-sided friendly behaviour. When an Auracast clean feed is active, preference offsets still apply; aggressive room-noise strategies should step down."
+    "notes": "Mid-band lift for speech clarity under sloping loss. Sustained listening effort leads to switching-off. Loudness intolerance / recruitment: amplified sound can become the problem — people remove aids or change programmes even when residual environmental awareness remains. Lived-experience signal (2026-08-25): deliberate aid-out recovery time (first thing in the morning and before sleep) is a common self-management strategy; the profile and any haptic path must respect intentional quiet periods rather than treating aid-out as non-compliance. Poorly matched amplification and dual-earpiece / stereo content can trigger or worsen tinnitus — preference and media contexts should allow mono / single-sided friendly behaviour. When an Auracast clean feed is active, preference offsets still apply; aggressive room-noise strategies should step down."
   },
   "context_map": {
     "comment": "Situational listening presets. Expanded through 2026-08-25 with SSD spatial awareness, multi-talker processing lag, hard acoustic environments, and institutional pathway failure signals. See also docs/AURACAST.md and docs/HEARING_LOSS_AND_DEMENTIA.md.",
@@ -225,7 +225,7 @@
       },
       {
         "name": "clinical_environment",
-        "label": "Hospital ward / ICU / medical appointment \u2014 alarms + concurrent speech",
+        "label": "Hospital ward / ICU / medical appointment — alarms + concurrent speech",
         "noise_reduction_aggressiveness": 0.7,
         "beamforming_enabled": true,
         "voice_clarity_gain": 2.2,
@@ -243,12 +243,12 @@
       },
       {
         "name": "outdoors",
-        "label": "Outdoors \u2014 wind, traffic, open space",
+        "label": "Outdoors — wind, traffic, open space",
         "noise_reduction_aggressiveness": 0.65,
         "beamforming_enabled": true,
         "voice_clarity_gain": 1.8,
         "compression_ratio_override": 2.0,
-        "notes": "Lived-experience signal (SSD): reduced spatial awareness \u2014 sound from the deaf side and from behind is harder to locate; people compensate with vision near roads and cycle paths. Haptic directional or traffic cues can support safety without adding more amplified noise."
+        "notes": "Lived-experience signal (SSD): reduced spatial awareness — sound from the deaf side and from behind is harder to locate; people compensate with vision near roads and cycle paths. Haptic directional or traffic cues can support safety without adding more amplified noise."
       },
       {
         "name": "phone_call",
@@ -257,20 +257,20 @@
         "beamforming_enabled": false,
         "voice_clarity_gain": 2.0,
         "compression_ratio_override": 2.0,
-        "notes": "Streaming can work for expected strands; drops when topic shifts or multiple people speak. Lived-experience signal: processing lag \u2014 the listener works a beat behind, combining residual audio, lip-reading, and context; turn-taking is easily misjudged (uncomfortable pauses or accidental interruption). Group meetings are a common failure mode; email follow-up is sometimes the only workable alternative."
+        "notes": "Streaming can work for expected strands; drops when topic shifts or multiple people speak. Lived-experience signal: processing lag — the listener works a beat behind, combining residual audio, lip-reading, and context; turn-taking is easily misjudged (uncomfortable pauses or accidental interruption). Group meetings are a common failure mode; email follow-up is sometimes the only workable alternative."
       },
       {
         "name": "transport",
-        "label": "Public transport \u2014 announcements and carriage noise",
+        "label": "Public transport — announcements and carriage noise",
         "noise_reduction_aggressiveness": 0.75,
         "beamforming_enabled": true,
         "voice_clarity_gain": 2.0,
         "compression_ratio_override": 2.2,
-        "notes": "Platform and carriage announcements are often unusable; people rely on visual boards. Auracast deployment in transport is a high-value complement when the user\u2019s aid supports it."
+        "notes": "Platform and carriage announcements are often unusable; people rely on visual boards. Auracast deployment in transport is a high-value complement when the user’s aid supports it."
       },
       {
         "name": "home_quiet",
-        "label": "Home \u2014 quiet domestic environment",
+        "label": "Home — quiet domestic environment",
         "noise_reduction_aggressiveness": 0.2,
         "beamforming_enabled": false,
         "voice_clarity_gain": 1.5,
@@ -278,7 +278,7 @@
       },
       {
         "name": "auracast_venue",
-        "label": "Auracast / LE Audio broadcast \u2014 clean feed in a public space",
+        "label": "Auracast / LE Audio broadcast — clean feed in a public space",
         "noise_reduction_aggressiveness": 0.25,
         "beamforming_enabled": false,
         "voice_clarity_gain": 1.6,
@@ -441,7 +441,7 @@
     ]
   },
   "history": {
-    "comment": "Append-only change log with SHA-256 content commitments (Burgess Principle compatible).",
+    "comment": "Append-only change log with SHA-256 content commitments (Burgess Principle compatible). Versions 2–4 were not recorded; the log is append-only from version 5.",
     "entries": [
       {
         "version": 1,
@@ -449,10 +449,11 @@
         "author": "Lewis Burgess",
         "change_type": "clinical_audiogram_loaded",
         "description": "Initial profile from Dorothy Thomson Hearing Services audiogram 2021-10-20.",
-        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha256": "ea53ad1ecf9c686c0b92e8a6cc513f82367f10d37b62e2ded653aebed030d7de",
         "layers_changed": [
           "clinical_core"
-        ]
+        ],
+        "hash_source": "git:a9a6bebe1b9e"
       },
       {
         "version": 5,
@@ -460,13 +461,14 @@
         "author": "Lewis Burgess",
         "change_type": "major_living_advancement",
         "description": "First authentic non-placeholder commitment. Living Hearing Profile advanced from static clinical snapshot.",
-        "sha256": "openhear-living-v5-2026-08-12-rnid-panel-day-first-real-commitment",
+        "sha256": "1d4c242a038de25ed3ea9ad91c2e232b1249847ce2fddaba9f4097e440b08ca5",
         "layers_changed": [
           "preference_layer",
           "context_map",
           "haptic_layer",
           "history"
-        ]
+        ],
+        "hash_source": "git:6e24b16807b9"
       },
       {
         "version": 6,
@@ -474,13 +476,14 @@
         "author": "Lewis Burgess",
         "change_type": "lived_experience_refinement",
         "description": "Familiar voices, speech-in-noise failure, cusp-of-implant gap, listening effort / switching-off.",
-        "sha256": "openhear-living-v6-2026-08-16-familiar-voice-implant-cusp-effort",
+        "sha256": "c7800a1af270d60bfae7c6d377eb8e8ccf3be8bcaf568016d7a4b76efb275919",
         "layers_changed": [
           "preference_layer",
           "context_map",
           "haptic_layer",
           "history"
-        ]
+        ],
+        "hash_source": "git:98da64880c35"
       },
       {
         "version": 7,
@@ -488,13 +491,14 @@
         "author": "Lewis Burgess",
         "change_type": "auracast_design_relationship",
         "description": "Auracast complementary relationship; auracast_venue context. See docs/AURACAST.md.",
-        "sha256": "openhear-living-v7-2026-08-19-auracast-venue",
+        "sha256": "1db425603fb7f97d494a1753a29a7e3b7c80ba688626777949e211975049a099",
         "layers_changed": [
           "preference_layer",
           "context_map",
           "haptic_layer",
           "history"
-        ]
+        ],
+        "hash_source": "git:8063f6dbd0b0"
       },
       {
         "version": 8,
@@ -502,27 +506,29 @@
         "author": "Lewis Burgess",
         "change_type": "lived_experience_refinement",
         "description": "Loudness intolerance, multi-talker failure, social/professional avoidance, medical appointment difficulty. docs/HEARING_LOSS_AND_DEMENTIA.md added.",
-        "sha256": "openhear-living-v8-2026-08-19-loudness-intolerance-multitalker-overload",
+        "sha256": "9da3181524e155397f43d41c9ddc60202c70d92c3a51ee688954a6b8b4d978c4",
         "layers_changed": [
           "preference_layer",
           "context_map",
           "haptic_layer",
           "history"
-        ]
+        ],
+        "hash_source": "git:a3ac75c3a7df"
       },
       {
         "version": 9,
         "timestamp": "2026-08-25T13:00:00Z",
         "author": "Lewis Burgess",
         "change_type": "lived_experience_refinement",
-        "description": "Incorporated detailed RNID-panel lived experience (sudden-onset single-sided deafness, long NHS-then-private pathway): (1) spatial awareness loss \u2014 \u2018bubble\u2019, reduced rear/deaf-side localisation, visual compensation near roads; (2) conversation processing lag and turn-taking misjudgement in multi-person meetings; (3) tinnitus triggered by unmatched amplification and dual-earpiece/stereo content \u2014 mono/single-sided friendly media behaviour; (4) deliberate aid-out recovery time (morning / before sleep) as legitimate self-management, not non-compliance; (5) hard acoustic environments (schools, tiled corridors) where environmental modification matters; (6) institutional pattern of full needs review then ignore \u2014 reinforces citizen-owned Living Hearing Profile as the record that cannot be discarded between appointments; (7) Auracast chicken-and-egg and unusable platform announcements reinforced in transport and auracast_venue notes. Preference, context, and haptic layers updated.",
-        "sha256": "openhear-living-v9-2026-08-25-ssd-spatial-processing-lag-tinnitus-aidout",
+        "description": "Incorporated detailed RNID-panel lived experience (sudden-onset single-sided deafness, long NHS-then-private pathway): (1) spatial awareness loss — ‘bubble’, reduced rear/deaf-side localisation, visual compensation near roads; (2) conversation processing lag and turn-taking misjudgement in multi-person meetings; (3) tinnitus triggered by unmatched amplification and dual-earpiece/stereo content — mono/single-sided friendly media behaviour; (4) deliberate aid-out recovery time (morning / before sleep) as legitimate self-management, not non-compliance; (5) hard acoustic environments (schools, tiled corridors) where environmental modification matters; (6) institutional pattern of full needs review then ignore — reinforces citizen-owned Living Hearing Profile as the record that cannot be discarded between appointments; (7) Auracast chicken-and-egg and unusable platform announcements reinforced in transport and auracast_venue notes. Preference, context, and haptic layers updated.",
+        "sha256": "7561df511f3d3c41536701f65c9e2e715be777d0b9e2730735850155abc60761",
         "layers_changed": [
           "preference_layer",
           "context_map",
           "haptic_layer",
           "history"
-        ]
+        ],
+        "hash_source": "git:ef12bd4cc589"
       },
       {
         "version": 10,
@@ -530,10 +536,11 @@
         "author": "Lewis Burgess",
         "change_type": "clinical_baseline_confirmation",
         "description": "Dorothy Thomson confirmed in writing that the 2021-10-20 audiogram is a valid baseline. She retired in July 2026. The baseline is attributable to a named clinician. Clinical core left unchanged; this fact is recorded in the history layer only.",
-        "sha256": "f8f7b16fb54648ca4fe0ea42fceb9ad48dbc53c979a31afc1a8e7f867b271dd0",
+        "sha256": "a1d48817f609b8bad0a180bb098fd3be81764b12899dac09ec7eb224432c4cc9",
         "layers_changed": [
           "history"
-        ]
+        ],
+        "hash_source": "git:22ece33ff1a6"
       }
     ]
   },

@@ -258,4 +258,4 @@ support placement, and suction-cupping risk.
 *Next: [sweat-proofing.md](sweat-proofing.md) — protect your finished shell from moisture and earwax.*
 
 *This module is part of [OpenHear](../../README.md) — sovereign audio for sovereign people.*
-*MIT Licensed.*
+*Apache 2.0 Licensed.*

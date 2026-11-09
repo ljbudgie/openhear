@@ -66,6 +66,9 @@ jobs:
             --markdown awareness_bench_report.md > /dev/null
           cat awareness_bench_report.md >> "$GITHUB_STEP_SUMMARY"
           cat awareness_bench_report.md
+          echo "-----BEGIN REPORT JSON-----"
+          python -c "import json;print(json.dumps(json.load(open('awareness_bench_report.json')),sort_keys=True,separators=(',',':')))"
+          echo "-----END REPORT JSON-----"
 
       - name: Upload report
         uses: actions/upload-artifact@v4

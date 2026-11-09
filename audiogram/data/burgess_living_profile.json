@@ -541,6 +541,20 @@
           "history"
         ],
         "hash_source": "git:22ece33ff1a6"
+      },
+      {
+        "version": 11,
+        "timestamp": "2026-11-09T22:00:00Z",
+        "author": "Lewis Burgess",
+        "change_type": "tinnitus_preference_rewording",
+        "description": "Reworded two notes on dual-earpiece listening and tinnitus as one person's reported preference, not general advice, following written feedback from Tinnitus UK (20 October 2026). Clinical core left unchanged. Earlier history entries left as written.",
+        "sha256": "05ee801f3c2d9991d4bff5f37c78da128510492da0ea7d69b87ed7d1d7e7fb91",
+        "layers_changed": [
+          "preference_layer",
+          "context_map",
+          "history"
+        ],
+        "hash_source": "git:837059bb5fc6"
       }
     ]
   },

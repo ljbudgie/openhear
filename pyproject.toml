@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openhear"
-version = "1.4.0"
-description = "Open, user-controlled hearing-aid signal processing, fitting and learning."
+version = "1.6.0"
+description = "Open-source research platform for environmental sound awareness through audiogram-weighted haptic patterns on the wrist. Not a hearing aid or certified medical device."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
@@ -13,13 +13,12 @@ authors = [
     { name = "Lewis Burgess", email = "lewisjames@theburgessprinciple.com" },
     { name = "OpenHear contributors" },
 ]
-keywords = ["hearing-aid", "audio", "dsp", "accessibility", "noahlink"]
+keywords = ["hearing", "haptic", "awareness", "audiogram", "accessibility"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "Intended Audience :: Healthcare Industry",
+    "Intended Audience :: Science/Research",
     "Topic :: Multimedia :: Sound/Audio",
-    "Topic :: Scientific/Engineering :: Medical Science Apps.",
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",

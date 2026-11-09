@@ -21,6 +21,20 @@ release; they will be called out under a **Breaking** subsection.
 - **Hearing loss and dementia — clinical context** (`docs/HEARING_LOSS_AND_DEMENTIA.md`).
 - **Living Hearing Profile v8–v9** and consented anonymised audiogram examples.
 
+## [1.6.0] - 2026-11-09
+
+### Changed
+
+- README aligned with the intended-purpose statement in docs/INTENDED_PURPOSE.md. Current claim is environmental sound awareness only (detection and identification of everyday sound classes via short wrist vibration patterns weighted by the person's own audiogram). Not a hearing aid, not a certified medical device, not a replacement for clinical care.
+- Removed overclaims that the wristband is a hearing system or that aids become unnecessary.
+- Licence badge and references corrected to plain Apache 2.0 to match the LICENSE file.
+- clinical/README.md updated: pilot description now states hit rate and false alerts for sound-class detection and identification; Southampton removed from partner list; Manchester retained.
+- Added PRE_REGISTRATION.md template stating that ethics approval, a sponsor and a clinical lead are still required. No data collected under it.
+
+### Fixed
+
+pyproject.toml version set to 1.6.0.
+
 ## [1.5.0] - 2026-08-16
 
 ### Added
@@ -49,4 +63,4 @@ release; they will be called out under a **Breaking** subsection.
 
 ### Added
 
-- Burgess Principle reference layer, Apache 2.0 + Sovereign Use Addendum, wristband stack, north-star documents.
+- Burgess Principle reference layer, Apache 2.0, wristband stack, north-star documents.

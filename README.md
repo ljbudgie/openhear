@@ -148,7 +148,7 @@ See [START_HERE.md](START_HERE.md).
 
 ## Roadmap
 
-See [docs/roadmap.md](docs/roadmap.md) if present, or the research roadmap in docs.
+See [docs/roadmap.md](docs/roadmap.md).
 
 ---
 

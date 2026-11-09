@@ -1,0 +1,580 @@
+{
+  "at_shipped_threshold": {
+    "negatives": {
+      "by_esc50_category": {
+        "airplane": {
+          "clips": 40,
+          "false_alert_clips": 23
+        },
+        "breathing": {
+          "clips": 40,
+          "false_alert_clips": 3
+        },
+        "brushing_teeth": {
+          "clips": 40,
+          "false_alert_clips": 6
+        },
+        "can_opening": {
+          "clips": 40,
+          "false_alert_clips": 2
+        },
+        "cat": {
+          "clips": 40,
+          "false_alert_clips": 15
+        },
+        "chainsaw": {
+          "clips": 40,
+          "false_alert_clips": 40
+        },
+        "chirping_birds": {
+          "clips": 40,
+          "false_alert_clips": 3
+        },
+        "church_bells": {
+          "clips": 40,
+          "false_alert_clips": 17
+        },
+        "clapping": {
+          "clips": 40,
+          "false_alert_clips": 9
+        },
+        "clock_tick": {
+          "clips": 40,
+          "false_alert_clips": 6
+        },
+        "coughing": {
+          "clips": 40,
+          "false_alert_clips": 15
+        },
+        "cow": {
+          "clips": 40,
+          "false_alert_clips": 15
+        },
+        "crackling_fire": {
+          "clips": 40,
+          "false_alert_clips": 2
+        },
+        "crickets": {
+          "clips": 40,
+          "false_alert_clips": 6
+        },
+        "crow": {
+          "clips": 40,
+          "false_alert_clips": 4
+        },
+        "door_wood_creaks": {
+          "clips": 40,
+          "false_alert_clips": 13
+        },
+        "drinking_sipping": {
+          "clips": 40,
+          "false_alert_clips": 13
+        },
+        "fireworks": {
+          "clips": 40,
+          "false_alert_clips": 1
+        },
+        "footsteps": {
+          "clips": 40,
+          "false_alert_clips": 4
+        },
+        "frog": {
+          "clips": 40,
+          "false_alert_clips": 4
+        },
+        "glass_breaking": {
+          "clips": 40,
+          "false_alert_clips": 2
+        },
+        "hand_saw": {
+          "clips": 40,
+          "false_alert_clips": 5
+        },
+        "helicopter": {
+          "clips": 40,
+          "false_alert_clips": 21
+        },
+        "hen": {
+          "clips": 40,
+          "false_alert_clips": 5
+        },
+        "insects": {
+          "clips": 40,
+          "false_alert_clips": 8
+        },
+        "keyboard_typing": {
+          "clips": 40,
+          "false_alert_clips": 3
+        },
+        "laughing": {
+          "clips": 40,
+          "false_alert_clips": 25
+        },
+        "mouse_click": {
+          "clips": 40,
+          "false_alert_clips": 4
+        },
+        "pig": {
+          "clips": 40,
+          "false_alert_clips": 11
+        },
+        "pouring_water": {
+          "clips": 40,
+          "false_alert_clips": 2
+        },
+        "rain": {
+          "clips": 40,
+          "false_alert_clips": 2
+        },
+        "rooster": {
+          "clips": 40,
+          "false_alert_clips": 9
+        },
+        "sea_waves": {
+          "clips": 40,
+          "false_alert_clips": 3
+        },
+        "sheep": {
+          "clips": 40,
+          "false_alert_clips": 6
+        },
+        "sneezing": {
+          "clips": 40,
+          "false_alert_clips": 13
+        },
+        "snoring": {
+          "clips": 40,
+          "false_alert_clips": 5
+        },
+        "thunderstorm": {
+          "clips": 40,
+          "false_alert_clips": 1
+        },
+        "toilet_flush": {
+          "clips": 40,
+          "false_alert_clips": 2
+        },
+        "train": {
+          "clips": 40,
+          "false_alert_clips": 40
+        },
+        "vacuum_cleaner": {
+          "clips": 40,
+          "false_alert_clips": 19
+        },
+        "washing_machine": {
+          "clips": 40,
+          "false_alert_clips": 20
+        },
+        "water_drops": {
+          "clips": 40,
+          "false_alert_clips": 11
+        },
+        "wind": {
+          "clips": 40,
+          "false_alert_clips": 11
+        }
+      },
+      "by_pattern": {
+        "alarm": 11,
+        "baby_cry": 8,
+        "dog": 31,
+        "knock": 8,
+        "media": 69,
+        "phone": 3,
+        "traffic": 179,
+        "voice": 120
+      },
+      "clips_with_false_alert": {
+        "count": 429,
+        "of": 1720,
+        "rate": 0.2494,
+        "wilson95": [
+          0.2295,
+          0.2704
+        ]
+      },
+      "windows_with_false_alert": {
+        "count": 957,
+        "of": 8600,
+        "rate": 0.1113,
+        "wilson95": [
+          0.1048,
+          0.1181
+        ]
+      }
+    },
+    "per_class": {
+      "alarm": {
+        "hit": {
+          "count": 72,
+          "of": 80,
+          "rate": 0.9,
+          "wilson95": [
+            0.8149,
+            0.9485
+          ]
+        },
+        "hits_with_other_pattern": 22,
+        "missed_as": {
+          "nothing": 4,
+          "phone": 3,
+          "traffic": 1
+        }
+      },
+      "baby_cry": {
+        "hit": {
+          "count": 35,
+          "of": 40,
+          "rate": 0.875,
+          "wilson95": [
+            0.7389,
+            0.9454
+          ]
+        },
+        "hits_with_other_pattern": 4,
+        "missed_as": {
+          "nothing": 1,
+          "voice": 4
+        }
+      },
+      "dog": {
+        "hit": {
+          "count": 40,
+          "of": 40,
+          "rate": 1.0,
+          "wilson95": [
+            0.9124,
+            1.0
+          ]
+        },
+        "hits_with_other_pattern": 3,
+        "missed_as": {}
+      },
+      "knock": {
+        "hit": {
+          "count": 27,
+          "of": 40,
+          "rate": 0.675,
+          "wilson95": [
+            0.5202,
+            0.7992
+          ]
+        },
+        "hits_with_other_pattern": 0,
+        "missed_as": {
+          "media": 7,
+          "nothing": 5,
+          "voice": 1
+        }
+      },
+      "traffic": {
+        "hit": {
+          "count": 67,
+          "of": 80,
+          "rate": 0.8375,
+          "wilson95": [
+            0.7416,
+            0.9025
+          ]
+        },
+        "hits_with_other_pattern": 7,
+        "missed_as": {
+          "alarm": 2,
+          "media": 1,
+          "nothing": 9,
+          "voice": 1
+        }
+      }
+    },
+    "per_esc50_category": {
+      "car_horn": {
+        "hit": {
+          "count": 32,
+          "of": 40,
+          "rate": 0.8,
+          "wilson95": [
+            0.6524,
+            0.895
+          ]
+        },
+        "hits_with_other_pattern": 7,
+        "missed_as": {
+          "alarm": 2,
+          "media": 1,
+          "nothing": 4,
+          "voice": 1
+        }
+      },
+      "clock_alarm": {
+        "hit": {
+          "count": 33,
+          "of": 40,
+          "rate": 0.825,
+          "wilson95": [
+            0.6805,
+            0.9125
+          ]
+        },
+        "hits_with_other_pattern": 8,
+        "missed_as": {
+          "nothing": 4,
+          "phone": 3
+        }
+      },
+      "crying_baby": {
+        "hit": {
+          "count": 35,
+          "of": 40,
+          "rate": 0.875,
+          "wilson95": [
+            0.7389,
+            0.9454
+          ]
+        },
+        "hits_with_other_pattern": 4,
+        "missed_as": {
+          "nothing": 1,
+          "voice": 4
+        }
+      },
+      "dog": {
+        "hit": {
+          "count": 40,
+          "of": 40,
+          "rate": 1.0,
+          "wilson95": [
+            0.9124,
+            1.0
+          ]
+        },
+        "hits_with_other_pattern": 3,
+        "missed_as": {}
+      },
+      "door_wood_knock": {
+        "hit": {
+          "count": 27,
+          "of": 40,
+          "rate": 0.675,
+          "wilson95": [
+            0.5202,
+            0.7992
+          ]
+        },
+        "hits_with_other_pattern": 0,
+        "missed_as": {
+          "media": 7,
+          "nothing": 5,
+          "voice": 1
+        }
+      },
+      "engine": {
+        "hit": {
+          "count": 35,
+          "of": 40,
+          "rate": 0.875,
+          "wilson95": [
+            0.7389,
+            0.9454
+          ]
+        },
+        "hits_with_other_pattern": 0,
+        "missed_as": {
+          "nothing": 5
+        }
+      },
+      "siren": {
+        "hit": {
+          "count": 39,
+          "of": 40,
+          "rate": 0.975,
+          "wilson95": [
+            0.8712,
+            0.9956
+          ]
+        },
+        "hits_with_other_pattern": 14,
+        "missed_as": {
+          "traffic": 1
+        }
+      }
+    },
+    "targets_overall": {
+      "count": 241,
+      "of": 280,
+      "rate": 0.8607,
+      "wilson95": [
+        0.8153,
+        0.8964
+      ]
+    },
+    "threshold": 0.2
+  },
+  "clips": {
+    "negatives": 1720,
+    "targets": 280,
+    "total": 2000
+  },
+  "kind": "openhear-awareness-bench",
+  "method": {
+    "classes_not_tested": [
+      "voice",
+      "doorbell",
+      "media",
+      "phone"
+    ],
+    "classes_not_tested_reason": "ESC-50 has no clips for these classes.",
+    "false_alert_rule": "Any pattern fires in at least one window of a negative clip.",
+    "hit_rule": "Target class fires in at least one window of the clip.",
+    "openhear_classes": [
+      "voice",
+      "doorbell",
+      "alarm",
+      "dog",
+      "traffic",
+      "media",
+      "knock",
+      "baby_cry",
+      "phone"
+    ],
+    "shipped_threshold": 0.2,
+    "target_map": {
+      "car_horn": "traffic",
+      "clock_alarm": "alarm",
+      "crying_baby": "baby_cry",
+      "dog": "dog",
+      "door_wood_knock": "knock",
+      "engine": "traffic",
+      "siren": "alarm"
+    },
+    "window_seconds": 0.975,
+    "windowing": "Consecutive non-overlapping windows at the clip's native sample rate; trailing part-window dropped."
+  },
+  "provenance": {
+    "esc50_commit": "33c8ce9eb2cf0b1c2f8bcf322eb349b6be34dbb6",
+    "esc50_licence": "CC BY-NC 3.0 (audio not redistributed)",
+    "git_sha": "62d9020a88430d482c1bb62165525999600b57ed",
+    "host": {
+      "numpy": "2.5.4",
+      "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+      "python": "3.12.16"
+    },
+    "limit": null,
+    "model_sha256": "4d8b4a53282dc83ef04e3e7dbc4fbc98082e34e44ed798e16c3a0cdd4c584faf",
+    "model_source": "https://storage.googleapis.com/mediapipe-models/audio_classifier/yamnet/float32/1/yamnet.tflite",
+    "run_url": "https://github.com/ljbudgie/openhear/actions/runs/42706933359"
+  },
+  "report_sha256": "f73c53d445c69a2edc34ebd01dcc6fc112c6233d934c37e5aa591b3967aec98f",
+  "schema_version": 1,
+  "scope": "Classifier only, on recorded ESC-50 clips. No wearers, no microphone, no wristband, no real rooms. Not a clinical result.",
+  "threshold_sweep": [
+    {
+      "false_alert_clip_rate": 0.4593,
+      "per_class_hit_rate": {
+        "alarm": 0.925,
+        "baby_cry": 0.925,
+        "dog": 1.0,
+        "knock": 0.775,
+        "traffic": 0.9375
+      },
+      "target_hit_rate": 0.9179,
+      "threshold": 0.1
+    },
+    {
+      "false_alert_clip_rate": 0.3198,
+      "per_class_hit_rate": {
+        "alarm": 0.9,
+        "baby_cry": 0.875,
+        "dog": 1.0,
+        "knock": 0.7,
+        "traffic": 0.875
+      },
+      "target_hit_rate": 0.875,
+      "threshold": 0.15
+    },
+    {
+      "false_alert_clip_rate": 0.2494,
+      "per_class_hit_rate": {
+        "alarm": 0.9,
+        "baby_cry": 0.875,
+        "dog": 1.0,
+        "knock": 0.675,
+        "traffic": 0.8375
+      },
+      "target_hit_rate": 0.8607,
+      "threshold": 0.2
+    },
+    {
+      "false_alert_clip_rate": 0.2494,
+      "per_class_hit_rate": {
+        "alarm": 0.9,
+        "baby_cry": 0.875,
+        "dog": 1.0,
+        "knock": 0.675,
+        "traffic": 0.8375
+      },
+      "target_hit_rate": 0.8607,
+      "threshold": 0.25
+    },
+    {
+      "false_alert_clip_rate": 0.2099,
+      "per_class_hit_rate": {
+        "alarm": 0.8625,
+        "baby_cry": 0.875,
+        "dog": 1.0,
+        "knock": 0.6,
+        "traffic": 0.7625
+      },
+      "target_hit_rate": 0.8179,
+      "threshold": 0.3
+    },
+    {
+      "false_alert_clip_rate": 0.164,
+      "per_class_hit_rate": {
+        "alarm": 0.8375,
+        "baby_cry": 0.875,
+        "dog": 1.0,
+        "knock": 0.6,
+        "traffic": 0.6125
+      },
+      "target_hit_rate": 0.7679,
+      "threshold": 0.35
+    },
+    {
+      "false_alert_clip_rate": 0.164,
+      "per_class_hit_rate": {
+        "alarm": 0.8375,
+        "baby_cry": 0.875,
+        "dog": 1.0,
+        "knock": 0.6,
+        "traffic": 0.6125
+      },
+      "target_hit_rate": 0.7679,
+      "threshold": 0.4
+    },
+    {
+      "false_alert_clip_rate": 0.1267,
+      "per_class_hit_rate": {
+        "alarm": 0.8,
+        "baby_cry": 0.85,
+        "dog": 1.0,
+        "knock": 0.6,
+        "traffic": 0.525
+      },
+      "target_hit_rate": 0.7286,
+      "threshold": 0.45
+    },
+    {
+      "false_alert_clip_rate": 0.1267,
+      "per_class_hit_rate": {
+        "alarm": 0.8,
+        "baby_cry": 0.85,
+        "dog": 1.0,
+        "knock": 0.6,
+        "traffic": 0.525
+      },
+      "target_hit_rate": 0.7286,
+      "threshold": 0.5
+    }
+  ]
+}

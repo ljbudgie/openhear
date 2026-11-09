@@ -21,6 +21,27 @@ release; they will be called out under a **Breaking** subsection.
 - **Hearing loss and dementia — clinical context** (`docs/HEARING_LOSS_AND_DEMENTIA.md`).
 - **Living Hearing Profile v8–v9** and consented anonymised audiogram examples.
 
+## [1.7.0] - 2026-11-09
+
+### Added
+
+- **First measured result.** `scripts/bench_awareness.py` and the `bench-awareness` workflow run the shipped classifier on the 2,000 ESC-50 recordings. Results, limits and the signed report are in docs/BENCH_RESULTS.md: 86.1% hit rate on target clips, and a pattern fired on 24.9% of clips with no OpenHear class. Classifier only, recorded clips, no wearers, not a clinical result.
+- Sound classes `knock`, `baby_cry` and `phone`, each with a wristband pattern.
+- Snapshot test that pins the full YAMNet-label to OpenHear-class table.
+- Tinnitus safety notice in README and docs/INTENDED_PURPOSE.md, following written feedback from Tinnitus UK.
+
+### Changed
+
+- Label matching is whole-word. "Scary music", "Carnatic music", "Shuffling cards" and "Busy signal" no longer fire the traffic pattern, and "Wind chime" no longer fires doorbell.
+- Only the "Knock" label fires the knock pattern; a door opening or sliding does not. DTMF dialling does not fire the phone pattern.
+- README, docs/EVALUATION.md and PRE_REGISTRATION.md list exactly the nine classes the code supports.
+- Living Hearing Profile: two notes on dual-earpiece listening and tinnitus reworded as one person's reported preference, not general advice (history version 11).
+
+### Known limits
+
+- The traffic class is too broad: any engine sound fires it. Narrowing it is the next change.
+- Voice, doorbell, media and phone have no bench figure, because ESC-50 has no clips for them.
+
 ## [1.6.0] - 2026-11-09
 
 ### Changed

@@ -6,8 +6,6 @@ name: Bench — awareness classifier (ESC-50)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [bench-awareness]
 
 permissions:
   contents: read

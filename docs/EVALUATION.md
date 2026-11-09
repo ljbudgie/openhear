@@ -38,3 +38,7 @@ Classes only (exactly the classes the code supports):
 A result is a count of hits, misses, and false alerts. It is not a clinical claim.
 
 OpenHear remains an environmental sound awareness tool. It is not a certified medical device. See [docs/INTENDED_PURPOSE.md](INTENDED_PURPOSE.md).
+
+## Bench results
+
+A classifier-only bench test on recorded clips (no wearers, not a clinical result) is in [BENCH_RESULTS.md](BENCH_RESULTS.md). It is not a substitute for the study above.

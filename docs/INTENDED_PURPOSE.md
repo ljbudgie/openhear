@@ -25,4 +25,4 @@ If a study is run, the endpoints must match this sentence. Detection and identif
 
 ## Status
 
-Last confirmed 9 November 2026. Public release at that date: v1.6.0. Evidence release (classifier matching and new classes) prepared for v1.7.0.
+Last confirmed 9 November 2026. Public release at that date: v1.7.0. Classifier-only bench results are in [BENCH_RESULTS.md](BENCH_RESULTS.md).

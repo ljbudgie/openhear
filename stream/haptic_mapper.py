@@ -38,6 +38,9 @@ SOUND_PROFILES: dict[str, SoundProfile] = {
     "dog": SoundProfile(4, 4, 500, "Right motor single 150 ms pulse."),
     "traffic": SoundProfile(5, 5, 500, "Left motor single 300 ms pulse."),
     "media": SoundProfile(6, 6, 1000, "Both motors slow 500/500 ms pulse x2."),
+    "knock": SoundProfile(7, 7, 500, "Short single pulse for door knock."),
+    "baby_cry": SoundProfile(8, 8, 2500, "Urgent multi-pulse for infant cry."),
+    "phone": SoundProfile(9, 9, 2000, "Repeating short pulse for telephone."),
 }
 
 SUPPORTED_SOUND_CLASSES: tuple[str, ...] = tuple(SOUND_PROFILES)

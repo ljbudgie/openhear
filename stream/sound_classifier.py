@@ -3,7 +3,7 @@ sound_classifier.py – YAMNet-oriented sound mapping for the OpenHear wristband
 
 This module provides:
 
-  - category definitions for the 7 OpenHear wristband sound classes,
+  - category definitions for the OpenHear wristband sound classes,
   - a pure-Python score aggregation layer that maps YAMNet labels to those
     classes, and
   - an optional TensorFlow Lite wrapper for running a local YAMNet model if
@@ -13,6 +13,7 @@ This module provides:
 from __future__ import annotations
 
 import csv
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -33,7 +34,7 @@ _LABEL_KEYWORDS: dict[str, tuple[str, ...]] = {
         "female speaking",
         "child speech",
     ),
-    "doorbell": ("doorbell", "ding-dong", "chime"),
+    "doorbell": ("doorbell", "ding-dong"),
     "alarm": ("alarm", "siren", "smoke detector", "fire alarm", "alarm clock", "buzzer"),
     "dog": ("dog", "bark", "bow-wow", "howl"),
     "traffic": (
@@ -48,6 +49,9 @@ _LABEL_KEYWORDS: dict[str, tuple[str, ...]] = {
         "engine",
     ),
     "media": ("music", "television", "radio", "podcast", "video game music"),
+    "knock": ("knock", "door"),
+    "baby_cry": ("baby cry", "infant cry", "crying baby"),
+    "phone": ("telephone", "ringtone", "phone ringing", "telephone bell"),
 }
 
 
@@ -100,13 +104,19 @@ def prepare_audio_window(
     return mono.astype(np.float32, copy=False)
 
 
+def _whole_word_match(keyword: str, label: str) -> bool:
+    """Return True if keyword appears as a whole word or phrase in label."""
+    pattern = r"\b" + re.escape(keyword) + r"\b"
+    return bool(re.search(pattern, label, re.IGNORECASE))
+
+
 def map_label_to_sound_key(label: str) -> str | None:
-    """Map one YAMNet label to an OpenHear sound class."""
+    """Map one YAMNet label to an OpenHear sound class using whole-word matching."""
     label_normalised = label.lower().strip()
     for sound_key, keywords in _LABEL_KEYWORDS.items():
-        if any(keyword in label_normalised for keyword in keywords):
+        if any(_whole_word_match(keyword, label_normalised) for keyword in keywords):
             return sound_key
-    if "silence" in label_normalised:
+    if _whole_word_match("silence", label_normalised):
         return "silence"
     return None
 
@@ -189,8 +199,6 @@ def _load_labels(labels_path: str) -> list[str]:
 
     labels: list[str] = []
     for row in rows:
-        # Fallback for non-official CSVs that still store the label in the
-        # rightmost populated column.
         for column in reversed(row):
             label = column.strip()
             if label:

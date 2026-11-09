@@ -8,10 +8,16 @@ OpenHear is a research platform that turns the wearer's own audiogram into hapti
 
 ## What that sentence means
 
-- The purpose is awareness of environmental sound (a knock, an alarm, traffic) through vibration, shaped by the wearer's own thresholds.
+- The purpose is awareness of environmental sound through vibration, shaped by the wearer's own thresholds.
+- Supported classes in the current code: voice, doorbell, alarm, dog, traffic, media, knock, baby_cry, phone, silence.
+- Examples named in this statement (knock, baby cry, alarm, traffic) are classes the code now supports.
 - The audiogram stays with the person. It is not uploaded unless the person chooses to paste it into a tool they already use.
 - Classification by a regulator is decided by the claim. This file states the claim. It does not assert a Class I or Class IIa status.
 - A future clinical claim (for example compensation for reduced hearing) would require this file to be updated first, and every other file to follow it. Until that update, the research sentence is the claim.
+
+## Tinnitus safety notice
+
+OpenHear is not designed to treat or manage tinnitus. If you have tinnitus in one ear only, pulsatile tinnitus, or sudden-onset tinnitus with hearing loss, see a healthcare professional promptly (NICE NG155 section 1.2). If tinnitus is linked to thoughts of self-harm or suicide, seek help urgently. If you think amplification is making your tinnitus worse, speak to your audiologist first. Further information: https://tinnitus.org.uk/how-we-can-help/
 
 ## What a pilot must measure
 
@@ -19,4 +25,4 @@ If a study is run, the endpoints must match this sentence. Detection and identif
 
 ## Status
 
-Last confirmed 17 October 2026. Public release at that date: v1.5.0.
+Last confirmed 9 November 2026. Public release at that date: v1.6.0. Evidence release (classifier matching and new classes) prepared for v1.7.0.

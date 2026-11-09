@@ -53,6 +53,9 @@ class TestHapticMapper:
             "dog": 4,
             "traffic": 5,
             "media": 6,
+            "knock": 7,
+            "baby_cry": 8,
+            "phone": 9,
         }
         assert PATTERN_IDS == SOUND_CLASS_IDS
 

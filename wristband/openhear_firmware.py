@@ -98,6 +98,27 @@ def _pattern_media(intensity):
         _off(500)
 
 
+def _pattern_knock(intensity):
+    _motors(intensity, intensity, 80)
+    _off(40)
+    _motors(intensity, intensity, 40)
+    _off()
+
+
+def _pattern_baby_cry(intensity):
+    for _ in range(4):
+        _motors(intensity, intensity, 60)
+        _off(40)
+
+
+def _pattern_phone(intensity):
+    for _ in range(3):
+        _motors(intensity, 0, 100)
+        _off(80)
+        _motors(0, intensity, 100)
+        _off(80)
+
+
 PATTERNS = {
     0: _pattern_silence,
     1: _pattern_voice,
@@ -106,6 +127,9 @@ PATTERNS = {
     4: _pattern_dog,
     5: _pattern_traffic,
     6: _pattern_media,
+    7: _pattern_knock,
+    8: _pattern_baby_cry,
+    9: _pattern_phone,
 }
 
 

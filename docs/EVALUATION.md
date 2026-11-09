@@ -8,15 +8,17 @@ Health Innovation NENC (September 2026) said the remaining job is evidence that 
 
 Whether a wearer can tell which class of sound happened, from a wrist pattern, in ordinary rooms.
 
-Classes only:
+Classes only (exactly the classes the code supports):
 
-- voice present (not what was said)
-- doorbell or chime
-- alarm or siren
-- animal
-- traffic or vehicle warning
-- television, radio, or other media
-- silence / no significant event
+- voice
+- doorbell
+- alarm
+- dog
+- traffic
+- media
+- knock
+- baby_cry
+- phone
 
 ## What is not being measured
 

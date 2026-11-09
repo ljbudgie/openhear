@@ -217,8 +217,11 @@ class TestPatterns:
         # 2 pulses, 4 writes per pin.
         assert len(_PIN0.values) == 4
 
-    def test_patterns_table_has_all_seven(self, firmware):
-        assert set(firmware.PATTERNS.keys()) == set(range(7))
+    def test_patterns_table_covers_every_sound_profile(self, firmware):
+        from stream.haptic_mapper import SOUND_PROFILES
+
+        expected = {profile.pattern_id for profile in SOUND_PROFILES.values()}
+        assert set(firmware.PATTERNS.keys()) == expected
         for handler in firmware.PATTERNS.values():
             assert callable(handler)
 

@@ -49,10 +49,19 @@ _LABEL_KEYWORDS: dict[str, tuple[str, ...]] = {
         "engine",
     ),
     "media": ("music", "television", "radio", "podcast", "video game music"),
-    "knock": ("knock", "door"),
+    "knock": ("knock",),
     "baby_cry": ("baby cry", "infant cry", "crying baby"),
     "phone": ("telephone", "ringtone", "phone ringing", "telephone bell"),
 }
+
+
+# Labels that contain a keyword but are not the event the class is for.
+# A door opening or sliding is not a knock, and dialling is not ringing.
+_EXCLUDED_LABELS: frozenset[str] = frozenset(
+    {
+        "telephone dialing, dtmf",
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -113,6 +122,8 @@ def _whole_word_match(keyword: str, label: str) -> bool:
 def map_label_to_sound_key(label: str) -> str | None:
     """Map one YAMNet label to an OpenHear sound class using whole-word matching."""
     label_normalised = label.lower().strip()
+    if label_normalised in _EXCLUDED_LABELS:
+        return None
     for sound_key, keywords in _LABEL_KEYWORDS.items():
         if any(_whole_word_match(keyword, label_normalised) for keyword in keywords):
             return sound_key
@@ -156,8 +167,18 @@ class YamnetClassifier:
         self._input_details = self._interpreter.get_input_details()
         self._output_details = self._interpreter.get_output_details()
 
-    def classify_window(self, samples: np.ndarray, sample_rate: int) -> ClassifiedSound:
-        """Run YAMNet on *samples* and return one OpenHear sound class."""
+    def classify_window(
+        self,
+        samples: np.ndarray,
+        sample_rate: int,
+        *,
+        min_confidence: float = DEFAULT_MIN_CONFIDENCE,
+    ) -> ClassifiedSound:
+        """Run YAMNet on *samples* and return one OpenHear sound class.
+
+        ``min_confidence`` defaults to the shipped threshold. The bench harness
+        passes ``0.0`` to read the best class and its score before thresholding.
+        """
         window = prepare_audio_window(samples, sample_rate)
         input_tensor = window
         input_shape = tuple(self._input_details[0]["shape"])
@@ -173,7 +194,7 @@ class YamnetClassifier:
             label: float(scores[idx])
             for idx, label in enumerate(self.labels[: len(scores)])
         }
-        return classify_scores(scores_by_label)
+        return classify_scores(scores_by_label, min_confidence=min_confidence)
 
 
 def _load_labels(labels_path: str) -> list[str]:
@@ -212,9 +233,13 @@ def _load_tflite_interpreter(model_path: str):
         from tflite_runtime.interpreter import Interpreter
     except ImportError:
         try:
-            from tensorflow.lite import Interpreter
-        except ImportError as exc:  # pragma: no cover - runtime-only path.
-            raise RuntimeError(
-                "YAMNet inference requires either 'tflite-runtime' or 'tensorflow'."
-            ) from exc
+            from ai_edge_litert.interpreter import Interpreter
+        except ImportError:
+            try:
+                from tensorflow.lite import Interpreter
+            except ImportError as exc:  # pragma: no cover - runtime-only path.
+                raise RuntimeError(
+                    "YAMNet inference requires 'tflite-runtime', 'ai-edge-litert' "
+                    "or 'tensorflow'."
+                ) from exc
     return Interpreter(model_path=model_path)

@@ -222,6 +222,7 @@ def test_yamnet_classifier_classify_window_handles_1d_input_shape(tmp_path):
 def test_load_tflite_interpreter_uses_tensorflow_when_no_tflite_runtime(monkeypatch):
     """When ``tflite_runtime`` is missing, fall back to ``tensorflow.lite``."""
     monkeypatch.setitem(sys.modules, "tflite_runtime", None)
+    monkeypatch.setitem(sys.modules, "ai_edge_litert", None)
 
     fake_tf = types.ModuleType("tensorflow")
     fake_lite = types.ModuleType("tensorflow.lite")

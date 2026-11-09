@@ -21,6 +21,10 @@
 > The only intended-purpose statement is in [docs/INTENDED_PURPOSE.md](docs/INTENDED_PURPOSE.md):
 > *OpenHear is a research platform that turns the wearer's own audiogram into haptic patterns for environmental sound awareness. It is not a certified medical device, not a hearing aid, and not a replacement for clinical care.*
 
+## Tinnitus safety notice
+
+OpenHear is not designed to treat or manage tinnitus. If you have tinnitus in one ear only, pulsatile tinnitus, or sudden-onset tinnitus with hearing loss, see a healthcare professional promptly (NICE NG155 section 1.2). If tinnitus is linked to thoughts of self-harm or suicide, seek help urgently. If you think amplification is making your tinnitus worse, speak to your audiologist first. Further information: https://tinnitus.org.uk/how-we-can-help/
+
 OpenHear is an open-source research platform for environmental sound awareness. It recognises a small set of everyday sounds and turns each sound class into a short, distinct vibration pattern on the wrist. The patterns are weighted by the wearer's own audiogram. Recognition runs on the device. Nothing is sent to a cloud. The audiogram stays with the person.
 
 It is designed to work alongside existing hearing aids, or when aids are out. It does not amplify sound. The current claim is awareness only.
@@ -106,7 +110,7 @@ World → On-device classifier → Sound class → Short vibration pattern on th
          (weighted by the person's audiogram, held on the device)
 ```
 
-**Current claim:** detection and identification of a small set of everyday environmental sound classes, delivered as distinct haptic patterns. Not speech recognition. Not amplification. Not a replacement for clinical care.
+**Current claim:** detection and identification of everyday environmental sound classes, delivered as distinct haptic patterns. Supported classes: voice, doorbell, alarm, dog, traffic, media, knock, baby_cry, phone. Not speech recognition. Not amplification. Not a replacement for clinical care.
 
 **Audiogram module** — the person's own thresholds stay on the device and weight the patterns. See the Living Hearing Profile.
 

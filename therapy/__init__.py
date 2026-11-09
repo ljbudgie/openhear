@@ -33,13 +33,6 @@ from therapy.binaural import (  # noqa: F401
     generate_binaural,
     prescribe_binaural,
 )
-from therapy.entrainment import (  # noqa: F401
-    EntrainmentEvent,
-    Pulse,
-    events_for_protocol,
-    haptic_events,
-    pulse_schedule,
-)
 from therapy.dermal_profiles import (  # noqa: F401
     DEFAULT_DUTY_CYCLE,
     DERMAL_PROFILES,
@@ -47,6 +40,13 @@ from therapy.dermal_profiles import (  # noqa: F401
     MAX_SESSION_S,
     DermalProfile,
     get_dermal_profile,
+)
+from therapy.entrainment import (  # noqa: F401
+    EntrainmentEvent,
+    Pulse,
+    events_for_protocol,
+    haptic_events,
+    pulse_schedule,
 )
 from therapy.protocol import (  # noqa: F401
     BRAINWAVE_BANDS,

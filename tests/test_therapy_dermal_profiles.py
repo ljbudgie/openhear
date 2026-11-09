@@ -6,9 +6,9 @@ import pytest
 
 from therapy.dermal_profiles import (
     DEFAULT_DUTY_CYCLE,
+    DERMAL_PROFILES,
     MAX_AMPLITUDE,
     MAX_SESSION_S,
-    DERMAL_PROFILES,
     DermalProfile,
     get_dermal_profile,
 )

@@ -22,13 +22,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Literal, Mapping
 
+from audiogram.audiogram import Audiogram
 from dsp.audiogram_profile import (
     PRESCRIPTION_FREQUENCIES_HZ,
     BandPrescription,
     Prescription,
     prescribe,
 )
-from audiogram.audiogram import Audiogram
 
 Coupler = Literal["mastoid", "forehead", "abutment", "unspecified"]
 SsdRoute = Literal["none", "contralateral"]

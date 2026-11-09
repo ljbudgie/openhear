@@ -45,7 +45,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from therapy.protocol import (
-    ContraindicationError,
     EvidenceGrade,
     TherapeuticProtocol,
 )

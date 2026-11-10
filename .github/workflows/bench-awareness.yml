@@ -12,8 +12,6 @@ on:
         type: choice
         default: esc50
         options: [esc50, fsd50k, sonyc, all]
-  push:
-    branches: [v1.8.0-dev]
 
 permissions:
   contents: read
@@ -29,7 +27,7 @@ env:
 jobs:
   esc50:
     name: ESC-50 (before/after comparison)
-    if: github.event_name == 'push' || inputs.dataset == 'esc50' || inputs.dataset == 'all'
+    if: inputs.dataset == 'esc50' || inputs.dataset == 'all'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -69,7 +67,7 @@ jobs:
 
   fsd50k:
     name: FSD50K eval (CC0 and CC BY clips only)
-    if: github.event_name == 'push' || inputs.dataset == 'fsd50k' || inputs.dataset == 'all'
+    if: inputs.dataset == 'fsd50k' || inputs.dataset == 'all'
     runs-on: ubuntu-latest
     timeout-minutes: 150
     env:
@@ -123,7 +121,7 @@ jobs:
 
   sonyc:
     name: SONYC-UST v2.3.0 (verified street recordings)
-    if: github.event_name == 'push' || inputs.dataset == 'sonyc' || inputs.dataset == 'all'
+    if: inputs.dataset == 'sonyc' || inputs.dataset == 'all'
     runs-on: ubuntu-latest
     timeout-minutes: 150
     env:

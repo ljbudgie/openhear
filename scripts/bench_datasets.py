@@ -126,7 +126,6 @@ _FSD50K_COMMON: dict[str, str] = {
     "Bark": "dog",
     "Dog": "dog",
     "Siren": "alarm",
-    "Alarm": "alarm",
     "Fire_alarm": "alarm",
     "Smoke_detector_and_smoke_alarm": "alarm",
     "Alarm_clock": "alarm",
@@ -151,6 +150,14 @@ _FSD50K_V17_ENGINES: dict[str, str] = {
         "Car_passing_by",
     )
 }
+# FSD50K tags every clip with its ancestors as well as its own label. "Alarm"
+# is an ancestor of telephones, doorbells and bicycle bells as well as sirens,
+# so on its own it does not say that the alarm pattern should fire. A clip whose
+# only relevant tag is "Alarm" is left out: it is neither a target nor a
+# negative. (The first run of this bench counted "Alarm" as an alarm target;
+# docs/BENCH_RESULTS.md gives that figure too.)
+FSD50K_AMBIGUOUS: frozenset[str] = frozenset({"Alarm"})
+
 FSD50K_TARGETS: dict[str, dict[str, str]] = {
     "v1.7.0": {**_FSD50K_COMMON, **_FSD50K_V17_ENGINES},
     "v1.8.0": dict(_FSD50K_COMMON),
@@ -179,6 +186,7 @@ def fsd50k_specs(
     """
     specs: list[ClipSpec] = []
     dropped: dict[str, int] = {}
+    wanted = set(FSD50K_TARGETS["v1.7.0"]) | set(FSD50K_TARGETS["v1.8.0"])
     for row in sorted(ground_truth_rows, key=lambda item: int(item["fname"])):
         fname = str(row["fname"])
         licence = str(clips_info.get(fname, {}).get("license", ""))
@@ -186,13 +194,17 @@ def fsd50k_specs(
             dropped[licence or "unknown"] = dropped.get(licence or "unknown", 0) + 1
             continue
         labels = tuple(label for label in row["labels"].split(",") if label)
-        specs.append(_spec(fname, f"{fname}.wav", labels, (), FSD50K_TARGETS))
-    wanted = set(FSD50K_TARGETS["v1.7.0"]) | set(FSD50K_TARGETS["v1.8.0"])
+        groups = tuple(label for label in labels if label in wanted or label in FSD50K_AMBIGUOUS)
+        ambiguous = any(label in FSD50K_AMBIGUOUS for label in labels)
+        specs.append(
+            _spec(fname, f"{fname}.wav", labels, groups, FSD50K_TARGETS, eligible_negative=not ambiguous)
+        )
     notes = {
         "clips_kept": len(specs),
         "clips_dropped_by_licence": dict(sorted(dropped.items())),
         "labels_found_in_vocabulary": sorted(wanted & vocabulary),
         "labels_not_in_vocabulary": sorted(wanted - vocabulary),
+        "ambiguous_labels_left_out": sorted(FSD50K_AMBIGUOUS),
     }
     return specs, notes
 

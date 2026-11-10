@@ -61,7 +61,8 @@ def test_fsd50k_specs_filter_licences_and_map_labels():
     specs, notes = datasets.fsd50k_specs(rows, info, vocabulary)
     by_id = {spec.clip_id: spec for spec in specs}
     assert list(by_id) == ["20", "30", "40"]
-    assert by_id["30"].targets["v1.8.0"] == {"doorbell", "alarm"}
+    assert by_id["30"].targets["v1.8.0"] == {"doorbell"}  # "Alarm" alone is not a target
+    assert by_id["30"].groups == ("Doorbell", "Alarm")
     assert by_id["20"].targets["v1.7.0"] == {"traffic"}
     assert by_id["20"].targets["v1.8.0"] == frozenset() and by_id["20"].negative["v1.8.0"]
     assert by_id["40"].negative == {"v1.7.0": True, "v1.8.0": True}
@@ -147,3 +148,16 @@ def test_iter_audio_reads_from_zip_and_skips_missing(tmp_path):
     found = list(datasets.iter_audio(specs, audio_zip=archive))
     assert [spec.clip_id for spec, _, _ in found] == ["30"]
     assert found[0][2] == 16_000 and len(found[0][1]) == 1600
+
+
+def test_fsd50k_alarm_ancestor_tag_alone_is_neither_target_nor_negative():
+    rows = [
+        {"fname": "1", "labels": "Bicycle_bell,Bell,Alarm"},
+        {"fname": "2", "labels": "Siren,Alarm"},
+    ]
+    info = {key: {"license": "http://creativecommons.org/publicdomain/zero/1.0/"} for key in "12"}
+    specs, notes = datasets.fsd50k_specs(rows, info, {"Siren", "Alarm"})
+    bell, siren = specs
+    assert bell.targets["v1.8.0"] == frozenset() and not bell.negative["v1.8.0"]
+    assert siren.targets["v1.8.0"] == {"alarm"}
+    assert notes["ambiguous_labels_left_out"] == ["Alarm"]

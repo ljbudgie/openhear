@@ -54,7 +54,11 @@ def test_dialling_is_not_ringing():
         ("Baby cry, infant cry", "baby_cry"),
         ("Doorbell", "doorbell"),
         ("Smoke detector, smoke alarm", "alarm"),
-        ("Engine knocking", "traffic"),
+        ("Vehicle horn, car horn, honking", "traffic"),
+        ("Reversing beeps", "traffic"),
+        ("Engine knocking", None),
+        ("Engine", None),
+        ("Traffic noise, roadway noise", None),
     ],
 )
 def test_named_everyday_sounds_map_to_their_class(label, expected):

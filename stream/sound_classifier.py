@@ -35,25 +35,40 @@ _LABEL_KEYWORDS: dict[str, tuple[str, ...]] = {
         "child speech",
     ),
     "doorbell": ("doorbell", "ding-dong"),
-    "alarm": ("alarm", "siren", "smoke detector", "fire alarm", "alarm clock", "buzzer"),
-    "dog": ("dog", "bark", "bow-wow", "howl"),
-    "traffic": (
-        "traffic",
-        "car",
-        "truck",
-        "bus",
-        "motor vehicle",
-        "motorcycle",
-        "roadway noise",
-        "vehicle horn",
-        "engine",
+    "alarm": (
+        "alarm",
+        "siren",
+        "smoke detector",
+        "fire alarm",
+        "alarm clock",
+        "buzzer",
+        "emergency vehicle",
     ),
+    "dog": ("dog", "bark", "bow-wow", "howl"),
     "media": ("music", "television", "radio", "podcast", "video game music"),
     "knock": ("knock",),
     "baby_cry": ("baby cry", "infant cry", "crying baby"),
     "phone": ("telephone", "ringtone", "phone ringing", "telephone bell"),
 }
 
+
+# The traffic class is an allowlist of YAMNet class indices, not keywords.
+# v1.7.0 matched any label containing "car", "engine", "truck" and so on, and
+# the ESC-50 bench showed that this fired on chainsaws, trains, aircraft and
+# washing machines. From v1.8.0 the traffic pattern means "a vehicle is
+# warning you": horns, reversing beeps, skidding, tyre squeal and train horns.
+# Engine, car, truck, bus, motorcycle, road-noise, race-car, ice-cream-van,
+# railroad-car and aircraft-engine labels no longer fire it.
+# Index -> display name; tests check both against the bundled class map.
+TRAFFIC_ALLOWLIST: dict[int, str] = {
+    302: "Vehicle horn, car horn, honking",
+    306: "Skidding",
+    307: "Tire squeal",
+    312: "Air horn, truck horn",
+    313: "Reversing beeps",
+    325: "Train horn",
+}
+_TRAFFIC_LABELS: frozenset[str] = frozenset(name.lower() for name in TRAFFIC_ALLOWLIST.values())
 
 # Labels that contain a keyword but are not the event the class is for.
 # A door opening or sliding is not a knock, and dialling is not ringing.
@@ -124,12 +139,32 @@ def map_label_to_sound_key(label: str) -> str | None:
     label_normalised = label.lower().strip()
     if label_normalised in _EXCLUDED_LABELS:
         return None
+    if label_normalised in _TRAFFIC_LABELS:
+        return "traffic"
     for sound_key, keywords in _LABEL_KEYWORDS.items():
         if any(_whole_word_match(keyword, label_normalised) for keyword in keywords):
             return sound_key
     if _whole_word_match("silence", label_normalised):
         return "silence"
     return None
+
+
+def class_scores(scores_by_label: dict[str, float]) -> dict[str, tuple[float, str]]:
+    """Return the best (score, label) for each OpenHear class present in the scores.
+
+    This is the per-class view of one window before any threshold is applied.
+    Classes with no scoring label are omitted. "silence" is included when the
+    model's Silence label is present.
+    """
+    best: dict[str, tuple[float, str]] = {}
+    for label, score in scores_by_label.items():
+        sound_key = map_label_to_sound_key(label)
+        if sound_key is None:
+            continue
+        value = float(score)
+        if sound_key not in best or value > best[sound_key][0]:
+            best[sound_key] = (value, label)
+    return best
 
 
 def classify_scores(
@@ -156,6 +191,15 @@ def classify_scores(
     return ClassifiedSound(best_sound, best_score, best_label)
 
 
+@dataclass(frozen=True)
+class WindowScores:
+    """Everything the model said about one window, before and after mapping."""
+
+    raw_scores: np.ndarray  # one score per YAMNet class index
+    class_scores: dict[str, tuple[float, str]]  # OpenHear class -> (score, label)
+    classified: ClassifiedSound  # the decision at the requested threshold
+
+
 class YamnetClassifier:
     """Optional TensorFlow Lite wrapper for running YAMNet locally."""
 
@@ -167,18 +211,8 @@ class YamnetClassifier:
         self._input_details = self._interpreter.get_input_details()
         self._output_details = self._interpreter.get_output_details()
 
-    def classify_window(
-        self,
-        samples: np.ndarray,
-        sample_rate: int,
-        *,
-        min_confidence: float = DEFAULT_MIN_CONFIDENCE,
-    ) -> ClassifiedSound:
-        """Run YAMNet on *samples* and return one OpenHear sound class.
-
-        ``min_confidence`` defaults to the shipped threshold. The bench harness
-        passes ``0.0`` to read the best class and its score before thresholding.
-        """
+    def score_window(self, samples: np.ndarray, sample_rate: int) -> np.ndarray:
+        """Run YAMNet on *samples* and return the raw score for every class index."""
         window = prepare_audio_window(samples, sample_rate)
         input_tensor = window
         input_shape = tuple(self._input_details[0]["shape"])
@@ -190,11 +224,43 @@ class YamnetClassifier:
         scores = np.asarray(raw_scores, dtype=np.float32)
         if scores.ndim == 2:
             scores = scores.mean(axis=0)
-        scores_by_label = {
+        return scores
+
+    def _scores_by_label(self, scores: np.ndarray) -> dict[str, float]:
+        return {
             label: float(scores[idx])
             for idx, label in enumerate(self.labels[: len(scores)])
         }
-        return classify_scores(scores_by_label, min_confidence=min_confidence)
+
+    def classify_window(
+        self,
+        samples: np.ndarray,
+        sample_rate: int,
+        *,
+        min_confidence: float = DEFAULT_MIN_CONFIDENCE,
+    ) -> ClassifiedSound:
+        """Run YAMNet on *samples* and return one OpenHear sound class.
+
+        ``min_confidence`` defaults to the shipped threshold.
+        """
+        scores = self.score_window(samples, sample_rate)
+        return classify_scores(self._scores_by_label(scores), min_confidence=min_confidence)
+
+    def classify_window_detailed(
+        self,
+        samples: np.ndarray,
+        sample_rate: int,
+        *,
+        min_confidence: float = DEFAULT_MIN_CONFIDENCE,
+    ) -> WindowScores:
+        """As ``classify_window``, but also return the raw and per-class scores."""
+        scores = self.score_window(samples, sample_rate)
+        by_label = self._scores_by_label(scores)
+        return WindowScores(
+            raw_scores=scores,
+            class_scores=class_scores(by_label),
+            classified=classify_scores(by_label, min_confidence=min_confidence),
+        )
 
 
 def _load_labels(labels_path: str) -> list[str]:

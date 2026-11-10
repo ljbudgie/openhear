@@ -42,7 +42,7 @@ def test_classify_scores_selects_best_supported_label():
         {
             "Speech": 0.41,
             "Dog": 0.32,
-            "Traffic noise, roadway noise": 0.87,
+            "Vehicle horn, car horn, honking": 0.87,
         }
     )
     assert isinstance(result, ClassifiedSound)
@@ -186,8 +186,8 @@ class _StubInterpreter:
 
 def test_yamnet_classifier_classify_window_returns_top_class(tmp_path):
     labels_path = tmp_path / "labels.txt"
-    labels_path.write_text("Speech\nDog\nTraffic noise, roadway noise\n", encoding="utf-8")
-    # Three frame scores → highest weight on traffic.
+    labels_path.write_text('Speech\nDog\n"Vehicle horn, car horn, honking"\n', encoding="utf-8")
+    # Three frame scores → highest weight on the vehicle horn (traffic pattern).
     interpreter = _StubInterpreter(
         scores=[[0.05, 0.2, 0.85], [0.01, 0.1, 0.9], [0.0, 0.05, 0.95]],
     )
@@ -242,3 +242,89 @@ def test_load_tflite_interpreter_uses_tensorflow_when_no_tflite_runtime(monkeypa
     assert isinstance(interp, _FakeInterpreter)
     assert captured["model_path"] == "/tmp/model.tflite"
 
+
+
+# ── v1.8.0: traffic allowlist and raw scores ──────────────────────────────────
+
+
+def test_traffic_allowlist_matches_bundled_class_map_by_index_and_name():
+    import csv
+    from pathlib import Path
+
+    path = Path(sound_classifier.__file__).resolve().parent / "data" / "yamnet_class_map.csv"
+    with open(path, newline="", encoding="utf-8") as fh:
+        names = {int(row["index"]): row["display_name"] for row in csv.DictReader(fh)}
+    for index, name in sound_classifier.TRAFFIC_ALLOWLIST.items():
+        assert names[index] == name
+    assert sorted(sound_classifier.TRAFFIC_ALLOWLIST) == [302, 306, 307, 312, 313, 325]
+
+
+def test_engine_and_vehicle_labels_no_longer_fire_traffic():
+    for label in (
+        "Vehicle",
+        "Motor vehicle (road)",
+        "Car",
+        "Car passing by",
+        "Race car, auto racing",
+        "Truck",
+        "Ice cream truck, ice cream van",
+        "Bus",
+        "Motorcycle",
+        "Traffic noise, roadway noise",
+        "Railroad car, train wagon",
+        "Aircraft engine",
+        "Jet engine",
+        "Engine",
+        "Light engine (high frequency)",
+        "Medium engine (mid frequency)",
+        "Heavy engine (low frequency)",
+        "Engine knocking",
+        "Engine starting",
+        "Idling",
+        "Accelerating, revving, vroom",
+    ):
+        assert map_label_to_sound_key(label) is None, label
+
+
+def test_sirens_and_emergency_vehicle_fire_alarm_not_traffic():
+    for label in (
+        "Emergency vehicle",
+        "Police car (siren)",
+        "Ambulance (siren)",
+        "Fire engine, fire truck (siren)",
+        "Siren",
+        "Car alarm",
+    ):
+        assert map_label_to_sound_key(label) == "alarm", label
+
+
+def test_class_scores_gives_best_score_and_label_per_class():
+    scores = sound_classifier.class_scores(
+        {
+            "Speech": 0.3,
+            "Conversation": 0.5,
+            "Vehicle horn, car horn, honking": 0.1,
+            "Engine": 0.9,
+            "Silence": 0.05,
+        }
+    )
+    assert scores["voice"] == (0.5, "Conversation")
+    assert scores["traffic"] == (0.1, "Vehicle horn, car horn, honking")
+    assert scores["silence"] == (0.05, "Silence")
+    assert "engine" not in scores and len(scores) == 3
+
+
+def test_classify_window_detailed_returns_raw_and_class_scores(tmp_path):
+    labels_path = tmp_path / "labels.txt"
+    labels_path.write_text('Speech\nEngine\n"Vehicle horn, car horn, honking"\n', encoding="utf-8")
+    interpreter = _StubInterpreter(scores=[[0.1, 0.9, 0.4]])
+    with patch.object(sound_classifier, "_load_tflite_interpreter", return_value=interpreter):
+        classifier = YamnetClassifier("dummy.tflite", str(labels_path))
+
+    detail = classifier.classify_window_detailed(np.zeros(15_600, dtype=np.float32), 16_000)
+
+    assert detail.raw_scores.tolist() == pytest.approx([0.1, 0.9, 0.4])
+    assert detail.class_scores["traffic"][0] == pytest.approx(0.4)
+    assert detail.classified.sound_key == "traffic"  # the engine score is ignored
+    raw = classifier.score_window(np.zeros(15_600, dtype=np.float32), 16_000)
+    assert raw.shape == (3,)

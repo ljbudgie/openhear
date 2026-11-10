@@ -1,11 +1,19 @@
-name: Bench — awareness classifier (ESC-50)
+name: Bench — awareness classifier
 
-# Classifier-only bench test. Downloads the YAMNet model and the ESC-50
-# recordings at run time; neither is committed to this repository.
+# Classifier-only bench tests on recorded clips. The YAMNet model and every
+# dataset are downloaded at run time; no audio and no model file is committed.
 # See scripts/bench_awareness.py and docs/BENCH_RESULTS.md.
 
 on:
   workflow_dispatch:
+    inputs:
+      dataset:
+        description: Which dataset to run
+        type: choice
+        default: esc50
+        options: [esc50, fsd50k, sonyc, all]
+  push:
+    branches: [v1.8.0-dev]
 
 permissions:
   contents: read
@@ -14,64 +22,158 @@ concurrency:
   group: bench-awareness-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  MODEL_URL: https://storage.googleapis.com/mediapipe-models/audio_classifier/yamnet/float32/1/yamnet.tflite
+  RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
 jobs:
-  bench:
-    name: ESC-50 hit rate and false alerts
+  esc50:
+    name: ESC-50 (before/after comparison)
+    if: github.event_name == 'push' || inputs.dataset == 'esc50' || inputs.dataset == 'all'
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    env:
-      MODEL_URL: https://storage.googleapis.com/mediapipe-models/audio_classifier/yamnet/float32/1/yamnet.tflite
-      MODEL_URL_FALLBACK: https://storage.googleapis.com/download.tensorflow.org/models/tflite/task_library/audio_classification/android/lite-model_yamnet_classification_tflite_1.tflite
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install numpy ai-edge-litert soundfile
-
+        run: pip install numpy ai-edge-litert soundfile
       - name: Download YAMNet model
         run: |
           mkdir -p "$RUNNER_TEMP/model"
-          if curl -fsSL "$MODEL_URL" -o "$RUNNER_TEMP/model/yamnet.tflite"; then
-            echo "MODEL_SOURCE=$MODEL_URL" >> "$GITHUB_ENV"
-          else
-            curl -fsSL "$MODEL_URL_FALLBACK" -o "$RUNNER_TEMP/model/yamnet.tflite"
-            echo "MODEL_SOURCE=$MODEL_URL_FALLBACK" >> "$GITHUB_ENV"
-          fi
+          curl -fsSL --retry 5 "$MODEL_URL" -o "$RUNNER_TEMP/model/yamnet.tflite"
           sha256sum "$RUNNER_TEMP/model/yamnet.tflite"
-          ls -l "$RUNNER_TEMP/model/yamnet.tflite"
-
       - name: Download ESC-50
         run: |
           git clone --depth 1 https://github.com/karolpiczak/ESC-50 "$RUNNER_TEMP/ESC-50"
-          git -C "$RUNNER_TEMP/ESC-50" rev-parse HEAD
-          ls "$RUNNER_TEMP/ESC-50/audio" | wc -l
-
+          echo "DATASET_VERSION=commit $(git -C "$RUNNER_TEMP/ESC-50" rev-parse HEAD)" >> "$GITHUB_ENV"
       - name: Run bench
         run: |
-          python -m scripts.bench_awareness \
-            --esc50 "$RUNNER_TEMP/ESC-50" \
-            --model "$RUNNER_TEMP/model/yamnet.tflite" \
-            --model-source "$MODEL_SOURCE" \
-            --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
-            --out awareness_bench_report.json \
-            --markdown awareness_bench_report.md > /dev/null
-          cat awareness_bench_report.md >> "$GITHUB_STEP_SUMMARY"
-          cat awareness_bench_report.md
+          python -m scripts.bench_awareness --dataset esc50 \
+            --data "$RUNNER_TEMP/ESC-50" \
+            --model "$RUNNER_TEMP/model/yamnet.tflite" --model-source "$MODEL_URL" \
+            --dataset-version "$DATASET_VERSION" --run-url "$RUN_URL" \
+            --out bench_esc50.json --markdown bench_esc50.md \
+            --scores-out bench_esc50_scores.npz > /dev/null
+      - name: Print report
+        run: |
+          cat bench_esc50.md | tee -a "$GITHUB_STEP_SUMMARY"
           echo "-----BEGIN REPORT JSON-----"
-          python -c "import json;print(json.dumps(json.load(open('awareness_bench_report.json')),sort_keys=True,separators=(',',':')))"
+          python -c "import json;print(json.dumps(json.load(open('bench_esc50.json')),sort_keys=True,separators=(',',':')))"
           echo "-----END REPORT JSON-----"
-
-      - name: Upload report
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: awareness-bench-report
-          path: |
-            awareness_bench_report.json
-            awareness_bench_report.md
+          name: bench-esc50
+          path: bench_esc50*
+
+  fsd50k:
+    name: FSD50K eval (CC0 and CC BY clips only)
+    if: github.event_name == 'push' || inputs.dataset == 'fsd50k' || inputs.dataset == 'all'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      ZENODO: https://zenodo.org/records/4060432/files
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install numpy ai-edge-litert soundfile
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h "$RUNNER_TEMP"
+      - name: Download YAMNet model
+        run: |
+          mkdir -p "$RUNNER_TEMP/model"
+          curl -fsSL --retry 5 "$MODEL_URL" -o "$RUNNER_TEMP/model/yamnet.tflite"
+          sha256sum "$RUNNER_TEMP/model/yamnet.tflite"
+      - name: Download FSD50K eval
+        run: |
+          mkdir -p "$RUNNER_TEMP/fsd50k" && cd "$RUNNER_TEMP/fsd50k"
+          for f in FSD50K.ground_truth.zip FSD50K.metadata.zip FSD50K.eval_audio.z01 FSD50K.eval_audio.zip; do
+            curl -fL --retry 8 --retry-delay 15 -C - -sS -o "$f" "$ZENODO/$f?download=1"
+            ls -l "$f"
+          done
+          unzip -q FSD50K.ground_truth.zip && unzip -q FSD50K.metadata.zip
+          zip -q -s 0 FSD50K.eval_audio.zip --out eval_unsplit.zip
+          rm -f FSD50K.eval_audio.z01 FSD50K.eval_audio.zip
+          ls -l && df -h .
+          echo "--- vocabulary.csv ---" && cat FSD50K.ground_truth/vocabulary.csv | tr '\n' ' '
+      - name: Run bench
+        run: |
+          python -m scripts.bench_awareness --dataset fsd50k \
+            --data "$RUNNER_TEMP/fsd50k" --audio-zip "$RUNNER_TEMP/fsd50k/eval_unsplit.zip" \
+            --model "$RUNNER_TEMP/model/yamnet.tflite" --model-source "$MODEL_URL" \
+            --dataset-version "Zenodo record 4060432, version 1.0" --run-url "$RUN_URL" \
+            --out bench_fsd50k.json --markdown bench_fsd50k.md \
+            --scores-out bench_fsd50k_scores.npz > /dev/null
+      - name: Print report
+        run: |
+          cat bench_fsd50k.md | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "-----BEGIN REPORT JSON-----"
+          python -c "import json;print(json.dumps(json.load(open('bench_fsd50k.json')),sort_keys=True,separators=(',',':')))"
+          echo "-----END REPORT JSON-----"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bench-fsd50k
+          path: bench_fsd50k*
+
+  sonyc:
+    name: SONYC-UST v2.3.0 (verified street recordings)
+    if: github.event_name == 'push' || inputs.dataset == 'sonyc' || inputs.dataset == 'all'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      ZENODO: https://zenodo.org/records/3966543/files
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install numpy ai-edge-litert soundfile
+      - name: Download YAMNet model
+        run: |
+          mkdir -p "$RUNNER_TEMP/model"
+          curl -fsSL --retry 5 "$MODEL_URL" -o "$RUNNER_TEMP/model/yamnet.tflite"
+          sha256sum "$RUNNER_TEMP/model/yamnet.tflite"
+      - name: Download SONYC-UST annotations
+        run: |
+          mkdir -p "$RUNNER_TEMP/sonyc" && cd "$RUNNER_TEMP/sonyc"
+          curl -fL --retry 8 --retry-delay 15 -sS -o annotations.csv "$ZENODO/annotations.csv?download=1"
+          curl -fL --retry 8 --retry-delay 15 -sS -o README.md "$ZENODO/README.md?download=1"
+          echo "--- README ---" && cat README.md
+          echo "--- header ---" && head -1 annotations.csv
+          cd "$GITHUB_WORKSPACE" && python -m scripts.bench_datasets sonyc-summary --data "$RUNNER_TEMP/sonyc"
+      - name: Download SONYC-UST audio, keeping only the clips used
+        run: |
+          cd "$RUNNER_TEMP/sonyc"
+          for i in $(seq 0 18); do
+            curl -fL --retry 8 --retry-delay 15 -C - -sS -o "audio-$i.tar.gz" "$ZENODO/audio-$i.tar.gz?download=1"
+            mkdir -p "unpack-$i" && tar -xzf "audio-$i.tar.gz" -C "unpack-$i" && rm -f "audio-$i.tar.gz"
+            (cd "$GITHUB_WORKSPACE" && python -m scripts.bench_datasets sonyc-keep --data "$RUNNER_TEMP/sonyc" \
+              --source "$RUNNER_TEMP/sonyc/unpack-$i" --audio-dir "$RUNNER_TEMP/sonyc/audio")
+            rm -rf "unpack-$i"
+          done
+          ls audio | wc -l && df -h .
+      - name: Run bench
+        run: |
+          python -m scripts.bench_awareness --dataset sonyc \
+            --data "$RUNNER_TEMP/sonyc" --audio-dir "$RUNNER_TEMP/sonyc/audio" \
+            --model "$RUNNER_TEMP/model/yamnet.tflite" --model-source "$MODEL_URL" \
+            --dataset-version "Zenodo record 3966543, version 2.3.0" --run-url "$RUN_URL" \
+            --out bench_sonyc.json --markdown bench_sonyc.md \
+            --scores-out bench_sonyc_scores.npz > /dev/null
+      - name: Print report
+        run: |
+          cat bench_sonyc.md | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "-----BEGIN REPORT JSON-----"
+          python -c "import json;print(json.dumps(json.load(open('bench_sonyc.json')),sort_keys=True,separators=(',',':')))"
+          echo "-----END REPORT JSON-----"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bench-sonyc
+          path: bench_sonyc*

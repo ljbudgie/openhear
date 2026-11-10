@@ -21,6 +21,35 @@ release; they will be called out under a **Breaking** subsection.
 - **Hearing loss and dementia — clinical context** (`docs/HEARING_LOSS_AND_DEMENTIA.md`).
 - **Living Hearing Profile v8–v9** and consented anonymised audiogram examples.
 
+## [1.8.0] - 2026-11-10
+
+### Changed
+
+- **The traffic class is narrowed.** It is now an allowlist of six YAMNet labels, matched by index and name: vehicle horn, air horn, reversing beeps, skidding, tyre squeal and train horn. Engine, car, truck, bus, motorcycle, road-noise, race-car, ice-cream-van, railroad-car and aircraft-engine labels no longer fire it.
+- "Emergency vehicle" now fires the alarm pattern, with the sirens.
+- The bench (`scripts/bench_awareness.py`, report schema 2) stores the raw score for every window and class, and scores the v1.7.0 and v1.8.0 label maps on identical model output.
+
+### Added
+
+- Held-out bench datasets, downloaded at run time only: FSD50K eval (CC0 and CC BY clips only) and SONYC-UST v2.3.0 (CC BY 4.0, verified annotations). ESC-50 (CC BY-NC) is kept for before/after comparison.
+- Per-class precision and recall, the YAMNet label behind each false alert, and a score distribution.
+- `class_scores()`, `YamnetClassifier.score_window()` and `classify_window_detailed()` expose per-class and raw scores.
+- Signed reports and full tables for all three datasets under docs/bench/.
+
+### Measured (classifier only, recorded clips, no wearers, not a clinical result)
+
+- Traffic false alerts on real street recordings with an engine and no horn: 79 of 374 clips under the v1.7.0 map, 0 of 374 under v1.8.0.
+- All false alerts on ESC-50: 24.9% under the v1.7.0 map, 14.9% under v1.8.0.
+- First figures on FSD50K: voice 80.8%, media 80.9%, phone 44.6%, doorbell 29.6% (27 clips).
+- The identical results at thresholds 0.20 and 0.25, and at 0.35 and 0.40, are explained: the model's scores take few distinct values, and none lies between those thresholds.
+
+### Known limits
+
+- **Horn detection is weak and fell with this change:** 55% of ESC-50 car-horn clips (80% under the v1.7.0 map), 57% on FSD50K, 18% on real street recordings. The traffic pattern is not a safety feature.
+- Doorbell and phone are weak on FSD50K.
+- Voice is now the largest source of false alerts, and media the second.
+- Skidding, tyre squeal and train horn are in the allowlist but no dataset here tests them as targets.
+
 ## [1.7.0] - 2026-11-09
 
 ### Added

@@ -47,7 +47,7 @@ Recruitment via RNID Research Panel volunteers who have already consented in wri
 
 ## 5. Intervention
 
-OpenHear software running on a personal phone or on the wristband (when available). The classes the code supports are: voice, doorbell, alarm, dog, traffic, media, knock, baby_cry, phone. These are recognised on-device and mapped to short vibration patterns. Patterns are weighted by the participant's own audiogram, which remains on the device. No cloud upload of audio or audiogram unless the participant explicitly chooses to paste it into a tool they already use.
+OpenHear software running on a personal phone or on the wristband (when available). The classes the code supports are: voice, doorbell, alarm, dog, traffic, media, knock, baby_cry, phone. From v1.8.0 the traffic class fires on vehicle warnings only (horns, reversing beeps, skidding, tyre squeal, train horn), not on engines. Bench testing found horn detection weak, so the traffic pattern is not a safety feature and must not be relied on to warn of a vehicle. These are recognised on-device and mapped to short vibration patterns. Patterns are weighted by the participant's own audiogram, which remains on the device. No cloud upload of audio or audiogram unless the participant explicitly chooses to paste it into a tool they already use.
 
 ## 6. Outcomes
 

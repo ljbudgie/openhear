@@ -11,6 +11,7 @@ OpenHear is a research platform that turns the wearer's own audiogram into hapti
 - The purpose is awareness of environmental sound through vibration, shaped by the wearer's own thresholds.
 - Supported classes in the current code: voice, doorbell, alarm, dog, traffic, media, knock, baby_cry, phone, silence.
 - Examples named in this statement (knock, baby cry, alarm, traffic) are classes the code now supports.
+- From v1.8.0 the traffic class fires on vehicle warnings only (horns, reversing beeps, skidding, tyre squeal, train horn), not on engines. Bench testing found horn detection weak, so the traffic pattern is not a safety feature and must not be relied on to warn of a vehicle.
 - The audiogram stays with the person. It is not uploaded unless the person chooses to paste it into a tool they already use.
 - Classification by a regulator is decided by the claim. This file states the claim. It does not assert a Class I or Class IIa status.
 - A future clinical claim (for example compensation for reduced hearing) would require this file to be updated first, and every other file to follow it. Until that update, the research sentence is the claim.
@@ -25,4 +26,4 @@ If a study is run, the endpoints must match this sentence. Detection and identif
 
 ## Status
 
-Last confirmed 9 November 2026. Public release at that date: v1.7.0. Classifier-only bench results are in [BENCH_RESULTS.md](BENCH_RESULTS.md).
+Last confirmed 10 November 2026. Public release at that date: v1.8.0. Classifier-only bench results are in [BENCH_RESULTS.md](BENCH_RESULTS.md).

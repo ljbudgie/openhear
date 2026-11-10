@@ -14,7 +14,7 @@ Classes only (exactly the classes the code supports):
 - doorbell
 - alarm
 - dog
-- traffic
+- traffic (vehicle warnings only from v1.8.0: horns, reversing beeps, skidding, tyre squeal, train horn; not engines)
 - media
 - knock
 - baby_cry

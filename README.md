@@ -110,7 +110,7 @@ World → On-device classifier → Sound class → Short vibration pattern on th
          (weighted by the person's audiogram, held on the device)
 ```
 
-**Current claim:** detection and identification of everyday environmental sound classes, delivered as distinct haptic patterns. Supported classes: voice, doorbell, alarm, dog, traffic, media, knock, baby_cry, phone. Not speech recognition. Not amplification. Not a replacement for clinical care.
+**Current claim:** detection and identification of everyday environmental sound classes, delivered as distinct haptic patterns. Supported classes: voice, doorbell, alarm, dog, traffic, media, knock, baby_cry, phone. From v1.8.0 the traffic class fires on vehicle warnings only (horns, reversing beeps, skidding, tyre squeal, train horn), not on engines. Bench testing found horn detection weak, so the traffic pattern is not a safety feature and must not be relied on to warn of a vehicle. Measured hit rates and false alerts, including the weak ones, are in [docs/BENCH_RESULTS.md](docs/BENCH_RESULTS.md). Not speech recognition. Not amplification. Not a replacement for clinical care.
 
 **Audiogram module** — the person's own thresholds stay on the device and weight the patterns. See the Living Hearing Profile.
 

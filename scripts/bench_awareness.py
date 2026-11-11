@@ -424,6 +424,78 @@ def score_scheme(clips: list[Decided], scheme: str) -> dict:
 # ---------------------------------------------------------------------------
 
 
+# ---------------------------------------------------------------------------
+# Input probes: does what happens to the audio before the model matter?
+# ---------------------------------------------------------------------------
+
+PROBE_CLASS = "traffic"
+
+
+def to_mono(samples: np.ndarray) -> np.ndarray:
+    mono = np.asarray(samples, dtype=np.float32)
+    return mono.mean(axis=1) if mono.ndim > 1 else mono
+
+
+def shift_half_window(samples: np.ndarray, sample_rate: int) -> np.ndarray:
+    """Drop the first half window, so every later window starts half a window later."""
+    return to_mono(samples)[int(round(sample_rate * WINDOW_SECONDS / 2)) :]
+
+
+def bandlimited_16k(samples: np.ndarray, sample_rate: int, target: int = 16_000) -> np.ndarray:
+    """Resample to 16 kHz with a band-limited polyphase filter (scipy)."""
+    from scipy.signal import resample_poly
+
+    mono = to_mono(samples)
+    if int(sample_rate) == target or not len(mono):
+        return mono
+    divisor = math.gcd(int(sample_rate), target)
+    return resample_poly(mono, target // divisor, int(sample_rate) // divisor).astype(np.float32)
+
+
+def summarise_input_probes(decided_by_name: dict[str, list[Decided]], scheme: str) -> dict:
+    """For PROBE_CLASS target clips: which fire under each input, and what changed."""
+    names = list(decided_by_name)
+    shipped_name = names[0]
+    per_clip: dict[str, dict[str, bool]] = {}
+    groups: dict[str, tuple[str, ...]] = {}
+    for name, decided in decided_by_name.items():
+        for clip in decided:
+            if PROBE_CLASS not in clip.spec.targets.get(scheme, ()):
+                continue
+            per_clip.setdefault(clip.spec.clip_id, {})[name] = PROBE_CLASS in clip.fired(
+                DEFAULT_MIN_CONFIDENCE
+            )
+            groups[clip.spec.clip_id] = clip.spec.groups
+    complete = {cid: row for cid, row in per_clip.items() if len(row) == len(names)}
+
+    def table(rows: list[dict[str, bool]]) -> dict:
+        out: dict = {"clips": len(rows), "fired": {n: sum(r[n] for r in rows) for n in names}}
+        out["fired_under_any_input"] = sum(any(r.values()) for r in rows)
+        out["against_shipped"] = {
+            n: {
+                "gained": sum(1 for r in rows if r[n] and not r[shipped_name]),
+                "lost": sum(1 for r in rows if not r[n] and r[shipped_name]),
+            }
+            for n in names[1:]
+        }
+        if len(names) > 1:
+            first = names[1]
+            out[f"fired_under_shipped_or_{first.split('+')[-1]}"] = sum(
+                1 for r in rows if r[shipped_name] or r[first]
+            )
+        return out
+
+    by_group: dict[str, list[dict[str, bool]]] = {}
+    for cid, row in complete.items():
+        for group in groups[cid]:
+            by_group.setdefault(group, []).append(row)
+    return {
+        "class": PROBE_CLASS,
+        "all": table(list(complete.values())),
+        "by_group": {group: table(rows) for group, rows in sorted(by_group.items())},
+    }
+
+
 def hash_report(report: dict) -> str:
     """SHA-256 of the report body with ``report_sha256`` nulled (as scripts.benchmark)."""
     body = dict(report)
@@ -444,24 +516,32 @@ def build_report(
     provenance: dict,
     dataset_notes: dict | None = None,
     voice_rule_v3: bool = False,
+    input_probes: dict[str, list[tuple[datasets.ClipSpec, np.ndarray]]] | None = None,
 ) -> dict:
     """Assemble the signed report from stored scores.
 
     By default the v1.7.0 and v1.8.0 label maps are compared. With
     ``voice_rule_v3`` the current label map is scored with rule V3 off and on.
+    With ``input_probes`` the current label map is scored on the shipped input
+    (``scored``) and on each probe's re-scored input.
     """
-    if voice_rule_v3:
-        current = datasets.SCHEMES[-1]
-        plan = [(current, current, 0.0), (V3_SCHEME, current, VOICE_RULE_V3_MINIMUM)]
+    current = datasets.SCHEMES[-1]
+    if input_probes is not None:
+        plan = [(current, current, 0.0, scored)]
+        plan += [(f"{current}+{name}", current, 0.0, rows) for name, rows in input_probes.items()]
+    elif voice_rule_v3:
+        plan = [(current, current, 0.0, scored), (V3_SCHEME, current, VOICE_RULE_V3_MINIMUM, scored)]
     else:
-        plan = [(scheme, scheme, 0.0) for scheme in datasets.SCHEMES]
+        plan = [(scheme, scheme, 0.0, scored) for scheme in datasets.SCHEMES]
     schemes = {}
-    for name, scheme, voice_minimum in plan:
+    decided_by_name: dict[str, list[Decided]] = {}
+    for name, scheme, voice_minimum, rows in plan:
         decided = [
-            decide(spec, scores, labels, label_maps[scheme], voice_minimum) for spec, scores in scored
+            decide(spec, scores, labels, label_maps[scheme], voice_minimum) for spec, scores in rows
         ]
+        decided_by_name[name] = decided
         result = score_scheme(decided, scheme)
-        specs = [spec for spec, _ in scored]
+        specs = [spec for spec, _ in rows]
         every = [key for key in SOUND_PROFILES if key != "silence"]
         tested = tested_classes(specs, scheme)
         result["classes_tested"] = tested
@@ -506,9 +586,19 @@ def build_report(
                 ),
             },
             "schemes_in_this_report": list(schemes),
+            "input_probes": {
+                f"{current}+shifted": "Windows start half a window (0.4875 s) later.",
+                f"{current}+bandlimited": (
+                    "Clip resampled to 16 kHz with a band-limited polyphase filter before "
+                    "windowing; the shipped code uses linear interpolation with no filter."
+                ),
+            },
         },
         "clips": {"scored": len(scored), "windows": int(sum(len(s) for _, s in scored))},
         "schemes": schemes,
+        "input_probes": (
+            summarise_input_probes(decided_by_name, current) if input_probes is not None else None
+        ),
         "report_sha256": None,
     }
     report["report_sha256"] = hash_report(report)
@@ -631,6 +721,28 @@ def render_markdown(report: dict) -> str:
             ),
             "",
         ]
+    probes = report.get("input_probes")
+    if probes:
+        names = list(probes["all"]["fired"])
+        lines += [
+            f"Input probes on {probes['class']} target clips (pattern fired at "
+            f"{report['method']['shipped_threshold']:.2f}):",
+            "",
+            "| Group | Clips | " + " | ".join(names) + " | Under any input | "
+            + " | ".join(f"{n.split('+')[-1]}: gained / lost" for n in names[1:]) + " |",
+            "|---|---|" + "---|" * (2 * len(names)),
+        ]
+        for group, row in [("all", probes["all"]), *probes["by_group"].items()]:
+            changes = [
+                f"+{row['against_shipped'][n]['gained']} / -{row['against_shipped'][n]['lost']}"
+                for n in names[1:]
+            ]
+            lines.append(
+                f"| {group} | {row['clips']} | "
+                + " | ".join(str(row["fired"][n]) for n in names)
+                + f" | {row['fired_under_any_input']} | " + " | ".join(changes) + " |"
+            )
+        lines.append("")
     lines += [
         "Provenance:",
         "",
@@ -747,6 +859,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", help="Write the signed JSON report here")
     parser.add_argument("--markdown", help="Write the Markdown results section here")
     parser.add_argument("--scores-out", help="Write raw scores here (.npz); a .top10.jsonl.gz is written beside it")
+    parser.add_argument(
+        "--input-probes",
+        action="store_true",
+        help="Also score every clip with shifted windows and with band-limited resampling",
+    )
     parser.add_argument("--limit", type=int, help="Only the first N clips (smoke test)")
     args = parser.parse_args(argv)
 
@@ -762,6 +879,11 @@ def main(argv: list[str] | None = None) -> int:
     notes["clips_listed"] = len(specs)
 
     scored: list[tuple[datasets.ClipSpec, np.ndarray]] = []
+    probes: dict[str, list[tuple[datasets.ClipSpec, np.ndarray]]] | None = None
+    if args.input_probes:
+        if args.stored_scores or args.voice_rule_v3:
+            parser.error("--input-probes needs the audio and the model, and is run on its own")
+        probes = {"shifted": [], "bandlimited": []}
     raw_sha = top_sha = None
     if args.stored_scores:
         by_clip, stored_labels, _ = load_stored_scores(Path(args.stored_scores))
@@ -781,6 +903,13 @@ def main(argv: list[str] | None = None) -> int:
         )
         for index, (spec, samples, rate) in enumerate(audio, start=1):
             scored.append((spec, score_clip(classifier, samples, rate)))
+            if probes is not None:
+                probes["shifted"].append(
+                    (spec, score_clip(classifier, shift_half_window(samples, rate), rate))
+                )
+                probes["bandlimited"].append(
+                    (spec, score_clip(classifier, bandlimited_16k(samples, rate), 16_000))
+                )
             if index % 250 == 0:
                 print(f"scored {index}/{len(specs)} clips", file=sys.stderr, flush=True)
         notes["clips_with_audio_found"] = len(scored)
@@ -818,6 +947,7 @@ def main(argv: list[str] | None = None) -> int:
         provenance,
         notes,
         voice_rule_v3=args.voice_rule_v3,
+        input_probes=probes,
     )
     text = json.dumps(report, indent=2, sort_keys=True)
     if args.out:

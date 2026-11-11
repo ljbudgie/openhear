@@ -13,10 +13,10 @@ on:
         default: esc50
         options: [esc50, fsd50k, sonyc, all]
       mode:
-        description: Run the model, re-analyse stored scores under all candidate rules, or score rule V3 alone on stored scores
+        description: Run the model; run it with the input probes (shifted windows, band-limited resampling); re-analyse stored scores under all candidate rules; or score rule V3 alone on stored scores
         type: choice
         default: run-model
-        options: [run-model, reanalyse-stored-scores, score-v3-on-stored-scores]
+        options: [run-model, input-probes, reanalyse-stored-scores, score-v3-on-stored-scores]
       scores_run_esc50:
         description: Run whose stored ESC-50 scores to re-analyse
         default: "42899256052"
@@ -38,11 +38,12 @@ concurrency:
 env:
   MODEL_URL: https://storage.googleapis.com/mediapipe-models/audio_classifier/yamnet/float32/1/yamnet.tflite
   RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+  PROBE_FLAG: ${{ inputs.mode == 'input-probes' && '--input-probes' || '' }}
 
 jobs:
   esc50:
     name: ESC-50 (before/after comparison)
-    if: (inputs.mode == 'run-model' || inputs.mode == '') && (inputs.dataset == 'esc50' || inputs.dataset == 'all')
+    if: (inputs.mode == 'run-model' || inputs.mode == 'input-probes' || inputs.mode == '') && (inputs.dataset == 'esc50' || inputs.dataset == 'all')
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -51,7 +52,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install dependencies
-        run: pip install numpy ai-edge-litert soundfile
+        run: pip install numpy scipy ai-edge-litert soundfile
       - name: Download YAMNet model
         run: |
           mkdir -p "$RUNNER_TEMP/model"
@@ -68,7 +69,7 @@ jobs:
             --model "$RUNNER_TEMP/model/yamnet.tflite" --model-source "$MODEL_URL" \
             --dataset-version "$DATASET_VERSION" --run-url "$RUN_URL" \
             --out bench_esc50.json --markdown bench_esc50.md \
-            --scores-out bench_esc50_scores.npz > /dev/null
+            --scores-out bench_esc50_scores.npz $PROBE_FLAG > /dev/null
       - name: Print report
         run: |
           cat bench_esc50.md | tee -a "$GITHUB_STEP_SUMMARY"
@@ -82,7 +83,7 @@ jobs:
 
   fsd50k:
     name: FSD50K eval (CC0 and CC BY clips only)
-    if: (inputs.mode == 'run-model' || inputs.mode == '') && (inputs.dataset == 'fsd50k' || inputs.dataset == 'all')
+    if: (inputs.mode == 'run-model' || inputs.mode == 'input-probes' || inputs.mode == '') && (inputs.dataset == 'fsd50k' || inputs.dataset == 'all')
     runs-on: ubuntu-latest
     timeout-minutes: 150
     env:
@@ -93,7 +94,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install dependencies
-        run: pip install numpy ai-edge-litert soundfile
+        run: pip install numpy scipy ai-edge-litert soundfile
       - name: Free disk space
         run: |
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
@@ -122,7 +123,7 @@ jobs:
             --model "$RUNNER_TEMP/model/yamnet.tflite" --model-source "$MODEL_URL" \
             --dataset-version "Zenodo record 4060432, version 1.0" --run-url "$RUN_URL" \
             --out bench_fsd50k.json --markdown bench_fsd50k.md \
-            --scores-out bench_fsd50k_scores.npz > /dev/null
+            --scores-out bench_fsd50k_scores.npz $PROBE_FLAG > /dev/null
       - name: Print report
         run: |
           cat bench_fsd50k.md | tee -a "$GITHUB_STEP_SUMMARY"
@@ -136,7 +137,7 @@ jobs:
 
   sonyc:
     name: SONYC-UST v2.3.0 (verified street recordings)
-    if: (inputs.mode == 'run-model' || inputs.mode == '') && (inputs.dataset == 'sonyc' || inputs.dataset == 'all')
+    if: (inputs.mode == 'run-model' || inputs.mode == 'input-probes' || inputs.mode == '') && (inputs.dataset == 'sonyc' || inputs.dataset == 'all')
     runs-on: ubuntu-latest
     timeout-minutes: 150
     env:
@@ -147,7 +148,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install dependencies
-        run: pip install numpy ai-edge-litert soundfile
+        run: pip install numpy scipy ai-edge-litert soundfile
       - name: Download YAMNet model
         run: |
           mkdir -p "$RUNNER_TEMP/model"
@@ -179,7 +180,7 @@ jobs:
             --model "$RUNNER_TEMP/model/yamnet.tflite" --model-source "$MODEL_URL" \
             --dataset-version "Zenodo record 3966543, version 2.3.0" --run-url "$RUN_URL" \
             --out bench_sonyc.json --markdown bench_sonyc.md \
-            --scores-out bench_sonyc_scores.npz > /dev/null
+            --scores-out bench_sonyc_scores.npz $PROBE_FLAG > /dev/null
       - name: Print report
         run: |
           cat bench_sonyc.md | tee -a "$GITHUB_STEP_SUMMARY"

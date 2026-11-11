@@ -1,6 +1,6 @@
 # Bench results — classifier only
 
-**Status:** v1.8.0 results measured on 10 November 2026. Candidate rules for v1.9.0 measured on 11 November 2026; none is enabled. Every figure on this page comes from a signed report of a GitHub Actions run of `scripts/bench_awareness.py`. The v1.7.0 results this page replaces are in [bench/awareness_bench_v1.7.0.json](bench/awareness_bench_v1.7.0.json) and are reproduced below.
+**Status:** v1.8.0 results measured on 10 November 2026. Candidate rules for v1.9.0 measured on 11 November 2026; one (V3) is available behind a flag that is off by default. Every figure on this page comes from a signed report of a GitHub Actions run of `scripts/bench_awareness.py`. The v1.7.0 results this page replaces are in [bench/awareness_bench_v1.7.0.json](bench/awareness_bench_v1.7.0.json) and are reproduced below.
 
 ## Read this first
 
@@ -13,7 +13,7 @@
 
 This page says how often the classifier fires the right wristband pattern for a recorded sound, and how often it fires a pattern for a sound that has no OpenHear class. It says nothing about whether a person can feel or name a pattern. The claim these numbers sit under is [INTENDED_PURPOSE.md](INTENDED_PURPOSE.md).
 
-## v1.9.0 work in progress: seven candidate rules, none enabled
+## v1.9.0 work in progress: seven candidate rules, one available behind a flag
 
 **Status:** Measured on 11 November 2026 on the `v1.9.0-dev` branch. The shipped classifier is unchanged from v1.8.0.
 
@@ -23,10 +23,23 @@ The rules, the measures and the pass conditions were committed in [BENCH_PLAN_v1
 
 ### Result
 
-- **No rule is enabled.**
+- **No rule is on by default.** One rule, V3, can be switched on with a flag.
 - **Both horn rules failed.** Letting alarm and traffic outrank other classes recovered no horn clip on any dataset. On FSD50K the wider rule (H2) also took the phone pattern from 41 ringing-phone clips and gave them to alarm.
 - **Horn misses are mostly not a masking problem.** At the baseline, a horn label scored 0.20 or more and lost the window to another class on 1 ESC-50 clip, no FSD50K clip and 1 SONYC-UST clip. On FSD50K and SONYC-UST most missed clips had no horn label reaching 0.05; on ESC-50 the largest group won a window with a score between 0.05 and 0.20. The fix is not in the decision rule.
-- **All four voice rules passed the plan's conditions, and all stay switched off.** Each one trades false alerts for missed speech. That trade-off is a decision for the project owner and has not been made.
+- **All four voice rules passed the plan's conditions.** Each one trades false alerts for missed speech. The project owner chose V3; it is available behind a flag that is off by default (see "Enabled rules"). V1, V2 and V4 stay bench-only.
+
+### Enabled rules
+
+**Rule V3 (voice minimum 0.30) is available behind one flag. The flag is off by default, so the shipped behaviour is unchanged from v1.8.0 until someone sets it.** No other rule is available: V1, V2, V4, H1, H2 and C1 remain bench-only.
+
+- **The flag:** set the environment variable `OPENHEAR_VOICE_RULE_V3=1` before starting OpenHear. Code can instead pass `voice_minimum=0.30` to `classify_scores()`.
+- **What it does:** a window won by the voice class fires only if its score is at least 0.30. A voice window below that fires nothing; it does not pass to another class. No other class is affected.
+- **Measured trade-off on FSD50K:** 88 fewer false-alert clips (1,286 to 1,198 of 5,586) for 17 speech clips no longer caught (530 to 513 of 656).
+- **On the other datasets:** false-alert clips fall from 262 to 239 of 1,760 on ESC-50 and from 16 to 13 of 374 on SONYC-UST. Neither has speech targets, so neither can show a speech cost. No siren, alarm, horn or other target hit changed on any dataset.
+- **Where the numbers come from:** the existing signed reports listed under "Provenance for the rules" below. Nothing here has been independently reviewed.
+- **Why 0.30 and not higher:** the decision was the project owner's, taken after the trade-off table below was published. V4 (0.50) removes more false alerts and loses 60 speech clips.
+
+Because the model's scores take few values, a minimum of 0.30 in practice means the next step up, 0.332: voice windows scoring 0.199 are already below the 0.20 threshold, and the rule removes those scoring 0.262.
 
 ### Verdict, computed from the three reports
 

@@ -59,11 +59,13 @@ from scripts import bench_datasets as datasets
 from stream.haptic_mapper import SOUND_PROFILES
 from stream.sound_classifier import (
     DEFAULT_MIN_CONFIDENCE,
+    VOICE_RULE_V3_MINIMUM,
     WINDOW_SECONDS,
     map_label_to_sound_key,
 )
 
 SCHEMA_VERSION = 2
+V3_SCHEME = "v1.8.0+V3"
 REPO_ROOT = Path(__file__).resolve().parent.parent
 LABELS_CSV = REPO_ROOT / "stream" / "data" / "yamnet_class_map.csv"
 LABEL_MAP_V17 = REPO_ROOT / "docs" / "bench" / "label_map_v1.7.0.json"
@@ -192,12 +194,18 @@ class Decided:
 
 
 def decide(
-    spec: datasets.ClipSpec, scores: np.ndarray, labels: list[str], label_map: dict[str, str]
+    spec: datasets.ClipSpec,
+    scores: np.ndarray,
+    labels: list[str],
+    label_map: dict[str, str],
+    voice_minimum: float = 0.0,
 ) -> Decided:
     """Apply a label map to one clip's stored scores, as ``classify_scores`` does.
 
     The highest-scoring mapped label wins each window. Ties go to the lower
     class index, and a score of zero never wins, matching the shipped loop.
+    ``voice_minimum`` applies rule V3 as the shipped classifier does: a window
+    won by voice below that score fires nothing.
     """
     win_class: list[str] = []
     win_score: list[float] = []
@@ -214,6 +222,11 @@ def decide(
                 continue
             position = int(np.argmax(row))
             label = labels[mapped[position]]
+            if label_map[label] == "voice" and float(row[position]) < voice_minimum:
+                win_class.append("silence")
+                win_score.append(0.0)
+                win_label.append("silence")
+                continue
             win_class.append(label_map[label])
             win_score.append(float(row[position]))
             win_label.append(label)
@@ -430,11 +443,23 @@ def build_report(
     label_maps: dict[str, dict[str, str]],
     provenance: dict,
     dataset_notes: dict | None = None,
+    voice_rule_v3: bool = False,
 ) -> dict:
-    """Assemble the signed report from stored scores."""
+    """Assemble the signed report from stored scores.
+
+    By default the v1.7.0 and v1.8.0 label maps are compared. With
+    ``voice_rule_v3`` the current label map is scored with rule V3 off and on.
+    """
+    if voice_rule_v3:
+        current = datasets.SCHEMES[-1]
+        plan = [(current, current, 0.0), (V3_SCHEME, current, VOICE_RULE_V3_MINIMUM)]
+    else:
+        plan = [(scheme, scheme, 0.0) for scheme in datasets.SCHEMES]
     schemes = {}
-    for scheme in datasets.SCHEMES:
-        decided = [decide(spec, scores, labels, label_maps[scheme]) for spec, scores in scored]
+    for name, scheme, voice_minimum in plan:
+        decided = [
+            decide(spec, scores, labels, label_maps[scheme], voice_minimum) for spec, scores in scored
+        ]
         result = score_scheme(decided, scheme)
         specs = [spec for spec, _ in scored]
         every = [key for key in SOUND_PROFILES if key != "silence"]
@@ -442,7 +467,8 @@ def build_report(
         result["classes_tested"] = tested
         result["classes_not_tested"] = [key for key in every if key not in tested]
         result["label_map_sha256"] = label_map_sha256(label_maps[scheme])
-        schemes[scheme] = result
+        result["voice_minimum"] = voice_minimum
+        schemes[name] = result
     report = {
         "schema_version": SCHEMA_VERSION,
         "kind": "openhear-awareness-bench",
@@ -473,8 +499,13 @@ def build_report(
             "shipped_threshold": DEFAULT_MIN_CONFIDENCE,
             "schemes": {
                 "v1.7.0": "Label map shipped in v1.7.0 (any engine fired traffic).",
-                "v1.8.0": "Label map in this release (traffic is an allowlist of vehicle warnings).",
+                "v1.8.0": "Current label map (traffic is an allowlist of vehicle warnings).",
+                V3_SCHEME: (
+                    "Current label map with rule V3 on: a window won by voice fires only "
+                    f"if its score is at least {VOICE_RULE_V3_MINIMUM:.2f}."
+                ),
             },
+            "schemes_in_this_report": list(schemes),
         },
         "clips": {"scored": len(scored), "windows": int(sum(len(s) for _, s in scored))},
         "schemes": schemes,
@@ -660,6 +691,21 @@ def write_raw_scores(
             )
 
 
+def load_stored_scores(path: Path) -> tuple[dict[str, np.ndarray], list[str], np.ndarray]:
+    """Read a ``*_scores.npz`` written by ``write_raw_scores``.
+
+    Returns (scores by clip id, YAMNet labels, the full matrix).
+    """
+    data = np.load(path, allow_pickle=False)
+    matrix = data["scores"]
+    by_clip: dict[str, np.ndarray] = {}
+    start = 0
+    for clip_id, count in zip(data["clip_ids"], data["windows_per_clip"], strict=True):
+        by_clip[str(clip_id)] = matrix[start : start + int(count)]
+        start += int(count)
+    return by_clip, [str(label) for label in data["labels"]], matrix
+
+
 def load_specs(dataset: str, root: Path) -> tuple[list[datasets.ClipSpec], dict, str, str]:
     """Return (specs, notes, source, licence) for a dataset rooted at *root*."""
     if dataset == "esc50":
@@ -684,7 +730,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--data", required=True, help="Dataset root (metadata)")
     parser.add_argument("--audio-dir", help="Directory holding the audio (default: dataset root)")
     parser.add_argument("--audio-zip", help="Read audio straight from this zip archive")
-    parser.add_argument("--model", required=True, help="Path to the YAMNet .tflite model")
+    parser.add_argument("--model", help="Path to the YAMNet .tflite model")
+    parser.add_argument(
+        "--stored-scores",
+        help="Score a stored *_scores.npz from an earlier run instead of running the model",
+    )
+    parser.add_argument("--scores-run", default=None, help="Workflow run the stored scores came from")
+    parser.add_argument(
+        "--voice-rule-v3",
+        action="store_true",
+        help="Score the current label map with rule V3 (voice minimum 0.30) off and on",
+    )
     parser.add_argument("--model-source", default="unknown")
     parser.add_argument("--dataset-version", default="unknown")
     parser.add_argument("--run-url", default="local run")
@@ -694,31 +750,42 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--limit", type=int, help="Only the first N clips (smoke test)")
     args = parser.parse_args(argv)
 
-    from stream.sound_classifier import YamnetClassifier
+    if bool(args.model) == bool(args.stored_scores):
+        parser.error("give exactly one of --model (run the model) or --stored-scores (re-score)")
 
     root = Path(args.data)
     labels = load_yamnet_labels()
     specs, notes, source, licence = load_specs(args.dataset, root)
     if args.limit:
         specs = specs[: args.limit]
-    classifier = YamnetClassifier(args.model, str(LABELS_CSV))
-
-    scored: list[tuple[datasets.ClipSpec, np.ndarray]] = []
-    audio = datasets.iter_audio(
-        specs,
-        audio_dir=Path(args.audio_dir) if args.audio_dir else root,
-        audio_zip=Path(args.audio_zip) if args.audio_zip else None,
-    )
-    for index, (spec, samples, rate) in enumerate(audio, start=1):
-        scored.append((spec, score_clip(classifier, samples, rate)))
-        if index % 250 == 0:
-            print(f"scored {index}/{len(specs)} clips", file=sys.stderr, flush=True)
     notes = dict(notes)
     notes["clips_listed"] = len(specs)
-    notes["clips_with_audio_found"] = len(scored)
 
+    scored: list[tuple[datasets.ClipSpec, np.ndarray]] = []
     raw_sha = top_sha = None
-    if args.scores_out:
+    if args.stored_scores:
+        by_clip, stored_labels, _ = load_stored_scores(Path(args.stored_scores))
+        if stored_labels != labels:
+            raise SystemExit("stored scores were made with a different YAMNet label list")
+        scored = [(spec, by_clip[spec.clip_id]) for spec in specs if spec.clip_id in by_clip]
+        notes["clips_with_stored_scores"] = len(scored)
+        raw_sha = _sha256_file(Path(args.stored_scores))
+    else:
+        from stream.sound_classifier import YamnetClassifier
+
+        classifier = YamnetClassifier(args.model, str(LABELS_CSV))
+        audio = datasets.iter_audio(
+            specs,
+            audio_dir=Path(args.audio_dir) if args.audio_dir else root,
+            audio_zip=Path(args.audio_zip) if args.audio_zip else None,
+        )
+        for index, (spec, samples, rate) in enumerate(audio, start=1):
+            scored.append((spec, score_clip(classifier, samples, rate)))
+            if index % 250 == 0:
+                print(f"scored {index}/{len(specs)} clips", file=sys.stderr, flush=True)
+        notes["clips_with_audio_found"] = len(scored)
+
+    if args.scores_out and not args.stored_scores:
         npz_path = Path(args.scores_out)
         top_path = npz_path.with_suffix(".top10.jsonl.gz")
         write_raw_scores(scored, labels, npz_path, top_path)
@@ -726,8 +793,10 @@ def main(argv: list[str] | None = None) -> int:
 
     provenance = {
         "git_sha": _git(["rev-parse", "HEAD"]),
-        "model_sha256": _sha256_file(Path(args.model)),
+        "model_was_run": not args.stored_scores,
+        "model_sha256": _sha256_file(Path(args.model)) if args.model else None,
         "model_source": args.model_source,
+        "stored_scores_from_run": args.scores_run,
         "dataset_source": source,
         "dataset_version": args.dataset_version,
         "dataset_licence": licence,
@@ -741,7 +810,15 @@ def main(argv: list[str] | None = None) -> int:
         },
         "limit": args.limit,
     }
-    report = build_report(args.dataset, scored, labels, load_label_maps(labels), provenance, notes)
+    report = build_report(
+        args.dataset,
+        scored,
+        labels,
+        load_label_maps(labels),
+        provenance,
+        notes,
+        voice_rule_v3=args.voice_rule_v3,
+    )
     text = json.dumps(report, indent=2, sort_keys=True)
     if args.out:
         Path(args.out).write_text(text + "\n", encoding="utf-8")

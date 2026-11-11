@@ -424,16 +424,7 @@ KEY_GROUPS: dict[str, tuple[str, ...]] = {
 }
 
 
-def load_stored_scores(path: Path) -> tuple[dict[str, np.ndarray], list[str], np.ndarray]:
-    """Read a ``*_scores.npz`` written by bench_awareness. Returns (by clip id, labels, matrix)."""
-    data = np.load(path, allow_pickle=False)
-    matrix = data["scores"]
-    by_clip: dict[str, np.ndarray] = {}
-    start = 0
-    for clip_id, count in zip(data["clip_ids"], data["windows_per_clip"], strict=True):
-        by_clip[str(clip_id)] = matrix[start : start + int(count)]
-        start += int(count)
-    return by_clip, [str(label) for label in data["labels"]], matrix
+load_stored_scores = bench.load_stored_scores
 
 
 def build_report(

@@ -13,6 +13,7 @@ This module provides:
 from __future__ import annotations
 
 import csv
+import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -167,12 +168,43 @@ def class_scores(scores_by_label: dict[str, float]) -> dict[str, tuple[float, st
     return best
 
 
+# Optional rule V3 ("voice minimum 0.30"), off by default.
+#
+# When it is on, a window won by the voice class fires only if its score is at
+# least 0.30. A voice window below that fires nothing; it does not pass to the
+# next class. No other class is affected.
+#
+# Turn it on by setting the environment variable OPENHEAR_VOICE_RULE_V3=1, or
+# by passing voice_minimum=VOICE_RULE_V3_MINIMUM to classify_scores().
+# The measured trade-off is in docs/BENCH_RESULTS.md ("Enabled rules").
+VOICE_RULE_V3_ENV = "OPENHEAR_VOICE_RULE_V3"
+VOICE_RULE_V3_MINIMUM = 0.30
+
+
+def voice_rule_v3_enabled() -> bool:
+    """True when the OPENHEAR_VOICE_RULE_V3 flag is set to 1, true, yes or on."""
+    return os.environ.get(VOICE_RULE_V3_ENV, "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def default_voice_minimum() -> float:
+    """The voice minimum in force: 0.30 when rule V3 is switched on, otherwise none."""
+    return VOICE_RULE_V3_MINIMUM if voice_rule_v3_enabled() else 0.0
+
+
 def classify_scores(
     scores_by_label: dict[str, float],
     *,
     min_confidence: float = DEFAULT_MIN_CONFIDENCE,
+    voice_minimum: float | None = None,
 ) -> ClassifiedSound:
-    """Aggregate YAMNet-like label scores into one OpenHear category."""
+    """Aggregate YAMNet-like label scores into one OpenHear category.
+
+    ``voice_minimum`` is the extra minimum score for a window won by voice.
+    Left as ``None`` it follows the OPENHEAR_VOICE_RULE_V3 flag, which is off
+    by default, so the shipped behaviour is unchanged unless the flag is set.
+    """
+    if voice_minimum is None:
+        voice_minimum = default_voice_minimum()
     best_sound = "silence"
     best_score = 0.0
     best_label = "silence"
@@ -187,6 +219,8 @@ def classify_scores(
             best_label = label
 
     if best_score < min_confidence or best_sound == "silence":
+        return ClassifiedSound("silence", 0.0, "silence")
+    if best_sound == "voice" and best_score < voice_minimum:
         return ClassifiedSound("silence", 0.0, "silence")
     return ClassifiedSound(best_sound, best_score, best_label)
 

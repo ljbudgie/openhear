@@ -35,6 +35,14 @@ Horn rules. They only apply when the best alarm label or the best traffic label 
 | H1 | Alarm and traffic outrank voice and media | a voice or media winner |
 | H2 | Alarm and traffic outrank everything | any other winner |
 
+Combined rule.
+
+| Rule | Name | What it does |
+|---|---|---|
+| C1 | H1 with V1 | H1 is applied first, then V1 to the windows voice still wins |
+
+The brief for this work named six rules (four voice, two horn) and asked for seven. C1 is the seventh. It was added in the second commit of this plan, still before any run, and the combination was fixed then so that it could not be picked after seeing results. Because it contains a voice rule, it is treated as a voice rule below and stays switched off.
+
 ## Measures
 
 - **Hit:** a target clip where its class fires in at least one window.
@@ -56,11 +64,13 @@ These are checked by code (`scripts/bench_rules.py`), not by eye.
 **Selected on ESC-50.**
 
 - A voice rule is selected if it passes the gate, has fewer false-alert clips than the baseline, and no target class has fewer hits than the baseline.
+- C1 is selected if it meets both the voice-rule and the horn-rule conditions.
 - A horn rule is selected if it passes the gate, has more car-horn hits than the baseline, adds no more wrong alarm-or-traffic clips than the horn hits it gains, and no target class has fewer hits than the baseline.
 
 **Confirmed on FSD50K and on SONYC-UST (each separately).**
 
 - A voice rule is confirmed if it passes the gate and has no more false-alert clips than the baseline.
+- C1 is confirmed if it meets both the voice-rule and the horn-rule conditions.
 - A horn rule is confirmed if it passes the gate, traffic hits are not lower than the baseline, the wrong alarm-or-traffic clips it adds are no more than the alarm and traffic hits it gains, and the hits other classes lose are no more than the alarm and traffic hits it gains.
 
 **Result.**

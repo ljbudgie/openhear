@@ -1,0 +1,134 @@
+{
+  "kind": "openhear-awareness-bench-rules-verdict",
+  "plan": "docs/BENCH_PLAN_v1.9.md",
+  "report_sha256": "e0f99daa9d3a91c084b0b8b6d7ec473d55c341cebb5ec461435303fa3f77fef7",
+  "report_sha256_by_dataset": {
+    "esc50": "c524ccc131fcaa09ccc19e4d0eb3502bd3fe78f922f1be5b31895131cc1ac6f9",
+    "fsd50k": "d8cd7049e94fc1c6ce5a0f1fb2135bdbeff6e7c07c6926351579887ad98ce3c5",
+    "sonyc": "8926bca70a847941297a17cca6fd961fec43c5b1b1480c9857a89eada3e7c3c3"
+  },
+  "rule_that_may_be_enabled": null,
+  "rules": {
+    "C1": {
+      "confirmed_on": {
+        "fsd50k": false,
+        "sonyc": true
+      },
+      "family": "combined",
+      "gate_no_alarm_hit_lost": {
+        "esc50": true,
+        "fsd50k": true,
+        "sonyc": true
+      },
+      "may_be_enabled": false,
+      "missed_speech_on_fsd50k": 4,
+      "name": "H1 with V1 (H1 applied first)",
+      "passes_protocol": false,
+      "selected_on_esc50": false
+    },
+    "H1": {
+      "confirmed_on": {
+        "fsd50k": false,
+        "sonyc": true
+      },
+      "family": "horn",
+      "gate_no_alarm_hit_lost": {
+        "esc50": true,
+        "fsd50k": true,
+        "sonyc": true
+      },
+      "may_be_enabled": false,
+      "missed_speech_on_fsd50k": 0,
+      "name": "Alarm and traffic outrank voice and media",
+      "passes_protocol": false,
+      "selected_on_esc50": false
+    },
+    "H2": {
+      "confirmed_on": {
+        "fsd50k": false,
+        "sonyc": true
+      },
+      "family": "horn",
+      "gate_no_alarm_hit_lost": {
+        "esc50": true,
+        "fsd50k": true,
+        "sonyc": true
+      },
+      "may_be_enabled": false,
+      "missed_speech_on_fsd50k": 0,
+      "name": "Alarm and traffic outrank everything",
+      "passes_protocol": false,
+      "selected_on_esc50": false
+    },
+    "V1": {
+      "confirmed_on": {
+        "fsd50k": true,
+        "sonyc": true
+      },
+      "family": "voice",
+      "gate_no_alarm_hit_lost": {
+        "esc50": true,
+        "fsd50k": true,
+        "sonyc": true
+      },
+      "may_be_enabled": false,
+      "missed_speech_on_fsd50k": 4,
+      "name": "Speech dominance: voice fires only if the top label of all 521 is a voice label",
+      "passes_protocol": true,
+      "selected_on_esc50": true
+    },
+    "V2": {
+      "confirmed_on": {
+        "fsd50k": true,
+        "sonyc": true
+      },
+      "family": "voice",
+      "gate_no_alarm_hit_lost": {
+        "esc50": true,
+        "fsd50k": true,
+        "sonyc": true
+      },
+      "may_be_enabled": false,
+      "missed_speech_on_fsd50k": 161,
+      "name": "Persistence: voice fires only if a neighbouring window was also won by voice",
+      "passes_protocol": true,
+      "selected_on_esc50": true
+    },
+    "V3": {
+      "confirmed_on": {
+        "fsd50k": true,
+        "sonyc": true
+      },
+      "family": "voice",
+      "gate_no_alarm_hit_lost": {
+        "esc50": true,
+        "fsd50k": true,
+        "sonyc": true
+      },
+      "may_be_enabled": false,
+      "missed_speech_on_fsd50k": 17,
+      "name": "Voice minimum 0.30",
+      "passes_protocol": true,
+      "selected_on_esc50": true
+    },
+    "V4": {
+      "confirmed_on": {
+        "fsd50k": true,
+        "sonyc": true
+      },
+      "family": "voice",
+      "gate_no_alarm_hit_lost": {
+        "esc50": true,
+        "fsd50k": true,
+        "sonyc": true
+      },
+      "may_be_enabled": false,
+      "missed_speech_on_fsd50k": 60,
+      "name": "Voice minimum 0.50",
+      "passes_protocol": true,
+      "selected_on_esc50": true
+    }
+  },
+  "schema_version": 1,
+  "voice_rules_stay_off": true
+}

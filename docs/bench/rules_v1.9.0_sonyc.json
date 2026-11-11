@@ -1,0 +1,876 @@
+{
+  "against_baseline": {
+    "C1": {
+      "alarm_and_traffic_hits_gained": 0,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": false,
+      "confirmed_if_held_out": true,
+      "false_alert_clips_change": 0,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 0,
+        "traffic": 0
+      },
+      "hits_lost_by_other_classes": 0,
+      "missed_speech": null,
+      "selected_if_esc50": false,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 0
+    },
+    "H1": {
+      "alarm_and_traffic_hits_gained": 0,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": false,
+      "confirmed_if_held_out": true,
+      "false_alert_clips_change": 0,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 0,
+        "traffic": 0
+      },
+      "hits_lost_by_other_classes": 0,
+      "missed_speech": null,
+      "selected_if_esc50": false,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 0
+    },
+    "H2": {
+      "alarm_and_traffic_hits_gained": 0,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": false,
+      "confirmed_if_held_out": true,
+      "false_alert_clips_change": 0,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 0,
+        "traffic": 0
+      },
+      "hits_lost_by_other_classes": 0,
+      "missed_speech": null,
+      "selected_if_esc50": false,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 0
+    },
+    "V1": {
+      "alarm_and_traffic_hits_gained": 0,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": false,
+      "confirmed_if_held_out": true,
+      "false_alert_clips_change": 0,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 0,
+        "traffic": 0
+      },
+      "hits_lost_by_other_classes": 0,
+      "missed_speech": null,
+      "selected_if_esc50": false,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 0
+    },
+    "V2": {
+      "alarm_and_traffic_hits_gained": 0,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": false,
+      "confirmed_if_held_out": true,
+      "false_alert_clips_change": -12,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 0,
+        "traffic": 0
+      },
+      "hits_lost_by_other_classes": 0,
+      "missed_speech": null,
+      "selected_if_esc50": true,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 0
+    },
+    "V3": {
+      "alarm_and_traffic_hits_gained": 0,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": false,
+      "confirmed_if_held_out": true,
+      "false_alert_clips_change": -3,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 0,
+        "traffic": 0
+      },
+      "hits_lost_by_other_classes": 0,
+      "missed_speech": null,
+      "selected_if_esc50": true,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 0
+    },
+    "V4": {
+      "alarm_and_traffic_hits_gained": 0,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": false,
+      "confirmed_if_held_out": true,
+      "false_alert_clips_change": -13,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 0,
+        "traffic": 0
+      },
+      "hits_lost_by_other_classes": 0,
+      "missed_speech": null,
+      "selected_if_esc50": true,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 0
+    }
+  },
+  "baseline": {
+    "label_map": "v1.8.0",
+    "label_map_sha256": "ab769cf78294ee3a871db0f6cf6d0ce231b56de966b0d3feb176b652b92f9230",
+    "matches_v1.8.0_report": {
+      "false_alerts_match": true,
+      "hits_match": true,
+      "raw_scores_sha256_match": true
+    },
+    "threshold": 0.2
+  },
+  "clips": {
+    "scored": 636,
+    "windows": 6360
+  },
+  "dataset": "sonyc",
+  "diagnostics": {
+    "horn": {
+      "alarm_target_clips": 107,
+      "alarm_target_clips_where_traffic_fired": 7,
+      "hits_at_0.05": 68,
+      "hits_at_0.20": 36,
+      "hits_by_clip_length": {
+        "6 to 10 windows": {
+          "hits": 36,
+          "of": 185
+        }
+      },
+      "horn_clips_where_alarm_fired": 23,
+      "horn_target_clips": 185,
+      "masked_by_class": {
+        "alarm": 1
+      },
+      "missed_at_0.20": 149,
+      "missed_by_cause": {
+        "index mapping: top label is a vehicle or engine label outside the allowlist": 6,
+        "masked: horn scored 0.20 or more but another class scored higher": 1,
+        "not detected: no horn label reached 0.05": 103,
+        "threshold: horn won a window but scored 0.05 to 0.20": 32,
+        "weak and outscored: horn scored 0.05 to 0.20 and another class won": 7
+      },
+      "missed_clips_top_yamnet_label": {
+        "Animal": 14,
+        "Mechanical fan": 4,
+        "Music": 3,
+        "Police car (siren)": 3,
+        "Rain": 3,
+        "Silence": 3,
+        "Siren": 3,
+        "Speech": 57,
+        "Vehicle": 15,
+        "Wind": 14
+      },
+      "missed_horn_clips_where_alarm_fired": 15,
+      "non_target_clips_where_traffic_fires_at_0.05": 16
+    },
+    "score_distributions": {
+      "alarm": {
+        "negative_clips": {
+          "0.0078": 4,
+          "0.0117": 7,
+          "0.0156": 9,
+          "0.0195": 8,
+          "0.0312": 11,
+          "0.0430": 3,
+          "0.0820": 3,
+          "0.1094": 1,
+          "0.1484": 1,
+          "0.1992": 1
+        },
+        "target_clips": {
+          "0.0117": 1,
+          "0.0312": 1,
+          "0.0430": 1,
+          "0.0820": 2,
+          "0.1484": 1,
+          "0.1992": 2,
+          "0.2617": 3,
+          "0.4141": 6,
+          "0.5000": 2,
+          "0.5859": 6,
+          "0.6680": 15,
+          "0.7383": 14,
+          "0.8008": 13,
+          "0.8516": 4,
+          "0.8906": 3,
+          "0.9180": 1,
+          "0.9570": 1,
+          "0.9688": 1,
+          "0.9844": 2,
+          "none": 28
+        }
+      },
+      "baby_cry": {
+        "negative_clips": {},
+        "target_clips": {}
+      },
+      "dog": {
+        "negative_clips": {
+          "0.0117": 1,
+          "0.0156": 1,
+          "0.0195": 2,
+          "0.0312": 1,
+          "0.0430": 2
+        },
+        "target_clips": {}
+      },
+      "media": {
+        "negative_clips": {
+          "0.0039": 2,
+          "0.0117": 3,
+          "0.0156": 4,
+          "0.0195": 4,
+          "0.0312": 4,
+          "0.0430": 4,
+          "0.0586": 1,
+          "0.0820": 1,
+          "0.1094": 1,
+          "0.1484": 1,
+          "0.1992": 1
+        },
+        "target_clips": {}
+      },
+      "traffic": {
+        "negative_clips": {
+          "0.0039": 1,
+          "0.0078": 7,
+          "0.0117": 10,
+          "0.0156": 22,
+          "0.0195": 32,
+          "0.0312": 20,
+          "0.0430": 7,
+          "0.0586": 8,
+          "0.0820": 2,
+          "0.1094": 3,
+          "0.1992": 1
+        },
+        "target_clips": {
+          "0.0117": 1,
+          "0.0195": 2,
+          "0.0312": 7,
+          "0.0430": 7,
+          "0.0586": 9,
+          "0.0820": 9,
+          "0.1094": 8,
+          "0.1992": 6,
+          "0.2617": 6,
+          "0.3320": 9,
+          "0.4141": 1,
+          "0.5000": 3,
+          "0.5859": 3,
+          "0.6680": 3,
+          "0.7383": 3,
+          "0.8008": 5,
+          "0.8516": 2,
+          "0.9414": 1,
+          "none": 100
+        }
+      },
+      "voice": {
+        "negative_clips": {
+          "0.0039": 3,
+          "0.0078": 10,
+          "0.0117": 13,
+          "0.0156": 20,
+          "0.0195": 35,
+          "0.0312": 62,
+          "0.0430": 81,
+          "0.0586": 57,
+          "0.0820": 35,
+          "0.1094": 19,
+          "0.1484": 13,
+          "0.1992": 8,
+          "0.2617": 3,
+          "0.3320": 7,
+          "0.4141": 3,
+          "0.5000": 1,
+          "0.6680": 1,
+          "0.7383": 1
+        },
+        "target_clips": {}
+      }
+    },
+    "score_grid": {
+      "all_multiples_of_1_over_256": true,
+      "distinct_values": 29,
+      "largest_value": 0.984375,
+      "smallest_nonzero_value": 0.00390625,
+      "values_from_0.15_to_0.55": [
+        0.199219,
+        0.261719,
+        0.332031,
+        0.414062,
+        0.5
+      ]
+    },
+    "voice_false_alerts": {
+      "by_yamnet_index": {
+        "0 Speech": 16
+      },
+      "negative_clips_where_voice_fired": 16
+    }
+  },
+  "kind": "openhear-awareness-bench-rules",
+  "plan": "docs/BENCH_PLAN_v1.9.md",
+  "provenance": {
+    "clips_listed": 636,
+    "clips_with_stored_scores": 636,
+    "dataset_licence": "CC BY 4.0 (audio not redistributed)",
+    "dataset_notes": {
+      "clips_kept": 636,
+      "clips_left_out_no_usable_tag": 744,
+      "columns_missing": [],
+      "columns_used": {
+        "alert_signal": "5_alert-signal_presence",
+        "car_alarm": "5-2_car-alarm_presence",
+        "car_horn": "5-1_car-horn_presence",
+        "dog": "8_dog_presence",
+        "engine": "1_engine_presence",
+        "human_voice": "7_human-voice_presence",
+        "music": "6_music_presence",
+        "reverse_beeper": "5-4_reverse-beeper_presence",
+        "siren": "5-3_siren_presence"
+      },
+      "verified_recordings": 1380
+    },
+    "dataset_source": "SONYC-UST v2.3.0 (zenodo.org/records/3966543)",
+    "git_sha": "391f71168a01025c40370ed5e798f081dcd6a644",
+    "host": {
+      "numpy": "2.5.4",
+      "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+      "python": "3.12.16"
+    },
+    "model_was_run": false,
+    "raw_scores_sha256": "b82e9c1903e3d56268676a124a8440d5567f046f14d37d68e90366436ac32a17",
+    "run_url": "https://github.com/ljbudgie/openhear/actions/runs/43066209373",
+    "stored_scores_from_run": "42899256052"
+  },
+  "report_sha256": "8926bca70a847941297a17cca6fd961fec43c5b1b1480c9857a89eada3e7c3c3",
+  "results": {
+    "C1": {
+      "false_alert_clips": 16,
+      "false_alerts_by_pattern": {
+        "voice": 16
+      },
+      "groups": {
+        "car_horn": {
+          "any_pattern_fired": 95,
+          "clips": 157,
+          "fired_by_class": {
+            "alarm": 19,
+            "dog": 1,
+            "media": 7,
+            "traffic": 28,
+            "voice": 62
+          }
+        },
+        "engine_only": {
+          "any_pattern_fired": 16,
+          "clips": 374,
+          "fired_by_class": {
+            "voice": 16
+          }
+        },
+        "reverse_beeper": {
+          "any_pattern_fired": 19,
+          "clips": 33,
+          "fired_by_class": {
+            "alarm": 4,
+            "media": 4,
+            "traffic": 9,
+            "voice": 8
+          }
+        },
+        "siren": {
+          "any_pattern_fired": 84,
+          "clips": 106,
+          "fired_by_class": {
+            "alarm": 71,
+            "media": 4,
+            "traffic": 6,
+            "voice": 17
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 71,
+          "of": 107
+        },
+        "traffic": {
+          "hits": 36,
+          "of": 185
+        }
+      },
+      "negative_clips": 374,
+      "wrong_fires": {
+        "alarm": 7,
+        "traffic": 1
+      }
+    },
+    "H1": {
+      "false_alert_clips": 16,
+      "false_alerts_by_pattern": {
+        "voice": 16
+      },
+      "groups": {
+        "car_horn": {
+          "any_pattern_fired": 95,
+          "clips": 157,
+          "fired_by_class": {
+            "alarm": 19,
+            "dog": 1,
+            "media": 7,
+            "traffic": 28,
+            "voice": 62
+          }
+        },
+        "engine_only": {
+          "any_pattern_fired": 16,
+          "clips": 374,
+          "fired_by_class": {
+            "voice": 16
+          }
+        },
+        "reverse_beeper": {
+          "any_pattern_fired": 19,
+          "clips": 33,
+          "fired_by_class": {
+            "alarm": 4,
+            "media": 4,
+            "traffic": 9,
+            "voice": 8
+          }
+        },
+        "siren": {
+          "any_pattern_fired": 84,
+          "clips": 106,
+          "fired_by_class": {
+            "alarm": 71,
+            "media": 4,
+            "traffic": 6,
+            "voice": 17
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 71,
+          "of": 107
+        },
+        "traffic": {
+          "hits": 36,
+          "of": 185
+        }
+      },
+      "negative_clips": 374,
+      "wrong_fires": {
+        "alarm": 7,
+        "traffic": 1
+      }
+    },
+    "H2": {
+      "false_alert_clips": 16,
+      "false_alerts_by_pattern": {
+        "voice": 16
+      },
+      "groups": {
+        "car_horn": {
+          "any_pattern_fired": 95,
+          "clips": 157,
+          "fired_by_class": {
+            "alarm": 19,
+            "dog": 1,
+            "media": 7,
+            "traffic": 28,
+            "voice": 62
+          }
+        },
+        "engine_only": {
+          "any_pattern_fired": 16,
+          "clips": 374,
+          "fired_by_class": {
+            "voice": 16
+          }
+        },
+        "reverse_beeper": {
+          "any_pattern_fired": 19,
+          "clips": 33,
+          "fired_by_class": {
+            "alarm": 4,
+            "media": 4,
+            "traffic": 9,
+            "voice": 8
+          }
+        },
+        "siren": {
+          "any_pattern_fired": 84,
+          "clips": 106,
+          "fired_by_class": {
+            "alarm": 71,
+            "media": 4,
+            "traffic": 6,
+            "voice": 17
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 71,
+          "of": 107
+        },
+        "traffic": {
+          "hits": 36,
+          "of": 185
+        }
+      },
+      "negative_clips": 374,
+      "wrong_fires": {
+        "alarm": 7,
+        "traffic": 1
+      }
+    },
+    "V1": {
+      "false_alert_clips": 16,
+      "false_alerts_by_pattern": {
+        "voice": 16
+      },
+      "groups": {
+        "car_horn": {
+          "any_pattern_fired": 95,
+          "clips": 157,
+          "fired_by_class": {
+            "alarm": 19,
+            "dog": 1,
+            "media": 7,
+            "traffic": 28,
+            "voice": 62
+          }
+        },
+        "engine_only": {
+          "any_pattern_fired": 16,
+          "clips": 374,
+          "fired_by_class": {
+            "voice": 16
+          }
+        },
+        "reverse_beeper": {
+          "any_pattern_fired": 19,
+          "clips": 33,
+          "fired_by_class": {
+            "alarm": 4,
+            "media": 4,
+            "traffic": 9,
+            "voice": 8
+          }
+        },
+        "siren": {
+          "any_pattern_fired": 84,
+          "clips": 106,
+          "fired_by_class": {
+            "alarm": 71,
+            "media": 4,
+            "traffic": 6,
+            "voice": 17
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 71,
+          "of": 107
+        },
+        "traffic": {
+          "hits": 36,
+          "of": 185
+        }
+      },
+      "negative_clips": 374,
+      "wrong_fires": {
+        "alarm": 7,
+        "traffic": 1
+      }
+    },
+    "V2": {
+      "false_alert_clips": 4,
+      "false_alerts_by_pattern": {
+        "voice": 4
+      },
+      "groups": {
+        "car_horn": {
+          "any_pattern_fired": 72,
+          "clips": 157,
+          "fired_by_class": {
+            "alarm": 19,
+            "dog": 1,
+            "media": 7,
+            "traffic": 28,
+            "voice": 31
+          }
+        },
+        "engine_only": {
+          "any_pattern_fired": 4,
+          "clips": 374,
+          "fired_by_class": {
+            "voice": 4
+          }
+        },
+        "reverse_beeper": {
+          "any_pattern_fired": 14,
+          "clips": 33,
+          "fired_by_class": {
+            "alarm": 4,
+            "media": 4,
+            "traffic": 9,
+            "voice": 3
+          }
+        },
+        "siren": {
+          "any_pattern_fired": 79,
+          "clips": 106,
+          "fired_by_class": {
+            "alarm": 71,
+            "media": 4,
+            "traffic": 6,
+            "voice": 10
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 71,
+          "of": 107
+        },
+        "traffic": {
+          "hits": 36,
+          "of": 185
+        }
+      },
+      "negative_clips": 374,
+      "wrong_fires": {
+        "alarm": 7,
+        "traffic": 1
+      }
+    },
+    "V3": {
+      "false_alert_clips": 13,
+      "false_alerts_by_pattern": {
+        "voice": 13
+      },
+      "groups": {
+        "car_horn": {
+          "any_pattern_fired": 93,
+          "clips": 157,
+          "fired_by_class": {
+            "alarm": 19,
+            "dog": 1,
+            "media": 7,
+            "traffic": 28,
+            "voice": 58
+          }
+        },
+        "engine_only": {
+          "any_pattern_fired": 13,
+          "clips": 374,
+          "fired_by_class": {
+            "voice": 13
+          }
+        },
+        "reverse_beeper": {
+          "any_pattern_fired": 19,
+          "clips": 33,
+          "fired_by_class": {
+            "alarm": 4,
+            "media": 4,
+            "traffic": 9,
+            "voice": 8
+          }
+        },
+        "siren": {
+          "any_pattern_fired": 84,
+          "clips": 106,
+          "fired_by_class": {
+            "alarm": 71,
+            "media": 4,
+            "traffic": 6,
+            "voice": 16
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 71,
+          "of": 107
+        },
+        "traffic": {
+          "hits": 36,
+          "of": 185
+        }
+      },
+      "negative_clips": 374,
+      "wrong_fires": {
+        "alarm": 7,
+        "traffic": 1
+      }
+    },
+    "V4": {
+      "false_alert_clips": 3,
+      "false_alerts_by_pattern": {
+        "voice": 3
+      },
+      "groups": {
+        "car_horn": {
+          "any_pattern_fired": 83,
+          "clips": 157,
+          "fired_by_class": {
+            "alarm": 19,
+            "dog": 1,
+            "media": 7,
+            "traffic": 28,
+            "voice": 46
+          }
+        },
+        "engine_only": {
+          "any_pattern_fired": 3,
+          "clips": 374,
+          "fired_by_class": {
+            "voice": 3
+          }
+        },
+        "reverse_beeper": {
+          "any_pattern_fired": 15,
+          "clips": 33,
+          "fired_by_class": {
+            "alarm": 4,
+            "media": 4,
+            "traffic": 9,
+            "voice": 4
+          }
+        },
+        "siren": {
+          "any_pattern_fired": 83,
+          "clips": 106,
+          "fired_by_class": {
+            "alarm": 71,
+            "media": 4,
+            "traffic": 6,
+            "voice": 15
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 71,
+          "of": 107
+        },
+        "traffic": {
+          "hits": 36,
+          "of": 185
+        }
+      },
+      "negative_clips": 374,
+      "wrong_fires": {
+        "alarm": 7,
+        "traffic": 1
+      }
+    },
+    "baseline": {
+      "false_alert_clips": 16,
+      "false_alerts_by_pattern": {
+        "voice": 16
+      },
+      "groups": {
+        "car_horn": {
+          "any_pattern_fired": 95,
+          "clips": 157,
+          "fired_by_class": {
+            "alarm": 19,
+            "dog": 1,
+            "media": 7,
+            "traffic": 28,
+            "voice": 62
+          }
+        },
+        "engine_only": {
+          "any_pattern_fired": 16,
+          "clips": 374,
+          "fired_by_class": {
+            "voice": 16
+          }
+        },
+        "reverse_beeper": {
+          "any_pattern_fired": 19,
+          "clips": 33,
+          "fired_by_class": {
+            "alarm": 4,
+            "media": 4,
+            "traffic": 9,
+            "voice": 8
+          }
+        },
+        "siren": {
+          "any_pattern_fired": 84,
+          "clips": 106,
+          "fired_by_class": {
+            "alarm": 71,
+            "media": 4,
+            "traffic": 6,
+            "voice": 17
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 71,
+          "of": 107
+        },
+        "traffic": {
+          "hits": 36,
+          "of": 185
+        }
+      },
+      "negative_clips": 374,
+      "wrong_fires": {
+        "alarm": 7,
+        "traffic": 1
+      }
+    }
+  },
+  "rules": {
+    "C1": "H1 with V1 (H1 applied first)",
+    "H1": "Alarm and traffic outrank voice and media",
+    "H2": "Alarm and traffic outrank everything",
+    "V1": "Speech dominance: voice fires only if the top label of all 521 is a voice label",
+    "V2": "Persistence: voice fires only if a neighbouring window was also won by voice",
+    "V3": "Voice minimum 0.30",
+    "V4": "Voice minimum 0.50"
+  },
+  "schema_version": 1,
+  "scope": "Re-analysis of stored model scores. Classifier only, on recorded clips. No wearers, no microphone, no wristband, no real rooms. Not a clinical result."
+}

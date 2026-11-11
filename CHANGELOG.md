@@ -21,6 +21,23 @@ release; they will be called out under a **Breaking** subsection.
 - **Hearing loss and dementia — clinical context** (`docs/HEARING_LOSS_AND_DEMENTIA.md`).
 - **Living Hearing Profile v8–v9** and consented anonymised audiogram examples.
 
+## [1.9.0-dev] - not released
+
+Work in progress on the `v1.9.0-dev` branch. The shipped classifier is unchanged from v1.8.0.
+
+### Added
+
+- `docs/BENCH_PLAN_v1.9.md`: seven candidate decision rules, the measures and code-checked pass conditions, committed before any rule was run. ESC-50 chooses; FSD50K and SONYC-UST only confirm; a rule that costs a siren or alarm hit does not ship.
+- `scripts/bench_rules.py`: applies the baseline and the seven rules to stored model scores without running the model. Reports hits per class, false alerts, wrong alarm and traffic fires, voice false alerts by YAMNet index, a horn breakdown, per-class score distributions and the pass or fail verdict.
+- Bench workflow mode `reanalyse-stored-scores`.
+- Credits for YAMNet, AudioSet, ESC-50, FSD50K, SONYC-UST and contributors in docs/BENCH_RESULTS.md.
+
+### Measured (classifier only, recorded clips, no wearers, not a clinical result, not independently reviewed)
+
+- **No rule is enabled.**
+- Both horn rules failed: they recovered no horn clip on any dataset, and the wider one cost 41 phone hits on FSD50K. Horn misses are mostly not a masking problem.
+- All four voice rules passed the plan's conditions and stay switched off pending a decision on missed speech. On FSD50K: voice minimum 0.30 removes 88 false-alert clips and loses 17 of 530 speech clips; voice minimum 0.50 removes 239 and loses 60; persistence removes 298 and loses 161; speech dominance removes 9 and loses 4.
+
 ## [1.8.0] - 2026-11-10
 
 ### Changed

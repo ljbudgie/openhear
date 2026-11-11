@@ -1,6 +1,6 @@
 # Bench results — classifier only
 
-**Status:** Measured on 10 November 2026 for v1.8.0. Every figure on this page comes from a signed report of a GitHub Actions run of `scripts/bench_awareness.py`. The v1.7.0 results this page replaces are in [bench/awareness_bench_v1.7.0.json](bench/awareness_bench_v1.7.0.json) and are reproduced below.
+**Status:** v1.8.0 results measured on 10 November 2026. Candidate rules for v1.9.0 measured on 11 November 2026; none is enabled. Every figure on this page comes from a signed report of a GitHub Actions run of `scripts/bench_awareness.py`. The v1.7.0 results this page replaces are in [bench/awareness_bench_v1.7.0.json](bench/awareness_bench_v1.7.0.json) and are reproduced below.
 
 ## Read this first
 
@@ -9,8 +9,181 @@
 - No wearers.
 - No real rooms.
 - Not a clinical result.
+- Nothing on this page has been independently reviewed.
 
 This page says how often the classifier fires the right wristband pattern for a recorded sound, and how often it fires a pattern for a sound that has no OpenHear class. It says nothing about whether a person can feel or name a pattern. The claim these numbers sit under is [INTENDED_PURPOSE.md](INTENDED_PURPOSE.md).
+
+## v1.9.0 work in progress: seven candidate rules, none enabled
+
+**Status:** Measured on 11 November 2026 on the `v1.9.0-dev` branch. The shipped classifier is unchanged from v1.8.0.
+
+v1.8.0 left two problems: the voice pattern causes most false alerts, and horn detection is weak. Seven candidate decision rules were tested against the v1.8.0 baseline by re-analysing the scores stored from the v1.8.0 runs. The model was not run again. The baseline computed from the stored scores matches the signed v1.8.0 reports exactly on all three datasets.
+
+The rules, the measures and the pass conditions were committed in [BENCH_PLAN_v1.9.md](BENCH_PLAN_v1.9.md) before any rule was run. ESC-50 chooses; FSD50K and SONYC-UST only confirm; a rule that costs a siren or alarm hit does not ship. Pass or fail is computed by `scripts/bench_rules.py`.
+
+### Result
+
+- **No rule is enabled.**
+- **Both horn rules failed.** Letting alarm and traffic outrank other classes recovered no horn clip on any dataset. On FSD50K the wider rule (H2) also took the phone pattern from 41 ringing-phone clips and gave them to alarm.
+- **Horn misses are mostly not a masking problem.** At the baseline, a horn label scored 0.20 or more and lost the window to another class on 1 ESC-50 clip, no FSD50K clip and 1 SONYC-UST clip. On FSD50K and SONYC-UST most missed clips had no horn label reaching 0.05; on ESC-50 the largest group won a window with a score between 0.05 and 0.20. The fix is not in the decision rule.
+- **All four voice rules passed the plan's conditions, and all stay switched off.** Each one trades false alerts for missed speech. That trade-off is a decision for the project owner and has not been made.
+
+### Verdict, computed from the three reports
+
+| Rule | No alarm hit lost | Selected on ESC-50 | Confirmed on FSD50K | Confirmed on SONYC-UST | Passes | Missed speech on FSD50K |
+|---|---|---|---|---|---|---|
+| C1: H1 with V1 (H1 applied first) | yes | no | no | yes | no | 4 |
+| H1: Alarm and traffic outrank voice and media | yes | no | no | yes | no | 0 |
+| H2: Alarm and traffic outrank everything | yes | no | no | yes | no | 0 |
+| V1: Speech dominance: voice fires only if the top label of all 521 is a voice label | yes | yes | yes | yes | yes | 4 |
+| V2: Persistence: voice fires only if a neighbouring window was also won by voice | yes | yes | yes | yes | yes | 161 |
+| V3: Voice minimum 0.30 | yes | yes | yes | yes | yes | 17 |
+| V4: Voice minimum 0.50 | yes | yes | yes | yes | yes | 60 |
+
+The combined rule C1 is treated as a voice rule and would stay off in any case.
+
+### The voice trade-off
+
+Fewer false alerts against speech clips no longer caught. The baseline catches 530 of 656 FSD50K speech clips.
+
+| Rule | False-alert clips, ESC-50 (of 1,760) | False-alert clips, FSD50K (of 5,586) | False-alert clips, SONYC-UST (of 374) | Speech clips caught, FSD50K (of 656) | Speech clips lost |
+|---|---|---|---|---|---|
+| Baseline (v1.8.0) | 262 | 1,286 | 16 | 530 |  |
+| V1: Speech dominance | 259 | 1,277 | 16 | 526 | 4 |
+| V2: Persistence | 180 | 988 | 4 | 369 | 161 |
+| V3: Voice minimum 0.30 | 239 | 1,198 | 13 | 513 | 17 |
+| V4: Voice minimum 0.50 | 196 | 1,047 | 3 | 470 | 60 |
+
+- **Persistence (V2) removes the most false alerts and loses the most speech**: 161 of 530 speech clips. A one-window clip can never fire under this rule, and many FSD50K speech clips are short.
+- **Voice minimum 0.50 (V4)** removes nearly as many false alerts as V2 on ESC-50 and SONYC-UST and loses 60 speech clips.
+- **Voice minimum 0.30 (V3)** is the mildest effective rule: 17 speech clips lost.
+- **Speech dominance (V1) does almost nothing.** When the voice pattern fires wrongly, "Speech" is nearly always the model's top label of all 521.
+
+### Before and after, per dataset and class
+
+Rules: V1 speech dominance; V2 persistence; V3 voice minimum 0.30; V4 voice minimum 0.50; H1 alarm and traffic outrank voice and media; H2 alarm and traffic outrank everything; C1 is H1 with V1. Figures in brackets are the change against the baseline. A "wrong" alarm or traffic clip is one that is not a target for that class where its pattern fired.
+
+#### ESC-50
+
+Hits per class (change against the baseline in brackets):
+
+| Rule | alarm (of 80) | baby_cry (of 40) | dog (of 40) | knock (of 40) | traffic (of 40) |
+|---|---|---|---|---|---|
+| C1 | 72 (0) | 35 (0) | 40 (0) | 27 (0) | 22 (0) |
+| H1 | 72 (0) | 35 (0) | 40 (0) | 27 (0) | 22 (0) |
+| H2 | 74 (+2) | 35 (0) | 40 (0) | 27 (0) | 22 (0) |
+| V1 | 72 (0) | 35 (0) | 40 (0) | 27 (0) | 22 (0) |
+| V2 | 72 (0) | 35 (0) | 40 (0) | 27 (0) | 22 (0) |
+| V3 | 72 (0) | 35 (0) | 40 (0) | 27 (0) | 22 (0) |
+| V4 | 72 (0) | 35 (0) | 40 (0) | 27 (0) | 22 (0) |
+| baseline | 72 | 35 | 40 | 27 | 22 |
+
+False alerts and wrong fires (negative clips: 1760):
+
+| Rule | False-alert clips | Led by voice | Wrong alarm clips | Wrong traffic clips |
+|---|---|---|---|---|
+| C1 | 259 (-3) | 121 | 26 | 8 |
+| H1 | 262 (0) | 125 | 26 | 8 |
+| H2 | 262 (0) | 125 | 26 | 8 |
+| V1 | 259 (-3) | 121 | 26 | 8 |
+| V2 | 180 (-82) | 35 | 26 | 8 |
+| V3 | 239 (-23) | 101 | 26 | 8 |
+| V4 | 196 (-66) | 55 | 26 | 8 |
+| baseline | 262 | 125 | 26 | 8 |
+
+#### FSD50K
+
+Hits per class (change against the baseline in brackets):
+
+| Rule | alarm (of 48) | dog (of 137) | doorbell (of 27) | knock (of 88) | media (of 1613) | phone (of 139) | traffic (of 56) | voice (of 656) |
+|---|---|---|---|---|---|---|---|---|
+| C1 | 36 (0) | 100 (0) | 8 (0) | 54 (0) | 1305 (0) | 62 (0) | 32 (0) | 526 (-4) |
+| H1 | 36 (0) | 100 (0) | 8 (0) | 54 (0) | 1305 (0) | 62 (0) | 32 (0) | 530 (0) |
+| H2 | 36 (0) | 100 (0) | 8 (0) | 54 (0) | 1305 (0) | 21 (-41) | 32 (0) | 530 (0) |
+| V1 | 36 (0) | 100 (0) | 8 (0) | 54 (0) | 1305 (0) | 62 (0) | 32 (0) | 526 (-4) |
+| V2 | 36 (0) | 100 (0) | 8 (0) | 54 (0) | 1305 (0) | 62 (0) | 32 (0) | 369 (-161) |
+| V3 | 36 (0) | 100 (0) | 8 (0) | 54 (0) | 1305 (0) | 62 (0) | 32 (0) | 513 (-17) |
+| V4 | 36 (0) | 100 (0) | 8 (0) | 54 (0) | 1305 (0) | 62 (0) | 32 (0) | 470 (-60) |
+| baseline | 36 | 100 | 8 | 54 | 1305 | 62 | 32 | 530 |
+
+False alerts and wrong fires (negative clips: 5586):
+
+| Rule | False-alert clips | Led by voice | Wrong alarm clips | Wrong traffic clips |
+|---|---|---|---|---|
+| C1 | 1277 (-9) | 546 | 186 | 111 |
+| H1 | 1286 (0) | 555 | 186 | 111 |
+| H2 | 1286 (0) | 555 | 247 | 111 |
+| V1 | 1277 (-9) | 546 | 185 | 107 |
+| V2 | 988 (-298) | 229 | 185 | 107 |
+| V3 | 1198 (-88) | 463 | 185 | 107 |
+| V4 | 1047 (-239) | 300 | 185 | 107 |
+| baseline | 1286 | 555 | 185 | 107 |
+
+#### SONYC-UST
+
+Hits per class (change against the baseline in brackets):
+
+| Rule | alarm (of 107) | traffic (of 185) |
+|---|---|---|
+| C1 | 71 (0) | 36 (0) |
+| H1 | 71 (0) | 36 (0) |
+| H2 | 71 (0) | 36 (0) |
+| V1 | 71 (0) | 36 (0) |
+| V2 | 71 (0) | 36 (0) |
+| V3 | 71 (0) | 36 (0) |
+| V4 | 71 (0) | 36 (0) |
+| baseline | 71 | 36 |
+
+False alerts and wrong fires (negative clips: 374):
+
+| Rule | False-alert clips | Led by voice | Wrong alarm clips | Wrong traffic clips |
+|---|---|---|---|---|
+| C1 | 16 (0) | 16 | 7 | 1 |
+| H1 | 16 (0) | 16 | 7 | 1 |
+| H2 | 16 (0) | 16 | 7 | 1 |
+| V1 | 16 (0) | 16 | 7 | 1 |
+| V2 | 4 (-12) | 4 | 7 | 1 |
+| V3 | 13 (-3) | 13 | 7 | 1 |
+| V4 | 3 (-13) | 3 | 7 | 1 |
+| baseline | 16 | 16 | 7 | 1 |
+
+### Why horns are missed
+
+Horn target clips at the baseline, by the first cause that applies:
+
+| Cause | ESC-50 (18 missed of 40) | FSD50K (24 missed of 56) | SONYC-UST (149 missed of 185) |
+|---|---|---|---|
+| No horn label reached 0.05 | 3 | 15 | 103 |
+| Horn won a window but scored 0.05 to 0.20 | 7 | 2 | 32 |
+| Horn scored 0.05 to 0.20 and another class won | 3 | 3 | 7 |
+| No horn label reached 0.05 and the top label was a vehicle or engine label outside the allowlist | 4 | 4 | 6 |
+| Horn scored 0.20 or more but another class scored higher | 1 | 0 | 1 |
+
+- **Lowering the threshold does not rescue horns.** Hits at 0.05 against 0.20: ESC-50 29 against 22 of 40, with the traffic pattern then firing on 51 clips that are not horns; FSD50K 34 against 32 of 56, with 293 wrong clips; SONYC-UST 68 against 36 of 185, with 16 wrong clips.
+- **Horn and alarm are confused.** The alarm pattern fired on 11 ESC-50 horn clips (9 of them missed horns) and on 23 SONYC-UST horn clips (15 missed). The traffic pattern fired on 2 of 80 ESC-50 alarm clips and 7 of 107 SONYC-UST alarm clips.
+- **What the model reported instead.** On ESC-50 the top label of a missed horn clip was most often the generic "Vehicle" (8 of 18). On SONYC-UST it was most often "Speech" (57 of 149).
+- **Clip length (FSD50K, the only set with varied lengths).** Horn hits were 5 of 6 for 1 window, 9 of 24 for 11 or more windows, 14 of 16 for 2 to 5 windows, 4 of 10 for 6 to 10 windows. Longer clips are mostly field recordings where the horn is a small part.
+
+### Voice false alerts by YAMNet label
+
+Negative clips where the voice pattern fired in any window: ESC-50 125, all from index 0 "Speech"; FSD50K 600, of which 598 from index 0 "Speech" and 2 from index 3 "Narration, monologue"; SONYC-UST 16, all from index 0. The v1.8.0 tables count a clip under the pattern with the highest score, which gives 555 voice-led clips on FSD50K; the 600 here counts every clip where voice fired at all.
+
+### The score grid
+
+Every stored score is a multiple of 1/256, and the model uses few of those steps: 32 distinct values across all ESC-50 scores, 32 on FSD50K and 29 on SONYC-UST. Between 0.15 and 0.55 the only values are 0.199, 0.262, 0.332, 0.414, 0.500. Full per-class score distributions are in the signed reports.
+
+### Provenance for the rules
+
+| Dataset | Signed report | Full tables |
+|---|---|---|
+| ESC-50 | [json](bench/rules_v1.9.0_esc50.json) (SHA-256 `c524ccc131fcaa09…`) | [tables](bench/rules_v1.9.0_esc50.md) |
+| FSD50K | [json](bench/rules_v1.9.0_fsd50k.json) (SHA-256 `d8cd7049e94fc1c6…`) | [tables](bench/rules_v1.9.0_fsd50k.md) |
+| SONYC-UST | [json](bench/rules_v1.9.0_sonyc.json) (SHA-256 `8926bca70a847941…`) | [tables](bench/rules_v1.9.0_sonyc.md) |
+| Verdict | [json](bench/rules_v1.9.0_verdict.json) (SHA-256 `e0f99daa9d3a91c0…`) | |
+
+- Workflow run: https://github.com/ljbudgie/openhear/actions/runs/43066209373 (commit `391f711`).
+- Stored scores came from the v1.8.0 runs, and their SHA-256 values match the signed v1.8.0 reports.
+- To repeat it: run the **Bench — awareness classifier** workflow with mode `reanalyse-stored-scores`. It takes about two minutes. GitHub keeps the stored scores for 90 days from 10 November 2026; after that, run the model mode first and pass the new run numbers.
 
 ## What changed in v1.8.0
 
@@ -158,6 +331,20 @@ SoundWatch (Jain et al., ASSETS 2020, doi.org/10.1145/3373625.3416991) reports 8
 - Raw scores for every window and class are attached to each workflow run as an artifact. GitHub keeps artifacts for 90 days. Their SHA-256 values are in the signed reports.
 
 To check a report, set `report_sha256` to `null`, serialise with sorted keys and compact separators, and take the SHA-256.
+
+## Credits
+
+OpenHear did not create the model or the recordings these results rest on. It is built by someone who has lived with hearing loss all his life, building on these foundations:
+
+- **YAMNet**, the sound classifier, by Manoj Plakal and Dan Ellis at Google, released under Apache 2.0 and distributed as a TensorFlow Lite model through MediaPipe.
+- **AudioSet**, the dataset YAMNet was trained on and the source of its 521 labels, by Gemmeke and colleagues at Google (ICASSP 2017).
+- **ESC-50**, by Karol J. Piczak (ACM Multimedia 2015), CC BY-NC.
+- **FSD50K**, by Eduardo Fonseca, Xavier Favory, Jordi Pons, Frederic Font and Xavier Serra at the Music Technology Group, Universitat Pompeu Fabra (2022), made from sounds shared by Freesound contributors under Creative Commons licences.
+- **SONYC-UST**, by Mark Cartwright and colleagues in the Sounds of New York City project at New York University (DCASE 2020), with labels from Zooniverse volunteers and the SONYC team, CC BY 4.0.
+- **SoundWatch**, by Dhruv Jain and colleagues (ASSETS 2020), cited above for context.
+- Everyone who has contributed code, testing and feedback to OpenHear.
+
+None of these people or organisations has reviewed or endorsed OpenHear or these results. Nothing on this page has been independently reviewed. The scope is environmental sound awareness only: OpenHear is not a hearing aid and not a medical device.
 
 ## Reproduce
 

@@ -1,0 +1,1372 @@
+{
+  "against_baseline": {
+    "C1": {
+      "alarm_and_traffic_hits_gained": 0,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": false,
+      "confirmed_if_held_out": true,
+      "false_alert_clips_change": -3,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 0,
+        "baby_cry": 0,
+        "dog": 0,
+        "knock": 0,
+        "traffic": 0
+      },
+      "hits_lost_by_other_classes": 0,
+      "missed_speech": null,
+      "selected_if_esc50": false,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 0
+    },
+    "H1": {
+      "alarm_and_traffic_hits_gained": 0,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": false,
+      "confirmed_if_held_out": true,
+      "false_alert_clips_change": 0,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 0,
+        "baby_cry": 0,
+        "dog": 0,
+        "knock": 0,
+        "traffic": 0
+      },
+      "hits_lost_by_other_classes": 0,
+      "missed_speech": null,
+      "selected_if_esc50": false,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 0
+    },
+    "H2": {
+      "alarm_and_traffic_hits_gained": 2,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": false,
+      "confirmed_if_held_out": true,
+      "false_alert_clips_change": 0,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 2,
+        "baby_cry": 0,
+        "dog": 0,
+        "knock": 0,
+        "traffic": 0
+      },
+      "hits_lost_by_other_classes": 0,
+      "missed_speech": null,
+      "selected_if_esc50": false,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 0
+    },
+    "V1": {
+      "alarm_and_traffic_hits_gained": 0,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": false,
+      "confirmed_if_held_out": true,
+      "false_alert_clips_change": -3,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 0,
+        "baby_cry": 0,
+        "dog": 0,
+        "knock": 0,
+        "traffic": 0
+      },
+      "hits_lost_by_other_classes": 0,
+      "missed_speech": null,
+      "selected_if_esc50": true,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 0
+    },
+    "V2": {
+      "alarm_and_traffic_hits_gained": 0,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": false,
+      "confirmed_if_held_out": true,
+      "false_alert_clips_change": -82,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 0,
+        "baby_cry": 0,
+        "dog": 0,
+        "knock": 0,
+        "traffic": 0
+      },
+      "hits_lost_by_other_classes": 0,
+      "missed_speech": null,
+      "selected_if_esc50": true,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 0
+    },
+    "V3": {
+      "alarm_and_traffic_hits_gained": 0,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": false,
+      "confirmed_if_held_out": true,
+      "false_alert_clips_change": -23,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 0,
+        "baby_cry": 0,
+        "dog": 0,
+        "knock": 0,
+        "traffic": 0
+      },
+      "hits_lost_by_other_classes": 0,
+      "missed_speech": null,
+      "selected_if_esc50": true,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 0
+    },
+    "V4": {
+      "alarm_and_traffic_hits_gained": 0,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": false,
+      "confirmed_if_held_out": true,
+      "false_alert_clips_change": -66,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 0,
+        "baby_cry": 0,
+        "dog": 0,
+        "knock": 0,
+        "traffic": 0
+      },
+      "hits_lost_by_other_classes": 0,
+      "missed_speech": null,
+      "selected_if_esc50": true,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 0
+    }
+  },
+  "baseline": {
+    "label_map": "v1.8.0",
+    "label_map_sha256": "ab769cf78294ee3a871db0f6cf6d0ce231b56de966b0d3feb176b652b92f9230",
+    "matches_v1.8.0_report": {
+      "false_alerts_match": true,
+      "hits_match": true,
+      "raw_scores_sha256_match": true
+    },
+    "threshold": 0.2
+  },
+  "clips": {
+    "scored": 2000,
+    "windows": 10000
+  },
+  "dataset": "esc50",
+  "diagnostics": {
+    "horn": {
+      "alarm_target_clips": 80,
+      "alarm_target_clips_where_traffic_fired": 2,
+      "hits_at_0.05": 29,
+      "hits_at_0.20": 22,
+      "hits_by_clip_length": {
+        "2 to 5 windows": {
+          "hits": 22,
+          "of": 40
+        }
+      },
+      "horn_clips_where_alarm_fired": 11,
+      "horn_target_clips": 40,
+      "masked_by_class": {
+        "alarm": 1
+      },
+      "missed_at_0.20": 18,
+      "missed_by_cause": {
+        "index mapping: top label is a vehicle or engine label outside the allowlist": 4,
+        "masked: horn scored 0.20 or more but another class scored higher": 1,
+        "not detected: no horn label reached 0.05": 3,
+        "threshold: horn won a window but scored 0.05 to 0.20": 7,
+        "weak and outscored: horn scored 0.05 to 0.20 and another class won": 3
+      },
+      "missed_clips_top_yamnet_label": {
+        "Animal": 2,
+        "Music": 1,
+        "Silence": 4,
+        "Speech": 2,
+        "Traffic noise, roadway noise": 1,
+        "Vehicle": 8
+      },
+      "missed_horn_clips_where_alarm_fired": 9,
+      "non_target_clips_where_traffic_fires_at_0.05": 51
+    },
+    "score_distributions": {
+      "alarm": {
+        "negative_clips": {
+          "0.0039": 7,
+          "0.0078": 8,
+          "0.0117": 12,
+          "0.0156": 5,
+          "0.0195": 6,
+          "0.0312": 7,
+          "0.0430": 12,
+          "0.0586": 7,
+          "0.0820": 8,
+          "0.1094": 5,
+          "0.1484": 8,
+          "0.1992": 10,
+          "0.2617": 3,
+          "0.3320": 3,
+          "0.4141": 2,
+          "0.5000": 1,
+          "0.6680": 1,
+          "0.8008": 1,
+          "0.8516": 1,
+          "0.8906": 1,
+          "0.9180": 2
+        },
+        "target_clips": {
+          "0.0586": 1,
+          "0.1094": 1,
+          "0.1484": 1,
+          "0.2617": 3,
+          "0.3320": 2,
+          "0.4141": 1,
+          "0.5000": 2,
+          "0.5859": 2,
+          "0.6680": 4,
+          "0.7383": 6,
+          "0.8008": 7,
+          "0.8516": 5,
+          "0.8906": 4,
+          "0.9180": 3,
+          "0.9414": 3,
+          "0.9570": 2,
+          "0.9688": 3,
+          "0.9805": 2,
+          "0.9844": 3,
+          "0.9883": 1,
+          "0.9922": 4,
+          "0.9961": 15,
+          "none": 5
+        }
+      },
+      "baby_cry": {
+        "negative_clips": {
+          "0.0312": 1,
+          "0.0430": 1,
+          "0.0586": 5,
+          "0.0820": 6,
+          "0.1094": 3,
+          "0.1484": 4,
+          "0.1992": 3,
+          "0.2617": 1,
+          "0.3320": 2,
+          "0.4141": 1,
+          "0.5000": 1,
+          "0.5859": 1,
+          "0.7383": 1,
+          "0.8516": 1
+        },
+        "target_clips": {
+          "0.0586": 1,
+          "0.1094": 2,
+          "0.4141": 1,
+          "0.5000": 1,
+          "0.5859": 4,
+          "0.6680": 2,
+          "0.7383": 3,
+          "0.8008": 6,
+          "0.8516": 3,
+          "0.8906": 4,
+          "0.9180": 2,
+          "0.9414": 7,
+          "0.9570": 1,
+          "0.9688": 1,
+          "none": 2
+        }
+      },
+      "dog": {
+        "negative_clips": {
+          "0.0039": 8,
+          "0.0078": 8,
+          "0.0117": 9,
+          "0.0156": 14,
+          "0.0195": 15,
+          "0.0312": 24,
+          "0.0430": 30,
+          "0.0586": 22,
+          "0.0820": 31,
+          "0.1094": 19,
+          "0.1484": 24,
+          "0.1992": 21,
+          "0.2617": 10,
+          "0.3320": 9,
+          "0.4141": 5,
+          "0.5000": 3,
+          "0.5859": 4,
+          "0.6680": 1,
+          "0.7383": 1,
+          "0.8008": 1,
+          "0.8516": 1,
+          "0.9570": 1
+        },
+        "target_clips": {
+          "0.6680": 1,
+          "0.7383": 1,
+          "0.8008": 3,
+          "0.8516": 3,
+          "0.8906": 7,
+          "0.9180": 3,
+          "0.9414": 8,
+          "0.9570": 4,
+          "0.9688": 4,
+          "0.9805": 3,
+          "0.9844": 2,
+          "0.9922": 1
+        }
+      },
+      "doorbell": {
+        "negative_clips": {
+          "0.0117": 1,
+          "0.3320": 1
+        },
+        "target_clips": {}
+      },
+      "knock": {
+        "negative_clips": {
+          "0.0156": 2,
+          "0.0195": 3,
+          "0.0312": 2,
+          "0.0430": 4,
+          "0.0586": 5,
+          "0.0820": 4,
+          "0.1094": 2,
+          "0.1484": 2,
+          "0.1992": 2,
+          "0.2617": 2,
+          "0.3320": 1,
+          "0.4141": 1,
+          "0.5000": 1,
+          "0.5859": 1,
+          "0.6680": 1,
+          "0.8008": 1,
+          "0.8906": 1
+        },
+        "target_clips": {
+          "0.0586": 1,
+          "0.0820": 1,
+          "0.1094": 1,
+          "0.1484": 2,
+          "0.1992": 1,
+          "0.2617": 3,
+          "0.5000": 2,
+          "0.5859": 3,
+          "0.6680": 1,
+          "0.7383": 2,
+          "0.8008": 1,
+          "0.8516": 1,
+          "0.8906": 2,
+          "0.9414": 2,
+          "0.9570": 3,
+          "0.9688": 1,
+          "0.9805": 1,
+          "0.9883": 1,
+          "0.9922": 1,
+          "0.9961": 3,
+          "none": 7
+        }
+      },
+      "media": {
+        "negative_clips": {
+          "0.0039": 69,
+          "0.0078": 33,
+          "0.0117": 32,
+          "0.0156": 45,
+          "0.0195": 35,
+          "0.0312": 48,
+          "0.0430": 59,
+          "0.0586": 38,
+          "0.0820": 34,
+          "0.1094": 35,
+          "0.1484": 30,
+          "0.1992": 28,
+          "0.2617": 13,
+          "0.3320": 15,
+          "0.4141": 11,
+          "0.5000": 10,
+          "0.5859": 6,
+          "0.6680": 8,
+          "0.7383": 3,
+          "0.8008": 1,
+          "0.8516": 2,
+          "0.8906": 3,
+          "0.9180": 5
+        },
+        "target_clips": {}
+      },
+      "phone": {
+        "negative_clips": {
+          "0.0156": 1,
+          "0.0195": 1,
+          "0.0430": 1,
+          "0.0586": 3,
+          "0.1094": 1,
+          "0.1484": 1,
+          "0.1992": 3,
+          "0.4141": 1,
+          "0.5859": 2
+        },
+        "target_clips": {}
+      },
+      "traffic": {
+        "negative_clips": {
+          "0.0039": 13,
+          "0.0078": 12,
+          "0.0117": 11,
+          "0.0156": 14,
+          "0.0195": 20,
+          "0.0312": 16,
+          "0.0430": 19,
+          "0.0586": 19,
+          "0.0820": 6,
+          "0.1094": 6,
+          "0.1484": 7,
+          "0.1992": 4,
+          "0.2617": 4,
+          "0.3320": 2
+        },
+        "target_clips": {
+          "0.0195": 1,
+          "0.0586": 2,
+          "0.1484": 1,
+          "0.1992": 4,
+          "0.2617": 2,
+          "0.3320": 1,
+          "0.5000": 2,
+          "0.5859": 2,
+          "0.6680": 2,
+          "0.7383": 3,
+          "0.8516": 2,
+          "0.9180": 1,
+          "0.9570": 1,
+          "0.9688": 1,
+          "0.9805": 1,
+          "0.9883": 1,
+          "0.9961": 3,
+          "none": 10
+        }
+      },
+      "voice": {
+        "negative_clips": {
+          "0.0039": 196,
+          "0.0078": 102,
+          "0.0117": 109,
+          "0.0156": 118,
+          "0.0195": 112,
+          "0.0312": 137,
+          "0.0430": 100,
+          "0.0586": 123,
+          "0.0820": 72,
+          "0.1094": 60,
+          "0.1484": 54,
+          "0.1992": 41,
+          "0.2617": 24,
+          "0.3320": 26,
+          "0.4141": 20,
+          "0.5000": 14,
+          "0.5859": 9,
+          "0.6680": 8,
+          "0.7383": 6,
+          "0.8008": 7,
+          "0.8516": 6,
+          "0.8906": 3,
+          "0.9570": 1,
+          "0.9688": 1
+        },
+        "target_clips": {}
+      }
+    },
+    "score_grid": {
+      "all_multiples_of_1_over_256": true,
+      "distinct_values": 32,
+      "largest_value": 0.99609375,
+      "smallest_nonzero_value": 0.00390625,
+      "values_from_0.15_to_0.55": [
+        0.199219,
+        0.261719,
+        0.332031,
+        0.414062,
+        0.5
+      ]
+    },
+    "voice_false_alerts": {
+      "by_yamnet_index": {
+        "0 Speech": 125
+      },
+      "negative_clips_where_voice_fired": 125
+    }
+  },
+  "kind": "openhear-awareness-bench-rules",
+  "plan": "docs/BENCH_PLAN_v1.9.md",
+  "provenance": {
+    "clips_listed": 2000,
+    "clips_with_stored_scores": 2000,
+    "dataset_licence": "CC BY-NC 3.0 (audio not redistributed; before/after comparison only)",
+    "dataset_notes": {},
+    "dataset_source": "ESC-50 (github.com/karolpiczak/ESC-50)",
+    "git_sha": "391f71168a01025c40370ed5e798f081dcd6a644",
+    "host": {
+      "numpy": "2.5.4",
+      "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+      "python": "3.12.16"
+    },
+    "model_was_run": false,
+    "raw_scores_sha256": "769af4e8726016b78d2dc886b3516bb498334795a32c5170a634f031e7c8f61f",
+    "run_url": "https://github.com/ljbudgie/openhear/actions/runs/43066209373",
+    "stored_scores_from_run": "42899256052"
+  },
+  "report_sha256": "c524ccc131fcaa09ccc19e4d0eb3502bd3fe78f922f1be5b31895131cc1ac6f9",
+  "results": {
+    "C1": {
+      "false_alert_clips": 259,
+      "false_alerts_by_pattern": {
+        "alarm": 14,
+        "baby_cry": 8,
+        "dog": 30,
+        "knock": 8,
+        "media": 71,
+        "phone": 3,
+        "traffic": 4,
+        "voice": 121
+      },
+      "groups": {
+        "car_horn": {
+          "any_pattern_fired": 32,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 11,
+            "media": 2,
+            "traffic": 22,
+            "voice": 2
+          }
+        },
+        "church_bells": {
+          "any_pattern_fired": 17,
+          "clips": 40,
+          "fired_by_class": {
+            "media": 17,
+            "traffic": 1
+          }
+        },
+        "clock_alarm": {
+          "any_pattern_fired": 36,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 33,
+            "phone": 11
+          }
+        },
+        "coughing": {
+          "any_pattern_fired": 14,
+          "clips": 40,
+          "fired_by_class": {
+            "traffic": 1,
+            "voice": 13
+          }
+        },
+        "engine": {
+          "any_pattern_fired": 0,
+          "clips": 40,
+          "fired_by_class": {}
+        },
+        "laughing": {
+          "any_pattern_fired": 25,
+          "clips": 40,
+          "fired_by_class": {
+            "baby_cry": 1,
+            "dog": 1,
+            "doorbell": 1,
+            "media": 1,
+            "voice": 24
+          }
+        },
+        "siren": {
+          "any_pattern_fired": 40,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 39,
+            "dog": 1,
+            "media": 8,
+            "phone": 1,
+            "traffic": 2
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 72,
+          "of": 80
+        },
+        "baby_cry": {
+          "hits": 35,
+          "of": 40
+        },
+        "dog": {
+          "hits": 40,
+          "of": 40
+        },
+        "knock": {
+          "hits": 27,
+          "of": 40
+        },
+        "traffic": {
+          "hits": 22,
+          "of": 40
+        }
+      },
+      "negative_clips": 1760,
+      "wrong_fires": {
+        "alarm": 26,
+        "traffic": 8
+      }
+    },
+    "H1": {
+      "false_alert_clips": 262,
+      "false_alerts_by_pattern": {
+        "alarm": 14,
+        "baby_cry": 8,
+        "dog": 29,
+        "knock": 8,
+        "media": 71,
+        "phone": 3,
+        "traffic": 4,
+        "voice": 125
+      },
+      "groups": {
+        "car_horn": {
+          "any_pattern_fired": 32,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 11,
+            "media": 2,
+            "traffic": 22,
+            "voice": 2
+          }
+        },
+        "church_bells": {
+          "any_pattern_fired": 17,
+          "clips": 40,
+          "fired_by_class": {
+            "media": 17,
+            "traffic": 1
+          }
+        },
+        "clock_alarm": {
+          "any_pattern_fired": 36,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 33,
+            "phone": 11
+          }
+        },
+        "coughing": {
+          "any_pattern_fired": 15,
+          "clips": 40,
+          "fired_by_class": {
+            "traffic": 1,
+            "voice": 14
+          }
+        },
+        "engine": {
+          "any_pattern_fired": 0,
+          "clips": 40,
+          "fired_by_class": {}
+        },
+        "laughing": {
+          "any_pattern_fired": 25,
+          "clips": 40,
+          "fired_by_class": {
+            "baby_cry": 1,
+            "dog": 1,
+            "doorbell": 1,
+            "media": 1,
+            "voice": 24
+          }
+        },
+        "siren": {
+          "any_pattern_fired": 40,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 39,
+            "dog": 1,
+            "media": 8,
+            "phone": 1,
+            "traffic": 2
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 72,
+          "of": 80
+        },
+        "baby_cry": {
+          "hits": 35,
+          "of": 40
+        },
+        "dog": {
+          "hits": 40,
+          "of": 40
+        },
+        "knock": {
+          "hits": 27,
+          "of": 40
+        },
+        "traffic": {
+          "hits": 22,
+          "of": 40
+        }
+      },
+      "negative_clips": 1760,
+      "wrong_fires": {
+        "alarm": 26,
+        "traffic": 8
+      }
+    },
+    "H2": {
+      "false_alert_clips": 262,
+      "false_alerts_by_pattern": {
+        "alarm": 14,
+        "baby_cry": 8,
+        "dog": 29,
+        "knock": 8,
+        "media": 71,
+        "phone": 3,
+        "traffic": 4,
+        "voice": 125
+      },
+      "groups": {
+        "car_horn": {
+          "any_pattern_fired": 32,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 11,
+            "media": 2,
+            "traffic": 22,
+            "voice": 2
+          }
+        },
+        "church_bells": {
+          "any_pattern_fired": 17,
+          "clips": 40,
+          "fired_by_class": {
+            "media": 17,
+            "traffic": 1
+          }
+        },
+        "clock_alarm": {
+          "any_pattern_fired": 36,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 35,
+            "phone": 2
+          }
+        },
+        "coughing": {
+          "any_pattern_fired": 15,
+          "clips": 40,
+          "fired_by_class": {
+            "traffic": 1,
+            "voice": 14
+          }
+        },
+        "engine": {
+          "any_pattern_fired": 0,
+          "clips": 40,
+          "fired_by_class": {}
+        },
+        "laughing": {
+          "any_pattern_fired": 25,
+          "clips": 40,
+          "fired_by_class": {
+            "baby_cry": 1,
+            "dog": 1,
+            "doorbell": 1,
+            "media": 1,
+            "voice": 24
+          }
+        },
+        "siren": {
+          "any_pattern_fired": 40,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 39,
+            "dog": 1,
+            "media": 8,
+            "traffic": 2
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 74,
+          "of": 80
+        },
+        "baby_cry": {
+          "hits": 35,
+          "of": 40
+        },
+        "dog": {
+          "hits": 40,
+          "of": 40
+        },
+        "knock": {
+          "hits": 27,
+          "of": 40
+        },
+        "traffic": {
+          "hits": 22,
+          "of": 40
+        }
+      },
+      "negative_clips": 1760,
+      "wrong_fires": {
+        "alarm": 26,
+        "traffic": 8
+      }
+    },
+    "V1": {
+      "false_alert_clips": 259,
+      "false_alerts_by_pattern": {
+        "alarm": 14,
+        "baby_cry": 8,
+        "dog": 30,
+        "knock": 8,
+        "media": 71,
+        "phone": 3,
+        "traffic": 4,
+        "voice": 121
+      },
+      "groups": {
+        "car_horn": {
+          "any_pattern_fired": 32,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 11,
+            "media": 3,
+            "traffic": 22,
+            "voice": 2
+          }
+        },
+        "church_bells": {
+          "any_pattern_fired": 17,
+          "clips": 40,
+          "fired_by_class": {
+            "media": 17,
+            "traffic": 1
+          }
+        },
+        "clock_alarm": {
+          "any_pattern_fired": 36,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 33,
+            "phone": 11
+          }
+        },
+        "coughing": {
+          "any_pattern_fired": 14,
+          "clips": 40,
+          "fired_by_class": {
+            "traffic": 1,
+            "voice": 13
+          }
+        },
+        "engine": {
+          "any_pattern_fired": 0,
+          "clips": 40,
+          "fired_by_class": {}
+        },
+        "laughing": {
+          "any_pattern_fired": 25,
+          "clips": 40,
+          "fired_by_class": {
+            "baby_cry": 1,
+            "dog": 1,
+            "doorbell": 1,
+            "media": 1,
+            "voice": 24
+          }
+        },
+        "siren": {
+          "any_pattern_fired": 40,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 39,
+            "dog": 1,
+            "media": 8,
+            "phone": 1,
+            "traffic": 2
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 72,
+          "of": 80
+        },
+        "baby_cry": {
+          "hits": 35,
+          "of": 40
+        },
+        "dog": {
+          "hits": 40,
+          "of": 40
+        },
+        "knock": {
+          "hits": 27,
+          "of": 40
+        },
+        "traffic": {
+          "hits": 22,
+          "of": 40
+        }
+      },
+      "negative_clips": 1760,
+      "wrong_fires": {
+        "alarm": 26,
+        "traffic": 8
+      }
+    },
+    "V2": {
+      "false_alert_clips": 180,
+      "false_alerts_by_pattern": {
+        "alarm": 15,
+        "baby_cry": 8,
+        "dog": 32,
+        "knock": 8,
+        "media": 75,
+        "phone": 3,
+        "traffic": 4,
+        "voice": 35
+      },
+      "groups": {
+        "car_horn": {
+          "any_pattern_fired": 32,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 11,
+            "media": 3,
+            "traffic": 22,
+            "voice": 2
+          }
+        },
+        "church_bells": {
+          "any_pattern_fired": 17,
+          "clips": 40,
+          "fired_by_class": {
+            "media": 17,
+            "traffic": 1
+          }
+        },
+        "clock_alarm": {
+          "any_pattern_fired": 36,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 33,
+            "phone": 11
+          }
+        },
+        "coughing": {
+          "any_pattern_fired": 2,
+          "clips": 40,
+          "fired_by_class": {
+            "traffic": 1,
+            "voice": 1
+          }
+        },
+        "engine": {
+          "any_pattern_fired": 0,
+          "clips": 40,
+          "fired_by_class": {}
+        },
+        "laughing": {
+          "any_pattern_fired": 17,
+          "clips": 40,
+          "fired_by_class": {
+            "baby_cry": 1,
+            "dog": 1,
+            "doorbell": 1,
+            "media": 1,
+            "voice": 15
+          }
+        },
+        "siren": {
+          "any_pattern_fired": 40,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 39,
+            "dog": 1,
+            "media": 8,
+            "phone": 1,
+            "traffic": 2
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 72,
+          "of": 80
+        },
+        "baby_cry": {
+          "hits": 35,
+          "of": 40
+        },
+        "dog": {
+          "hits": 40,
+          "of": 40
+        },
+        "knock": {
+          "hits": 27,
+          "of": 40
+        },
+        "traffic": {
+          "hits": 22,
+          "of": 40
+        }
+      },
+      "negative_clips": 1760,
+      "wrong_fires": {
+        "alarm": 26,
+        "traffic": 8
+      }
+    },
+    "V3": {
+      "false_alert_clips": 239,
+      "false_alerts_by_pattern": {
+        "alarm": 14,
+        "baby_cry": 8,
+        "dog": 30,
+        "knock": 8,
+        "media": 71,
+        "phone": 3,
+        "traffic": 4,
+        "voice": 101
+      },
+      "groups": {
+        "car_horn": {
+          "any_pattern_fired": 32,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 11,
+            "media": 3,
+            "traffic": 22,
+            "voice": 2
+          }
+        },
+        "church_bells": {
+          "any_pattern_fired": 17,
+          "clips": 40,
+          "fired_by_class": {
+            "media": 17,
+            "traffic": 1
+          }
+        },
+        "clock_alarm": {
+          "any_pattern_fired": 36,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 33,
+            "phone": 11
+          }
+        },
+        "coughing": {
+          "any_pattern_fired": 11,
+          "clips": 40,
+          "fired_by_class": {
+            "traffic": 1,
+            "voice": 10
+          }
+        },
+        "engine": {
+          "any_pattern_fired": 0,
+          "clips": 40,
+          "fired_by_class": {}
+        },
+        "laughing": {
+          "any_pattern_fired": 22,
+          "clips": 40,
+          "fired_by_class": {
+            "baby_cry": 1,
+            "dog": 1,
+            "doorbell": 1,
+            "media": 1,
+            "voice": 21
+          }
+        },
+        "siren": {
+          "any_pattern_fired": 40,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 39,
+            "dog": 1,
+            "media": 8,
+            "phone": 1,
+            "traffic": 2
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 72,
+          "of": 80
+        },
+        "baby_cry": {
+          "hits": 35,
+          "of": 40
+        },
+        "dog": {
+          "hits": 40,
+          "of": 40
+        },
+        "knock": {
+          "hits": 27,
+          "of": 40
+        },
+        "traffic": {
+          "hits": 22,
+          "of": 40
+        }
+      },
+      "negative_clips": 1760,
+      "wrong_fires": {
+        "alarm": 26,
+        "traffic": 8
+      }
+    },
+    "V4": {
+      "false_alert_clips": 196,
+      "false_alerts_by_pattern": {
+        "alarm": 14,
+        "baby_cry": 8,
+        "dog": 32,
+        "knock": 8,
+        "media": 72,
+        "phone": 3,
+        "traffic": 4,
+        "voice": 55
+      },
+      "groups": {
+        "car_horn": {
+          "any_pattern_fired": 32,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 11,
+            "media": 3,
+            "traffic": 22,
+            "voice": 2
+          }
+        },
+        "church_bells": {
+          "any_pattern_fired": 17,
+          "clips": 40,
+          "fired_by_class": {
+            "media": 17,
+            "traffic": 1
+          }
+        },
+        "clock_alarm": {
+          "any_pattern_fired": 36,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 33,
+            "phone": 11
+          }
+        },
+        "coughing": {
+          "any_pattern_fired": 3,
+          "clips": 40,
+          "fired_by_class": {
+            "traffic": 1,
+            "voice": 2
+          }
+        },
+        "engine": {
+          "any_pattern_fired": 0,
+          "clips": 40,
+          "fired_by_class": {}
+        },
+        "laughing": {
+          "any_pattern_fired": 18,
+          "clips": 40,
+          "fired_by_class": {
+            "baby_cry": 1,
+            "dog": 1,
+            "doorbell": 1,
+            "media": 1,
+            "voice": 17
+          }
+        },
+        "siren": {
+          "any_pattern_fired": 40,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 39,
+            "dog": 1,
+            "media": 8,
+            "phone": 1,
+            "traffic": 2
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 72,
+          "of": 80
+        },
+        "baby_cry": {
+          "hits": 35,
+          "of": 40
+        },
+        "dog": {
+          "hits": 40,
+          "of": 40
+        },
+        "knock": {
+          "hits": 27,
+          "of": 40
+        },
+        "traffic": {
+          "hits": 22,
+          "of": 40
+        }
+      },
+      "negative_clips": 1760,
+      "wrong_fires": {
+        "alarm": 26,
+        "traffic": 8
+      }
+    },
+    "baseline": {
+      "false_alert_clips": 262,
+      "false_alerts_by_pattern": {
+        "alarm": 14,
+        "baby_cry": 8,
+        "dog": 29,
+        "knock": 8,
+        "media": 71,
+        "phone": 3,
+        "traffic": 4,
+        "voice": 125
+      },
+      "groups": {
+        "car_horn": {
+          "any_pattern_fired": 32,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 11,
+            "media": 3,
+            "traffic": 22,
+            "voice": 2
+          }
+        },
+        "church_bells": {
+          "any_pattern_fired": 17,
+          "clips": 40,
+          "fired_by_class": {
+            "media": 17,
+            "traffic": 1
+          }
+        },
+        "clock_alarm": {
+          "any_pattern_fired": 36,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 33,
+            "phone": 11
+          }
+        },
+        "coughing": {
+          "any_pattern_fired": 15,
+          "clips": 40,
+          "fired_by_class": {
+            "traffic": 1,
+            "voice": 14
+          }
+        },
+        "engine": {
+          "any_pattern_fired": 0,
+          "clips": 40,
+          "fired_by_class": {}
+        },
+        "laughing": {
+          "any_pattern_fired": 25,
+          "clips": 40,
+          "fired_by_class": {
+            "baby_cry": 1,
+            "dog": 1,
+            "doorbell": 1,
+            "media": 1,
+            "voice": 24
+          }
+        },
+        "siren": {
+          "any_pattern_fired": 40,
+          "clips": 40,
+          "fired_by_class": {
+            "alarm": 39,
+            "dog": 1,
+            "media": 8,
+            "phone": 1,
+            "traffic": 2
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 72,
+          "of": 80
+        },
+        "baby_cry": {
+          "hits": 35,
+          "of": 40
+        },
+        "dog": {
+          "hits": 40,
+          "of": 40
+        },
+        "knock": {
+          "hits": 27,
+          "of": 40
+        },
+        "traffic": {
+          "hits": 22,
+          "of": 40
+        }
+      },
+      "negative_clips": 1760,
+      "wrong_fires": {
+        "alarm": 26,
+        "traffic": 8
+      }
+    }
+  },
+  "rules": {
+    "C1": "H1 with V1 (H1 applied first)",
+    "H1": "Alarm and traffic outrank voice and media",
+    "H2": "Alarm and traffic outrank everything",
+    "V1": "Speech dominance: voice fires only if the top label of all 521 is a voice label",
+    "V2": "Persistence: voice fires only if a neighbouring window was also won by voice",
+    "V3": "Voice minimum 0.30",
+    "V4": "Voice minimum 0.50"
+  },
+  "schema_version": 1,
+  "scope": "Re-analysis of stored model scores. Classifier only, on recorded clips. No wearers, no microphone, no wristband, no real rooms. Not a clinical result."
+}

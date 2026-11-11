@@ -1,0 +1,1796 @@
+{
+  "against_baseline": {
+    "C1": {
+      "alarm_and_traffic_hits_gained": 0,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": true,
+      "confirmed_if_held_out": false,
+      "false_alert_clips_change": -9,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 0,
+        "dog": 0,
+        "doorbell": 0,
+        "knock": 0,
+        "media": 0,
+        "phone": 0,
+        "traffic": 0,
+        "voice": -4
+      },
+      "hits_lost_by_other_classes": 4,
+      "missed_speech": 4,
+      "selected_if_esc50": false,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 5
+    },
+    "H1": {
+      "alarm_and_traffic_hits_gained": 0,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": false,
+      "confirmed_if_held_out": false,
+      "false_alert_clips_change": 0,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 0,
+        "dog": 0,
+        "doorbell": 0,
+        "knock": 0,
+        "media": 0,
+        "phone": 0,
+        "traffic": 0,
+        "voice": 0
+      },
+      "hits_lost_by_other_classes": 0,
+      "missed_speech": 0,
+      "selected_if_esc50": false,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 5
+    },
+    "H2": {
+      "alarm_and_traffic_hits_gained": 0,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": true,
+      "confirmed_if_held_out": false,
+      "false_alert_clips_change": 0,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 0,
+        "dog": 0,
+        "doorbell": 0,
+        "knock": 0,
+        "media": 0,
+        "phone": -41,
+        "traffic": 0,
+        "voice": 0
+      },
+      "hits_lost_by_other_classes": 41,
+      "missed_speech": 0,
+      "selected_if_esc50": false,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 66
+    },
+    "V1": {
+      "alarm_and_traffic_hits_gained": 0,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": true,
+      "confirmed_if_held_out": true,
+      "false_alert_clips_change": -9,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 0,
+        "dog": 0,
+        "doorbell": 0,
+        "knock": 0,
+        "media": 0,
+        "phone": 0,
+        "traffic": 0,
+        "voice": -4
+      },
+      "hits_lost_by_other_classes": 4,
+      "missed_speech": 4,
+      "selected_if_esc50": false,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 0
+    },
+    "V2": {
+      "alarm_and_traffic_hits_gained": 0,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": true,
+      "confirmed_if_held_out": true,
+      "false_alert_clips_change": -298,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 0,
+        "dog": 0,
+        "doorbell": 0,
+        "knock": 0,
+        "media": 0,
+        "phone": 0,
+        "traffic": 0,
+        "voice": -161
+      },
+      "hits_lost_by_other_classes": 161,
+      "missed_speech": 161,
+      "selected_if_esc50": false,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 0
+    },
+    "V3": {
+      "alarm_and_traffic_hits_gained": 0,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": true,
+      "confirmed_if_held_out": true,
+      "false_alert_clips_change": -88,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 0,
+        "dog": 0,
+        "doorbell": 0,
+        "knock": 0,
+        "media": 0,
+        "phone": 0,
+        "traffic": 0,
+        "voice": -17
+      },
+      "hits_lost_by_other_classes": 17,
+      "missed_speech": 17,
+      "selected_if_esc50": false,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 0
+    },
+    "V4": {
+      "alarm_and_traffic_hits_gained": 0,
+      "alarm_hits_lost": 0,
+      "alarm_tested": true,
+      "any_class_lost_hits": true,
+      "confirmed_if_held_out": true,
+      "false_alert_clips_change": -239,
+      "gate_no_alarm_hit_lost": true,
+      "hit_change_by_class": {
+        "alarm": 0,
+        "dog": 0,
+        "doorbell": 0,
+        "knock": 0,
+        "media": 0,
+        "phone": 0,
+        "traffic": 0,
+        "voice": -60
+      },
+      "hits_lost_by_other_classes": 60,
+      "missed_speech": 60,
+      "selected_if_esc50": false,
+      "traffic_hits_change": 0,
+      "traffic_tested": true,
+      "wrong_alarm_or_traffic_clips_added": 0
+    }
+  },
+  "baseline": {
+    "label_map": "v1.8.0",
+    "label_map_sha256": "ab769cf78294ee3a871db0f6cf6d0ce231b56de966b0d3feb176b652b92f9230",
+    "matches_v1.8.0_report": {
+      "false_alerts_match": true,
+      "hits_match": true,
+      "raw_scores_sha256_match": true
+    },
+    "threshold": 0.2
+  },
+  "clips": {
+    "scored": 8403,
+    "windows": 79241
+  },
+  "dataset": "fsd50k",
+  "diagnostics": {
+    "horn": {
+      "alarm_target_clips": 48,
+      "alarm_target_clips_where_traffic_fired": 4,
+      "hits_at_0.05": 34,
+      "hits_at_0.20": 32,
+      "hits_by_clip_length": {
+        "1 window": {
+          "hits": 5,
+          "of": 6
+        },
+        "11 or more windows": {
+          "hits": 9,
+          "of": 24
+        },
+        "2 to 5 windows": {
+          "hits": 14,
+          "of": 16
+        },
+        "6 to 10 windows": {
+          "hits": 4,
+          "of": 10
+        }
+      },
+      "horn_clips_where_alarm_fired": 5,
+      "horn_target_clips": 56,
+      "masked_by_class": {},
+      "missed_at_0.20": 24,
+      "missed_by_cause": {
+        "index mapping: top label is a vehicle or engine label outside the allowlist": 4,
+        "not detected: no horn label reached 0.05": 15,
+        "threshold: horn won a window but scored 0.05 to 0.20": 2,
+        "weak and outscored: horn scored 0.05 to 0.20 and another class won": 3
+      },
+      "missed_clips_top_yamnet_label": {
+        "Animal": 3,
+        "Breathing": 1,
+        "Burping, eructation": 1,
+        "Buzzer": 1,
+        "Glass": 1,
+        "Music": 2,
+        "Speech": 5,
+        "Toilet flush": 1,
+        "Vehicle": 5,
+        "Whistle": 1
+      },
+      "missed_horn_clips_where_alarm_fired": 4,
+      "non_target_clips_where_traffic_fires_at_0.05": 293
+    },
+    "score_distributions": {
+      "alarm": {
+        "negative_clips": {
+          "0.0039": 10,
+          "0.0078": 15,
+          "0.0117": 30,
+          "0.0156": 39,
+          "0.0195": 45,
+          "0.0312": 35,
+          "0.0430": 45,
+          "0.0586": 43,
+          "0.0820": 33,
+          "0.1094": 25,
+          "0.1484": 28,
+          "0.1992": 24,
+          "0.2617": 17,
+          "0.3320": 15,
+          "0.4141": 16,
+          "0.5000": 15,
+          "0.5859": 15,
+          "0.6680": 3,
+          "0.7383": 5,
+          "0.8008": 1,
+          "0.8516": 3,
+          "0.8906": 4,
+          "0.9180": 2,
+          "0.9414": 1,
+          "0.9883": 1
+        },
+        "target_clips": {
+          "0.1992": 2,
+          "0.4141": 1,
+          "0.5000": 1,
+          "0.5859": 1,
+          "0.6680": 4,
+          "0.7383": 2,
+          "0.8008": 3,
+          "0.8516": 5,
+          "0.8906": 3,
+          "0.9180": 5,
+          "0.9414": 4,
+          "0.9570": 1,
+          "0.9688": 2,
+          "0.9844": 1,
+          "0.9883": 1,
+          "0.9961": 2,
+          "none": 10
+        }
+      },
+      "baby_cry": {
+        "negative_clips": {
+          "0.0312": 1,
+          "0.0430": 4,
+          "0.0586": 11,
+          "0.0820": 6,
+          "0.1094": 18,
+          "0.1484": 13,
+          "0.1992": 5,
+          "0.2617": 6,
+          "0.3320": 5,
+          "0.4141": 5,
+          "0.5000": 4,
+          "0.6680": 4,
+          "0.7383": 4,
+          "0.8008": 1,
+          "0.8516": 1,
+          "0.8906": 3,
+          "0.9180": 1,
+          "0.9414": 1,
+          "0.9570": 1
+        },
+        "target_clips": {}
+      },
+      "dog": {
+        "negative_clips": {
+          "0.0039": 21,
+          "0.0078": 19,
+          "0.0117": 33,
+          "0.0156": 41,
+          "0.0195": 39,
+          "0.0312": 48,
+          "0.0430": 66,
+          "0.0586": 74,
+          "0.0820": 56,
+          "0.1094": 45,
+          "0.1484": 41,
+          "0.1992": 29,
+          "0.2617": 25,
+          "0.3320": 12,
+          "0.4141": 17,
+          "0.5000": 14,
+          "0.5859": 10,
+          "0.6680": 7,
+          "0.7383": 3,
+          "0.8516": 2,
+          "0.8906": 2
+        },
+        "target_clips": {
+          "0.0078": 1,
+          "0.0156": 2,
+          "0.0195": 1,
+          "0.0430": 1,
+          "0.0820": 1,
+          "0.1094": 4,
+          "0.1484": 1,
+          "0.1992": 4,
+          "0.3320": 1,
+          "0.4141": 1,
+          "0.5000": 2,
+          "0.5859": 4,
+          "0.6680": 2,
+          "0.7383": 7,
+          "0.8008": 8,
+          "0.8516": 15,
+          "0.8906": 7,
+          "0.9180": 14,
+          "0.9414": 13,
+          "0.9570": 7,
+          "0.9688": 10,
+          "0.9805": 4,
+          "0.9844": 4,
+          "0.9883": 1,
+          "none": 22
+        }
+      },
+      "doorbell": {
+        "negative_clips": {
+          "0.0078": 2,
+          "0.0156": 3,
+          "0.0195": 1,
+          "0.0312": 5,
+          "0.0430": 2,
+          "0.0586": 5,
+          "0.0820": 6,
+          "0.1094": 4,
+          "0.1484": 2,
+          "0.1992": 3,
+          "0.2617": 5,
+          "0.3320": 2,
+          "0.8008": 1
+        },
+        "target_clips": {
+          "0.0195": 1,
+          "0.2617": 1,
+          "0.3320": 1,
+          "0.5000": 1,
+          "0.5859": 1,
+          "0.7383": 1,
+          "0.8008": 1,
+          "0.9570": 1,
+          "0.9688": 1,
+          "none": 18
+        }
+      },
+      "knock": {
+        "negative_clips": {
+          "0.0039": 5,
+          "0.0078": 4,
+          "0.0117": 10,
+          "0.0156": 14,
+          "0.0195": 21,
+          "0.0312": 31,
+          "0.0430": 30,
+          "0.0586": 47,
+          "0.0820": 28,
+          "0.1094": 34,
+          "0.1484": 29,
+          "0.1992": 26,
+          "0.2617": 28,
+          "0.3320": 19,
+          "0.4141": 22,
+          "0.5000": 15,
+          "0.5859": 10,
+          "0.6680": 10,
+          "0.7383": 6,
+          "0.8516": 3,
+          "0.9805": 1
+        },
+        "target_clips": {
+          "0.0117": 1,
+          "0.0195": 1,
+          "0.0312": 1,
+          "0.0430": 2,
+          "0.0586": 4,
+          "0.0820": 1,
+          "0.1094": 1,
+          "0.1484": 3,
+          "0.1992": 1,
+          "0.2617": 2,
+          "0.3320": 3,
+          "0.4141": 3,
+          "0.5000": 3,
+          "0.5859": 4,
+          "0.6680": 5,
+          "0.7383": 1,
+          "0.8008": 4,
+          "0.8516": 6,
+          "0.8906": 3,
+          "0.9180": 1,
+          "0.9414": 4,
+          "0.9570": 4,
+          "0.9688": 2,
+          "0.9805": 4,
+          "0.9844": 2,
+          "0.9883": 1,
+          "0.9922": 1,
+          "0.9961": 1,
+          "none": 19
+        }
+      },
+      "media": {
+        "negative_clips": {
+          "0.0039": 148,
+          "0.0078": 113,
+          "0.0117": 122,
+          "0.0156": 168,
+          "0.0195": 164,
+          "0.0312": 188,
+          "0.0430": 186,
+          "0.0586": 189,
+          "0.0820": 146,
+          "0.1094": 153,
+          "0.1484": 109,
+          "0.1992": 102,
+          "0.2617": 79,
+          "0.3320": 50,
+          "0.4141": 57,
+          "0.5000": 53,
+          "0.5859": 42,
+          "0.6680": 30,
+          "0.7383": 25,
+          "0.8008": 23,
+          "0.8516": 13,
+          "0.8906": 11,
+          "0.9180": 12,
+          "0.9414": 8,
+          "0.9570": 7,
+          "0.9688": 5,
+          "0.9805": 3,
+          "0.9844": 1,
+          "0.9961": 1
+        },
+        "target_clips": {
+          "0.0039": 1,
+          "0.0078": 2,
+          "0.0117": 2,
+          "0.0156": 11,
+          "0.0195": 6,
+          "0.0312": 6,
+          "0.0430": 7,
+          "0.0586": 15,
+          "0.0820": 28,
+          "0.1094": 29,
+          "0.1484": 34,
+          "0.1992": 37,
+          "0.2617": 39,
+          "0.3320": 40,
+          "0.4141": 46,
+          "0.5000": 41,
+          "0.5859": 45,
+          "0.6680": 49,
+          "0.7383": 49,
+          "0.8008": 51,
+          "0.8516": 43,
+          "0.8906": 47,
+          "0.9180": 68,
+          "0.9414": 61,
+          "0.9570": 64,
+          "0.9688": 63,
+          "0.9805": 48,
+          "0.9844": 81,
+          "0.9883": 73,
+          "0.9922": 61,
+          "0.9961": 336,
+          "none": 130
+        }
+      },
+      "phone": {
+        "negative_clips": {
+          "0.0078": 3,
+          "0.0117": 1,
+          "0.0156": 4,
+          "0.0195": 3,
+          "0.0312": 5,
+          "0.0430": 12,
+          "0.0586": 11,
+          "0.0820": 13,
+          "0.1094": 18,
+          "0.1484": 10,
+          "0.1992": 3,
+          "0.2617": 7,
+          "0.3320": 10,
+          "0.4141": 9,
+          "0.5000": 6,
+          "0.5859": 1,
+          "0.6680": 2,
+          "0.7383": 1,
+          "0.8008": 1,
+          "0.8906": 2,
+          "0.9180": 1,
+          "0.9414": 2,
+          "0.9688": 1
+        },
+        "target_clips": {
+          "0.0430": 1,
+          "0.0820": 1,
+          "0.1094": 1,
+          "0.2617": 1,
+          "0.3320": 2,
+          "0.4141": 1,
+          "0.5000": 1,
+          "0.5859": 1,
+          "0.6680": 2,
+          "0.8008": 4,
+          "0.8516": 5,
+          "0.8906": 5,
+          "0.9180": 3,
+          "0.9414": 4,
+          "0.9570": 1,
+          "0.9688": 6,
+          "0.9805": 3,
+          "0.9844": 2,
+          "0.9883": 8,
+          "0.9922": 2,
+          "0.9961": 11,
+          "none": 74
+        }
+      },
+      "traffic": {
+        "negative_clips": {
+          "0.0039": 32,
+          "0.0078": 26,
+          "0.0117": 37,
+          "0.0156": 49,
+          "0.0195": 61,
+          "0.0312": 56,
+          "0.0430": 41,
+          "0.0586": 34,
+          "0.0820": 31,
+          "0.1094": 25,
+          "0.1484": 27,
+          "0.1992": 17,
+          "0.2617": 17,
+          "0.3320": 9,
+          "0.4141": 5,
+          "0.5000": 3,
+          "0.5859": 5,
+          "0.6680": 3,
+          "0.7383": 2,
+          "0.8008": 4,
+          "0.8516": 1,
+          "0.8906": 1,
+          "0.9180": 2,
+          "0.9414": 1,
+          "0.9570": 1
+        },
+        "target_clips": {
+          "0.0156": 2,
+          "0.0195": 1,
+          "0.0430": 2,
+          "0.1484": 2,
+          "0.3320": 1,
+          "0.4141": 2,
+          "0.5000": 2,
+          "0.5859": 1,
+          "0.6680": 3,
+          "0.8516": 4,
+          "0.8906": 3,
+          "0.9180": 2,
+          "0.9570": 1,
+          "0.9688": 1,
+          "0.9805": 1,
+          "0.9844": 2,
+          "0.9922": 1,
+          "0.9961": 8,
+          "none": 17
+        }
+      },
+      "voice": {
+        "negative_clips": {
+          "0.0039": 240,
+          "0.0078": 149,
+          "0.0117": 193,
+          "0.0156": 273,
+          "0.0195": 353,
+          "0.0312": 453,
+          "0.0430": 532,
+          "0.0586": 425,
+          "0.0820": 319,
+          "0.1094": 214,
+          "0.1484": 196,
+          "0.1992": 161,
+          "0.2617": 101,
+          "0.3320": 101,
+          "0.4141": 86,
+          "0.5000": 55,
+          "0.5859": 47,
+          "0.6680": 46,
+          "0.7383": 34,
+          "0.8008": 31,
+          "0.8516": 28,
+          "0.8906": 21,
+          "0.9180": 9,
+          "0.9414": 14,
+          "0.9570": 9,
+          "0.9688": 6,
+          "0.9805": 2,
+          "0.9844": 1,
+          "0.9883": 1,
+          "0.9922": 2,
+          "0.9961": 6
+        },
+        "target_clips": {
+          "0.0039": 1,
+          "0.0117": 1,
+          "0.0156": 1,
+          "0.0195": 5,
+          "0.0312": 3,
+          "0.0430": 5,
+          "0.0586": 13,
+          "0.0820": 16,
+          "0.1094": 11,
+          "0.1484": 11,
+          "0.1992": 26,
+          "0.2617": 17,
+          "0.3320": 20,
+          "0.4141": 23,
+          "0.5000": 28,
+          "0.5859": 34,
+          "0.6680": 27,
+          "0.7383": 40,
+          "0.8008": 34,
+          "0.8516": 41,
+          "0.8906": 34,
+          "0.9180": 36,
+          "0.9414": 27,
+          "0.9570": 45,
+          "0.9688": 30,
+          "0.9805": 30,
+          "0.9844": 16,
+          "0.9883": 21,
+          "0.9922": 12,
+          "0.9961": 15,
+          "none": 33
+        }
+      }
+    },
+    "score_grid": {
+      "all_multiples_of_1_over_256": true,
+      "distinct_values": 32,
+      "largest_value": 0.99609375,
+      "smallest_nonzero_value": 0.00390625,
+      "values_from_0.15_to_0.55": [
+        0.199219,
+        0.261719,
+        0.332031,
+        0.414062,
+        0.5
+      ]
+    },
+    "voice_false_alerts": {
+      "by_yamnet_index": {
+        "0 Speech": 598,
+        "3 Narration, monologue": 2
+      },
+      "negative_clips_where_voice_fired": 600
+    }
+  },
+  "kind": "openhear-awareness-bench-rules",
+  "plan": "docs/BENCH_PLAN_v1.9.md",
+  "provenance": {
+    "clips_listed": 8403,
+    "clips_with_stored_scores": 8403,
+    "dataset_licence": "Per-clip Creative Commons licences. Only CC0 and CC BY clips are used; CC BY-NC and CC Sampling+ clips are excluded. Audio not redistributed.",
+    "dataset_notes": {
+      "ambiguous_labels_left_out": [
+        "Alarm"
+      ],
+      "clips_dropped_by_licence": {
+        "http://creativecommons.org/licenses/by-nc/3.0/": 1425,
+        "http://creativecommons.org/licenses/sampling+/1.0/": 403
+      },
+      "clips_kept": 8403,
+      "labels_found_in_vocabulary": [
+        "Bark",
+        "Bus",
+        "Car",
+        "Car_passing_by",
+        "Child_speech_and_kid_speaking",
+        "Conversation",
+        "Dog",
+        "Doorbell",
+        "Engine",
+        "Engine_starting",
+        "Female_speech_and_woman_speaking",
+        "Knock",
+        "Male_speech_and_man_speaking",
+        "Motor_vehicle_(road)",
+        "Motorcycle",
+        "Music",
+        "Race_car_and_auto_racing",
+        "Ringtone",
+        "Siren",
+        "Speech",
+        "Speech_synthesizer",
+        "Telephone",
+        "Traffic_noise_and_roadway_noise",
+        "Truck",
+        "Vehicle_horn_and_car_horn_and_honking"
+      ],
+      "labels_not_in_vocabulary": [
+        "Alarm_clock",
+        "Baby_cry_and_infant_cry",
+        "Buzzer",
+        "Car_alarm",
+        "Fire_alarm",
+        "Smoke_detector_and_smoke_alarm",
+        "Telephone_bell_ringing"
+      ]
+    },
+    "dataset_source": "FSD50K eval split (zenodo.org/records/4060432)",
+    "git_sha": "391f71168a01025c40370ed5e798f081dcd6a644",
+    "host": {
+      "numpy": "2.5.4",
+      "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+      "python": "3.12.16"
+    },
+    "model_was_run": false,
+    "raw_scores_sha256": "7c1cea926b5e2709e7d13c71634e5c80ab0ed3a247576fe320ccc384cf8717a9",
+    "run_url": "https://github.com/ljbudgie/openhear/actions/runs/43066209373",
+    "stored_scores_from_run": "42911082407"
+  },
+  "report_sha256": "d8cd7049e94fc1c6ce5a0f1fb2135bdbeff6e7c07c6926351579887ad98ce3c5",
+  "results": {
+    "C1": {
+      "false_alert_clips": 1277,
+      "false_alerts_by_pattern": {
+        "alarm": 77,
+        "baby_cry": 31,
+        "dog": 68,
+        "doorbell": 4,
+        "knock": 113,
+        "media": 365,
+        "phone": 35,
+        "traffic": 38,
+        "voice": 546
+      },
+      "groups": {
+        "Doorbell": {
+          "any_pattern_fired": 20,
+          "clips": 27,
+          "fired_by_class": {
+            "alarm": 3,
+            "dog": 1,
+            "doorbell": 8,
+            "media": 9,
+            "phone": 3,
+            "voice": 2
+          }
+        },
+        "Knock": {
+          "any_pattern_fired": 63,
+          "clips": 88,
+          "fired_by_class": {
+            "baby_cry": 1,
+            "knock": 54,
+            "media": 10,
+            "voice": 10
+          }
+        },
+        "Ringtone": {
+          "any_pattern_fired": 60,
+          "clips": 65,
+          "fired_by_class": {
+            "alarm": 12,
+            "doorbell": 2,
+            "media": 31,
+            "phone": 31,
+            "traffic": 1,
+            "voice": 3
+          }
+        },
+        "Siren": {
+          "any_pattern_fired": 44,
+          "clips": 48,
+          "fired_by_class": {
+            "alarm": 36,
+            "media": 15,
+            "phone": 2,
+            "traffic": 4,
+            "voice": 7
+          }
+        },
+        "Speech": {
+          "any_pattern_fired": 564,
+          "clips": 656,
+          "fired_by_class": {
+            "alarm": 27,
+            "baby_cry": 7,
+            "dog": 23,
+            "doorbell": 1,
+            "knock": 2,
+            "media": 78,
+            "phone": 11,
+            "traffic": 17,
+            "voice": 526
+          }
+        },
+        "Vehicle_horn_and_car_horn_and_honking": {
+          "any_pattern_fired": 48,
+          "clips": 56,
+          "fired_by_class": {
+            "alarm": 5,
+            "knock": 1,
+            "media": 6,
+            "traffic": 32,
+            "voice": 11
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 36,
+          "of": 48
+        },
+        "dog": {
+          "hits": 100,
+          "of": 137
+        },
+        "doorbell": {
+          "hits": 8,
+          "of": 27
+        },
+        "knock": {
+          "hits": 54,
+          "of": 88
+        },
+        "media": {
+          "hits": 1305,
+          "of": 1613
+        },
+        "phone": {
+          "hits": 62,
+          "of": 139
+        },
+        "traffic": {
+          "hits": 32,
+          "of": 56
+        },
+        "voice": {
+          "hits": 526,
+          "of": 656
+        }
+      },
+      "negative_clips": 5586,
+      "wrong_fires": {
+        "alarm": 186,
+        "traffic": 111
+      }
+    },
+    "H1": {
+      "false_alert_clips": 1286,
+      "false_alerts_by_pattern": {
+        "alarm": 77,
+        "baby_cry": 31,
+        "dog": 68,
+        "doorbell": 4,
+        "knock": 113,
+        "media": 365,
+        "phone": 35,
+        "traffic": 38,
+        "voice": 555
+      },
+      "groups": {
+        "Doorbell": {
+          "any_pattern_fired": 20,
+          "clips": 27,
+          "fired_by_class": {
+            "alarm": 3,
+            "dog": 1,
+            "doorbell": 8,
+            "media": 9,
+            "phone": 3,
+            "voice": 2
+          }
+        },
+        "Knock": {
+          "any_pattern_fired": 64,
+          "clips": 88,
+          "fired_by_class": {
+            "baby_cry": 1,
+            "knock": 54,
+            "media": 10,
+            "voice": 11
+          }
+        },
+        "Ringtone": {
+          "any_pattern_fired": 60,
+          "clips": 65,
+          "fired_by_class": {
+            "alarm": 12,
+            "doorbell": 2,
+            "media": 31,
+            "phone": 31,
+            "traffic": 1,
+            "voice": 3
+          }
+        },
+        "Siren": {
+          "any_pattern_fired": 44,
+          "clips": 48,
+          "fired_by_class": {
+            "alarm": 36,
+            "media": 15,
+            "phone": 2,
+            "traffic": 4,
+            "voice": 7
+          }
+        },
+        "Speech": {
+          "any_pattern_fired": 568,
+          "clips": 656,
+          "fired_by_class": {
+            "alarm": 27,
+            "baby_cry": 7,
+            "dog": 23,
+            "doorbell": 1,
+            "knock": 2,
+            "media": 78,
+            "phone": 11,
+            "traffic": 17,
+            "voice": 530
+          }
+        },
+        "Vehicle_horn_and_car_horn_and_honking": {
+          "any_pattern_fired": 48,
+          "clips": 56,
+          "fired_by_class": {
+            "alarm": 5,
+            "knock": 1,
+            "media": 6,
+            "traffic": 32,
+            "voice": 11
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 36,
+          "of": 48
+        },
+        "dog": {
+          "hits": 100,
+          "of": 137
+        },
+        "doorbell": {
+          "hits": 8,
+          "of": 27
+        },
+        "knock": {
+          "hits": 54,
+          "of": 88
+        },
+        "media": {
+          "hits": 1305,
+          "of": 1613
+        },
+        "phone": {
+          "hits": 62,
+          "of": 139
+        },
+        "traffic": {
+          "hits": 32,
+          "of": 56
+        },
+        "voice": {
+          "hits": 530,
+          "of": 656
+        }
+      },
+      "negative_clips": 5586,
+      "wrong_fires": {
+        "alarm": 186,
+        "traffic": 111
+      }
+    },
+    "H2": {
+      "false_alert_clips": 1286,
+      "false_alerts_by_pattern": {
+        "alarm": 86,
+        "baby_cry": 31,
+        "dog": 68,
+        "doorbell": 4,
+        "knock": 113,
+        "media": 365,
+        "phone": 26,
+        "traffic": 38,
+        "voice": 555
+      },
+      "groups": {
+        "Doorbell": {
+          "any_pattern_fired": 20,
+          "clips": 27,
+          "fired_by_class": {
+            "alarm": 5,
+            "dog": 1,
+            "doorbell": 8,
+            "media": 9,
+            "phone": 1,
+            "voice": 2
+          }
+        },
+        "Knock": {
+          "any_pattern_fired": 64,
+          "clips": 88,
+          "fired_by_class": {
+            "baby_cry": 1,
+            "knock": 54,
+            "media": 10,
+            "voice": 11
+          }
+        },
+        "Ringtone": {
+          "any_pattern_fired": 60,
+          "clips": 65,
+          "fired_by_class": {
+            "alarm": 30,
+            "doorbell": 2,
+            "media": 31,
+            "phone": 8,
+            "traffic": 1,
+            "voice": 3
+          }
+        },
+        "Siren": {
+          "any_pattern_fired": 44,
+          "clips": 48,
+          "fired_by_class": {
+            "alarm": 36,
+            "media": 15,
+            "phone": 2,
+            "traffic": 4,
+            "voice": 7
+          }
+        },
+        "Speech": {
+          "any_pattern_fired": 568,
+          "clips": 656,
+          "fired_by_class": {
+            "alarm": 33,
+            "baby_cry": 7,
+            "dog": 23,
+            "doorbell": 1,
+            "knock": 2,
+            "media": 78,
+            "phone": 6,
+            "traffic": 17,
+            "voice": 530
+          }
+        },
+        "Vehicle_horn_and_car_horn_and_honking": {
+          "any_pattern_fired": 48,
+          "clips": 56,
+          "fired_by_class": {
+            "alarm": 5,
+            "knock": 1,
+            "media": 6,
+            "traffic": 32,
+            "voice": 11
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 36,
+          "of": 48
+        },
+        "dog": {
+          "hits": 100,
+          "of": 137
+        },
+        "doorbell": {
+          "hits": 8,
+          "of": 27
+        },
+        "knock": {
+          "hits": 54,
+          "of": 88
+        },
+        "media": {
+          "hits": 1305,
+          "of": 1613
+        },
+        "phone": {
+          "hits": 21,
+          "of": 139
+        },
+        "traffic": {
+          "hits": 32,
+          "of": 56
+        },
+        "voice": {
+          "hits": 530,
+          "of": 656
+        }
+      },
+      "negative_clips": 5586,
+      "wrong_fires": {
+        "alarm": 247,
+        "traffic": 111
+      }
+    },
+    "V1": {
+      "false_alert_clips": 1277,
+      "false_alerts_by_pattern": {
+        "alarm": 77,
+        "baby_cry": 31,
+        "dog": 68,
+        "doorbell": 4,
+        "knock": 113,
+        "media": 365,
+        "phone": 35,
+        "traffic": 38,
+        "voice": 546
+      },
+      "groups": {
+        "Doorbell": {
+          "any_pattern_fired": 20,
+          "clips": 27,
+          "fired_by_class": {
+            "alarm": 3,
+            "dog": 1,
+            "doorbell": 8,
+            "media": 9,
+            "phone": 3,
+            "voice": 2
+          }
+        },
+        "Knock": {
+          "any_pattern_fired": 63,
+          "clips": 88,
+          "fired_by_class": {
+            "baby_cry": 1,
+            "knock": 54,
+            "media": 10,
+            "voice": 10
+          }
+        },
+        "Ringtone": {
+          "any_pattern_fired": 60,
+          "clips": 65,
+          "fired_by_class": {
+            "alarm": 12,
+            "doorbell": 2,
+            "media": 31,
+            "phone": 31,
+            "traffic": 1,
+            "voice": 3
+          }
+        },
+        "Siren": {
+          "any_pattern_fired": 44,
+          "clips": 48,
+          "fired_by_class": {
+            "alarm": 36,
+            "media": 15,
+            "phone": 2,
+            "traffic": 4,
+            "voice": 7
+          }
+        },
+        "Speech": {
+          "any_pattern_fired": 564,
+          "clips": 656,
+          "fired_by_class": {
+            "alarm": 27,
+            "baby_cry": 7,
+            "dog": 23,
+            "doorbell": 1,
+            "knock": 2,
+            "media": 78,
+            "phone": 11,
+            "traffic": 17,
+            "voice": 526
+          }
+        },
+        "Vehicle_horn_and_car_horn_and_honking": {
+          "any_pattern_fired": 48,
+          "clips": 56,
+          "fired_by_class": {
+            "alarm": 5,
+            "knock": 1,
+            "media": 6,
+            "traffic": 32,
+            "voice": 11
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 36,
+          "of": 48
+        },
+        "dog": {
+          "hits": 100,
+          "of": 137
+        },
+        "doorbell": {
+          "hits": 8,
+          "of": 27
+        },
+        "knock": {
+          "hits": 54,
+          "of": 88
+        },
+        "media": {
+          "hits": 1305,
+          "of": 1613
+        },
+        "phone": {
+          "hits": 62,
+          "of": 139
+        },
+        "traffic": {
+          "hits": 32,
+          "of": 56
+        },
+        "voice": {
+          "hits": 526,
+          "of": 656
+        }
+      },
+      "negative_clips": 5586,
+      "wrong_fires": {
+        "alarm": 185,
+        "traffic": 107
+      }
+    },
+    "V2": {
+      "false_alert_clips": 988,
+      "false_alerts_by_pattern": {
+        "alarm": 79,
+        "baby_cry": 31,
+        "dog": 76,
+        "doorbell": 4,
+        "knock": 113,
+        "media": 379,
+        "phone": 35,
+        "traffic": 42,
+        "voice": 229
+      },
+      "groups": {
+        "Doorbell": {
+          "any_pattern_fired": 19,
+          "clips": 27,
+          "fired_by_class": {
+            "alarm": 3,
+            "dog": 1,
+            "doorbell": 8,
+            "media": 9,
+            "phone": 3,
+            "voice": 1
+          }
+        },
+        "Knock": {
+          "any_pattern_fired": 62,
+          "clips": 88,
+          "fired_by_class": {
+            "baby_cry": 1,
+            "knock": 54,
+            "media": 10,
+            "voice": 5
+          }
+        },
+        "Ringtone": {
+          "any_pattern_fired": 59,
+          "clips": 65,
+          "fired_by_class": {
+            "alarm": 12,
+            "doorbell": 2,
+            "media": 31,
+            "phone": 31,
+            "traffic": 1
+          }
+        },
+        "Siren": {
+          "any_pattern_fired": 44,
+          "clips": 48,
+          "fired_by_class": {
+            "alarm": 36,
+            "media": 15,
+            "phone": 2,
+            "traffic": 4,
+            "voice": 4
+          }
+        },
+        "Speech": {
+          "any_pattern_fired": 443,
+          "clips": 656,
+          "fired_by_class": {
+            "alarm": 27,
+            "baby_cry": 7,
+            "dog": 23,
+            "doorbell": 1,
+            "knock": 2,
+            "media": 78,
+            "phone": 11,
+            "traffic": 17,
+            "voice": 369
+          }
+        },
+        "Vehicle_horn_and_car_horn_and_honking": {
+          "any_pattern_fired": 45,
+          "clips": 56,
+          "fired_by_class": {
+            "alarm": 5,
+            "knock": 1,
+            "media": 6,
+            "traffic": 32,
+            "voice": 8
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 36,
+          "of": 48
+        },
+        "dog": {
+          "hits": 100,
+          "of": 137
+        },
+        "doorbell": {
+          "hits": 8,
+          "of": 27
+        },
+        "knock": {
+          "hits": 54,
+          "of": 88
+        },
+        "media": {
+          "hits": 1305,
+          "of": 1613
+        },
+        "phone": {
+          "hits": 62,
+          "of": 139
+        },
+        "traffic": {
+          "hits": 32,
+          "of": 56
+        },
+        "voice": {
+          "hits": 369,
+          "of": 656
+        }
+      },
+      "negative_clips": 5586,
+      "wrong_fires": {
+        "alarm": 185,
+        "traffic": 107
+      }
+    },
+    "V3": {
+      "false_alert_clips": 1198,
+      "false_alerts_by_pattern": {
+        "alarm": 77,
+        "baby_cry": 31,
+        "dog": 69,
+        "doorbell": 4,
+        "knock": 113,
+        "media": 368,
+        "phone": 35,
+        "traffic": 38,
+        "voice": 463
+      },
+      "groups": {
+        "Doorbell": {
+          "any_pattern_fired": 19,
+          "clips": 27,
+          "fired_by_class": {
+            "alarm": 3,
+            "dog": 1,
+            "doorbell": 8,
+            "media": 9,
+            "phone": 3,
+            "voice": 1
+          }
+        },
+        "Knock": {
+          "any_pattern_fired": 62,
+          "clips": 88,
+          "fired_by_class": {
+            "baby_cry": 1,
+            "knock": 54,
+            "media": 10,
+            "voice": 6
+          }
+        },
+        "Ringtone": {
+          "any_pattern_fired": 60,
+          "clips": 65,
+          "fired_by_class": {
+            "alarm": 12,
+            "doorbell": 2,
+            "media": 31,
+            "phone": 31,
+            "traffic": 1,
+            "voice": 2
+          }
+        },
+        "Siren": {
+          "any_pattern_fired": 44,
+          "clips": 48,
+          "fired_by_class": {
+            "alarm": 36,
+            "media": 15,
+            "phone": 2,
+            "traffic": 4,
+            "voice": 6
+          }
+        },
+        "Speech": {
+          "any_pattern_fired": 557,
+          "clips": 656,
+          "fired_by_class": {
+            "alarm": 27,
+            "baby_cry": 7,
+            "dog": 23,
+            "doorbell": 1,
+            "knock": 2,
+            "media": 78,
+            "phone": 11,
+            "traffic": 17,
+            "voice": 513
+          }
+        },
+        "Vehicle_horn_and_car_horn_and_honking": {
+          "any_pattern_fired": 46,
+          "clips": 56,
+          "fired_by_class": {
+            "alarm": 5,
+            "knock": 1,
+            "media": 6,
+            "traffic": 32,
+            "voice": 9
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 36,
+          "of": 48
+        },
+        "dog": {
+          "hits": 100,
+          "of": 137
+        },
+        "doorbell": {
+          "hits": 8,
+          "of": 27
+        },
+        "knock": {
+          "hits": 54,
+          "of": 88
+        },
+        "media": {
+          "hits": 1305,
+          "of": 1613
+        },
+        "phone": {
+          "hits": 62,
+          "of": 139
+        },
+        "traffic": {
+          "hits": 32,
+          "of": 56
+        },
+        "voice": {
+          "hits": 513,
+          "of": 656
+        }
+      },
+      "negative_clips": 5586,
+      "wrong_fires": {
+        "alarm": 185,
+        "traffic": 107
+      }
+    },
+    "V4": {
+      "false_alert_clips": 1047,
+      "false_alerts_by_pattern": {
+        "alarm": 77,
+        "baby_cry": 31,
+        "dog": 71,
+        "doorbell": 4,
+        "knock": 113,
+        "media": 375,
+        "phone": 35,
+        "traffic": 41,
+        "voice": 300
+      },
+      "groups": {
+        "Doorbell": {
+          "any_pattern_fired": 19,
+          "clips": 27,
+          "fired_by_class": {
+            "alarm": 3,
+            "dog": 1,
+            "doorbell": 8,
+            "media": 9,
+            "phone": 3,
+            "voice": 1
+          }
+        },
+        "Knock": {
+          "any_pattern_fired": 62,
+          "clips": 88,
+          "fired_by_class": {
+            "baby_cry": 1,
+            "knock": 54,
+            "media": 10,
+            "voice": 6
+          }
+        },
+        "Ringtone": {
+          "any_pattern_fired": 59,
+          "clips": 65,
+          "fired_by_class": {
+            "alarm": 12,
+            "doorbell": 2,
+            "media": 31,
+            "phone": 31,
+            "traffic": 1,
+            "voice": 1
+          }
+        },
+        "Siren": {
+          "any_pattern_fired": 44,
+          "clips": 48,
+          "fired_by_class": {
+            "alarm": 36,
+            "media": 15,
+            "phone": 2,
+            "traffic": 4,
+            "voice": 5
+          }
+        },
+        "Speech": {
+          "any_pattern_fired": 528,
+          "clips": 656,
+          "fired_by_class": {
+            "alarm": 27,
+            "baby_cry": 7,
+            "dog": 23,
+            "doorbell": 1,
+            "knock": 2,
+            "media": 78,
+            "phone": 11,
+            "traffic": 17,
+            "voice": 470
+          }
+        },
+        "Vehicle_horn_and_car_horn_and_honking": {
+          "any_pattern_fired": 45,
+          "clips": 56,
+          "fired_by_class": {
+            "alarm": 5,
+            "knock": 1,
+            "media": 6,
+            "traffic": 32,
+            "voice": 8
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 36,
+          "of": 48
+        },
+        "dog": {
+          "hits": 100,
+          "of": 137
+        },
+        "doorbell": {
+          "hits": 8,
+          "of": 27
+        },
+        "knock": {
+          "hits": 54,
+          "of": 88
+        },
+        "media": {
+          "hits": 1305,
+          "of": 1613
+        },
+        "phone": {
+          "hits": 62,
+          "of": 139
+        },
+        "traffic": {
+          "hits": 32,
+          "of": 56
+        },
+        "voice": {
+          "hits": 470,
+          "of": 656
+        }
+      },
+      "negative_clips": 5586,
+      "wrong_fires": {
+        "alarm": 185,
+        "traffic": 107
+      }
+    },
+    "baseline": {
+      "false_alert_clips": 1286,
+      "false_alerts_by_pattern": {
+        "alarm": 77,
+        "baby_cry": 31,
+        "dog": 68,
+        "doorbell": 4,
+        "knock": 113,
+        "media": 365,
+        "phone": 35,
+        "traffic": 38,
+        "voice": 555
+      },
+      "groups": {
+        "Doorbell": {
+          "any_pattern_fired": 20,
+          "clips": 27,
+          "fired_by_class": {
+            "alarm": 3,
+            "dog": 1,
+            "doorbell": 8,
+            "media": 9,
+            "phone": 3,
+            "voice": 2
+          }
+        },
+        "Knock": {
+          "any_pattern_fired": 64,
+          "clips": 88,
+          "fired_by_class": {
+            "baby_cry": 1,
+            "knock": 54,
+            "media": 10,
+            "voice": 11
+          }
+        },
+        "Ringtone": {
+          "any_pattern_fired": 60,
+          "clips": 65,
+          "fired_by_class": {
+            "alarm": 12,
+            "doorbell": 2,
+            "media": 31,
+            "phone": 31,
+            "traffic": 1,
+            "voice": 3
+          }
+        },
+        "Siren": {
+          "any_pattern_fired": 44,
+          "clips": 48,
+          "fired_by_class": {
+            "alarm": 36,
+            "media": 15,
+            "phone": 2,
+            "traffic": 4,
+            "voice": 7
+          }
+        },
+        "Speech": {
+          "any_pattern_fired": 568,
+          "clips": 656,
+          "fired_by_class": {
+            "alarm": 27,
+            "baby_cry": 7,
+            "dog": 23,
+            "doorbell": 1,
+            "knock": 2,
+            "media": 78,
+            "phone": 11,
+            "traffic": 17,
+            "voice": 530
+          }
+        },
+        "Vehicle_horn_and_car_horn_and_honking": {
+          "any_pattern_fired": 48,
+          "clips": 56,
+          "fired_by_class": {
+            "alarm": 5,
+            "knock": 1,
+            "media": 6,
+            "traffic": 32,
+            "voice": 11
+          }
+        }
+      },
+      "hits": {
+        "alarm": {
+          "hits": 36,
+          "of": 48
+        },
+        "dog": {
+          "hits": 100,
+          "of": 137
+        },
+        "doorbell": {
+          "hits": 8,
+          "of": 27
+        },
+        "knock": {
+          "hits": 54,
+          "of": 88
+        },
+        "media": {
+          "hits": 1305,
+          "of": 1613
+        },
+        "phone": {
+          "hits": 62,
+          "of": 139
+        },
+        "traffic": {
+          "hits": 32,
+          "of": 56
+        },
+        "voice": {
+          "hits": 530,
+          "of": 656
+        }
+      },
+      "negative_clips": 5586,
+      "wrong_fires": {
+        "alarm": 185,
+        "traffic": 107
+      }
+    }
+  },
+  "rules": {
+    "C1": "H1 with V1 (H1 applied first)",
+    "H1": "Alarm and traffic outrank voice and media",
+    "H2": "Alarm and traffic outrank everything",
+    "V1": "Speech dominance: voice fires only if the top label of all 521 is a voice label",
+    "V2": "Persistence: voice fires only if a neighbouring window was also won by voice",
+    "V3": "Voice minimum 0.30",
+    "V4": "Voice minimum 0.50"
+  },
+  "schema_version": 1,
+  "scope": "Re-analysis of stored model scores. Classifier only, on recorded clips. No wearers, no microphone, no wristband, no real rooms. Not a clinical result."
+}

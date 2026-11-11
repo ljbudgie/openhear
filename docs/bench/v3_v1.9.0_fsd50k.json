@@ -1,0 +1,4130 @@
+{
+  "clips": {
+    "scored": 8403,
+    "windows": 79241
+  },
+  "dataset": "fsd50k",
+  "dataset_notes": {
+    "ambiguous_labels_left_out": [
+      "Alarm"
+    ],
+    "clips_dropped_by_licence": {
+      "http://creativecommons.org/licenses/by-nc/3.0/": 1425,
+      "http://creativecommons.org/licenses/sampling+/1.0/": 403
+    },
+    "clips_kept": 8403,
+    "clips_listed": 8403,
+    "clips_with_stored_scores": 8403,
+    "labels_found_in_vocabulary": [
+      "Bark",
+      "Bus",
+      "Car",
+      "Car_passing_by",
+      "Child_speech_and_kid_speaking",
+      "Conversation",
+      "Dog",
+      "Doorbell",
+      "Engine",
+      "Engine_starting",
+      "Female_speech_and_woman_speaking",
+      "Knock",
+      "Male_speech_and_man_speaking",
+      "Motor_vehicle_(road)",
+      "Motorcycle",
+      "Music",
+      "Race_car_and_auto_racing",
+      "Ringtone",
+      "Siren",
+      "Speech",
+      "Speech_synthesizer",
+      "Telephone",
+      "Traffic_noise_and_roadway_noise",
+      "Truck",
+      "Vehicle_horn_and_car_horn_and_honking"
+    ],
+    "labels_not_in_vocabulary": [
+      "Alarm_clock",
+      "Baby_cry_and_infant_cry",
+      "Buzzer",
+      "Car_alarm",
+      "Fire_alarm",
+      "Smoke_detector_and_smoke_alarm",
+      "Telephone_bell_ringing"
+    ]
+  },
+  "kind": "openhear-awareness-bench",
+  "method": {
+    "decision_rule": "Highest-scoring mapped YAMNet label wins the window; its pattern fires if the score reaches the threshold. Applied to stored raw scores.",
+    "false_alert_rule": "Any pattern fires in at least one window of a negative clip.",
+    "hit_rule": "Target class fires in at least one window of the clip.",
+    "max_clip_seconds": 30.0,
+    "precision_rule": "Clips where the class fired and was a target, out of all in-scope clips where it fired.",
+    "schemes": {
+      "v1.7.0": "Label map shipped in v1.7.0 (any engine fired traffic).",
+      "v1.8.0": "Current label map (traffic is an allowlist of vehicle warnings).",
+      "v1.8.0+V3": "Current label map with rule V3 on: a window won by voice fires only if its score is at least 0.30."
+    },
+    "schemes_in_this_report": [
+      "v1.8.0",
+      "v1.8.0+V3"
+    ],
+    "shipped_threshold": 0.2,
+    "window_seconds": 0.975,
+    "windowing": "Consecutive non-overlapping windows at the clip's native sample rate; trailing part-window dropped; clips cut off at max_clip_seconds."
+  },
+  "provenance": {
+    "dataset_licence": "Per-clip Creative Commons licences. Only CC0 and CC BY clips are used; CC BY-NC and CC Sampling+ clips are excluded. Audio not redistributed.",
+    "dataset_source": "FSD50K eval split (zenodo.org/records/4060432)",
+    "dataset_version": "unknown",
+    "git_sha": "8352588fe604a2f1c5d7bf128a135f34952aabab",
+    "host": {
+      "numpy": "2.5.4",
+      "platform": "Linux-7.0.0-1019-azure-x86_64-with-glibc2.43",
+      "python": "3.12.16"
+    },
+    "limit": null,
+    "model_sha256": null,
+    "model_source": "unknown",
+    "model_was_run": false,
+    "raw_scores_sha256": "7c1cea926b5e2709e7d13c71634e5c80ab0ed3a247576fe320ccc384cf8717a9",
+    "run_url": "https://github.com/ljbudgie/openhear/actions/runs/43068718291",
+    "stored_scores_from_run": "42911082407",
+    "top10_per_window_sha256": null
+  },
+  "report_sha256": "91bac1dbfc2f20d269658ce205941e3a04cbf1e06271c4d983b73a1e42c1ae1b",
+  "schema_version": 2,
+  "schemes": {
+    "v1.8.0": {
+      "at_shipped_threshold": {
+        "groups": {
+          "Alarm": {
+            "any_pattern_fired": 363,
+            "clips": 480,
+            "fired_by_class": {
+              "alarm": 134,
+              "dog": 1,
+              "doorbell": 11,
+              "knock": 2,
+              "media": 125,
+              "phone": 96,
+              "traffic": 57,
+              "voice": 69
+            }
+          },
+          "Bark": {
+            "any_pattern_fired": 80,
+            "clips": 97,
+            "fired_by_class": {
+              "dog": 74,
+              "media": 3,
+              "traffic": 2,
+              "voice": 21
+            }
+          },
+          "Bus": {
+            "any_pattern_fired": 29,
+            "clips": 50,
+            "fired_by_class": {
+              "alarm": 4,
+              "baby_cry": 1,
+              "media": 1,
+              "traffic": 2,
+              "voice": 24
+            }
+          },
+          "Car": {
+            "any_pattern_fired": 119,
+            "clips": 279,
+            "fired_by_class": {
+              "alarm": 26,
+              "dog": 2,
+              "knock": 12,
+              "media": 25,
+              "phone": 1,
+              "traffic": 53,
+              "voice": 40
+            }
+          },
+          "Car_passing_by": {
+            "any_pattern_fired": 38,
+            "clips": 98,
+            "fired_by_class": {
+              "alarm": 15,
+              "dog": 1,
+              "media": 13,
+              "traffic": 12,
+              "voice": 17
+            }
+          },
+          "Child_speech_and_kid_speaking": {
+            "any_pattern_fired": 65,
+            "clips": 72,
+            "fired_by_class": {
+              "alarm": 4,
+              "baby_cry": 1,
+              "dog": 2,
+              "knock": 1,
+              "media": 7,
+              "traffic": 1,
+              "voice": 62
+            }
+          },
+          "Conversation": {
+            "any_pattern_fired": 48,
+            "clips": 49,
+            "fired_by_class": {
+              "alarm": 2,
+              "baby_cry": 1,
+              "dog": 1,
+              "media": 8,
+              "traffic": 1,
+              "voice": 47
+            }
+          },
+          "Dog": {
+            "any_pattern_fired": 113,
+            "clips": 137,
+            "fired_by_class": {
+              "alarm": 1,
+              "dog": 100,
+              "doorbell": 1,
+              "media": 8,
+              "traffic": 2,
+              "voice": 31
+            }
+          },
+          "Doorbell": {
+            "any_pattern_fired": 20,
+            "clips": 27,
+            "fired_by_class": {
+              "alarm": 3,
+              "dog": 1,
+              "doorbell": 8,
+              "media": 9,
+              "phone": 3,
+              "voice": 2
+            }
+          },
+          "Engine": {
+            "any_pattern_fired": 163,
+            "clips": 470,
+            "fired_by_class": {
+              "alarm": 35,
+              "baby_cry": 1,
+              "dog": 4,
+              "knock": 1,
+              "media": 53,
+              "phone": 1,
+              "traffic": 35,
+              "voice": 98
+            }
+          },
+          "Engine_starting": {
+            "any_pattern_fired": 8,
+            "clips": 64,
+            "fired_by_class": {
+              "media": 2,
+              "traffic": 1,
+              "voice": 6
+            }
+          },
+          "Female_speech_and_woman_speaking": {
+            "any_pattern_fired": 191,
+            "clips": 212,
+            "fired_by_class": {
+              "alarm": 3,
+              "baby_cry": 4,
+              "dog": 5,
+              "media": 18,
+              "phone": 5,
+              "traffic": 3,
+              "voice": 185
+            }
+          },
+          "Knock": {
+            "any_pattern_fired": 64,
+            "clips": 88,
+            "fired_by_class": {
+              "baby_cry": 1,
+              "knock": 54,
+              "media": 10,
+              "voice": 11
+            }
+          },
+          "Male_speech_and_man_speaking": {
+            "any_pattern_fired": 345,
+            "clips": 397,
+            "fired_by_class": {
+              "alarm": 18,
+              "baby_cry": 1,
+              "dog": 10,
+              "doorbell": 1,
+              "knock": 1,
+              "media": 48,
+              "phone": 5,
+              "traffic": 12,
+              "voice": 323
+            }
+          },
+          "Motor_vehicle_(road)": {
+            "any_pattern_fired": 216,
+            "clips": 507,
+            "fired_by_class": {
+              "alarm": 57,
+              "baby_cry": 1,
+              "dog": 5,
+              "knock": 12,
+              "media": 52,
+              "phone": 1,
+              "traffic": 67,
+              "voice": 88
+            }
+          },
+          "Motorcycle": {
+            "any_pattern_fired": 20,
+            "clips": 71,
+            "fired_by_class": {
+              "alarm": 8,
+              "dog": 1,
+              "media": 9,
+              "traffic": 3,
+              "voice": 9
+            }
+          },
+          "Music": {
+            "any_pattern_fired": 1366,
+            "clips": 1613,
+            "fired_by_class": {
+              "alarm": 31,
+              "dog": 3,
+              "doorbell": 14,
+              "knock": 3,
+              "media": 1305,
+              "phone": 33,
+              "traffic": 32,
+              "voice": 50
+            }
+          },
+          "Race_car_and_auto_racing": {
+            "any_pattern_fired": 30,
+            "clips": 45,
+            "fired_by_class": {
+              "alarm": 8,
+              "dog": 1,
+              "media": 17,
+              "traffic": 14,
+              "voice": 18
+            }
+          },
+          "Ringtone": {
+            "any_pattern_fired": 60,
+            "clips": 65,
+            "fired_by_class": {
+              "alarm": 12,
+              "doorbell": 2,
+              "media": 31,
+              "phone": 31,
+              "traffic": 1,
+              "voice": 3
+            }
+          },
+          "Siren": {
+            "any_pattern_fired": 44,
+            "clips": 48,
+            "fired_by_class": {
+              "alarm": 36,
+              "media": 15,
+              "phone": 2,
+              "traffic": 4,
+              "voice": 7
+            }
+          },
+          "Speech": {
+            "any_pattern_fired": 568,
+            "clips": 656,
+            "fired_by_class": {
+              "alarm": 27,
+              "baby_cry": 7,
+              "dog": 23,
+              "doorbell": 1,
+              "knock": 2,
+              "media": 78,
+              "phone": 11,
+              "traffic": 17,
+              "voice": 530
+            }
+          },
+          "Speech_synthesizer": {
+            "any_pattern_fired": 41,
+            "clips": 46,
+            "fired_by_class": {
+              "alarm": 3,
+              "baby_cry": 1,
+              "dog": 2,
+              "media": 7,
+              "phone": 2,
+              "voice": 37
+            }
+          },
+          "Telephone": {
+            "any_pattern_fired": 107,
+            "clips": 139,
+            "fired_by_class": {
+              "alarm": 29,
+              "doorbell": 2,
+              "knock": 1,
+              "media": 44,
+              "phone": 62,
+              "traffic": 1,
+              "voice": 10
+            }
+          },
+          "Traffic_noise_and_roadway_noise": {
+            "any_pattern_fired": 42,
+            "clips": 116,
+            "fired_by_class": {
+              "alarm": 10,
+              "dog": 1,
+              "media": 7,
+              "traffic": 4,
+              "voice": 25
+            }
+          },
+          "Truck": {
+            "any_pattern_fired": 22,
+            "clips": 40,
+            "fired_by_class": {
+              "alarm": 3,
+              "media": 9,
+              "traffic": 11,
+              "voice": 8
+            }
+          },
+          "Vehicle_horn_and_car_horn_and_honking": {
+            "any_pattern_fired": 48,
+            "clips": 56,
+            "fired_by_class": {
+              "alarm": 5,
+              "knock": 1,
+              "media": 6,
+              "traffic": 32,
+              "voice": 11
+            }
+          }
+        },
+        "negatives": {
+          "by_pattern": {
+            "alarm": 77,
+            "baby_cry": 31,
+            "dog": 68,
+            "doorbell": 4,
+            "knock": 113,
+            "media": 365,
+            "phone": 35,
+            "traffic": 38,
+            "voice": 555
+          },
+          "by_yamnet_label": {
+            "Alarm -> alarm": 24,
+            "Alarm clock -> alarm": 16,
+            "Ambulance (siren) -> alarm": 3,
+            "Baby cry, infant cry -> baby_cry": 31,
+            "Buzzer -> alarm": 4,
+            "Carnatic music -> media": 3,
+            "Civil defense siren -> alarm": 4,
+            "Dog -> dog": 65,
+            "Doorbell -> doorbell": 4,
+            "Emergency vehicle -> alarm": 9,
+            "Fire alarm -> alarm": 3,
+            "Howl -> dog": 3,
+            "Knock -> knock": 113,
+            "Music -> media": 346,
+            "Radio -> media": 6,
+            "Ringtone -> phone": 5,
+            "Siren -> alarm": 4,
+            "Skidding -> traffic": 5,
+            "Smoke detector, smoke alarm -> alarm": 5,
+            "Speech -> voice": 553,
+            "Telephone -> phone": 24,
+            "Telephone bell ringing -> phone": 6,
+            "Train horn -> traffic": 21,
+            "Vehicle horn, car horn, honking -> traffic": 9,
+            "Vocal music -> media": 8
+          },
+          "clips_with_false_alert": {
+            "count": 1286,
+            "of": 5586,
+            "rate": 0.2302,
+            "wilson95": [
+              0.2194,
+              0.2414
+            ]
+          },
+          "windows_with_false_alert": {
+            "count": 4283,
+            "of": 55336,
+            "rate": 0.0774,
+            "wilson95": [
+              0.0752,
+              0.0797
+            ]
+          }
+        },
+        "per_class": {
+          "alarm": {
+            "hit": {
+              "count": 36,
+              "of": 48,
+              "rate": 0.75,
+              "wilson95": [
+                0.6122,
+                0.8508
+              ]
+            },
+            "hits_with_other_pattern": 11,
+            "missed_as": {
+              "media": 4,
+              "nothing": 7,
+              "traffic": 1
+            },
+            "missed_clips_top_yamnet_label": {
+              "Foghorn": 1,
+              "Hands": 1,
+              "Music": 6,
+              "Silence": 2,
+              "Theremin": 1,
+              "Vehicle horn, car horn, honking": 1
+            }
+          },
+          "dog": {
+            "hit": {
+              "count": 100,
+              "of": 137,
+              "rate": 0.7299,
+              "wilson95": [
+                0.6501,
+                0.7973
+              ]
+            },
+            "hits_with_other_pattern": 20,
+            "missed_as": {
+              "media": 3,
+              "nothing": 28,
+              "voice": 6
+            },
+            "missed_clips_top_yamnet_label": {
+              "Animal": 7,
+              "Crunch": 1,
+              "Explosion": 2,
+              "Music": 2,
+              "Rain": 1,
+              "Silence": 1,
+              "Speech": 5,
+              "Vehicle": 2
+            }
+          },
+          "doorbell": {
+            "hit": {
+              "count": 8,
+              "of": 27,
+              "rate": 0.2963,
+              "wilson95": [
+                0.1585,
+                0.4848
+              ]
+            },
+            "hits_with_other_pattern": 4,
+            "missed_as": {
+              "alarm": 2,
+              "media": 6,
+              "nothing": 8,
+              "phone": 2,
+              "voice": 1
+            },
+            "missed_clips_top_yamnet_label": {
+              "Cowbell": 1,
+              "Helicopter": 1,
+              "Mains hum": 1,
+              "Music": 2,
+              "Rail transport": 1,
+              "Silence": 3,
+              "Sine wave": 1,
+              "Sonar": 1
+            }
+          },
+          "knock": {
+            "hit": {
+              "count": 54,
+              "of": 88,
+              "rate": 0.6136,
+              "wilson95": [
+                0.5092,
+                0.7086
+              ]
+            },
+            "hits_with_other_pattern": 8,
+            "missed_as": {
+              "media": 4,
+              "nothing": 24,
+              "voice": 6
+            },
+            "missed_clips_top_yamnet_label": {
+              "Boat, Water vehicle": 1,
+              "Fireworks": 1,
+              "Hands": 1,
+              "Inside, small room": 2,
+              "Silence": 3,
+              "Speech": 4,
+              "Walk, footsteps": 2,
+              "Wood block": 2
+            }
+          },
+          "media": {
+            "hit": {
+              "count": 1305,
+              "of": 1613,
+              "rate": 0.8091,
+              "wilson95": [
+                0.7891,
+                0.8275
+              ]
+            },
+            "hits_with_other_pattern": 73,
+            "missed_as": {
+              "alarm": 13,
+              "dog": 1,
+              "doorbell": 8,
+              "knock": 2,
+              "nothing": 255,
+              "phone": 13,
+              "traffic": 7,
+              "voice": 9
+            },
+            "missed_clips_top_yamnet_label": {
+              "Ding": 21,
+              "Music": 39,
+              "Silence": 51,
+              "Sound effect": 14,
+              "Speech": 12,
+              "Telephone": 7,
+              "Vehicle horn, car horn, honking": 8,
+              "Whoosh, swoosh, swish": 8
+            }
+          },
+          "phone": {
+            "hit": {
+              "count": 62,
+              "of": 139,
+              "rate": 0.446,
+              "wilson95": [
+                0.366,
+                0.529
+              ]
+            },
+            "hits_with_other_pattern": 27,
+            "missed_as": {
+              "alarm": 3,
+              "doorbell": 1,
+              "knock": 1,
+              "media": 15,
+              "nothing": 54,
+              "voice": 3
+            },
+            "missed_clips_top_yamnet_label": {
+              "Alarm": 2,
+              "Ding": 3,
+              "Electric shaver, electric razor": 2,
+              "Mechanisms": 2,
+              "Music": 30,
+              "Silence": 10,
+              "Speech": 3,
+              "Synthesizer": 2
+            }
+          },
+          "traffic": {
+            "hit": {
+              "count": 32,
+              "of": 56,
+              "rate": 0.5714,
+              "wilson95": [
+                0.4414,
+                0.6923
+              ]
+            },
+            "hits_with_other_pattern": 5,
+            "missed_as": {
+              "alarm": 4,
+              "knock": 1,
+              "media": 2,
+              "nothing": 12,
+              "voice": 5
+            },
+            "missed_clips_top_yamnet_label": {
+              "Animal": 3,
+              "Burping, eructation": 1,
+              "Glass": 1,
+              "Music": 2,
+              "Speech": 5,
+              "Toilet flush": 1,
+              "Vehicle": 5,
+              "Whistle": 1
+            }
+          },
+          "voice": {
+            "hit": {
+              "count": 530,
+              "of": 656,
+              "rate": 0.8079,
+              "wilson95": [
+                0.776,
+                0.8362
+              ]
+            },
+            "hits_with_other_pattern": 69,
+            "missed_as": {
+              "alarm": 7,
+              "baby_cry": 1,
+              "dog": 3,
+              "knock": 1,
+              "media": 15,
+              "nothing": 96,
+              "phone": 2,
+              "traffic": 1
+            },
+            "missed_clips_top_yamnet_label": {
+              "Alarm": 3,
+              "Animal": 11,
+              "Bell": 7,
+              "Music": 12,
+              "Silence": 16,
+              "Speech": 7,
+              "Typing": 5,
+              "Vehicle": 8
+            }
+          }
+        },
+        "targets_overall": {
+          "count": 2127,
+          "of": 2764,
+          "rate": 0.7695,
+          "wilson95": [
+            0.7535,
+            0.7849
+          ]
+        },
+        "threshold": 0.2
+      },
+      "classes_not_tested": [
+        "baby_cry"
+      ],
+      "classes_tested": [
+        "alarm",
+        "dog",
+        "doorbell",
+        "knock",
+        "media",
+        "phone",
+        "traffic",
+        "voice"
+      ],
+      "clips": {
+        "negatives": 5586,
+        "targets": 2656
+      },
+      "label_map_sha256": "ab769cf78294ee3a871db0f6cf6d0ce231b56de966b0d3feb176b652b92f9230",
+      "precision_recall": {
+        "alarm": [
+          {
+            "fired": 427,
+            "precision": 0.089,
+            "recall": 0.7917,
+            "threshold": 0.05,
+            "true_positive": 38
+          },
+          {
+            "fired": 329,
+            "precision": 0.1155,
+            "recall": 0.7917,
+            "threshold": 0.1,
+            "true_positive": 38
+          },
+          {
+            "fired": 257,
+            "precision": 0.1479,
+            "recall": 0.7917,
+            "threshold": 0.15,
+            "true_positive": 38
+          },
+          {
+            "fired": 221,
+            "precision": 0.1629,
+            "recall": 0.75,
+            "threshold": 0.2,
+            "true_positive": 36
+          },
+          {
+            "fired": 221,
+            "precision": 0.1629,
+            "recall": 0.75,
+            "threshold": 0.25,
+            "true_positive": 36
+          },
+          {
+            "fired": 198,
+            "precision": 0.1818,
+            "recall": 0.75,
+            "threshold": 0.3,
+            "true_positive": 36
+          },
+          {
+            "fired": 177,
+            "precision": 0.2034,
+            "recall": 0.75,
+            "threshold": 0.35,
+            "true_positive": 36
+          },
+          {
+            "fired": 177,
+            "precision": 0.2034,
+            "recall": 0.75,
+            "threshold": 0.4,
+            "true_positive": 36
+          },
+          {
+            "fired": 148,
+            "precision": 0.2365,
+            "recall": 0.7292,
+            "threshold": 0.45,
+            "true_positive": 35
+          },
+          {
+            "fired": 148,
+            "precision": 0.2365,
+            "recall": 0.7292,
+            "threshold": 0.5,
+            "true_positive": 35
+          },
+          {
+            "fired": 123,
+            "precision": 0.2764,
+            "recall": 0.7083,
+            "threshold": 0.55,
+            "true_positive": 34
+          },
+          {
+            "fired": 100,
+            "precision": 0.33,
+            "recall": 0.6875,
+            "threshold": 0.6,
+            "true_positive": 33
+          },
+          {
+            "fired": 100,
+            "precision": 0.33,
+            "recall": 0.6875,
+            "threshold": 0.65,
+            "true_positive": 33
+          },
+          {
+            "fired": 88,
+            "precision": 0.3295,
+            "recall": 0.6042,
+            "threshold": 0.7,
+            "true_positive": 29
+          },
+          {
+            "fired": 75,
+            "precision": 0.36,
+            "recall": 0.5625,
+            "threshold": 0.75,
+            "true_positive": 27
+          },
+          {
+            "fired": 75,
+            "precision": 0.36,
+            "recall": 0.5625,
+            "threshold": 0.8,
+            "true_positive": 27
+          },
+          {
+            "fired": 65,
+            "precision": 0.3692,
+            "recall": 0.5,
+            "threshold": 0.85,
+            "true_positive": 24
+          },
+          {
+            "fired": 43,
+            "precision": 0.3721,
+            "recall": 0.3333,
+            "threshold": 0.9,
+            "true_positive": 16
+          },
+          {
+            "fired": 24,
+            "precision": 0.2917,
+            "recall": 0.1458,
+            "threshold": 0.95,
+            "true_positive": 7
+          }
+        ],
+        "dog": [
+          {
+            "fired": 499,
+            "precision": 0.2204,
+            "recall": 0.8029,
+            "threshold": 0.05,
+            "true_positive": 110
+          },
+          {
+            "fired": 351,
+            "precision": 0.3105,
+            "recall": 0.7956,
+            "threshold": 0.1,
+            "true_positive": 109
+          },
+          {
+            "fired": 248,
+            "precision": 0.4194,
+            "recall": 0.7591,
+            "threshold": 0.15,
+            "true_positive": 104
+          },
+          {
+            "fired": 207,
+            "precision": 0.4831,
+            "recall": 0.7299,
+            "threshold": 0.2,
+            "true_positive": 100
+          },
+          {
+            "fired": 207,
+            "precision": 0.4831,
+            "recall": 0.7299,
+            "threshold": 0.25,
+            "true_positive": 100
+          },
+          {
+            "fired": 179,
+            "precision": 0.5587,
+            "recall": 0.7299,
+            "threshold": 0.3,
+            "true_positive": 100
+          },
+          {
+            "fired": 163,
+            "precision": 0.6074,
+            "recall": 0.7226,
+            "threshold": 0.35,
+            "true_positive": 99
+          },
+          {
+            "fired": 163,
+            "precision": 0.6074,
+            "recall": 0.7226,
+            "threshold": 0.4,
+            "true_positive": 99
+          },
+          {
+            "fired": 143,
+            "precision": 0.6853,
+            "recall": 0.7153,
+            "threshold": 0.45,
+            "true_positive": 98
+          },
+          {
+            "fired": 143,
+            "precision": 0.6853,
+            "recall": 0.7153,
+            "threshold": 0.5,
+            "true_positive": 98
+          },
+          {
+            "fired": 125,
+            "precision": 0.768,
+            "recall": 0.7007,
+            "threshold": 0.55,
+            "true_positive": 96
+          },
+          {
+            "fired": 109,
+            "precision": 0.844,
+            "recall": 0.6715,
+            "threshold": 0.6,
+            "true_positive": 92
+          },
+          {
+            "fired": 109,
+            "precision": 0.844,
+            "recall": 0.6715,
+            "threshold": 0.65,
+            "true_positive": 92
+          },
+          {
+            "fired": 99,
+            "precision": 0.9091,
+            "recall": 0.6569,
+            "threshold": 0.7,
+            "true_positive": 90
+          },
+          {
+            "fired": 88,
+            "precision": 0.9432,
+            "recall": 0.6058,
+            "threshold": 0.75,
+            "true_positive": 83
+          },
+          {
+            "fired": 88,
+            "precision": 0.9432,
+            "recall": 0.6058,
+            "threshold": 0.8,
+            "true_positive": 83
+          },
+          {
+            "fired": 80,
+            "precision": 0.9375,
+            "recall": 0.5474,
+            "threshold": 0.85,
+            "true_positive": 75
+          },
+          {
+            "fired": 53,
+            "precision": 1.0,
+            "recall": 0.3869,
+            "threshold": 0.9,
+            "true_positive": 53
+          },
+          {
+            "fired": 26,
+            "precision": 1.0,
+            "recall": 0.1898,
+            "threshold": 0.95,
+            "true_positive": 26
+          }
+        ],
+        "doorbell": [
+          {
+            "fired": 77,
+            "precision": 0.1039,
+            "recall": 0.2963,
+            "threshold": 0.05,
+            "true_positive": 8
+          },
+          {
+            "fired": 60,
+            "precision": 0.1333,
+            "recall": 0.2963,
+            "threshold": 0.1,
+            "true_positive": 8
+          },
+          {
+            "fired": 39,
+            "precision": 0.2051,
+            "recall": 0.2963,
+            "threshold": 0.15,
+            "true_positive": 8
+          },
+          {
+            "fired": 31,
+            "precision": 0.2581,
+            "recall": 0.2963,
+            "threshold": 0.2,
+            "true_positive": 8
+          },
+          {
+            "fired": 31,
+            "precision": 0.2581,
+            "recall": 0.2963,
+            "threshold": 0.25,
+            "true_positive": 8
+          },
+          {
+            "fired": 21,
+            "precision": 0.3333,
+            "recall": 0.2593,
+            "threshold": 0.3,
+            "true_positive": 7
+          },
+          {
+            "fired": 14,
+            "precision": 0.4286,
+            "recall": 0.2222,
+            "threshold": 0.35,
+            "true_positive": 6
+          },
+          {
+            "fired": 14,
+            "precision": 0.4286,
+            "recall": 0.2222,
+            "threshold": 0.4,
+            "true_positive": 6
+          },
+          {
+            "fired": 10,
+            "precision": 0.6,
+            "recall": 0.2222,
+            "threshold": 0.45,
+            "true_positive": 6
+          },
+          {
+            "fired": 10,
+            "precision": 0.6,
+            "recall": 0.2222,
+            "threshold": 0.5,
+            "true_positive": 6
+          },
+          {
+            "fired": 8,
+            "precision": 0.625,
+            "recall": 0.1852,
+            "threshold": 0.55,
+            "true_positive": 5
+          },
+          {
+            "fired": 7,
+            "precision": 0.5714,
+            "recall": 0.1481,
+            "threshold": 0.6,
+            "true_positive": 4
+          },
+          {
+            "fired": 7,
+            "precision": 0.5714,
+            "recall": 0.1481,
+            "threshold": 0.65,
+            "true_positive": 4
+          },
+          {
+            "fired": 5,
+            "precision": 0.8,
+            "recall": 0.1481,
+            "threshold": 0.7,
+            "true_positive": 4
+          },
+          {
+            "fired": 4,
+            "precision": 0.75,
+            "recall": 0.1111,
+            "threshold": 0.75,
+            "true_positive": 3
+          },
+          {
+            "fired": 4,
+            "precision": 0.75,
+            "recall": 0.1111,
+            "threshold": 0.8,
+            "true_positive": 3
+          },
+          {
+            "fired": 2,
+            "precision": 1.0,
+            "recall": 0.0741,
+            "threshold": 0.85,
+            "true_positive": 2
+          },
+          {
+            "fired": 2,
+            "precision": 1.0,
+            "recall": 0.0741,
+            "threshold": 0.9,
+            "true_positive": 2
+          },
+          {
+            "fired": 2,
+            "precision": 1.0,
+            "recall": 0.0741,
+            "threshold": 0.95,
+            "true_positive": 2
+          }
+        ],
+        "knock": [
+          {
+            "fired": 360,
+            "precision": 0.1778,
+            "recall": 0.7273,
+            "threshold": 0.05,
+            "true_positive": 64
+          },
+          {
+            "fired": 274,
+            "precision": 0.2153,
+            "recall": 0.6705,
+            "threshold": 0.1,
+            "true_positive": 59
+          },
+          {
+            "fired": 203,
+            "precision": 0.2709,
+            "recall": 0.625,
+            "threshold": 0.15,
+            "true_positive": 55
+          },
+          {
+            "fired": 174,
+            "precision": 0.3103,
+            "recall": 0.6136,
+            "threshold": 0.2,
+            "true_positive": 54
+          },
+          {
+            "fired": 174,
+            "precision": 0.3103,
+            "recall": 0.6136,
+            "threshold": 0.25,
+            "true_positive": 54
+          },
+          {
+            "fired": 143,
+            "precision": 0.3636,
+            "recall": 0.5909,
+            "threshold": 0.3,
+            "true_positive": 52
+          },
+          {
+            "fired": 120,
+            "precision": 0.4083,
+            "recall": 0.5568,
+            "threshold": 0.35,
+            "true_positive": 49
+          },
+          {
+            "fired": 120,
+            "precision": 0.4083,
+            "recall": 0.5568,
+            "threshold": 0.4,
+            "true_positive": 49
+          },
+          {
+            "fired": 91,
+            "precision": 0.5055,
+            "recall": 0.5227,
+            "threshold": 0.45,
+            "true_positive": 46
+          },
+          {
+            "fired": 91,
+            "precision": 0.5055,
+            "recall": 0.5227,
+            "threshold": 0.5,
+            "true_positive": 46
+          },
+          {
+            "fired": 73,
+            "precision": 0.589,
+            "recall": 0.4886,
+            "threshold": 0.55,
+            "true_positive": 43
+          },
+          {
+            "fired": 59,
+            "precision": 0.661,
+            "recall": 0.4432,
+            "threshold": 0.6,
+            "true_positive": 39
+          },
+          {
+            "fired": 59,
+            "precision": 0.661,
+            "recall": 0.4432,
+            "threshold": 0.65,
+            "true_positive": 39
+          },
+          {
+            "fired": 44,
+            "precision": 0.7727,
+            "recall": 0.3864,
+            "threshold": 0.7,
+            "true_positive": 34
+          },
+          {
+            "fired": 37,
+            "precision": 0.8919,
+            "recall": 0.375,
+            "threshold": 0.75,
+            "true_positive": 33
+          },
+          {
+            "fired": 37,
+            "precision": 0.8919,
+            "recall": 0.375,
+            "threshold": 0.8,
+            "true_positive": 33
+          },
+          {
+            "fired": 33,
+            "precision": 0.8788,
+            "recall": 0.3295,
+            "threshold": 0.85,
+            "true_positive": 29
+          },
+          {
+            "fired": 21,
+            "precision": 0.9524,
+            "recall": 0.2273,
+            "threshold": 0.9,
+            "true_positive": 20
+          },
+          {
+            "fired": 16,
+            "precision": 0.9375,
+            "recall": 0.1705,
+            "threshold": 0.95,
+            "true_positive": 15
+          }
+        ],
+        "media": [
+          {
+            "fired": 2784,
+            "precision": 0.5201,
+            "recall": 0.8977,
+            "threshold": 0.05,
+            "true_positive": 1448
+          },
+          {
+            "fired": 2373,
+            "precision": 0.5921,
+            "recall": 0.871,
+            "threshold": 0.1,
+            "true_positive": 1405
+          },
+          {
+            "fired": 2002,
+            "precision": 0.6703,
+            "recall": 0.832,
+            "threshold": 0.15,
+            "true_positive": 1342
+          },
+          {
+            "fired": 1842,
+            "precision": 0.7085,
+            "recall": 0.8091,
+            "threshold": 0.2,
+            "true_positive": 1305
+          },
+          {
+            "fired": 1842,
+            "precision": 0.7085,
+            "recall": 0.8091,
+            "threshold": 0.25,
+            "true_positive": 1305
+          },
+          {
+            "fired": 1707,
+            "precision": 0.7417,
+            "recall": 0.7849,
+            "threshold": 0.3,
+            "true_positive": 1266
+          },
+          {
+            "fired": 1597,
+            "precision": 0.7677,
+            "recall": 0.7601,
+            "threshold": 0.35,
+            "true_positive": 1226
+          },
+          {
+            "fired": 1597,
+            "precision": 0.7677,
+            "recall": 0.7601,
+            "threshold": 0.4,
+            "true_positive": 1226
+          },
+          {
+            "fired": 1478,
+            "precision": 0.7984,
+            "recall": 0.7316,
+            "threshold": 0.45,
+            "true_positive": 1180
+          },
+          {
+            "fired": 1478,
+            "precision": 0.7984,
+            "recall": 0.7316,
+            "threshold": 0.5,
+            "true_positive": 1180
+          },
+          {
+            "fired": 1368,
+            "precision": 0.8326,
+            "recall": 0.7061,
+            "threshold": 0.55,
+            "true_positive": 1139
+          },
+          {
+            "fired": 1269,
+            "precision": 0.8621,
+            "recall": 0.6782,
+            "threshold": 0.6,
+            "true_positive": 1094
+          },
+          {
+            "fired": 1269,
+            "precision": 0.8621,
+            "recall": 0.6782,
+            "threshold": 0.65,
+            "true_positive": 1094
+          },
+          {
+            "fired": 1179,
+            "precision": 0.8863,
+            "recall": 0.6479,
+            "threshold": 0.7,
+            "true_positive": 1045
+          },
+          {
+            "fired": 1100,
+            "precision": 0.9055,
+            "recall": 0.6175,
+            "threshold": 0.75,
+            "true_positive": 996
+          },
+          {
+            "fired": 1100,
+            "precision": 0.9055,
+            "recall": 0.6175,
+            "threshold": 0.8,
+            "true_positive": 996
+          },
+          {
+            "fired": 1019,
+            "precision": 0.9274,
+            "recall": 0.5859,
+            "threshold": 0.85,
+            "true_positive": 945
+          },
+          {
+            "fired": 895,
+            "precision": 0.9553,
+            "recall": 0.5301,
+            "threshold": 0.9,
+            "true_positive": 855
+          },
+          {
+            "fired": 744,
+            "precision": 0.9758,
+            "recall": 0.4501,
+            "threshold": 0.95,
+            "true_positive": 726
+          }
+        ],
+        "phone": [
+          {
+            "fired": 212,
+            "precision": 0.3019,
+            "recall": 0.4604,
+            "threshold": 0.05,
+            "true_positive": 64
+          },
+          {
+            "fired": 183,
+            "precision": 0.3443,
+            "recall": 0.4532,
+            "threshold": 0.1,
+            "true_positive": 63
+          },
+          {
+            "fired": 148,
+            "precision": 0.4189,
+            "recall": 0.446,
+            "threshold": 0.15,
+            "true_positive": 62
+          },
+          {
+            "fired": 142,
+            "precision": 0.4366,
+            "recall": 0.446,
+            "threshold": 0.2,
+            "true_positive": 62
+          },
+          {
+            "fired": 142,
+            "precision": 0.4366,
+            "recall": 0.446,
+            "threshold": 0.25,
+            "true_positive": 62
+          },
+          {
+            "fired": 129,
+            "precision": 0.4729,
+            "recall": 0.4388,
+            "threshold": 0.3,
+            "true_positive": 61
+          },
+          {
+            "fired": 112,
+            "precision": 0.5268,
+            "recall": 0.4245,
+            "threshold": 0.35,
+            "true_positive": 59
+          },
+          {
+            "fired": 112,
+            "precision": 0.5268,
+            "recall": 0.4245,
+            "threshold": 0.4,
+            "true_positive": 59
+          },
+          {
+            "fired": 98,
+            "precision": 0.5918,
+            "recall": 0.4173,
+            "threshold": 0.45,
+            "true_positive": 58
+          },
+          {
+            "fired": 98,
+            "precision": 0.5918,
+            "recall": 0.4173,
+            "threshold": 0.5,
+            "true_positive": 58
+          },
+          {
+            "fired": 86,
+            "precision": 0.6628,
+            "recall": 0.4101,
+            "threshold": 0.55,
+            "true_positive": 57
+          },
+          {
+            "fired": 80,
+            "precision": 0.7,
+            "recall": 0.4029,
+            "threshold": 0.6,
+            "true_positive": 56
+          },
+          {
+            "fired": 80,
+            "precision": 0.7,
+            "recall": 0.4029,
+            "threshold": 0.65,
+            "true_positive": 56
+          },
+          {
+            "fired": 70,
+            "precision": 0.7714,
+            "recall": 0.3885,
+            "threshold": 0.7,
+            "true_positive": 54
+          },
+          {
+            "fired": 66,
+            "precision": 0.8182,
+            "recall": 0.3885,
+            "threshold": 0.75,
+            "true_positive": 54
+          },
+          {
+            "fired": 66,
+            "precision": 0.8182,
+            "recall": 0.3885,
+            "threshold": 0.8,
+            "true_positive": 54
+          },
+          {
+            "fired": 60,
+            "precision": 0.8333,
+            "recall": 0.3597,
+            "threshold": 0.85,
+            "true_positive": 50
+          },
+          {
+            "fired": 45,
+            "precision": 0.8889,
+            "recall": 0.2878,
+            "threshold": 0.9,
+            "true_positive": 40
+          },
+          {
+            "fired": 35,
+            "precision": 0.9429,
+            "recall": 0.2374,
+            "threshold": 0.95,
+            "true_positive": 33
+          }
+        ],
+        "traffic": [
+          {
+            "fired": 327,
+            "precision": 0.104,
+            "recall": 0.6071,
+            "threshold": 0.05,
+            "true_positive": 34
+          },
+          {
+            "fired": 244,
+            "precision": 0.1393,
+            "recall": 0.6071,
+            "threshold": 0.1,
+            "true_positive": 34
+          },
+          {
+            "fired": 166,
+            "precision": 0.1928,
+            "recall": 0.5714,
+            "threshold": 0.15,
+            "true_positive": 32
+          },
+          {
+            "fired": 139,
+            "precision": 0.2302,
+            "recall": 0.5714,
+            "threshold": 0.2,
+            "true_positive": 32
+          },
+          {
+            "fired": 139,
+            "precision": 0.2302,
+            "recall": 0.5714,
+            "threshold": 0.25,
+            "true_positive": 32
+          },
+          {
+            "fired": 106,
+            "precision": 0.3019,
+            "recall": 0.5714,
+            "threshold": 0.3,
+            "true_positive": 32
+          },
+          {
+            "fired": 92,
+            "precision": 0.337,
+            "recall": 0.5536,
+            "threshold": 0.35,
+            "true_positive": 31
+          },
+          {
+            "fired": 92,
+            "precision": 0.337,
+            "recall": 0.5536,
+            "threshold": 0.4,
+            "true_positive": 31
+          },
+          {
+            "fired": 78,
+            "precision": 0.3718,
+            "recall": 0.5179,
+            "threshold": 0.45,
+            "true_positive": 29
+          },
+          {
+            "fired": 78,
+            "precision": 0.3718,
+            "recall": 0.5179,
+            "threshold": 0.5,
+            "true_positive": 29
+          },
+          {
+            "fired": 67,
+            "precision": 0.403,
+            "recall": 0.4821,
+            "threshold": 0.55,
+            "true_positive": 27
+          },
+          {
+            "fired": 56,
+            "precision": 0.4643,
+            "recall": 0.4643,
+            "threshold": 0.6,
+            "true_positive": 26
+          },
+          {
+            "fired": 56,
+            "precision": 0.4643,
+            "recall": 0.4643,
+            "threshold": 0.65,
+            "true_positive": 26
+          },
+          {
+            "fired": 48,
+            "precision": 0.4792,
+            "recall": 0.4107,
+            "threshold": 0.7,
+            "true_positive": 23
+          },
+          {
+            "fired": 40,
+            "precision": 0.575,
+            "recall": 0.4107,
+            "threshold": 0.75,
+            "true_positive": 23
+          },
+          {
+            "fired": 40,
+            "precision": 0.575,
+            "recall": 0.4107,
+            "threshold": 0.8,
+            "true_positive": 23
+          },
+          {
+            "fired": 34,
+            "precision": 0.6765,
+            "recall": 0.4107,
+            "threshold": 0.85,
+            "true_positive": 23
+          },
+          {
+            "fired": 22,
+            "precision": 0.7273,
+            "recall": 0.2857,
+            "threshold": 0.9,
+            "true_positive": 16
+          },
+          {
+            "fired": 16,
+            "precision": 0.875,
+            "recall": 0.25,
+            "threshold": 0.95,
+            "true_positive": 14
+          }
+        ],
+        "voice": [
+          {
+            "fired": 2692,
+            "precision": 0.2255,
+            "recall": 0.9253,
+            "threshold": 0.05,
+            "true_positive": 607
+          },
+          {
+            "fired": 1872,
+            "precision": 0.3088,
+            "recall": 0.8811,
+            "threshold": 0.1,
+            "true_positive": 578
+          },
+          {
+            "fired": 1404,
+            "precision": 0.396,
+            "recall": 0.8476,
+            "threshold": 0.15,
+            "true_positive": 556
+          },
+          {
+            "fired": 1200,
+            "precision": 0.4417,
+            "recall": 0.8079,
+            "threshold": 0.2,
+            "true_positive": 530
+          },
+          {
+            "fired": 1200,
+            "precision": 0.4417,
+            "recall": 0.8079,
+            "threshold": 0.25,
+            "true_positive": 530
+          },
+          {
+            "fired": 1059,
+            "precision": 0.4844,
+            "recall": 0.782,
+            "threshold": 0.3,
+            "true_positive": 513
+          },
+          {
+            "fired": 935,
+            "precision": 0.5273,
+            "recall": 0.7515,
+            "threshold": 0.35,
+            "true_positive": 493
+          },
+          {
+            "fired": 935,
+            "precision": 0.5273,
+            "recall": 0.7515,
+            "threshold": 0.4,
+            "true_positive": 493
+          },
+          {
+            "fired": 818,
+            "precision": 0.5746,
+            "recall": 0.7165,
+            "threshold": 0.45,
+            "true_positive": 470
+          },
+          {
+            "fired": 818,
+            "precision": 0.5746,
+            "recall": 0.7165,
+            "threshold": 0.5,
+            "true_positive": 470
+          },
+          {
+            "fired": 727,
+            "precision": 0.608,
+            "recall": 0.6738,
+            "threshold": 0.55,
+            "true_positive": 442
+          },
+          {
+            "fired": 638,
+            "precision": 0.6395,
+            "recall": 0.622,
+            "threshold": 0.6,
+            "true_positive": 408
+          },
+          {
+            "fired": 638,
+            "precision": 0.6395,
+            "recall": 0.622,
+            "threshold": 0.65,
+            "true_positive": 408
+          },
+          {
+            "fired": 563,
+            "precision": 0.6767,
+            "recall": 0.5808,
+            "threshold": 0.7,
+            "true_positive": 381
+          },
+          {
+            "fired": 484,
+            "precision": 0.7045,
+            "recall": 0.5198,
+            "threshold": 0.75,
+            "true_positive": 341
+          },
+          {
+            "fired": 484,
+            "precision": 0.7045,
+            "recall": 0.5198,
+            "threshold": 0.8,
+            "true_positive": 341
+          },
+          {
+            "fired": 415,
+            "precision": 0.7398,
+            "recall": 0.468,
+            "threshold": 0.85,
+            "true_positive": 307
+          },
+          {
+            "fired": 286,
+            "precision": 0.8112,
+            "recall": 0.3537,
+            "threshold": 0.9,
+            "true_positive": 232
+          },
+          {
+            "fired": 198,
+            "precision": 0.8535,
+            "recall": 0.2576,
+            "threshold": 0.95,
+            "true_positive": 169
+          }
+        ]
+      },
+      "score_distribution": {
+        "deciding_scores_between_thresholds": [
+          {
+            "deciding_scores_between": 1252,
+            "from": 0.1,
+            "to": 0.15
+          },
+          {
+            "deciding_scores_between": 516,
+            "from": 0.15,
+            "to": 0.2
+          },
+          {
+            "deciding_scores_between": 0,
+            "from": 0.2,
+            "to": 0.25
+          },
+          {
+            "deciding_scores_between": 421,
+            "from": 0.25,
+            "to": 0.3
+          },
+          {
+            "deciding_scores_between": 337,
+            "from": 0.3,
+            "to": 0.35
+          },
+          {
+            "deciding_scores_between": 0,
+            "from": 0.35,
+            "to": 0.4
+          },
+          {
+            "deciding_scores_between": 351,
+            "from": 0.4,
+            "to": 0.45
+          },
+          {
+            "deciding_scores_between": 0,
+            "from": 0.45,
+            "to": 0.5
+          }
+        ],
+        "distinct_scores_from_0.15_to_0.45": [
+          0.199219,
+          0.261719,
+          0.332031,
+          0.414062
+        ],
+        "distinct_winning_scores": 31,
+        "histogram_bin_width": 0.01,
+        "histogram_winning_window_scores": [
+          9579,
+          12814,
+          0,
+          4548,
+          3981,
+          3270,
+          0,
+          0,
+          2644,
+          0,
+          2160,
+          0,
+          0,
+          0,
+          1936,
+          0,
+          0,
+          0,
+          0,
+          1726,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1548,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1360,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1316,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1232,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1193,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1107,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1018,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          992,
+          0,
+          0,
+          0,
+          0,
+          970,
+          0,
+          0,
+          0,
+          868,
+          0,
+          816,
+          0,
+          0,
+          705,
+          652,
+          620,
+          0,
+          1493,
+          1392
+        ],
+        "median_gap_between_distinct_scores": 0.023437,
+        "smallest_gap_between_distinct_scores": 0.003906,
+        "winning_window_scores": 59940
+      },
+      "threshold_sweep": [
+        {
+          "false_alert_clip_rate": 0.4024,
+          "per_class_hit_rate": {
+            "alarm": 0.7917,
+            "dog": 0.7956,
+            "doorbell": 0.2963,
+            "knock": 0.6705,
+            "media": 0.871,
+            "phone": 0.4532,
+            "traffic": 0.6071,
+            "voice": 0.8811
+          },
+          "target_hit_rate": 0.83,
+          "threshold": 0.1
+        },
+        {
+          "false_alert_clip_rate": 0.282,
+          "per_class_hit_rate": {
+            "alarm": 0.7917,
+            "dog": 0.7591,
+            "doorbell": 0.2963,
+            "knock": 0.625,
+            "media": 0.832,
+            "phone": 0.446,
+            "traffic": 0.5714,
+            "voice": 0.8476
+          },
+          "target_hit_rate": 0.7949,
+          "threshold": 0.15
+        },
+        {
+          "false_alert_clip_rate": 0.2302,
+          "per_class_hit_rate": {
+            "alarm": 0.75,
+            "dog": 0.7299,
+            "doorbell": 0.2963,
+            "knock": 0.6136,
+            "media": 0.8091,
+            "phone": 0.446,
+            "traffic": 0.5714,
+            "voice": 0.8079
+          },
+          "target_hit_rate": 0.7695,
+          "threshold": 0.2
+        },
+        {
+          "false_alert_clip_rate": 0.2302,
+          "per_class_hit_rate": {
+            "alarm": 0.75,
+            "dog": 0.7299,
+            "doorbell": 0.2963,
+            "knock": 0.6136,
+            "media": 0.8091,
+            "phone": 0.446,
+            "traffic": 0.5714,
+            "voice": 0.8079
+          },
+          "target_hit_rate": 0.7695,
+          "threshold": 0.25
+        },
+        {
+          "false_alert_clip_rate": 0.1899,
+          "per_class_hit_rate": {
+            "alarm": 0.75,
+            "dog": 0.7299,
+            "doorbell": 0.2593,
+            "knock": 0.5909,
+            "media": 0.7849,
+            "phone": 0.4388,
+            "traffic": 0.5714,
+            "voice": 0.782
+          },
+          "target_hit_rate": 0.7478,
+          "threshold": 0.3
+        },
+        {
+          "false_alert_clip_rate": 0.1556,
+          "per_class_hit_rate": {
+            "alarm": 0.75,
+            "dog": 0.7226,
+            "doorbell": 0.2222,
+            "knock": 0.5568,
+            "media": 0.7601,
+            "phone": 0.4245,
+            "traffic": 0.5536,
+            "voice": 0.7515
+          },
+          "target_hit_rate": 0.7232,
+          "threshold": 0.35
+        },
+        {
+          "false_alert_clip_rate": 0.1556,
+          "per_class_hit_rate": {
+            "alarm": 0.75,
+            "dog": 0.7226,
+            "doorbell": 0.2222,
+            "knock": 0.5568,
+            "media": 0.7601,
+            "phone": 0.4245,
+            "traffic": 0.5536,
+            "voice": 0.7515
+          },
+          "target_hit_rate": 0.7232,
+          "threshold": 0.4
+        },
+        {
+          "false_alert_clip_rate": 0.123,
+          "per_class_hit_rate": {
+            "alarm": 0.7292,
+            "dog": 0.7153,
+            "doorbell": 0.2222,
+            "knock": 0.5227,
+            "media": 0.7316,
+            "phone": 0.4173,
+            "traffic": 0.5179,
+            "voice": 0.7165
+          },
+          "target_hit_rate": 0.6954,
+          "threshold": 0.45
+        },
+        {
+          "false_alert_clip_rate": 0.123,
+          "per_class_hit_rate": {
+            "alarm": 0.7292,
+            "dog": 0.7153,
+            "doorbell": 0.2222,
+            "knock": 0.5227,
+            "media": 0.7316,
+            "phone": 0.4173,
+            "traffic": 0.5179,
+            "voice": 0.7165
+          },
+          "target_hit_rate": 0.6954,
+          "threshold": 0.5
+        }
+      ],
+      "voice_minimum": 0.0
+    },
+    "v1.8.0+V3": {
+      "at_shipped_threshold": {
+        "groups": {
+          "Alarm": {
+            "any_pattern_fired": 359,
+            "clips": 480,
+            "fired_by_class": {
+              "alarm": 134,
+              "dog": 1,
+              "doorbell": 11,
+              "knock": 2,
+              "media": 125,
+              "phone": 96,
+              "traffic": 57,
+              "voice": 61
+            }
+          },
+          "Bark": {
+            "any_pattern_fired": 79,
+            "clips": 97,
+            "fired_by_class": {
+              "dog": 74,
+              "media": 3,
+              "traffic": 2,
+              "voice": 14
+            }
+          },
+          "Bus": {
+            "any_pattern_fired": 28,
+            "clips": 50,
+            "fired_by_class": {
+              "alarm": 4,
+              "baby_cry": 1,
+              "media": 1,
+              "traffic": 2,
+              "voice": 23
+            }
+          },
+          "Car": {
+            "any_pattern_fired": 117,
+            "clips": 279,
+            "fired_by_class": {
+              "alarm": 26,
+              "dog": 2,
+              "knock": 12,
+              "media": 25,
+              "phone": 1,
+              "traffic": 53,
+              "voice": 35
+            }
+          },
+          "Car_passing_by": {
+            "any_pattern_fired": 37,
+            "clips": 98,
+            "fired_by_class": {
+              "alarm": 15,
+              "dog": 1,
+              "media": 13,
+              "traffic": 12,
+              "voice": 15
+            }
+          },
+          "Child_speech_and_kid_speaking": {
+            "any_pattern_fired": 62,
+            "clips": 72,
+            "fired_by_class": {
+              "alarm": 4,
+              "baby_cry": 1,
+              "dog": 2,
+              "knock": 1,
+              "media": 7,
+              "traffic": 1,
+              "voice": 58
+            }
+          },
+          "Conversation": {
+            "any_pattern_fired": 48,
+            "clips": 49,
+            "fired_by_class": {
+              "alarm": 2,
+              "baby_cry": 1,
+              "dog": 1,
+              "media": 8,
+              "traffic": 1,
+              "voice": 47
+            }
+          },
+          "Dog": {
+            "any_pattern_fired": 111,
+            "clips": 137,
+            "fired_by_class": {
+              "alarm": 1,
+              "dog": 100,
+              "doorbell": 1,
+              "media": 8,
+              "traffic": 2,
+              "voice": 21
+            }
+          },
+          "Doorbell": {
+            "any_pattern_fired": 19,
+            "clips": 27,
+            "fired_by_class": {
+              "alarm": 3,
+              "dog": 1,
+              "doorbell": 8,
+              "media": 9,
+              "phone": 3,
+              "voice": 1
+            }
+          },
+          "Engine": {
+            "any_pattern_fired": 155,
+            "clips": 470,
+            "fired_by_class": {
+              "alarm": 35,
+              "baby_cry": 1,
+              "dog": 4,
+              "knock": 1,
+              "media": 53,
+              "phone": 1,
+              "traffic": 35,
+              "voice": 80
+            }
+          },
+          "Engine_starting": {
+            "any_pattern_fired": 8,
+            "clips": 64,
+            "fired_by_class": {
+              "media": 2,
+              "traffic": 1,
+              "voice": 6
+            }
+          },
+          "Female_speech_and_woman_speaking": {
+            "any_pattern_fired": 189,
+            "clips": 212,
+            "fired_by_class": {
+              "alarm": 3,
+              "baby_cry": 4,
+              "dog": 5,
+              "media": 18,
+              "phone": 5,
+              "traffic": 3,
+              "voice": 180
+            }
+          },
+          "Knock": {
+            "any_pattern_fired": 62,
+            "clips": 88,
+            "fired_by_class": {
+              "baby_cry": 1,
+              "knock": 54,
+              "media": 10,
+              "voice": 6
+            }
+          },
+          "Male_speech_and_man_speaking": {
+            "any_pattern_fired": 339,
+            "clips": 397,
+            "fired_by_class": {
+              "alarm": 18,
+              "baby_cry": 1,
+              "dog": 10,
+              "doorbell": 1,
+              "knock": 1,
+              "media": 48,
+              "phone": 5,
+              "traffic": 12,
+              "voice": 316
+            }
+          },
+          "Motor_vehicle_(road)": {
+            "any_pattern_fired": 211,
+            "clips": 507,
+            "fired_by_class": {
+              "alarm": 57,
+              "baby_cry": 1,
+              "dog": 5,
+              "knock": 12,
+              "media": 52,
+              "phone": 1,
+              "traffic": 67,
+              "voice": 77
+            }
+          },
+          "Motorcycle": {
+            "any_pattern_fired": 19,
+            "clips": 71,
+            "fired_by_class": {
+              "alarm": 8,
+              "dog": 1,
+              "media": 9,
+              "traffic": 3,
+              "voice": 7
+            }
+          },
+          "Music": {
+            "any_pattern_fired": 1364,
+            "clips": 1613,
+            "fired_by_class": {
+              "alarm": 31,
+              "dog": 3,
+              "doorbell": 14,
+              "knock": 3,
+              "media": 1305,
+              "phone": 33,
+              "traffic": 32,
+              "voice": 44
+            }
+          },
+          "Race_car_and_auto_racing": {
+            "any_pattern_fired": 30,
+            "clips": 45,
+            "fired_by_class": {
+              "alarm": 8,
+              "dog": 1,
+              "media": 17,
+              "traffic": 14,
+              "voice": 16
+            }
+          },
+          "Ringtone": {
+            "any_pattern_fired": 60,
+            "clips": 65,
+            "fired_by_class": {
+              "alarm": 12,
+              "doorbell": 2,
+              "media": 31,
+              "phone": 31,
+              "traffic": 1,
+              "voice": 2
+            }
+          },
+          "Siren": {
+            "any_pattern_fired": 44,
+            "clips": 48,
+            "fired_by_class": {
+              "alarm": 36,
+              "media": 15,
+              "phone": 2,
+              "traffic": 4,
+              "voice": 6
+            }
+          },
+          "Speech": {
+            "any_pattern_fired": 557,
+            "clips": 656,
+            "fired_by_class": {
+              "alarm": 27,
+              "baby_cry": 7,
+              "dog": 23,
+              "doorbell": 1,
+              "knock": 2,
+              "media": 78,
+              "phone": 11,
+              "traffic": 17,
+              "voice": 513
+            }
+          },
+          "Speech_synthesizer": {
+            "any_pattern_fired": 39,
+            "clips": 46,
+            "fired_by_class": {
+              "alarm": 3,
+              "baby_cry": 1,
+              "dog": 2,
+              "media": 7,
+              "phone": 2,
+              "voice": 34
+            }
+          },
+          "Telephone": {
+            "any_pattern_fired": 107,
+            "clips": 139,
+            "fired_by_class": {
+              "alarm": 29,
+              "doorbell": 2,
+              "knock": 1,
+              "media": 44,
+              "phone": 62,
+              "traffic": 1,
+              "voice": 9
+            }
+          },
+          "Traffic_noise_and_roadway_noise": {
+            "any_pattern_fired": 41,
+            "clips": 116,
+            "fired_by_class": {
+              "alarm": 10,
+              "dog": 1,
+              "media": 7,
+              "traffic": 4,
+              "voice": 22
+            }
+          },
+          "Truck": {
+            "any_pattern_fired": 22,
+            "clips": 40,
+            "fired_by_class": {
+              "alarm": 3,
+              "media": 9,
+              "traffic": 11,
+              "voice": 8
+            }
+          },
+          "Vehicle_horn_and_car_horn_and_honking": {
+            "any_pattern_fired": 46,
+            "clips": 56,
+            "fired_by_class": {
+              "alarm": 5,
+              "knock": 1,
+              "media": 6,
+              "traffic": 32,
+              "voice": 9
+            }
+          }
+        },
+        "negatives": {
+          "by_pattern": {
+            "alarm": 77,
+            "baby_cry": 31,
+            "dog": 69,
+            "doorbell": 4,
+            "knock": 113,
+            "media": 368,
+            "phone": 35,
+            "traffic": 38,
+            "voice": 463
+          },
+          "by_yamnet_label": {
+            "Alarm -> alarm": 24,
+            "Alarm clock -> alarm": 16,
+            "Ambulance (siren) -> alarm": 3,
+            "Baby cry, infant cry -> baby_cry": 31,
+            "Buzzer -> alarm": 4,
+            "Carnatic music -> media": 3,
+            "Civil defense siren -> alarm": 4,
+            "Dog -> dog": 66,
+            "Doorbell -> doorbell": 4,
+            "Emergency vehicle -> alarm": 9,
+            "Fire alarm -> alarm": 3,
+            "Howl -> dog": 3,
+            "Knock -> knock": 113,
+            "Music -> media": 349,
+            "Radio -> media": 6,
+            "Ringtone -> phone": 5,
+            "Siren -> alarm": 4,
+            "Skidding -> traffic": 5,
+            "Smoke detector, smoke alarm -> alarm": 5,
+            "Speech -> voice": 463,
+            "Telephone -> phone": 24,
+            "Telephone bell ringing -> phone": 6,
+            "Train horn -> traffic": 21,
+            "Vehicle horn, car horn, honking -> traffic": 9,
+            "Vocal music -> media": 8
+          },
+          "clips_with_false_alert": {
+            "count": 1198,
+            "of": 5586,
+            "rate": 0.2145,
+            "wilson95": [
+              0.2039,
+              0.2254
+            ]
+          },
+          "windows_with_false_alert": {
+            "count": 3924,
+            "of": 55336,
+            "rate": 0.0709,
+            "wilson95": [
+              0.0688,
+              0.0731
+            ]
+          }
+        },
+        "per_class": {
+          "alarm": {
+            "hit": {
+              "count": 36,
+              "of": 48,
+              "rate": 0.75,
+              "wilson95": [
+                0.6122,
+                0.8508
+              ]
+            },
+            "hits_with_other_pattern": 11,
+            "missed_as": {
+              "media": 4,
+              "nothing": 7,
+              "traffic": 1
+            },
+            "missed_clips_top_yamnet_label": {
+              "Foghorn": 1,
+              "Hands": 1,
+              "Music": 6,
+              "Silence": 2,
+              "Theremin": 1,
+              "Vehicle horn, car horn, honking": 1
+            }
+          },
+          "dog": {
+            "hit": {
+              "count": 100,
+              "of": 137,
+              "rate": 0.7299,
+              "wilson95": [
+                0.6501,
+                0.7973
+              ]
+            },
+            "hits_with_other_pattern": 14,
+            "missed_as": {
+              "media": 3,
+              "nothing": 30,
+              "voice": 4
+            },
+            "missed_clips_top_yamnet_label": {
+              "Animal": 7,
+              "Crunch": 1,
+              "Explosion": 2,
+              "Music": 2,
+              "Rain": 1,
+              "Silence": 1,
+              "Speech": 5,
+              "Vehicle": 2
+            }
+          },
+          "doorbell": {
+            "hit": {
+              "count": 8,
+              "of": 27,
+              "rate": 0.2963,
+              "wilson95": [
+                0.1585,
+                0.4848
+              ]
+            },
+            "hits_with_other_pattern": 4,
+            "missed_as": {
+              "alarm": 2,
+              "media": 6,
+              "nothing": 9,
+              "phone": 2
+            },
+            "missed_clips_top_yamnet_label": {
+              "Cowbell": 1,
+              "Helicopter": 1,
+              "Mains hum": 1,
+              "Music": 2,
+              "Rail transport": 1,
+              "Silence": 3,
+              "Sine wave": 1,
+              "Sonar": 1
+            }
+          },
+          "knock": {
+            "hit": {
+              "count": 54,
+              "of": 88,
+              "rate": 0.6136,
+              "wilson95": [
+                0.5092,
+                0.7086
+              ]
+            },
+            "hits_with_other_pattern": 6,
+            "missed_as": {
+              "media": 4,
+              "nothing": 26,
+              "voice": 4
+            },
+            "missed_clips_top_yamnet_label": {
+              "Boat, Water vehicle": 1,
+              "Fireworks": 1,
+              "Hands": 1,
+              "Inside, small room": 2,
+              "Silence": 3,
+              "Speech": 4,
+              "Walk, footsteps": 2,
+              "Wood block": 2
+            }
+          },
+          "media": {
+            "hit": {
+              "count": 1305,
+              "of": 1613,
+              "rate": 0.8091,
+              "wilson95": [
+                0.7891,
+                0.8275
+              ]
+            },
+            "hits_with_other_pattern": 71,
+            "missed_as": {
+              "alarm": 13,
+              "dog": 1,
+              "doorbell": 8,
+              "knock": 2,
+              "nothing": 257,
+              "phone": 13,
+              "traffic": 7,
+              "voice": 7
+            },
+            "missed_clips_top_yamnet_label": {
+              "Ding": 21,
+              "Music": 39,
+              "Silence": 51,
+              "Sound effect": 14,
+              "Speech": 12,
+              "Telephone": 7,
+              "Vehicle horn, car horn, honking": 8,
+              "Whoosh, swoosh, swish": 8
+            }
+          },
+          "phone": {
+            "hit": {
+              "count": 62,
+              "of": 139,
+              "rate": 0.446,
+              "wilson95": [
+                0.366,
+                0.529
+              ]
+            },
+            "hits_with_other_pattern": 27,
+            "missed_as": {
+              "alarm": 3,
+              "doorbell": 1,
+              "knock": 1,
+              "media": 15,
+              "nothing": 54,
+              "voice": 3
+            },
+            "missed_clips_top_yamnet_label": {
+              "Alarm": 2,
+              "Ding": 3,
+              "Electric shaver, electric razor": 2,
+              "Mechanisms": 2,
+              "Music": 30,
+              "Silence": 10,
+              "Speech": 3,
+              "Synthesizer": 2
+            }
+          },
+          "traffic": {
+            "hit": {
+              "count": 32,
+              "of": 56,
+              "rate": 0.5714,
+              "wilson95": [
+                0.4414,
+                0.6923
+              ]
+            },
+            "hits_with_other_pattern": 5,
+            "missed_as": {
+              "alarm": 4,
+              "knock": 1,
+              "media": 2,
+              "nothing": 14,
+              "voice": 3
+            },
+            "missed_clips_top_yamnet_label": {
+              "Animal": 3,
+              "Burping, eructation": 1,
+              "Glass": 1,
+              "Music": 2,
+              "Speech": 5,
+              "Toilet flush": 1,
+              "Vehicle": 5,
+              "Whistle": 1
+            }
+          },
+          "voice": {
+            "hit": {
+              "count": 513,
+              "of": 656,
+              "rate": 0.782,
+              "wilson95": [
+                0.7488,
+                0.8119
+              ]
+            },
+            "hits_with_other_pattern": 66,
+            "missed_as": {
+              "alarm": 8,
+              "baby_cry": 1,
+              "dog": 4,
+              "knock": 1,
+              "media": 16,
+              "nothing": 110,
+              "phone": 2,
+              "traffic": 1
+            },
+            "missed_clips_top_yamnet_label": {
+              "Animal": 14,
+              "Bell": 7,
+              "Music": 14,
+              "Silence": 17,
+              "Speech": 12,
+              "Typing": 5,
+              "Vehicle": 9,
+              "Whispering": 3
+            }
+          }
+        },
+        "targets_overall": {
+          "count": 2110,
+          "of": 2764,
+          "rate": 0.7634,
+          "wilson95": [
+            0.7472,
+            0.7789
+          ]
+        },
+        "threshold": 0.2
+      },
+      "classes_not_tested": [
+        "baby_cry"
+      ],
+      "classes_tested": [
+        "alarm",
+        "dog",
+        "doorbell",
+        "knock",
+        "media",
+        "phone",
+        "traffic",
+        "voice"
+      ],
+      "clips": {
+        "negatives": 5586,
+        "targets": 2656
+      },
+      "label_map_sha256": "ab769cf78294ee3a871db0f6cf6d0ce231b56de966b0d3feb176b652b92f9230",
+      "precision_recall": {
+        "alarm": [
+          {
+            "fired": 427,
+            "precision": 0.089,
+            "recall": 0.7917,
+            "threshold": 0.05,
+            "true_positive": 38
+          },
+          {
+            "fired": 329,
+            "precision": 0.1155,
+            "recall": 0.7917,
+            "threshold": 0.1,
+            "true_positive": 38
+          },
+          {
+            "fired": 257,
+            "precision": 0.1479,
+            "recall": 0.7917,
+            "threshold": 0.15,
+            "true_positive": 38
+          },
+          {
+            "fired": 221,
+            "precision": 0.1629,
+            "recall": 0.75,
+            "threshold": 0.2,
+            "true_positive": 36
+          },
+          {
+            "fired": 221,
+            "precision": 0.1629,
+            "recall": 0.75,
+            "threshold": 0.25,
+            "true_positive": 36
+          },
+          {
+            "fired": 198,
+            "precision": 0.1818,
+            "recall": 0.75,
+            "threshold": 0.3,
+            "true_positive": 36
+          },
+          {
+            "fired": 177,
+            "precision": 0.2034,
+            "recall": 0.75,
+            "threshold": 0.35,
+            "true_positive": 36
+          },
+          {
+            "fired": 177,
+            "precision": 0.2034,
+            "recall": 0.75,
+            "threshold": 0.4,
+            "true_positive": 36
+          },
+          {
+            "fired": 148,
+            "precision": 0.2365,
+            "recall": 0.7292,
+            "threshold": 0.45,
+            "true_positive": 35
+          },
+          {
+            "fired": 148,
+            "precision": 0.2365,
+            "recall": 0.7292,
+            "threshold": 0.5,
+            "true_positive": 35
+          },
+          {
+            "fired": 123,
+            "precision": 0.2764,
+            "recall": 0.7083,
+            "threshold": 0.55,
+            "true_positive": 34
+          },
+          {
+            "fired": 100,
+            "precision": 0.33,
+            "recall": 0.6875,
+            "threshold": 0.6,
+            "true_positive": 33
+          },
+          {
+            "fired": 100,
+            "precision": 0.33,
+            "recall": 0.6875,
+            "threshold": 0.65,
+            "true_positive": 33
+          },
+          {
+            "fired": 88,
+            "precision": 0.3295,
+            "recall": 0.6042,
+            "threshold": 0.7,
+            "true_positive": 29
+          },
+          {
+            "fired": 75,
+            "precision": 0.36,
+            "recall": 0.5625,
+            "threshold": 0.75,
+            "true_positive": 27
+          },
+          {
+            "fired": 75,
+            "precision": 0.36,
+            "recall": 0.5625,
+            "threshold": 0.8,
+            "true_positive": 27
+          },
+          {
+            "fired": 65,
+            "precision": 0.3692,
+            "recall": 0.5,
+            "threshold": 0.85,
+            "true_positive": 24
+          },
+          {
+            "fired": 43,
+            "precision": 0.3721,
+            "recall": 0.3333,
+            "threshold": 0.9,
+            "true_positive": 16
+          },
+          {
+            "fired": 24,
+            "precision": 0.2917,
+            "recall": 0.1458,
+            "threshold": 0.95,
+            "true_positive": 7
+          }
+        ],
+        "dog": [
+          {
+            "fired": 499,
+            "precision": 0.2204,
+            "recall": 0.8029,
+            "threshold": 0.05,
+            "true_positive": 110
+          },
+          {
+            "fired": 351,
+            "precision": 0.3105,
+            "recall": 0.7956,
+            "threshold": 0.1,
+            "true_positive": 109
+          },
+          {
+            "fired": 248,
+            "precision": 0.4194,
+            "recall": 0.7591,
+            "threshold": 0.15,
+            "true_positive": 104
+          },
+          {
+            "fired": 207,
+            "precision": 0.4831,
+            "recall": 0.7299,
+            "threshold": 0.2,
+            "true_positive": 100
+          },
+          {
+            "fired": 207,
+            "precision": 0.4831,
+            "recall": 0.7299,
+            "threshold": 0.25,
+            "true_positive": 100
+          },
+          {
+            "fired": 179,
+            "precision": 0.5587,
+            "recall": 0.7299,
+            "threshold": 0.3,
+            "true_positive": 100
+          },
+          {
+            "fired": 163,
+            "precision": 0.6074,
+            "recall": 0.7226,
+            "threshold": 0.35,
+            "true_positive": 99
+          },
+          {
+            "fired": 163,
+            "precision": 0.6074,
+            "recall": 0.7226,
+            "threshold": 0.4,
+            "true_positive": 99
+          },
+          {
+            "fired": 143,
+            "precision": 0.6853,
+            "recall": 0.7153,
+            "threshold": 0.45,
+            "true_positive": 98
+          },
+          {
+            "fired": 143,
+            "precision": 0.6853,
+            "recall": 0.7153,
+            "threshold": 0.5,
+            "true_positive": 98
+          },
+          {
+            "fired": 125,
+            "precision": 0.768,
+            "recall": 0.7007,
+            "threshold": 0.55,
+            "true_positive": 96
+          },
+          {
+            "fired": 109,
+            "precision": 0.844,
+            "recall": 0.6715,
+            "threshold": 0.6,
+            "true_positive": 92
+          },
+          {
+            "fired": 109,
+            "precision": 0.844,
+            "recall": 0.6715,
+            "threshold": 0.65,
+            "true_positive": 92
+          },
+          {
+            "fired": 99,
+            "precision": 0.9091,
+            "recall": 0.6569,
+            "threshold": 0.7,
+            "true_positive": 90
+          },
+          {
+            "fired": 88,
+            "precision": 0.9432,
+            "recall": 0.6058,
+            "threshold": 0.75,
+            "true_positive": 83
+          },
+          {
+            "fired": 88,
+            "precision": 0.9432,
+            "recall": 0.6058,
+            "threshold": 0.8,
+            "true_positive": 83
+          },
+          {
+            "fired": 80,
+            "precision": 0.9375,
+            "recall": 0.5474,
+            "threshold": 0.85,
+            "true_positive": 75
+          },
+          {
+            "fired": 53,
+            "precision": 1.0,
+            "recall": 0.3869,
+            "threshold": 0.9,
+            "true_positive": 53
+          },
+          {
+            "fired": 26,
+            "precision": 1.0,
+            "recall": 0.1898,
+            "threshold": 0.95,
+            "true_positive": 26
+          }
+        ],
+        "doorbell": [
+          {
+            "fired": 77,
+            "precision": 0.1039,
+            "recall": 0.2963,
+            "threshold": 0.05,
+            "true_positive": 8
+          },
+          {
+            "fired": 60,
+            "precision": 0.1333,
+            "recall": 0.2963,
+            "threshold": 0.1,
+            "true_positive": 8
+          },
+          {
+            "fired": 39,
+            "precision": 0.2051,
+            "recall": 0.2963,
+            "threshold": 0.15,
+            "true_positive": 8
+          },
+          {
+            "fired": 31,
+            "precision": 0.2581,
+            "recall": 0.2963,
+            "threshold": 0.2,
+            "true_positive": 8
+          },
+          {
+            "fired": 31,
+            "precision": 0.2581,
+            "recall": 0.2963,
+            "threshold": 0.25,
+            "true_positive": 8
+          },
+          {
+            "fired": 21,
+            "precision": 0.3333,
+            "recall": 0.2593,
+            "threshold": 0.3,
+            "true_positive": 7
+          },
+          {
+            "fired": 14,
+            "precision": 0.4286,
+            "recall": 0.2222,
+            "threshold": 0.35,
+            "true_positive": 6
+          },
+          {
+            "fired": 14,
+            "precision": 0.4286,
+            "recall": 0.2222,
+            "threshold": 0.4,
+            "true_positive": 6
+          },
+          {
+            "fired": 10,
+            "precision": 0.6,
+            "recall": 0.2222,
+            "threshold": 0.45,
+            "true_positive": 6
+          },
+          {
+            "fired": 10,
+            "precision": 0.6,
+            "recall": 0.2222,
+            "threshold": 0.5,
+            "true_positive": 6
+          },
+          {
+            "fired": 8,
+            "precision": 0.625,
+            "recall": 0.1852,
+            "threshold": 0.55,
+            "true_positive": 5
+          },
+          {
+            "fired": 7,
+            "precision": 0.5714,
+            "recall": 0.1481,
+            "threshold": 0.6,
+            "true_positive": 4
+          },
+          {
+            "fired": 7,
+            "precision": 0.5714,
+            "recall": 0.1481,
+            "threshold": 0.65,
+            "true_positive": 4
+          },
+          {
+            "fired": 5,
+            "precision": 0.8,
+            "recall": 0.1481,
+            "threshold": 0.7,
+            "true_positive": 4
+          },
+          {
+            "fired": 4,
+            "precision": 0.75,
+            "recall": 0.1111,
+            "threshold": 0.75,
+            "true_positive": 3
+          },
+          {
+            "fired": 4,
+            "precision": 0.75,
+            "recall": 0.1111,
+            "threshold": 0.8,
+            "true_positive": 3
+          },
+          {
+            "fired": 2,
+            "precision": 1.0,
+            "recall": 0.0741,
+            "threshold": 0.85,
+            "true_positive": 2
+          },
+          {
+            "fired": 2,
+            "precision": 1.0,
+            "recall": 0.0741,
+            "threshold": 0.9,
+            "true_positive": 2
+          },
+          {
+            "fired": 2,
+            "precision": 1.0,
+            "recall": 0.0741,
+            "threshold": 0.95,
+            "true_positive": 2
+          }
+        ],
+        "knock": [
+          {
+            "fired": 360,
+            "precision": 0.1778,
+            "recall": 0.7273,
+            "threshold": 0.05,
+            "true_positive": 64
+          },
+          {
+            "fired": 274,
+            "precision": 0.2153,
+            "recall": 0.6705,
+            "threshold": 0.1,
+            "true_positive": 59
+          },
+          {
+            "fired": 203,
+            "precision": 0.2709,
+            "recall": 0.625,
+            "threshold": 0.15,
+            "true_positive": 55
+          },
+          {
+            "fired": 174,
+            "precision": 0.3103,
+            "recall": 0.6136,
+            "threshold": 0.2,
+            "true_positive": 54
+          },
+          {
+            "fired": 174,
+            "precision": 0.3103,
+            "recall": 0.6136,
+            "threshold": 0.25,
+            "true_positive": 54
+          },
+          {
+            "fired": 143,
+            "precision": 0.3636,
+            "recall": 0.5909,
+            "threshold": 0.3,
+            "true_positive": 52
+          },
+          {
+            "fired": 120,
+            "precision": 0.4083,
+            "recall": 0.5568,
+            "threshold": 0.35,
+            "true_positive": 49
+          },
+          {
+            "fired": 120,
+            "precision": 0.4083,
+            "recall": 0.5568,
+            "threshold": 0.4,
+            "true_positive": 49
+          },
+          {
+            "fired": 91,
+            "precision": 0.5055,
+            "recall": 0.5227,
+            "threshold": 0.45,
+            "true_positive": 46
+          },
+          {
+            "fired": 91,
+            "precision": 0.5055,
+            "recall": 0.5227,
+            "threshold": 0.5,
+            "true_positive": 46
+          },
+          {
+            "fired": 73,
+            "precision": 0.589,
+            "recall": 0.4886,
+            "threshold": 0.55,
+            "true_positive": 43
+          },
+          {
+            "fired": 59,
+            "precision": 0.661,
+            "recall": 0.4432,
+            "threshold": 0.6,
+            "true_positive": 39
+          },
+          {
+            "fired": 59,
+            "precision": 0.661,
+            "recall": 0.4432,
+            "threshold": 0.65,
+            "true_positive": 39
+          },
+          {
+            "fired": 44,
+            "precision": 0.7727,
+            "recall": 0.3864,
+            "threshold": 0.7,
+            "true_positive": 34
+          },
+          {
+            "fired": 37,
+            "precision": 0.8919,
+            "recall": 0.375,
+            "threshold": 0.75,
+            "true_positive": 33
+          },
+          {
+            "fired": 37,
+            "precision": 0.8919,
+            "recall": 0.375,
+            "threshold": 0.8,
+            "true_positive": 33
+          },
+          {
+            "fired": 33,
+            "precision": 0.8788,
+            "recall": 0.3295,
+            "threshold": 0.85,
+            "true_positive": 29
+          },
+          {
+            "fired": 21,
+            "precision": 0.9524,
+            "recall": 0.2273,
+            "threshold": 0.9,
+            "true_positive": 20
+          },
+          {
+            "fired": 16,
+            "precision": 0.9375,
+            "recall": 0.1705,
+            "threshold": 0.95,
+            "true_positive": 15
+          }
+        ],
+        "media": [
+          {
+            "fired": 2784,
+            "precision": 0.5201,
+            "recall": 0.8977,
+            "threshold": 0.05,
+            "true_positive": 1448
+          },
+          {
+            "fired": 2373,
+            "precision": 0.5921,
+            "recall": 0.871,
+            "threshold": 0.1,
+            "true_positive": 1405
+          },
+          {
+            "fired": 2002,
+            "precision": 0.6703,
+            "recall": 0.832,
+            "threshold": 0.15,
+            "true_positive": 1342
+          },
+          {
+            "fired": 1842,
+            "precision": 0.7085,
+            "recall": 0.8091,
+            "threshold": 0.2,
+            "true_positive": 1305
+          },
+          {
+            "fired": 1842,
+            "precision": 0.7085,
+            "recall": 0.8091,
+            "threshold": 0.25,
+            "true_positive": 1305
+          },
+          {
+            "fired": 1707,
+            "precision": 0.7417,
+            "recall": 0.7849,
+            "threshold": 0.3,
+            "true_positive": 1266
+          },
+          {
+            "fired": 1597,
+            "precision": 0.7677,
+            "recall": 0.7601,
+            "threshold": 0.35,
+            "true_positive": 1226
+          },
+          {
+            "fired": 1597,
+            "precision": 0.7677,
+            "recall": 0.7601,
+            "threshold": 0.4,
+            "true_positive": 1226
+          },
+          {
+            "fired": 1478,
+            "precision": 0.7984,
+            "recall": 0.7316,
+            "threshold": 0.45,
+            "true_positive": 1180
+          },
+          {
+            "fired": 1478,
+            "precision": 0.7984,
+            "recall": 0.7316,
+            "threshold": 0.5,
+            "true_positive": 1180
+          },
+          {
+            "fired": 1368,
+            "precision": 0.8326,
+            "recall": 0.7061,
+            "threshold": 0.55,
+            "true_positive": 1139
+          },
+          {
+            "fired": 1269,
+            "precision": 0.8621,
+            "recall": 0.6782,
+            "threshold": 0.6,
+            "true_positive": 1094
+          },
+          {
+            "fired": 1269,
+            "precision": 0.8621,
+            "recall": 0.6782,
+            "threshold": 0.65,
+            "true_positive": 1094
+          },
+          {
+            "fired": 1179,
+            "precision": 0.8863,
+            "recall": 0.6479,
+            "threshold": 0.7,
+            "true_positive": 1045
+          },
+          {
+            "fired": 1100,
+            "precision": 0.9055,
+            "recall": 0.6175,
+            "threshold": 0.75,
+            "true_positive": 996
+          },
+          {
+            "fired": 1100,
+            "precision": 0.9055,
+            "recall": 0.6175,
+            "threshold": 0.8,
+            "true_positive": 996
+          },
+          {
+            "fired": 1019,
+            "precision": 0.9274,
+            "recall": 0.5859,
+            "threshold": 0.85,
+            "true_positive": 945
+          },
+          {
+            "fired": 895,
+            "precision": 0.9553,
+            "recall": 0.5301,
+            "threshold": 0.9,
+            "true_positive": 855
+          },
+          {
+            "fired": 744,
+            "precision": 0.9758,
+            "recall": 0.4501,
+            "threshold": 0.95,
+            "true_positive": 726
+          }
+        ],
+        "phone": [
+          {
+            "fired": 212,
+            "precision": 0.3019,
+            "recall": 0.4604,
+            "threshold": 0.05,
+            "true_positive": 64
+          },
+          {
+            "fired": 183,
+            "precision": 0.3443,
+            "recall": 0.4532,
+            "threshold": 0.1,
+            "true_positive": 63
+          },
+          {
+            "fired": 148,
+            "precision": 0.4189,
+            "recall": 0.446,
+            "threshold": 0.15,
+            "true_positive": 62
+          },
+          {
+            "fired": 142,
+            "precision": 0.4366,
+            "recall": 0.446,
+            "threshold": 0.2,
+            "true_positive": 62
+          },
+          {
+            "fired": 142,
+            "precision": 0.4366,
+            "recall": 0.446,
+            "threshold": 0.25,
+            "true_positive": 62
+          },
+          {
+            "fired": 129,
+            "precision": 0.4729,
+            "recall": 0.4388,
+            "threshold": 0.3,
+            "true_positive": 61
+          },
+          {
+            "fired": 112,
+            "precision": 0.5268,
+            "recall": 0.4245,
+            "threshold": 0.35,
+            "true_positive": 59
+          },
+          {
+            "fired": 112,
+            "precision": 0.5268,
+            "recall": 0.4245,
+            "threshold": 0.4,
+            "true_positive": 59
+          },
+          {
+            "fired": 98,
+            "precision": 0.5918,
+            "recall": 0.4173,
+            "threshold": 0.45,
+            "true_positive": 58
+          },
+          {
+            "fired": 98,
+            "precision": 0.5918,
+            "recall": 0.4173,
+            "threshold": 0.5,
+            "true_positive": 58
+          },
+          {
+            "fired": 86,
+            "precision": 0.6628,
+            "recall": 0.4101,
+            "threshold": 0.55,
+            "true_positive": 57
+          },
+          {
+            "fired": 80,
+            "precision": 0.7,
+            "recall": 0.4029,
+            "threshold": 0.6,
+            "true_positive": 56
+          },
+          {
+            "fired": 80,
+            "precision": 0.7,
+            "recall": 0.4029,
+            "threshold": 0.65,
+            "true_positive": 56
+          },
+          {
+            "fired": 70,
+            "precision": 0.7714,
+            "recall": 0.3885,
+            "threshold": 0.7,
+            "true_positive": 54
+          },
+          {
+            "fired": 66,
+            "precision": 0.8182,
+            "recall": 0.3885,
+            "threshold": 0.75,
+            "true_positive": 54
+          },
+          {
+            "fired": 66,
+            "precision": 0.8182,
+            "recall": 0.3885,
+            "threshold": 0.8,
+            "true_positive": 54
+          },
+          {
+            "fired": 60,
+            "precision": 0.8333,
+            "recall": 0.3597,
+            "threshold": 0.85,
+            "true_positive": 50
+          },
+          {
+            "fired": 45,
+            "precision": 0.8889,
+            "recall": 0.2878,
+            "threshold": 0.9,
+            "true_positive": 40
+          },
+          {
+            "fired": 35,
+            "precision": 0.9429,
+            "recall": 0.2374,
+            "threshold": 0.95,
+            "true_positive": 33
+          }
+        ],
+        "traffic": [
+          {
+            "fired": 327,
+            "precision": 0.104,
+            "recall": 0.6071,
+            "threshold": 0.05,
+            "true_positive": 34
+          },
+          {
+            "fired": 244,
+            "precision": 0.1393,
+            "recall": 0.6071,
+            "threshold": 0.1,
+            "true_positive": 34
+          },
+          {
+            "fired": 166,
+            "precision": 0.1928,
+            "recall": 0.5714,
+            "threshold": 0.15,
+            "true_positive": 32
+          },
+          {
+            "fired": 139,
+            "precision": 0.2302,
+            "recall": 0.5714,
+            "threshold": 0.2,
+            "true_positive": 32
+          },
+          {
+            "fired": 139,
+            "precision": 0.2302,
+            "recall": 0.5714,
+            "threshold": 0.25,
+            "true_positive": 32
+          },
+          {
+            "fired": 106,
+            "precision": 0.3019,
+            "recall": 0.5714,
+            "threshold": 0.3,
+            "true_positive": 32
+          },
+          {
+            "fired": 92,
+            "precision": 0.337,
+            "recall": 0.5536,
+            "threshold": 0.35,
+            "true_positive": 31
+          },
+          {
+            "fired": 92,
+            "precision": 0.337,
+            "recall": 0.5536,
+            "threshold": 0.4,
+            "true_positive": 31
+          },
+          {
+            "fired": 78,
+            "precision": 0.3718,
+            "recall": 0.5179,
+            "threshold": 0.45,
+            "true_positive": 29
+          },
+          {
+            "fired": 78,
+            "precision": 0.3718,
+            "recall": 0.5179,
+            "threshold": 0.5,
+            "true_positive": 29
+          },
+          {
+            "fired": 67,
+            "precision": 0.403,
+            "recall": 0.4821,
+            "threshold": 0.55,
+            "true_positive": 27
+          },
+          {
+            "fired": 56,
+            "precision": 0.4643,
+            "recall": 0.4643,
+            "threshold": 0.6,
+            "true_positive": 26
+          },
+          {
+            "fired": 56,
+            "precision": 0.4643,
+            "recall": 0.4643,
+            "threshold": 0.65,
+            "true_positive": 26
+          },
+          {
+            "fired": 48,
+            "precision": 0.4792,
+            "recall": 0.4107,
+            "threshold": 0.7,
+            "true_positive": 23
+          },
+          {
+            "fired": 40,
+            "precision": 0.575,
+            "recall": 0.4107,
+            "threshold": 0.75,
+            "true_positive": 23
+          },
+          {
+            "fired": 40,
+            "precision": 0.575,
+            "recall": 0.4107,
+            "threshold": 0.8,
+            "true_positive": 23
+          },
+          {
+            "fired": 34,
+            "precision": 0.6765,
+            "recall": 0.4107,
+            "threshold": 0.85,
+            "true_positive": 23
+          },
+          {
+            "fired": 22,
+            "precision": 0.7273,
+            "recall": 0.2857,
+            "threshold": 0.9,
+            "true_positive": 16
+          },
+          {
+            "fired": 16,
+            "precision": 0.875,
+            "recall": 0.25,
+            "threshold": 0.95,
+            "true_positive": 14
+          }
+        ],
+        "voice": [
+          {
+            "fired": 1059,
+            "precision": 0.4844,
+            "recall": 0.782,
+            "threshold": 0.05,
+            "true_positive": 513
+          },
+          {
+            "fired": 1059,
+            "precision": 0.4844,
+            "recall": 0.782,
+            "threshold": 0.1,
+            "true_positive": 513
+          },
+          {
+            "fired": 1059,
+            "precision": 0.4844,
+            "recall": 0.782,
+            "threshold": 0.15,
+            "true_positive": 513
+          },
+          {
+            "fired": 1059,
+            "precision": 0.4844,
+            "recall": 0.782,
+            "threshold": 0.2,
+            "true_positive": 513
+          },
+          {
+            "fired": 1059,
+            "precision": 0.4844,
+            "recall": 0.782,
+            "threshold": 0.25,
+            "true_positive": 513
+          },
+          {
+            "fired": 1059,
+            "precision": 0.4844,
+            "recall": 0.782,
+            "threshold": 0.3,
+            "true_positive": 513
+          },
+          {
+            "fired": 935,
+            "precision": 0.5273,
+            "recall": 0.7515,
+            "threshold": 0.35,
+            "true_positive": 493
+          },
+          {
+            "fired": 935,
+            "precision": 0.5273,
+            "recall": 0.7515,
+            "threshold": 0.4,
+            "true_positive": 493
+          },
+          {
+            "fired": 818,
+            "precision": 0.5746,
+            "recall": 0.7165,
+            "threshold": 0.45,
+            "true_positive": 470
+          },
+          {
+            "fired": 818,
+            "precision": 0.5746,
+            "recall": 0.7165,
+            "threshold": 0.5,
+            "true_positive": 470
+          },
+          {
+            "fired": 727,
+            "precision": 0.608,
+            "recall": 0.6738,
+            "threshold": 0.55,
+            "true_positive": 442
+          },
+          {
+            "fired": 638,
+            "precision": 0.6395,
+            "recall": 0.622,
+            "threshold": 0.6,
+            "true_positive": 408
+          },
+          {
+            "fired": 638,
+            "precision": 0.6395,
+            "recall": 0.622,
+            "threshold": 0.65,
+            "true_positive": 408
+          },
+          {
+            "fired": 563,
+            "precision": 0.6767,
+            "recall": 0.5808,
+            "threshold": 0.7,
+            "true_positive": 381
+          },
+          {
+            "fired": 484,
+            "precision": 0.7045,
+            "recall": 0.5198,
+            "threshold": 0.75,
+            "true_positive": 341
+          },
+          {
+            "fired": 484,
+            "precision": 0.7045,
+            "recall": 0.5198,
+            "threshold": 0.8,
+            "true_positive": 341
+          },
+          {
+            "fired": 415,
+            "precision": 0.7398,
+            "recall": 0.468,
+            "threshold": 0.85,
+            "true_positive": 307
+          },
+          {
+            "fired": 286,
+            "precision": 0.8112,
+            "recall": 0.3537,
+            "threshold": 0.9,
+            "true_positive": 232
+          },
+          {
+            "fired": 198,
+            "precision": 0.8535,
+            "recall": 0.2576,
+            "threshold": 0.95,
+            "true_positive": 169
+          }
+        ]
+      },
+      "score_distribution": {
+        "deciding_scores_between_thresholds": [
+          {
+            "deciding_scores_between": 784,
+            "from": 0.1,
+            "to": 0.15
+          },
+          {
+            "deciding_scores_between": 312,
+            "from": 0.15,
+            "to": 0.2
+          },
+          {
+            "deciding_scores_between": 0,
+            "from": 0.2,
+            "to": 0.25
+          },
+          {
+            "deciding_scores_between": 280,
+            "from": 0.25,
+            "to": 0.3
+          },
+          {
+            "deciding_scores_between": 337,
+            "from": 0.3,
+            "to": 0.35
+          },
+          {
+            "deciding_scores_between": 0,
+            "from": 0.35,
+            "to": 0.4
+          },
+          {
+            "deciding_scores_between": 351,
+            "from": 0.4,
+            "to": 0.45
+          },
+          {
+            "deciding_scores_between": 0,
+            "from": 0.45,
+            "to": 0.5
+          }
+        ],
+        "distinct_scores_from_0.15_to_0.45": [
+          0.199219,
+          0.261719,
+          0.332031,
+          0.414062
+        ],
+        "distinct_winning_scores": 31,
+        "histogram_bin_width": 0.01,
+        "histogram_winning_window_scores": [
+          1845,
+          3165,
+          0,
+          1279,
+          1328,
+          1377,
+          0,
+          0,
+          1274,
+          0,
+          1197,
+          0,
+          0,
+          0,
+          1091,
+          0,
+          0,
+          0,
+          0,
+          1001,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          952,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1360,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1316,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1232,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1193,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1107,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1018,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          992,
+          0,
+          0,
+          0,
+          0,
+          970,
+          0,
+          0,
+          0,
+          868,
+          0,
+          816,
+          0,
+          0,
+          705,
+          652,
+          620,
+          0,
+          1493,
+          1392
+        ],
+        "median_gap_between_distinct_scores": 0.023437,
+        "smallest_gap_between_distinct_scores": 0.003906,
+        "winning_window_scores": 30243
+      },
+      "threshold_sweep": [
+        {
+          "false_alert_clip_rate": 0.3149,
+          "per_class_hit_rate": {
+            "alarm": 0.7917,
+            "dog": 0.7956,
+            "doorbell": 0.2963,
+            "knock": 0.6705,
+            "media": 0.871,
+            "phone": 0.4532,
+            "traffic": 0.6071,
+            "voice": 0.782
+          },
+          "target_hit_rate": 0.8064,
+          "threshold": 0.1
+        },
+        {
+          "false_alert_clip_rate": 0.2424,
+          "per_class_hit_rate": {
+            "alarm": 0.7917,
+            "dog": 0.7591,
+            "doorbell": 0.2963,
+            "knock": 0.625,
+            "media": 0.832,
+            "phone": 0.446,
+            "traffic": 0.5714,
+            "voice": 0.782
+          },
+          "target_hit_rate": 0.7793,
+          "threshold": 0.15
+        },
+        {
+          "false_alert_clip_rate": 0.2145,
+          "per_class_hit_rate": {
+            "alarm": 0.75,
+            "dog": 0.7299,
+            "doorbell": 0.2963,
+            "knock": 0.6136,
+            "media": 0.8091,
+            "phone": 0.446,
+            "traffic": 0.5714,
+            "voice": 0.782
+          },
+          "target_hit_rate": 0.7634,
+          "threshold": 0.2
+        },
+        {
+          "false_alert_clip_rate": 0.2145,
+          "per_class_hit_rate": {
+            "alarm": 0.75,
+            "dog": 0.7299,
+            "doorbell": 0.2963,
+            "knock": 0.6136,
+            "media": 0.8091,
+            "phone": 0.446,
+            "traffic": 0.5714,
+            "voice": 0.782
+          },
+          "target_hit_rate": 0.7634,
+          "threshold": 0.25
+        },
+        {
+          "false_alert_clip_rate": 0.1899,
+          "per_class_hit_rate": {
+            "alarm": 0.75,
+            "dog": 0.7299,
+            "doorbell": 0.2593,
+            "knock": 0.5909,
+            "media": 0.7849,
+            "phone": 0.4388,
+            "traffic": 0.5714,
+            "voice": 0.782
+          },
+          "target_hit_rate": 0.7478,
+          "threshold": 0.3
+        },
+        {
+          "false_alert_clip_rate": 0.1556,
+          "per_class_hit_rate": {
+            "alarm": 0.75,
+            "dog": 0.7226,
+            "doorbell": 0.2222,
+            "knock": 0.5568,
+            "media": 0.7601,
+            "phone": 0.4245,
+            "traffic": 0.5536,
+            "voice": 0.7515
+          },
+          "target_hit_rate": 0.7232,
+          "threshold": 0.35
+        },
+        {
+          "false_alert_clip_rate": 0.1556,
+          "per_class_hit_rate": {
+            "alarm": 0.75,
+            "dog": 0.7226,
+            "doorbell": 0.2222,
+            "knock": 0.5568,
+            "media": 0.7601,
+            "phone": 0.4245,
+            "traffic": 0.5536,
+            "voice": 0.7515
+          },
+          "target_hit_rate": 0.7232,
+          "threshold": 0.4
+        },
+        {
+          "false_alert_clip_rate": 0.123,
+          "per_class_hit_rate": {
+            "alarm": 0.7292,
+            "dog": 0.7153,
+            "doorbell": 0.2222,
+            "knock": 0.5227,
+            "media": 0.7316,
+            "phone": 0.4173,
+            "traffic": 0.5179,
+            "voice": 0.7165
+          },
+          "target_hit_rate": 0.6954,
+          "threshold": 0.45
+        },
+        {
+          "false_alert_clip_rate": 0.123,
+          "per_class_hit_rate": {
+            "alarm": 0.7292,
+            "dog": 0.7153,
+            "doorbell": 0.2222,
+            "knock": 0.5227,
+            "media": 0.7316,
+            "phone": 0.4173,
+            "traffic": 0.5179,
+            "voice": 0.7165
+          },
+          "target_hit_rate": 0.6954,
+          "threshold": 0.5
+        }
+      ],
+      "voice_minimum": 0.3
+    }
+  },
+  "scope": "Classifier only, on recorded clips. No wearers, no microphone, no wristband, no real rooms. Not a clinical result."
+}

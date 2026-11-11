@@ -12,9 +12,24 @@ on:
         type: choice
         default: esc50
         options: [esc50, fsd50k, sonyc, all]
+      mode:
+        description: Run the model, or re-analyse stored scores under the candidate rules
+        type: choice
+        default: run-model
+        options: [run-model, reanalyse-stored-scores]
+      scores_run_esc50:
+        description: Run whose stored ESC-50 scores to re-analyse
+        default: "42899256052"
+      scores_run_fsd50k:
+        description: Run whose stored FSD50K scores to re-analyse
+        default: "42911082407"
+      scores_run_sonyc:
+        description: Run whose stored SONYC-UST scores to re-analyse
+        default: "42899256052"
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: bench-awareness-${{ github.ref }}
@@ -27,7 +42,7 @@ env:
 jobs:
   esc50:
     name: ESC-50 (before/after comparison)
-    if: inputs.dataset == 'esc50' || inputs.dataset == 'all'
+    if: inputs.mode != 'reanalyse-stored-scores' && (inputs.dataset == 'esc50' || inputs.dataset == 'all')
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -67,7 +82,7 @@ jobs:
 
   fsd50k:
     name: FSD50K eval (CC0 and CC BY clips only)
-    if: inputs.dataset == 'fsd50k' || inputs.dataset == 'all'
+    if: inputs.mode != 'reanalyse-stored-scores' && (inputs.dataset == 'fsd50k' || inputs.dataset == 'all')
     runs-on: ubuntu-latest
     timeout-minutes: 150
     env:
@@ -121,7 +136,7 @@ jobs:
 
   sonyc:
     name: SONYC-UST v2.3.0 (verified street recordings)
-    if: inputs.dataset == 'sonyc' || inputs.dataset == 'all'
+    if: inputs.mode != 'reanalyse-stored-scores' && (inputs.dataset == 'sonyc' || inputs.dataset == 'all')
     runs-on: ubuntu-latest
     timeout-minutes: 150
     env:
@@ -175,3 +190,107 @@ jobs:
         with:
           name: bench-sonyc
           path: bench_sonyc*
+
+  # ---------------------------------------------------------------------------
+  # Re-analysis of stored scores under the candidate rules. The model is not run.
+  # Rules and pass conditions: docs/BENCH_PLAN_v1.9.md
+  # ---------------------------------------------------------------------------
+
+  rules:
+    name: Rules on stored scores (${{ matrix.dataset }})
+    if: inputs.mode == 'reanalyse-stored-scores'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        dataset: [esc50, fsd50k, sonyc]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install numpy
+      - name: Pick the run that holds the stored scores
+        run: |
+          case "${{ matrix.dataset }}" in
+            esc50) echo "SCORES_RUN=${{ inputs.scores_run_esc50 }}" >> "$GITHUB_ENV" ;;
+            fsd50k) echo "SCORES_RUN=${{ inputs.scores_run_fsd50k }}" >> "$GITHUB_ENV" ;;
+            sonyc) echo "SCORES_RUN=${{ inputs.scores_run_sonyc }}" >> "$GITHUB_ENV" ;;
+          esac
+      - name: Download stored scores
+        uses: actions/download-artifact@v4
+        with:
+          name: bench-${{ matrix.dataset }}
+          run-id: ${{ env.SCORES_RUN }}
+          github-token: ${{ github.token }}
+          path: stored
+      - name: Download dataset metadata (no audio)
+        run: |
+          mkdir -p "$RUNNER_TEMP/meta" && cd "$RUNNER_TEMP/meta"
+          case "${{ matrix.dataset }}" in
+            esc50)
+              commit=$(python -c "import json;print(json.load(open('$GITHUB_WORKSPACE/docs/bench/awareness_bench_v1.8.0_esc50.json'))['provenance']['dataset_version'].split()[-1])")
+              mkdir -p meta
+              curl -fsSL --retry 5 -o meta/esc50.csv "https://raw.githubusercontent.com/karolpiczak/ESC-50/$commit/meta/esc50.csv"
+              ;;
+            fsd50k)
+              for f in FSD50K.ground_truth.zip FSD50K.metadata.zip; do
+                curl -fL --retry 8 --retry-delay 15 -sS -o "$f" "https://zenodo.org/records/4060432/files/$f?download=1"
+                unzip -q "$f"
+              done
+              ;;
+            sonyc)
+              curl -fL --retry 8 --retry-delay 15 -sS -o annotations.csv "https://zenodo.org/records/3966543/files/annotations.csv?download=1"
+              ;;
+          esac
+          ls
+      - name: Apply the rules
+        run: |
+          ls -l stored
+          python -m scripts.bench_rules analyse --dataset "${{ matrix.dataset }}" \
+            --data "$RUNNER_TEMP/meta" \
+            --scores "stored/bench_${{ matrix.dataset }}_scores.npz" \
+            --scores-run "$SCORES_RUN" --run-url "$RUN_URL" \
+            --out "rules_${{ matrix.dataset }}.json" --markdown "rules_${{ matrix.dataset }}.md"
+      - name: Print report
+        run: |
+          cat "rules_${{ matrix.dataset }}.md" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "-----BEGIN REPORT JSON-----"
+          python -c "import json;print(json.dumps(json.load(open('rules_${{ matrix.dataset }}.json')),sort_keys=True,separators=(',',':')))"
+          echo "-----END REPORT JSON-----"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rules-${{ matrix.dataset }}
+          path: rules_${{ matrix.dataset }}.*
+
+  rules-verdict:
+    name: Rules verdict (pass or fail per the plan)
+    needs: rules
+    if: inputs.mode == 'reanalyse-stored-scores'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install numpy
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: rules-*
+          merge-multiple: true
+          path: reports
+      - name: Verdict
+        run: |
+          python -m scripts.bench_rules verdict --reports reports/rules_esc50.json \
+            reports/rules_fsd50k.json reports/rules_sonyc.json \
+            --out rules_verdict.json --markdown rules_verdict.md | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "-----BEGIN REPORT JSON-----"
+          python -c "import json;print(json.dumps(json.load(open('rules_verdict.json')),sort_keys=True,separators=(',',':')))"
+          echo "-----END REPORT JSON-----"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rules-verdict
+          path: rules_verdict.*

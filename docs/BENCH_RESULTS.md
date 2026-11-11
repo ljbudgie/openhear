@@ -1,6 +1,6 @@
 # Bench results — classifier only
 
-**Status:** v1.8.0 results measured on 10 November 2026. Candidate rules for v1.9.0 measured on 11 November 2026; one (V3) is available behind a flag that is off by default. Every figure on this page comes from a signed report of a GitHub Actions run of `scripts/bench_awareness.py`. The v1.7.0 results this page replaces are in [bench/awareness_bench_v1.7.0.json](bench/awareness_bench_v1.7.0.json) and are reproduced below.
+**Status:** v1.8.0 results measured on 10 November 2026. Candidate rules for v1.9.0 measured on 11 November 2026; one (V3) is available behind a flag that is off by default. Two input probes measured the same day; neither changes the classifier. Every figure on this page comes from a signed report of a GitHub Actions run of `scripts/bench_awareness.py`. The v1.7.0 results this page replaces are in [bench/awareness_bench_v1.7.0.json](bench/awareness_bench_v1.7.0.json) and are reproduced below.
 
 ## Read this first
 
@@ -198,6 +198,69 @@ Every stored score is a multiple of 1/256, and the model uses few of those steps
 - Workflow run: https://github.com/ljbudgie/openhear/actions/runs/43066209373 (commit `391f711`).
 - Stored scores came from the v1.8.0 runs, and their SHA-256 values match the signed v1.8.0 reports.
 - To repeat it: run the **Bench — awareness classifier** workflow with mode `reanalyse-stored-scores`. It takes about two minutes. GitHub keeps the stored scores for 90 days from 10 November 2026; after that, run the model mode first and pass the new run numbers.
+
+## Input probes: window position and resampling (measurement only)
+
+**Status:** Measured on 11 November 2026 on the `v1.9.0-probes` branch. Nothing in the shipped classifier is changed by this work.
+
+The rules work above found that horn misses are not a decision-rule problem. These two probes look one step earlier, at what happens to the audio before the model hears it. The plan, [BENCH_PLAN_v1.9_probes.md](BENCH_PLAN_v1.9_probes.md), was committed before either probe was run. Every clip in all three datasets was scored three ways with the same model, the v1.8.0 label map and the 0.20 threshold:
+
+- **Shipped:** as the classifier does it today. This reproduced the signed v1.8.0 figures exactly on all three datasets.
+- **Shifted windows:** every window starts half a window (0.4875 s) later.
+- **Band-limited resampling:** the clip is converted to 16 kHz with a low-pass filter first. The shipped code uses linear interpolation with no filter, which folds content above 8 kHz back into the band the model hears.
+
+### Result
+
+- **Neither probe fixes horn detection.**
+- **Band-limited resampling does not meet the plan's condition and is not proposed.** The condition was more horn hits, no siren or alarm hit lost and no more false-alert clips, on both held-out sets. On FSD50K it gained no horn clip and added 42 false-alert clips. On SONYC-UST it gained 2 horn clips and added 5 false-alert clips. It does catch a little more of several classes, at the price of more false alerts.
+- **Window position matters on real street audio.** On SONYC-UST, shifting gained 15 horn clips and lost 13, so 51 of 185 horn clips fire under shipped or shifted windows against 36 as shipped. That suggests overlapping windows are worth testing. It would also raise false alerts, and it has not been measured.
+- **The shifted figures on FSD50K are not a fair comparison.** Dropping the first half window removes most or all of a short clip, and FSD50K has many short clips. Its shifted row is published for completeness.
+
+### Hits per class and false alerts under each input
+
+#### ESC-50
+
+| Input | alarm (of 80) | baby_cry (of 40) | dog (of 40) | knock (of 40) | traffic (of 40) | False-alert clips (of 1,760) |
+|---|---|---|---|---|---|---|
+| Shipped | 72 | 35 | 40 | 27 | 22 | 262 |
+| Shifted windows | 72 | 38 | 39 | 28 | 22 | 256 |
+| Band-limited resampling | 73 | 34 | 40 | 30 | 24 | 276 |
+
+#### FSD50K
+
+| Input | alarm (of 48) | dog (of 137) | doorbell (of 27) | knock (of 88) | media (of 1613) | phone (of 139) | traffic (of 56) | voice (of 656) | False-alert clips (of 5,586) |
+|---|---|---|---|---|---|---|---|---|---|
+| Shipped | 36 | 100 | 8 | 54 | 1305 | 62 | 32 | 530 | 1,286 |
+| Shifted windows | 36 | 94 | 7 | 54 | 1165 | 57 | 26 | 514 | 1,205 |
+| Band-limited resampling | 36 | 100 | 8 | 56 | 1345 | 61 | 32 | 537 | 1,328 |
+
+#### SONYC-UST
+
+| Input | alarm (of 107) | traffic (of 185) | False-alert clips (of 374) |
+|---|---|---|---|
+| Shipped | 71 | 36 | 16 |
+| Shifted windows | 71 | 38 | 21 |
+| Band-limited resampling | 73 | 38 | 21 |
+
+### Horn clips that change
+
+| Dataset | Horn clips | Fired as shipped | Shifted: gained / lost | Fired under shipped or shifted | Band-limited: gained / lost | Fired under any input |
+|---|---|---|---|---|---|---|
+| ESC-50 | 40 | 22 | +4 / -4 | 26 | +3 / -1 | 29 |
+| FSD50K | 56 | 32 | +1 / -7 | 33 | +0 / -0 | 33 |
+| SONYC-UST | 185 | 36 | +15 / -13 | 51 | +3 / -1 | 53 |
+
+### Provenance for the probes
+
+| Dataset | Signed report |
+|---|---|
+| ESC-50 | [json](bench/probes_v1.9.0_esc50.json) (SHA-256 `c6d5a8f619cb2921…`) |
+| FSD50K | [json](bench/probes_v1.9.0_fsd50k.json) (SHA-256 `cfe0ba3ca724b29b…`) |
+| SONYC-UST | [json](bench/probes_v1.9.0_sonyc.json) (SHA-256 `2e01291a64012255…`) |
+
+- Workflow run: https://github.com/ljbudgie/openhear/actions/runs/43072071621 (commit `cc068b2`). The model was run on the audio for this; it is the same model file as v1.8.0 (SHA-256 `4d8b4a53282dc83e…`).
+- To repeat it: run the **Bench — awareness classifier** workflow with mode `input-probes`.
+- The idea for both probes came from an earlier session's unmerged patch. Nothing here has been independently reviewed.
 
 ## What changed in v1.8.0
 

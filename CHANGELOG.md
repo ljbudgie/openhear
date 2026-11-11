@@ -30,11 +30,13 @@ Work in progress on the `v1.9.0-dev` branch. The shipped classifier is unchanged
 - `docs/BENCH_PLAN_v1.9.md`: seven candidate decision rules, the measures and code-checked pass conditions, committed before any rule was run. ESC-50 chooses; FSD50K and SONYC-UST only confirm; a rule that costs a siren or alarm hit does not ship.
 - `scripts/bench_rules.py`: applies the baseline and the seven rules to stored model scores without running the model. Reports hits per class, false alerts, wrong alarm and traffic fires, voice false alerts by YAMNet index, a horn breakdown, per-class score distributions and the pass or fail verdict.
 - Bench workflow mode `reanalyse-stored-scores`.
+- Bench workflow mode `input-probes` and the `--input-probes` option.
 - Bench workflow mode `score-v3-on-stored-scores`, and `--stored-scores` and `--voice-rule-v3` options on `scripts/bench_awareness.py`, to score the current label map with rule V3 off and on without running the model.
 - Credits for YAMNet, AudioSet, ESC-50, FSD50K, SONYC-UST and contributors in docs/BENCH_RESULTS.md.
 
 ### Measured (classifier only, recorded clips, no wearers, not a clinical result, not independently reviewed)
 
+- Input probes (measurement only, plan in docs/BENCH_PLAN_v1.9_probes.md): shifted windows and band-limited resampling. Neither fixes horn detection. Band-limited resampling did not meet the plan's condition (no horn gain on FSD50K, more false alerts on both held-out sets) and is not proposed. On SONYC-UST 51 of 185 horn clips fire under shipped or shifted windows against 36 as shipped, so overlapping windows are worth testing later.
 - **No rule is on by default.** Rule V3 (voice minimum 0.30) is available behind the flag `OPENHEAR_VOICE_RULE_V3=1`, which is off by default. Measured on FSD50K: 88 fewer false-alert clips for 17 speech clips lost. V1, V2, V4 and the horn rules stay bench-only.
 - Both horn rules failed: they recovered no horn clip on any dataset, and the wider one cost 41 phone hits on FSD50K. Horn misses are mostly not a masking problem.
 - All four voice rules passed the plan's conditions and stay switched off pending a decision on missed speech. On FSD50K: voice minimum 0.30 removes 88 false-alert clips and loses 17 of 530 speech clips; voice minimum 0.50 removes 239 and loses 60; persistence removes 298 and loses 161; speech dominance removes 9 and loses 4.

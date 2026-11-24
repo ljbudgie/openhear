@@ -113,8 +113,10 @@ DISCLAIMERS: tuple[str, ...] = (
     "Self-reported communication needs, written by the person and held by them.",
     "Not PIP evidence and does not replace any assessment. No descriptor scoring.",
     "Not endorsed by DWP or the Timms Review. Not an official 'Tell Us Once' profile.",
-    "Not a medical or clinical document. OpenHear is a research platform for "
-    "environmental sound awareness; it is not a hearing aid or a medical device.",
+    (
+        "Not a medical or clinical document. OpenHear is a research platform for "
+        + "environmental sound awareness; it is not a hearing aid or a medical device."
+    ),
     "Written to local files only. No upload, no account, no central storage.",
     "Contains no hearing test results, diagnosis or identifier, and is not a digital ID.",
     "The optional SHA-256 value is an integrity hash, not a signature.",
@@ -724,8 +726,10 @@ def build_markdown(doc: dict[str, Any]) -> str:
         ]
     else:
         lines += [
-            "- Status: **PENDING — not given.** Consent is recorded only after you "
-            "type `write` to confirm. Nothing has been written.",
+            (
+                "- Status: **PENDING — not given.** Consent is recorded only after you "
+                + "type `write` to confirm. Nothing has been written."
+            ),
             "- Preview confirmed: not yet",
         ]
     lines += [
@@ -741,8 +745,10 @@ def build_markdown(doc: dict[str, Any]) -> str:
             "",
             f"SHA-256 of the canonical JSON companion file: `{integ['value']}`",
             "",
-            "This is an integrity hash. It shows whether the JSON has changed since "
-            "export. It is not a signature, not proof of who wrote it, and not a digital ID.",
+            (
+                "This is an integrity hash. It shows whether the JSON has changed since "
+                + "export. It is not a signature, not proof of who wrote it, and not a digital ID."
+            ),
             "",
         ]
     return "\n".join(lines)

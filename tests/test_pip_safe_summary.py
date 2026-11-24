@@ -20,7 +20,10 @@ from audiogram.pip_safe_summary import (
     build_markdown,
     build_summary,
     canonical_json,
+    coarsen_date,
+    confirm_consent,
     find_forbidden_keys,
+    free_text_warning_box,
     is_forbidden_key,
     verify_integrity,
     write_summary,
@@ -88,12 +91,17 @@ def _poisoned_living_profile() -> dict:
     }
 
 
-def _build(source=None, **kw) -> dict:
+def _pending(source=None, **kw) -> dict:
     kw.setdefault("include", SECTIONS)
-    kw.setdefault("consent_given", True)
-    kw.setdefault("preview_confirmed", True)
     kw.setdefault("now", FIXED_NOW)
     return build_summary(source if source is not None else _self_report(), **kw)
+
+
+def _build(source=None, *, with_integrity_hash=True, **kw) -> dict:
+    """Pending document plus confirmed consent, as written after 'write'."""
+    return confirm_consent(
+        _pending(source, **kw), with_integrity_hash=with_integrity_hash, now=FIXED_NOW
+    )
 
 
 # ── Forbidden keys ────────────────────────────────────────────────────────────
@@ -210,7 +218,7 @@ def test_every_item_has_self_reported_provenance_and_date():
     )
     for item in items:
         assert item["provenance"]["source_type"] == "self_reported"
-        assert len(item["provenance"]["recorded_on"]) == 10
+        assert len(item["provenance"]["recorded_on"]) == 7  # month by default
 
 
 def test_email_only_is_marked_as_reasonable_adjustment():
@@ -233,10 +241,11 @@ def test_clinician_sourced_provenance_is_rejected():
         _build(src)
 
 
-def test_bad_date_is_rejected():
+@pytest.mark.parametrize("bad", ["12/10/2026", "2026-13", "2026-02-30", "26"])
+def test_bad_date_is_rejected(bad):
     src = _self_report()
-    src["variation_over_time"][0]["recorded_on"] = "12/10/2026"
-    with pytest.raises(ValueError, match="YYYY-MM-DD"):
+    src["variation_over_time"][0]["recorded_on"] = bad
+    with pytest.raises(ValueError, match="date"):
         _build(src)
 
 
@@ -246,7 +255,7 @@ def test_unknown_section_is_rejected():
 
 
 def test_display_name_is_opt_in():
-    doc = build_summary(_self_report(), consent_given=True, preview_confirmed=True, now=FIXED_NOW)
+    doc = build_summary(_self_report(), now=FIXED_NOW)
     assert "display_name" not in doc
     assert "display_name" in doc["consent"]["sections_not_included"]
 
@@ -296,14 +305,137 @@ def test_hash_is_never_called_a_signature():
 # ── Writing, consent and network ─────────────────────────────────────────────
 
 
-def test_write_requires_consent_and_preview(tmp_path):
-    doc = _build(consent_given=False)
+def test_write_refuses_pending_consent(tmp_path):
     with pytest.raises(PermissionError):
-        write_summary(doc, tmp_path / "out")
-    doc = _build(preview_confirmed=False)
+        write_summary(_pending(), tmp_path / "out")
+    forged = _pending()
+    forged["consent"]["given"] = True  # status still pending, no timestamp
     with pytest.raises(PermissionError):
-        write_summary(doc, tmp_path / "out")
+        write_summary(forged, tmp_path / "out")
     assert list(tmp_path.iterdir()) == []
+
+
+# ── Consent: pending in preview, given only after confirmation ───────────────
+
+
+def test_preview_shows_consent_pending():
+    pending = _pending()
+    consent = pending["consent"]
+    assert consent["status"] == "pending"
+    assert consent["given"] is False
+    assert consent["given_at"] is None
+    assert consent["preview_confirmed"] is False
+    assert "integrity" not in pending
+    md = build_markdown(pending)
+    assert "PENDING" in md
+    assert "Status: given" not in md
+
+
+def test_confirm_records_given_with_date_and_does_not_mutate_pending():
+    pending = _pending()
+    final = confirm_consent(pending, now=FIXED_NOW)
+    assert pending["consent"]["status"] == "pending"
+    assert final["consent"]["status"] == "given"
+    assert final["consent"]["given"] is True
+    assert final["consent"]["preview_confirmed"] is True
+    assert final["consent"]["given_at"] == "2026-11"  # month precision, no time
+    assert "Status: given (2026-11)" in build_markdown(final)
+    assert verify_integrity(final)
+    with pytest.raises(ValueError, match="pending"):
+        confirm_consent(final)
+
+
+def test_confirm_with_export_time_records_full_timestamp():
+    final = _build(include_export_time=True)
+    assert final["exported_at"] == "2026-11-24T20:00:00+00:00"
+    assert final["consent"]["given_at"] == "2026-11-24T20:00:00+00:00"
+
+
+def test_only_consent_and_hash_differ_between_preview_and_written():
+    pending = _pending()
+    final = confirm_consent(pending, now=FIXED_NOW)
+    strip = lambda d: {k: v for k, v in d.items() if k not in ("consent", "integrity")}  # noqa: E731
+    assert strip(pending) == strip(final)
+    keep = ("statement", "destination", "upload_performed", "sections_included")
+    for key in keep:
+        assert pending["consent"][key] == final["consent"][key]
+
+
+# ── Timestamps and date precision ────────────────────────────────────────────
+
+
+def test_export_time_is_off_by_default():
+    assert "exported_at" not in _pending()
+    assert "exported_at" not in _build()
+    assert "Exported" not in build_markdown(_build())
+
+
+@pytest.mark.parametrize("precision, length", [("day", 10), ("month", 7), ("year", 4)])
+def test_date_precision_applies_to_every_entry_date(precision, length):
+    doc = _build(date_precision=precision)
+    assert doc["date_precision"] == precision
+    dates = [v["recorded_on"] for v in doc["variation_over_time"]]
+    for section in (
+        "reasonable_adjustments",
+        "channels_that_do_not_work_for_me",
+        "variation_over_time",
+    ):
+        for item in doc[section]:
+            dates.append(item["provenance"]["recorded_on"])
+            if "last_reviewed" in item["provenance"]:
+                dates.append(item["provenance"]["last_reviewed"])
+    dates.append(doc["functional_impact"]["provenance"]["recorded_on"])
+    assert dates and all(len(d) == length for d in dates)
+
+
+def test_default_date_precision_is_month():
+    assert _build()["date_precision"] == "month"
+    assert _build()["variation_over_time"][0]["recorded_on"] == "2026-10"
+
+
+def test_coarsen_never_invents_precision():
+    assert coarsen_date("2026", "day") == "2026"
+    assert coarsen_date("2026-10", "day") == "2026-10"
+    assert coarsen_date("2026-10-12", "year") == "2026"
+    with pytest.raises(ValueError):
+        coarsen_date("2026-10-12", "week")
+
+
+def test_coarse_input_dates_are_accepted():
+    src = _self_report()
+    src["variation_over_time"][0]["recorded_on"] = "2026-10"
+    src["functional_impact"]["provenance"]["recorded_on"] = "2026"
+    doc = _build(src, date_precision="day")
+    assert doc["variation_over_time"][0]["recorded_on"] == "2026-10"
+    assert doc["functional_impact"]["provenance"]["recorded_on"] == "2026"
+
+
+def test_unknown_precision_is_rejected():
+    with pytest.raises(ValueError, match="precision"):
+        _pending(date_precision="week")
+
+
+# ── Free-text warning ────────────────────────────────────────────────────────
+
+
+def test_free_text_warning_box_always_shown_and_lists_examples():
+    box = free_text_warning_box(_pending())
+    assert box.splitlines()[0].startswith("!!!")
+    assert "never edits or removes anything you typed" in box
+    for example in ("test results", "dB", "diagnoses", "NHS"):
+        assert example in box
+    assert "Spotted in your text" not in box
+
+
+def test_free_text_warning_box_lists_spotted_snippets_without_editing():
+    src = _self_report()
+    words = "My audiogram shows 70 dB HL at 4 kHz; diagnosis was given."
+    src["functional_impact"]["in_my_own_words"] = words
+    pending = _pending(src)
+    box = free_text_warning_box(pending)
+    assert "Spotted in your text" in box
+    assert "functional_impact.in_my_own_words" in box
+    assert pending["functional_impact"]["in_my_own_words"] == words
 
 
 def test_write_produces_exact_preview_and_refuses_overwrite(tmp_path):
@@ -358,6 +490,8 @@ def test_cli_cancel_writes_nothing(tmp_path, no_network):
     result = CliRunner().invoke(cli_main, _cli_args(out), input="y\ny\ny\ny\ny\nno\n")
     assert result.exit_code == 0, result.output
     assert "PREVIEW" in result.output
+    assert "PENDING" in result.output
+    assert "Consent was not given" in result.output
     assert "Nothing was written" in result.output
     assert list(tmp_path.iterdir()) == []
 
@@ -369,8 +503,23 @@ def test_cli_confirm_writes_exactly_the_preview(tmp_path, no_network):
     assert result.exit_code == 0, result.output
     md = (tmp_path / "summary.md").read_text(encoding="utf-8")
     data = json.loads((tmp_path / "summary.json").read_text(encoding="utf-8"))
-    assert md in result.output
-    assert build_json_text(data) in result.output
+    out_text = result.output
+    # The warning box comes before the free-text preview.
+    assert out_text.index("CHECK YOUR OWN WORDS") < out_text.index("PREVIEW: Markdown")
+    # Preview said PENDING; the written file says given, and nothing else differs.
+    assert "PENDING" in out_text
+    assert data["consent"]["status"] == "given" and data["consent"]["given"] is True
+    assert "Status: given" in md and "PENDING" not in md
+    preview_doc = json.loads(
+        out_text.split("──── PREVIEW: JSON (consent PENDING) ────\n\n", 1)[1].split(
+            "\nIf you confirm", 1
+        )[0]
+    )
+    assert preview_doc["consent"]["status"] == "pending"
+    strip = lambda d: {k: v for k, v in d.items() if k not in ("consent", "integrity")}  # noqa: E731
+    assert strip(preview_doc) == strip(data)
+    assert "exported_at" not in data
+    assert data["date_precision"] == "month"
     assert "display_name" not in data
     assert data["schema"] == SCHEMA_ID
     assert find_forbidden_keys(data) == []
@@ -407,8 +556,114 @@ def test_committed_example_is_reproducible_and_clean():
     assert data["display_name"] == "Alex Example"
 
 
+def test_cli_opt_in_export_time_and_year_precision(tmp_path, no_network):
+    out = tmp_path / "summary"
+    args = _cli_args(out) + [
+        "--include",
+        "variation_over_time",
+        "--include-export-time",
+        "--date-precision",
+        "year",
+    ]
+    result = CliRunner().invoke(cli_main, args, input="write\n")
+    assert result.exit_code == 0, result.output
+    data = json.loads((tmp_path / "summary.json").read_text(encoding="utf-8"))
+    assert "exported_at" in data
+    assert "T" in data["consent"]["given_at"]
+    assert all(len(v["recorded_on"]) == 4 for v in data["variation_over_time"])
+
+
+def test_written_and_pending_documents_against_schema_without_dependencies():
+    """Runs everywhere, including CI, using the small validator below."""
+    schema = json.loads(pss.SCHEMA_PATH.read_text(encoding="utf-8"))
+    committed = json.loads((EXAMPLE_DIR / "alex_example_pip_safe_summary.json").read_text("utf-8"))
+    for doc in (
+        committed,
+        _build(),
+        _build(date_precision="day", include_export_time=True),
+        _build(date_precision="year", with_integrity_hash=False),
+    ):
+        assert _mini_validate(doc, schema) == [], _mini_validate(doc, schema)
+    # Pending (unconfirmed) documents are never valid as written files.
+    assert _mini_validate(_pending(), schema)
+    bad = copy.deepcopy(committed)
+    bad["functional_impact"]["severity"] = "severe"
+    assert _mini_validate(bad, schema)
+    bad = copy.deepcopy(committed)
+    bad["variation_over_time"][0]["recorded_on"] = "12/10/2026"
+    assert _mini_validate(bad, schema)
+
+
+def _mini_validate(inst, schema, root=None, path="$"):
+    """Validate the JSON Schema subset used by pip_safe_summary.schema.json.
+
+    Supports $ref (local), type, const, enum, required, properties,
+    additionalProperties (false), items, pattern, minLength, minItems,
+    uniqueItems and anyOf.  ``format`` is advisory and not checked.
+    """
+    import re as _re
+
+    root = root or schema
+    errs: list[str] = []
+    if "$ref" in schema:
+        node = root
+        for part in schema["$ref"].lstrip("#/").split("/"):
+            node = node[part]
+        return _mini_validate(inst, node, root, path)
+    if "anyOf" in schema:
+        if all(_mini_validate(inst, sub, root, path) for sub in schema["anyOf"]):
+            errs.append(f"{path}: matches no anyOf branch")
+    types = {
+        "object": dict,
+        "array": list,
+        "string": str,
+        "boolean": bool,
+        "integer": int,
+    }
+    if "type" in schema and not isinstance(inst, types[schema["type"]]):
+        return errs + [f"{path}: expected {schema['type']}"]
+    if "const" in schema and (inst != schema["const"] or type(inst) is not type(schema["const"])):
+        errs.append(f"{path}: expected const {schema['const']!r}")
+    if "enum" in schema and inst not in schema["enum"]:
+        errs.append(f"{path}: not in enum")
+    if isinstance(inst, str):
+        if len(inst) < schema.get("minLength", 0):
+            errs.append(f"{path}: too short")
+        if "pattern" in schema and not _re.search(schema["pattern"], inst):
+            errs.append(f"{path}: does not match pattern")
+    if isinstance(inst, dict):
+        for key in schema.get("required", []):
+            if key not in inst:
+                errs.append(f"{path}: missing {key}")
+        props = schema.get("properties", {})
+        for key, value in inst.items():
+            if key in props:
+                errs += _mini_validate(value, props[key], root, f"{path}.{key}")
+            elif schema.get("additionalProperties") is False:
+                errs.append(f"{path}: unexpected key {key}")
+    if isinstance(inst, list):
+        if len(inst) < schema.get("minItems", 0):
+            errs.append(f"{path}: too few items")
+        if schema.get("uniqueItems") and len({json.dumps(i, sort_keys=True) for i in inst}) != len(
+            inst
+        ):
+            errs.append(f"{path}: items not unique")
+        if "items" in schema:
+            for i, value in enumerate(inst):
+                errs += _mini_validate(value, schema["items"], root, f"{path}[{i}]")
+    return errs
+
+
 def test_committed_example_matches_json_schema():
-    jsonschema = pytest.importorskip("jsonschema")
+    # CI's workflow installs an explicit package list without jsonschema, and that
+    # workflow file cannot be changed from this branch's push credentials.  The
+    # dependency-free schema test above always runs; this one adds full
+    # validation wherever jsonschema is installed (e.g. `make install-dev`).
+    jsonschema = pytest.importorskip(
+        "jsonschema",
+        reason="jsonschema not installed (CI workflow does not install it); "
+        "dependency-free schema test still runs",
+    )
     schema = json.loads(pss.SCHEMA_PATH.read_text(encoding="utf-8"))
     data = json.loads((EXAMPLE_DIR / "alex_example_pip_safe_summary.json").read_text("utf-8"))
     jsonschema.validate(data, schema)

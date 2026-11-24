@@ -15,7 +15,8 @@ self-reported needs. It adds no clinical claim.
 ## What it contains
 
 Self-reported content only. Every item carries provenance (`source_type: self_reported`) and
-the date it was recorded, with an optional last-reviewed date.
+the date it was recorded, with an optional last-reviewed date. Dates are shown to the month by
+default (see [Dates and timestamps](#dates-and-timestamps)).
 
 | Section | Content |
 |---------|---------|
@@ -24,7 +25,9 @@ the date it was recorded, with an optional last-reviewed date.
 | `functional_impact` | Day-to-day impact in the person's own words, with optional "what helps" and "what does not help" lists. |
 | `variation_over_time` | Dated entries in the person's own words. No automatic better or worse score. |
 | `display_name` | Optional and off by default. |
-| `consent` | What the person confirmed: preview seen, sections included and left out, destination `local_files_only`, `upload_performed: false`. |
+| `consent` | `status` (`pending` in the preview, `given` in a written file), `given_at`, preview confirmed, sections included and left out, destination `local_files_only`, `upload_performed: false`. |
+| `date_precision` | `month` (default), `day` or `year`: the most precise any entry date is shown. |
+| `exported_at` | Optional and off by default. |
 | `clinician_sourced` | Fixed stub, `included: false`. There is no clinician section in this version. |
 | `integrity` | Optional SHA-256 integrity hash (see below). |
 
@@ -41,8 +44,11 @@ runs before every write and refuses to write if a forbidden key is present. The 
 sets `additionalProperties: false` everywhere. `tests/test_pip_safe_summary.py` fails if a
 forbidden key reaches the output, including when the source profile holds one.
 
-Free text is the person's own words and is not edited. If it looks like clinical data has been
-pasted in (for example "dB HL" or "PTA"), the preview shows a note so the person can decide.
+Free text is the person's own words and is **never edited or removed**. Before the preview, the
+CLI always shows a boxed warning saying so, with examples of what to check for: hearing test
+results or audiogram figures, dB or Hz values, diagnoses and severity words, NHS or National
+Insurance numbers, and date of birth. If the text appears to contain any of these, the box lists
+where, and leaves the text unchanged. The person can cancel, edit their self-report and run it again.
 
 ## How to use it
 
@@ -55,13 +61,33 @@ python -m audiogram.pip_safe_summary_cli my_self_report.json --out my_summary
 ```
 
 1. You choose each section (or pre-select with `--include`). A name is off unless you choose it.
-2. The CLI prints the exact Markdown and JSON it will write.
-3. You type `write` to confirm. Anything else cancels and nothing is written.
-4. `my_summary.md` and `my_summary.json` are written on your device. Existing files are not
+2. The CLI shows the boxed free-text warning.
+3. The CLI prints the Markdown and JSON it will write, with consent shown as **PENDING**.
+4. You type `write` to give consent. Anything else cancels: consent is not given and nothing is
+   written.
+5. Only then is consent recorded as given, with its date, and the optional integrity hash added.
+   Those are the only differences from the preview, and the CLI says so before you confirm.
+6. `my_summary.md` and `my_summary.json` are written on your device. Existing files are not
    overwritten unless you pass `--overwrite`.
 
-The consent block shown in the preview already reads "given". That is deliberate: the preview
-is byte-for-byte what will be written, and it is only written if you confirm.
+A written file always says consent was given. The exporter refuses to write a document whose
+consent is still pending.
+
+## Dates and timestamps
+
+- **No export timestamp by default.** `--include-export-time` adds `exported_at`.
+- **Entry dates shown to the month by default** (`YYYY-MM`). `--date-precision day` keeps full
+  dates and `--date-precision year` shows the year only. This applies to recorded, last-reviewed
+  and variation dates. A date already less precise than the setting is kept as it is; precision is
+  never invented.
+- **Consent date follows the same rule.** `given_at` is a full timestamp only if you opted in to
+  the export time; otherwise it is the date at the chosen precision.
+
+Why month by default: a variation-over-time record needs order and rough recency to be useful
+("on tired days" in October versus November), and month keeps that. Exact days and times make a
+file more distinctive and easier to link with other records, which is what this export avoids.
+Year alone loses most of the sense of change over time. Full dates are one flag away for anyone
+who needs them.
 
 No network calls are made. The modules import nothing that opens a connection, and the tests
 block sockets while running the CLI.

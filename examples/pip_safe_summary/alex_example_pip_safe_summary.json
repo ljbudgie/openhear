@@ -1,8 +1,8 @@
 {
   "schema": "openhear-pip-safe-summary-v1",
   "schema_version": 1,
-  "exported_at": "2026-11-24T20:00:00+00:00",
   "language": "en-GB",
+  "date_precision": "month",
   "disclaimers": [
     "Self-reported communication needs, written by the person and held by them.",
     "Not PIP evidence and does not replace any assessment. No descriptor scoring.",
@@ -13,8 +13,9 @@
     "The optional SHA-256 value is an integrity hash, not a signature."
   ],
   "consent": {
+    "status": "given",
     "given": true,
-    "given_at": "2026-11-24T20:00:00+00:00",
+    "given_at": "2026-11",
     "statement": "I have previewed this summary and I chose which sections it includes. It is written to local files on my device only. Nothing is uploaded. It is my own document, not a digital ID.",
     "preview_confirmed": true,
     "destination": "local_files_only",
@@ -36,8 +37,8 @@
       "is_reasonable_adjustment": true,
       "provenance": {
         "source_type": "self_reported",
-        "recorded_on": "2026-09-01",
-        "last_reviewed": "2026-11-20"
+        "recorded_on": "2026-09",
+        "last_reviewed": "2026-11"
       }
     },
     {
@@ -46,8 +47,8 @@
       "is_reasonable_adjustment": true,
       "provenance": {
         "source_type": "self_reported",
-        "recorded_on": "2026-09-01",
-        "last_reviewed": "2026-11-20"
+        "recorded_on": "2026-09",
+        "last_reviewed": "2026-11"
       }
     },
     {
@@ -56,7 +57,7 @@
       "is_reasonable_adjustment": true,
       "provenance": {
         "source_type": "self_reported",
-        "recorded_on": "2026-10-05"
+        "recorded_on": "2026-10"
       }
     }
   ],
@@ -66,14 +67,14 @@
       "in_my_own_words": "I cannot follow speech on the phone, so I miss what is said.",
       "provenance": {
         "source_type": "self_reported",
-        "recorded_on": "2026-09-01"
+        "recorded_on": "2026-09"
       }
     },
     {
       "channel": "Video calls without live captions",
       "provenance": {
         "source_type": "self_reported",
-        "recorded_on": "2026-09-01"
+        "recorded_on": "2026-09"
       }
     }
   ],
@@ -90,25 +91,25 @@
     ],
     "provenance": {
       "source_type": "self_reported",
-      "recorded_on": "2026-09-01",
-      "last_reviewed": "2026-11-20"
+      "recorded_on": "2026-09",
+      "last_reviewed": "2026-11"
     }
   },
   "variation_over_time": [
     {
-      "recorded_on": "2026-10-12",
+      "recorded_on": "2026-10",
       "in_my_own_words": "On tired days following even captioned conversation takes longer and I need more breaks.",
       "provenance": {
         "source_type": "self_reported",
-        "recorded_on": "2026-10-12"
+        "recorded_on": "2026-10"
       }
     },
     {
-      "recorded_on": "2026-11-18",
+      "recorded_on": "2026-11",
       "in_my_own_words": "In unfamiliar or busy rooms I miss more side-comments, even when the main speaker is captioned.",
       "provenance": {
         "source_type": "self_reported",
-        "recorded_on": "2026-11-18"
+        "recorded_on": "2026-11"
       }
     }
   ],
@@ -121,6 +122,6 @@
     "encoding": "hex",
     "canonical_form": "UTF-8 JSON of this document without the integrity field, keys sorted, separators (',', ':')",
     "label": "integrity hash - not a signature, not a certificate, not a digital ID",
-    "value": "fc7b352cb71e38e5a0deabd52e9fdef64cb8c2933c7dbd2714d76aab65e5cd4f"
+    "value": "0320b3a608e290b7f57cf515f39145597fc59ee7f4ab3550b0b9193538eb3402"
   }
 }

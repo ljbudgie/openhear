@@ -39,10 +39,15 @@ Usage::
 
     from audiogram.pip_safe_summary import build_summary, build_markdown, write_summary
 
-    doc = build_summary(source, include=["reasonable_adjustments"], consent_given=True,
-                        preview_confirmed=True)
-    print(build_markdown(doc))          # preview
-    write_summary(doc, "my_summary")    # writes my_summary.md and my_summary.json
+    pending = build_summary(source, include=["reasonable_adjustments"])
+    print(build_markdown(pending))          # preview: consent shown as PENDING
+    # ... only after the person explicitly confirms:
+    final = confirm_consent(pending)        # consent given, timestamp, integrity hash
+    write_summary(final, "my_summary")      # writes my_summary.md and my_summary.json
+
+Privacy defaults: no export timestamp (opt in with ``include_export_time``) and
+entry dates coarsened to month (``date_precision="month"``; ``"day"`` and
+``"year"`` are available).
 """
 
 from __future__ import annotations
@@ -82,6 +87,14 @@ ADJUSTMENT_CATEGORIES: tuple[str, ...] = (
 )
 
 SELF_REPORTED = "self_reported"
+
+#: Allowed date precisions, most to least precise, with output length.
+DATE_PRECISIONS: dict[str, int] = {"day": 10, "month": 7, "year": 4}
+
+#: Default precision.  Month keeps the order and recency of entries readable
+#: (enough to show how needs vary over time) while making each file less
+#: distinctive and less linkable than exact days.  Exact days are opt-in.
+DEFAULT_DATE_PRECISION = "month"
 
 CONSENT_STATEMENT = (
     "I have previewed this summary and I chose which sections it includes. "
@@ -163,15 +176,45 @@ FORBIDDEN_KEY_TOKENS: frozenset[str] = frozenset(
 )
 
 _TOKEN_SPLIT = re.compile(r"[_\-\s.]+|(?<=[a-z0-9])(?=[A-Z])")
-_ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_ISO_DATE = re.compile(r"^\d{4}(-\d{2}(-\d{2})?)?$")
 
 # Words that, in free text, suggest clinical data is being pasted in.  These
 # only produce a warning for the preview; the person's own words are theirs.
 _CLINICAL_TEXT_HINTS = re.compile(
-    r"\b(\d{1,3}\s?dB(\s?HL)?|PTA|pure[- ]tone|audiogram|threshold|diagnos\w*|"
-    r"severity|NHS number|National Insurance|NI number|date of birth)\b",
+    r"\b(\d{1,3}\s?dB(\s?HL)?|\d+(\.\d+)?\s?k?Hz|PTA|pure[- ]tone|audiogram|audiometr\w*|"
+    r"threshold\w*|hearing test|test results?|diagnos\w*|severity|severe|profound|"
+    r"NHS number|National Insurance|NI number|date of birth)\b",
     re.IGNORECASE,
 )
+
+#: Shown before the free-text preview, every time, whether or not anything is spotted.
+FREE_TEXT_WARNING_LINES: tuple[str, ...] = (
+    "CHECK YOUR OWN WORDS BEFORE YOU CONFIRM",
+    "",
+    "This tool never edits or removes anything you typed.",
+    "Your free text is written exactly as it is, including anything",
+    "clinical you may have pasted in, for example:",
+    "  - hearing test results or audiogram figures",
+    "  - dB or Hz values (e.g. '70 dB HL', '4 kHz')",
+    "  - diagnoses, severity words (e.g. 'severe', 'profound')",
+    "  - NHS or National Insurance numbers, date of birth",
+    "If you do not want any of that in the file, cancel, edit your",
+    "self-report file, and run this again.",
+)
+
+
+def free_text_warning_box(doc: dict[str, Any]) -> str:
+    """Return a boxed warning about free text, listing anything spotted in *doc*."""
+    lines = list(FREE_TEXT_WARNING_LINES)
+    spotted = clinical_text_warnings(doc)
+    if spotted:
+        lines += ["", "Spotted in your text (left unchanged):"]
+        lines += [f"  * {w}" for w in spotted]
+    width = max(len(line) for line in lines) + 2
+    out = ["!" * (width + 2)]
+    out += [f"!{(' ' + line).ljust(width)}!" for line in lines]
+    out.append("!" * (width + 2))
+    return "\n".join(out)
 
 
 def _key_tokens(key: str) -> list[str]:
@@ -253,9 +296,24 @@ def available_sections(source: dict[str, Any]) -> list[str]:
 
 def _check_date(value: Any, where: str) -> str:
     if not isinstance(value, str) or not _ISO_DATE.match(value):
-        raise ValueError(f"{where}: expected a date as YYYY-MM-DD, got {value!r}.")
-    date.fromisoformat(value)
+        raise ValueError(f"{where}: expected a date as YYYY-MM-DD, YYYY-MM or YYYY, got {value!r}.")
+    padded = value + "-01-01"[len(value) - 4 :] if len(value) < 10 else value
+    try:
+        date.fromisoformat(padded)
+    except ValueError as exc:
+        raise ValueError(f"{where}: invalid date {value!r}.") from exc
     return value
+
+
+def coarsen_date(value: str, precision: str) -> str:
+    """Reduce an ISO date to *precision* (``day``, ``month`` or ``year``).
+
+    A date already coarser than *precision* is returned unchanged; precision
+    is never invented.
+    """
+    if precision not in DATE_PRECISIONS:
+        raise ValueError(f"Unknown date precision {precision!r}.")
+    return value[: DATE_PRECISIONS[precision]]
 
 
 def _text(value: Any, where: str) -> str:
@@ -264,7 +322,7 @@ def _text(value: Any, where: str) -> str:
     return value.strip()
 
 
-def _provenance(item: dict[str, Any], where: str) -> dict[str, str]:
+def _provenance(item: dict[str, Any], where: str, precision: str) -> dict[str, str]:
     prov = item.get("provenance")
     if not isinstance(prov, dict):
         raise ValueError(f"{where}: every item needs a 'provenance' object.")
@@ -276,14 +334,18 @@ def _provenance(item: dict[str, Any], where: str) -> dict[str, str]:
         )
     out = {
         "source_type": SELF_REPORTED,
-        "recorded_on": _check_date(prov.get("recorded_on"), f"{where}.recorded_on"),
+        "recorded_on": coarsen_date(
+            _check_date(prov.get("recorded_on"), f"{where}.recorded_on"), precision
+        ),
     }
     if prov.get("last_reviewed") is not None:
-        out["last_reviewed"] = _check_date(prov["last_reviewed"], f"{where}.last_reviewed")
+        out["last_reviewed"] = coarsen_date(
+            _check_date(prov["last_reviewed"], f"{where}.last_reviewed"), precision
+        )
     return out
 
 
-def _adjustments(items: Any) -> list[dict[str, Any]]:
+def _adjustments(items: Any, precision: str) -> list[dict[str, Any]]:
     if not isinstance(items, list):
         raise ValueError("reasonable_adjustments must be a list.")
     out = []
@@ -302,13 +364,13 @@ def _adjustments(items: Any) -> list[dict[str, Any]]:
                 "description": _text(item.get("description"), f"{where}.description"),
                 "category": category,
                 "is_reasonable_adjustment": is_ra,
-                "provenance": _provenance(item, where),
+                "provenance": _provenance(item, where, precision),
             }
         )
     return out
 
 
-def _channels(items: Any) -> list[dict[str, Any]]:
+def _channels(items: Any, precision: str) -> list[dict[str, Any]]:
     if not isinstance(items, list):
         raise ValueError("channels_that_do_not_work_for_me must be a list.")
     out = []
@@ -319,12 +381,12 @@ def _channels(items: Any) -> list[dict[str, Any]]:
         entry = {"channel": _text(item.get("channel"), f"{where}.channel")}
         if item.get("in_my_own_words"):
             entry["in_my_own_words"] = _text(item["in_my_own_words"], f"{where}.in_my_own_words")
-        entry["provenance"] = _provenance(item, where)
+        entry["provenance"] = _provenance(item, where, precision)
         out.append(entry)
     return out
 
 
-def _impact(item: Any) -> dict[str, Any]:
+def _impact(item: Any, precision: str) -> dict[str, Any]:
     where = "functional_impact"
     if not isinstance(item, dict):
         raise ValueError(f"{where}: expected an object.")
@@ -337,11 +399,11 @@ def _impact(item: Any) -> dict[str, Any]:
             if not isinstance(values, list):
                 raise ValueError(f"{where}.{key} must be a list of text.")
             out[key] = [_text(v, f"{where}.{key}[{j}]") for j, v in enumerate(values)]
-    out["provenance"] = _provenance(item, where)
+    out["provenance"] = _provenance(item, where, precision)
     return out
 
 
-def _variation(items: Any) -> list[dict[str, Any]]:
+def _variation(items: Any, precision: str) -> list[dict[str, Any]]:
     if not isinstance(items, list):
         raise ValueError("variation_over_time must be a list.")
     out = []
@@ -351,9 +413,11 @@ def _variation(items: Any) -> list[dict[str, Any]]:
             raise ValueError(f"{where}: expected an object.")
         out.append(
             {
-                "recorded_on": _check_date(item.get("recorded_on"), f"{where}.recorded_on"),
+                "recorded_on": coarsen_date(
+                    _check_date(item.get("recorded_on"), f"{where}.recorded_on"), precision
+                ),
                 "in_my_own_words": _text(item.get("in_my_own_words"), f"{where}.in_my_own_words"),
-                "provenance": _provenance(item, where),
+                "provenance": _provenance(item, where, precision),
             }
         )
     return sorted(out, key=lambda e: e["recorded_on"])
@@ -399,32 +463,37 @@ def build_summary(
     source: dict[str, Any],
     *,
     include: Iterable[str] | None = None,
-    consent_given: bool,
-    preview_confirmed: bool,
-    with_integrity_hash: bool = True,
+    include_export_time: bool = False,
+    date_precision: str = DEFAULT_DATE_PRECISION,
     language: str = "en-GB",
     now: datetime | None = None,
 ) -> dict[str, Any]:
-    """Build an ``openhear-pip-safe-summary-v1`` document from *source*.
+    """Build a **pending** ``openhear-pip-safe-summary-v1`` document for preview.
 
     Only allow-listed, self-reported fields are copied.  Everything else in
-    *source* is ignored.
+    *source* is ignored.  Consent is recorded as pending and there is no
+    integrity hash yet: call :func:`confirm_consent` only after the person has
+    seen the preview and explicitly confirmed.
 
     Args:
-        source:             Standalone self-report, or a Living Hearing Profile
-                            with a ``communication_needs`` block.
-        include:            Sections the person chose (see :data:`SECTIONS`).
-                            Defaults to :data:`DEFAULT_SECTIONS` that have content.
-        consent_given:      Recorded in the consent block.
-        preview_confirmed:  Recorded in the consent block.
-        with_integrity_hash: Add the optional SHA-256 integrity hash.
-        language:           BCP 47 language tag of the content.
-        now:                Export time (for tests); defaults to now, UTC.
+        source:              Standalone self-report, or a Living Hearing Profile
+                             with a ``communication_needs`` block.
+        include:             Sections the person chose (see :data:`SECTIONS`).
+                             Defaults to :data:`DEFAULT_SECTIONS` that have content.
+        include_export_time: Add an ``exported_at`` timestamp.  Off by default.
+        date_precision:      ``"month"`` (default), ``"day"`` or ``"year"`` for
+                             recorded, last-reviewed and variation dates.
+        language:            BCP 47 language tag of the content.
+        now:                 Export time (for tests); defaults to now, UTC.
 
     Raises:
-        ValueError: on unknown sections, malformed items, or non-self-reported
-            provenance.
+        ValueError: on unknown sections, unknown precision, malformed items, or
+            non-self-reported provenance.
     """
+    if date_precision not in DATE_PRECISIONS:
+        raise ValueError(
+            f"Unknown date precision {date_precision!r}; use one of {', '.join(DATE_PRECISIONS)}."
+        )
     block = extract_self_report(source)
     chosen = list(DEFAULT_SECTIONS if include is None else include)
     unknown = [s for s in chosen if s not in SECTIONS]
@@ -432,35 +501,67 @@ def build_summary(
         raise ValueError(f"Unknown section(s): {', '.join(unknown)}.")
     chosen = [s for s in SECTIONS if s in chosen and block.get(s)]
 
-    when = (now or datetime.now(tz=timezone.utc)).replace(microsecond=0)
-    doc: dict[str, Any] = {
-        "schema": SCHEMA_ID,
-        "schema_version": SCHEMA_VERSION,
-        "exported_at": when.isoformat(),
-        "language": language,
-        "disclaimers": list(DISCLAIMERS),
-        "consent": {
-            "given": bool(consent_given),
-            "given_at": when.isoformat(),
-            "statement": CONSENT_STATEMENT,
-            "preview_confirmed": bool(preview_confirmed),
-            "destination": "local_files_only",
-            "upload_performed": False,
-            "sections_included": chosen,
-            "sections_not_included": [s for s in SECTIONS if s not in chosen],
-        },
-    }
+    doc: dict[str, Any] = {"schema": SCHEMA_ID, "schema_version": SCHEMA_VERSION}
+    if include_export_time:
+        when = (now or datetime.now(tz=timezone.utc)).replace(microsecond=0)
+        doc["exported_at"] = when.isoformat()
+    doc.update(
+        {
+            "language": language,
+            "date_precision": date_precision,
+            "disclaimers": list(DISCLAIMERS),
+            "consent": {
+                "status": "pending",
+                "given": False,
+                "given_at": None,
+                "statement": CONSENT_STATEMENT,
+                "preview_confirmed": False,
+                "destination": "local_files_only",
+                "upload_performed": False,
+                "sections_included": chosen,
+                "sections_not_included": [s for s in SECTIONS if s not in chosen],
+            },
+        }
+    )
     if "display_name" in chosen:
         doc["display_name"] = _text(block["display_name"], "display_name")
     for section in SECTIONS[1:]:
         if section in chosen:
-            doc[section] = _BUILDERS[section](block[section])
+            doc[section] = _BUILDERS[section](block[section], date_precision)
     doc["clinician_sourced"] = {"included": False, "note": CLINICIAN_STUB_NOTE}
 
     bad = find_forbidden_keys(doc)
     if bad:  # pragma: no cover - allow-list makes this unreachable; kept as a guard
         raise ValueError(f"Forbidden keys in summary: {', '.join(bad)}")
+    return doc
 
+
+def confirm_consent(
+    pending: dict[str, Any],
+    *,
+    with_integrity_hash: bool = True,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Record consent on a previewed document.  Call only after explicit confirmation.
+
+    Returns a new document with consent ``given``, the preview marked as
+    confirmed, and (optionally) the integrity hash.  ``given_at`` is a full
+    UTC timestamp only if the person opted in to an export timestamp;
+    otherwise it is the date at the document's ``date_precision``, so the
+    consent record does not reintroduce an exact time.
+    """
+    consent = pending.get("consent") or {}
+    if consent.get("status") != "pending":
+        raise ValueError("Consent can only be confirmed on a pending document.")
+    doc = copy.deepcopy(pending)
+    when = (now or datetime.now(tz=timezone.utc)).replace(microsecond=0)
+    if "exported_at" in doc:
+        given_at = when.isoformat()
+    else:
+        given_at = coarsen_date(when.date().isoformat(), doc["date_precision"])
+    doc["consent"].update(
+        {"status": "given", "given": True, "given_at": given_at, "preview_confirmed": True}
+    )
     if with_integrity_hash:
         doc["integrity"] = {
             "algorithm": "SHA-256",
@@ -480,6 +581,13 @@ _SECTION_TITLES = {
     "channels_that_do_not_work_for_me": "Channels that do not work for me",
     "functional_impact": "Day-to-day impact, in my own words",
     "variation_over_time": "How this varies over time",
+}
+
+
+_PRECISION_LABELS = {
+    "day": "day (YYYY-MM-DD)",
+    "month": "month (YYYY-MM)",
+    "year": "year (YYYY)",
 }
 
 
@@ -504,7 +612,11 @@ def build_markdown(doc: dict[str, Any]) -> str:
         "| Field | Value |",
         "|-------|-------|",
         f"| Format | `{doc['schema']}` (version {doc['schema_version']}) |",
-        f"| Exported | {doc['exported_at']} |",
+    ]
+    if doc.get("exported_at"):
+        lines.append(f"| Exported | {doc['exported_at']} |")
+    lines += [
+        f"| Dates shown to | {_PRECISION_LABELS[doc['date_precision']]} |",
         f"| Language | {doc['language']} |",
         "",
     ]
@@ -543,13 +655,19 @@ def build_markdown(doc: dict[str, Any]) -> str:
         lines.append("")
 
     consent = doc["consent"]
+    lines += ["## Consent", "", f"> {consent['statement']}", ""]
+    if consent.get("status") == "given":
+        lines += [
+            f"- Status: given ({consent['given_at']})",
+            "- Preview confirmed: yes",
+        ]
+    else:
+        lines += [
+            "- Status: **PENDING — not given.** Consent is recorded only after you "
+            "type `write` to confirm. Nothing has been written.",
+            "- Preview confirmed: not yet",
+        ]
     lines += [
-        "## Consent",
-        "",
-        f"> {consent['statement']}",
-        "",
-        f"- Given: {'yes' if consent['given'] else 'no'} ({consent['given_at']})",
-        f"- Preview confirmed: {'yes' if consent['preview_confirmed'] else 'no'}",
         "- Destination: local files only. Upload performed: no.",
         f"- Sections included: {', '.join(consent['sections_included']) or 'none'}",
         f"- Sections not included: {', '.join(consent['sections_not_included']) or 'none'}",
@@ -584,6 +702,8 @@ def validate_document(doc: dict[str, Any]) -> None:
     bad = find_forbidden_keys(doc)
     if bad:
         raise ValueError(f"Forbidden keys present: {', '.join(bad)}.")
+    if doc.get("date_precision") not in DATE_PRECISIONS:
+        raise ValueError(f"Unknown date_precision: {doc.get('date_precision')!r}.")
     consent = doc.get("consent") or {}
     if consent.get("destination") != "local_files_only" or consent.get("upload_performed"):
         raise ValueError("Consent block must record local files only and no upload.")
@@ -599,15 +719,22 @@ def write_summary(
 ) -> tuple[Path, Path]:
     """Write *doc* as ``<output_path>.md`` and ``<output_path>.json`` locally.
 
-    Refuses to write unless consent was given and the preview confirmed.
+    Refuses to write unless :func:`confirm_consent` has recorded consent.
     Refuses to overwrite existing files unless *overwrite* is True.
 
     Returns:
         The Markdown and JSON paths written.
     """
     consent = doc.get("consent") or {}
-    if not (consent.get("given") and consent.get("preview_confirmed")):
-        raise PermissionError("Consent and a confirmed preview are required before writing.")
+    if not (
+        consent.get("status") == "given"
+        and consent.get("given") is True
+        and consent.get("preview_confirmed") is True
+        and consent.get("given_at")
+    ):
+        raise PermissionError(
+            "Consent has not been given. Confirm the preview (confirm_consent) before writing."
+        )
     validate_document(doc)
 
     base = Path(output_path)

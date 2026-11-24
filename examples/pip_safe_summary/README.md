@@ -18,7 +18,8 @@ python -m audiogram.pip_safe_summary_cli examples/pip_safe_summary/alex_example_
     --include functional_impact --include variation_over_time
 ```
 
-The committed example was built with a fixed export time (2026-11-24T20:00:00+00:00) so
-that its integrity hash is reproducible in `tests/test_pip_safe_summary.py`.
+The committed example uses the privacy defaults: no export timestamp, and dates shown to the
+month. It was built with a fixed clock (2026-11-24, UTC) so that the consent date and integrity
+hash are reproducible in `tests/test_pip_safe_summary.py`.
 
 What this is and is not: see [`docs/PIP_SAFE_SUMMARY.md`](../../docs/PIP_SAFE_SUMMARY.md).

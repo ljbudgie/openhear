@@ -11,24 +11,24 @@
 | Field | Value |
 |-------|-------|
 | Format | `openhear-pip-safe-summary-v1` (version 1) |
-| Exported | 2026-11-24T20:00:00+00:00 |
+| Dates shown to | month (YYYY-MM) |
 | Language | en-GB |
 
 ## Reasonable adjustments
 
 - Please contact me by email only. Email is a reasonable adjustment for me, not a preference. (reasonable adjustment)  
-  _Self-reported. Recorded 2026-09-01; last reviewed 2026-11-20._
+  _Self-reported. Recorded 2026-09; last reviewed 2026-11._
 - For any live spoken meeting or assessment, please provide live speech-to-text, such as a palantypist or real-time captions. (reasonable adjustment)  
-  _Self-reported. Recorded 2026-09-01; last reviewed 2026-11-20._
+  _Self-reported. Recorded 2026-09; last reviewed 2026-11._
 - Please send written questions or an agenda in advance where possible. (reasonable adjustment)  
-  _Self-reported. Recorded 2026-10-05._
+  _Self-reported. Recorded 2026-10._
 
 ## Channels that do not work for me
 
 - **Telephone calls** — I cannot follow speech on the phone, so I miss what is said.  
-  _Self-reported. Recorded 2026-09-01._
+  _Self-reported. Recorded 2026-09._
 - **Video calls without live captions**  
-  _Self-reported. Recorded 2026-09-01._
+  _Self-reported. Recorded 2026-09._
 
 ## Day-to-day impact, in my own words
 
@@ -45,20 +45,20 @@ Without text access to speech I cannot reliably follow spoken conversation. With
 - Telephone calls
 - Being asked to repeat everything at each new contact
 
-_Self-reported. Recorded 2026-09-01; last reviewed 2026-11-20._
+_Self-reported. Recorded 2026-09; last reviewed 2026-11._
 
 ## How this varies over time
 
-- **2026-10-12** — On tired days following even captioned conversation takes longer and I need more breaks.  
-  _Self-reported. Recorded 2026-10-12._
-- **2026-11-18** — In unfamiliar or busy rooms I miss more side-comments, even when the main speaker is captioned.  
-  _Self-reported. Recorded 2026-11-18._
+- **2026-10** — On tired days following even captioned conversation takes longer and I need more breaks.  
+  _Self-reported. Recorded 2026-10._
+- **2026-11** — In unfamiliar or busy rooms I miss more side-comments, even when the main speaker is captioned.  
+  _Self-reported. Recorded 2026-11._
 
 ## Consent
 
 > I have previewed this summary and I chose which sections it includes. It is written to local files on my device only. Nothing is uploaded. It is my own document, not a digital ID.
 
-- Given: yes (2026-11-24T20:00:00+00:00)
+- Status: given (2026-11)
 - Preview confirmed: yes
 - Destination: local files only. Upload performed: no.
 - Sections included: display_name, reasonable_adjustments, channels_that_do_not_work_for_me, functional_impact, variation_over_time
@@ -66,6 +66,6 @@ _Self-reported. Recorded 2026-09-01; last reviewed 2026-11-20._
 
 ## Integrity hash
 
-SHA-256 of the canonical JSON companion file: `fc7b352cb71e38e5a0deabd52e9fdef64cb8c2933c7dbd2714d76aab65e5cd4f`
+SHA-256 of the canonical JSON companion file: `0320b3a608e290b7f57cf515f39145597fc59ee7f4ab3550b0b9193538eb3402`
 
 This is an integrity hash. It shows whether the JSON has changed since export. It is not a signature, not proof of who wrote it, and not a digital ID.

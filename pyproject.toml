@@ -49,6 +49,8 @@ plot = ["matplotlib>=3.8.0"]
 ble = ["bleak>=1.1.1"]
 dev = [
     "pytest>=7.0",
+    # Full JSON Schema validation of audiogram/pip_safe_summary.schema.json.
+    "jsonschema>=4.0",
 ]
 
 [project.scripts]

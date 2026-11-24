@@ -1,0 +1,126 @@
+{
+  "schema": "openhear-pip-safe-summary-v1",
+  "schema_version": 1,
+  "exported_at": "2026-11-24T20:00:00+00:00",
+  "language": "en-GB",
+  "disclaimers": [
+    "Self-reported communication needs, written by the person and held by them.",
+    "Not PIP evidence and does not replace any assessment. No descriptor scoring.",
+    "Not endorsed by DWP or the Timms Review. Not an official 'Tell Us Once' profile.",
+    "Not a medical or clinical document. OpenHear is a research platform for environmental sound awareness; it is not a hearing aid or a medical device.",
+    "Written to local files only. No upload, no account, no central storage.",
+    "Contains no hearing test results, diagnosis or identifier, and is not a digital ID.",
+    "The optional SHA-256 value is an integrity hash, not a signature."
+  ],
+  "consent": {
+    "given": true,
+    "given_at": "2026-11-24T20:00:00+00:00",
+    "statement": "I have previewed this summary and I chose which sections it includes. It is written to local files on my device only. Nothing is uploaded. It is my own document, not a digital ID.",
+    "preview_confirmed": true,
+    "destination": "local_files_only",
+    "upload_performed": false,
+    "sections_included": [
+      "display_name",
+      "reasonable_adjustments",
+      "channels_that_do_not_work_for_me",
+      "functional_impact",
+      "variation_over_time"
+    ],
+    "sections_not_included": []
+  },
+  "display_name": "Alex Example",
+  "reasonable_adjustments": [
+    {
+      "description": "Please contact me by email only. Email is a reasonable adjustment for me, not a preference.",
+      "category": "contact_channel",
+      "is_reasonable_adjustment": true,
+      "provenance": {
+        "source_type": "self_reported",
+        "recorded_on": "2026-09-01",
+        "last_reviewed": "2026-11-20"
+      }
+    },
+    {
+      "description": "For any live spoken meeting or assessment, please provide live speech-to-text, such as a palantypist or real-time captions.",
+      "category": "live_communication_support",
+      "is_reasonable_adjustment": true,
+      "provenance": {
+        "source_type": "self_reported",
+        "recorded_on": "2026-09-01",
+        "last_reviewed": "2026-11-20"
+      }
+    },
+    {
+      "description": "Please send written questions or an agenda in advance where possible.",
+      "category": "written_information",
+      "is_reasonable_adjustment": true,
+      "provenance": {
+        "source_type": "self_reported",
+        "recorded_on": "2026-10-05"
+      }
+    }
+  ],
+  "channels_that_do_not_work_for_me": [
+    {
+      "channel": "Telephone calls",
+      "in_my_own_words": "I cannot follow speech on the phone, so I miss what is said.",
+      "provenance": {
+        "source_type": "self_reported",
+        "recorded_on": "2026-09-01"
+      }
+    },
+    {
+      "channel": "Video calls without live captions",
+      "provenance": {
+        "source_type": "self_reported",
+        "recorded_on": "2026-09-01"
+      }
+    }
+  ],
+  "functional_impact": {
+    "in_my_own_words": "Without text access to speech I cannot reliably follow spoken conversation. With live captions I can take part. Background noise and several people talking at once make it much harder. I can deal with my own affairs in writing.",
+    "what_helps": [
+      "Email",
+      "Live captions or a palantypist",
+      "Written information in advance"
+    ],
+    "what_does_not_help": [
+      "Telephone calls",
+      "Being asked to repeat everything at each new contact"
+    ],
+    "provenance": {
+      "source_type": "self_reported",
+      "recorded_on": "2026-09-01",
+      "last_reviewed": "2026-11-20"
+    }
+  },
+  "variation_over_time": [
+    {
+      "recorded_on": "2026-10-12",
+      "in_my_own_words": "On tired days following even captioned conversation takes longer and I need more breaks.",
+      "provenance": {
+        "source_type": "self_reported",
+        "recorded_on": "2026-10-12"
+      }
+    },
+    {
+      "recorded_on": "2026-11-18",
+      "in_my_own_words": "In unfamiliar or busy rooms I miss more side-comments, even when the main speaker is captioned.",
+      "provenance": {
+        "source_type": "self_reported",
+        "recorded_on": "2026-11-18"
+      }
+    }
+  ],
+  "clinician_sourced": {
+    "included": false,
+    "note": "Not included. The minimal version carries self-reported content only."
+  },
+  "integrity": {
+    "algorithm": "SHA-256",
+    "encoding": "hex",
+    "canonical_form": "UTF-8 JSON of this document without the integrity field, keys sorted, separators (',', ':')",
+    "label": "integrity hash - not a signature, not a certificate, not a digital ID",
+    "value": "fc7b352cb71e38e5a0deabd52e9fdef64cb8c2933c7dbd2714d76aab65e5cd4f"
+  }
+}

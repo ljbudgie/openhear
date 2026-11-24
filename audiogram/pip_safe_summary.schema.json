@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ljbudgie/openhear/blob/main/audiogram/pip_safe_summary.schema.json",
+  "title": "openhear-pip-safe-summary-v1",
+  "description": "Self-reported communication-needs summary, held by the person and written to local files only. Not PIP evidence, not endorsed by DWP or the Timms Review, not an official Tell Us Once profile, not a medical or clinical document, not a digital ID. Contains no hearing test results, diagnosis or identifier. additionalProperties is false throughout so no other field can appear.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schema_version", "exported_at", "language", "disclaimers", "consent", "clinician_sourced"],
+  "properties": {
+    "schema": { "const": "openhear-pip-safe-summary-v1" },
+    "schema_version": { "const": 1 },
+    "exported_at": { "type": "string", "format": "date-time" },
+    "language": { "type": "string", "minLength": 2 },
+    "disclaimers": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "display_name": { "type": "string", "minLength": 1 },
+    "consent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["given", "given_at", "statement", "preview_confirmed", "destination", "upload_performed", "sections_included", "sections_not_included"],
+      "properties": {
+        "given": { "const": true },
+        "given_at": { "type": "string", "format": "date-time" },
+        "statement": { "type": "string", "minLength": 1 },
+        "preview_confirmed": { "const": true },
+        "destination": { "const": "local_files_only" },
+        "upload_performed": { "const": false },
+        "sections_included": { "type": "array", "items": { "$ref": "#/$defs/section" }, "uniqueItems": true },
+        "sections_not_included": { "type": "array", "items": { "$ref": "#/$defs/section" }, "uniqueItems": true }
+      }
+    },
+    "reasonable_adjustments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["description", "category", "is_reasonable_adjustment", "provenance"],
+        "properties": {
+          "description": { "type": "string", "minLength": 1 },
+          "category": { "enum": ["contact_channel", "live_communication_support", "written_information", "time_and_breaks", "other"] },
+          "is_reasonable_adjustment": { "type": "boolean" },
+          "provenance": { "$ref": "#/$defs/provenance" }
+        }
+      }
+    },
+    "channels_that_do_not_work_for_me": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["channel", "provenance"],
+        "properties": {
+          "channel": { "type": "string", "minLength": 1 },
+          "in_my_own_words": { "type": "string", "minLength": 1 },
+          "provenance": { "$ref": "#/$defs/provenance" }
+        }
+      }
+    },
+    "functional_impact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["in_my_own_words", "provenance"],
+      "properties": {
+        "in_my_own_words": { "type": "string", "minLength": 1 },
+        "what_helps": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "what_does_not_help": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "provenance": { "$ref": "#/$defs/provenance" }
+      }
+    },
+    "variation_over_time": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["recorded_on", "in_my_own_words", "provenance"],
+        "properties": {
+          "recorded_on": { "$ref": "#/$defs/date" },
+          "in_my_own_words": { "type": "string", "minLength": 1 },
+          "provenance": { "$ref": "#/$defs/provenance" }
+        }
+      }
+    },
+    "clinician_sourced": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["included"],
+      "properties": {
+        "included": { "const": false },
+        "note": { "type": "string" }
+      }
+    },
+    "integrity": {
+      "description": "Optional SHA-256 integrity hash over canonical JSON of the document without this field. Not a signature, not a certificate, not a digital ID.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "encoding", "canonical_form", "label", "value"],
+      "properties": {
+        "algorithm": { "const": "SHA-256" },
+        "encoding": { "const": "hex" },
+        "canonical_form": { "type": "string" },
+        "label": { "type": "string" },
+        "value": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    }
+  },
+  "$defs": {
+    "date": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+    "section": { "enum": ["display_name", "reasonable_adjustments", "channels_that_do_not_work_for_me", "functional_impact", "variation_over_time"] },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_type", "recorded_on"],
+      "properties": {
+        "source_type": { "const": "self_reported" },
+        "recorded_on": { "$ref": "#/$defs/date" },
+        "last_reviewed": { "$ref": "#/$defs/date" }
+      }
+    }
+  }
+}

@@ -92,7 +92,7 @@ packages = [
 include-package-data = true
 
 [tool.setuptools.package-data]
-"audiogram" = ["data/*.json"]
+"audiogram" = ["data/*.json", "pip_safe_summary.schema.json"]
 "dsp" = ["config.schema.json"]
 "hardware.sovereign_device" = ["components.json"]
 "stream" = ["data/*.csv"]

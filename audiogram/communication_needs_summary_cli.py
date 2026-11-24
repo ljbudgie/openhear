@@ -1,5 +1,5 @@
 """
-pip_safe_summary_cli.py – consent-and-preview CLI for the communication-needs summary.
+communication_needs_summary_cli.py – consent-and-preview CLI for the communication-needs summary.
 
 Reads a local self-report file (or a Living Hearing Profile carrying a
 ``communication_needs`` block), lets the person choose sections, shows a
@@ -12,8 +12,8 @@ and entry dates shown to the month (``--date-precision day|month|year``).
 
 Usage::
 
-    python -m audiogram.pip_safe_summary_cli SELF_REPORT.json --out my_summary
-    python -m audiogram.pip_safe_summary_cli SELF_REPORT.json --out my_summary \\
+    python -m audiogram.communication_needs_summary_cli SELF_REPORT.json --out my_summary
+    python -m audiogram.communication_needs_summary_cli SELF_REPORT.json --out my_summary \\
         --include reasonable_adjustments --include functional_impact \\
         --date-precision year --no-hash
 """
@@ -26,7 +26,7 @@ from pathlib import Path
 
 import click
 
-from audiogram.pip_safe_summary import (
+from audiogram.communication_needs_summary import (
     CONSENT_STATEMENT,
     DATE_PRECISIONS,
     DEFAULT_DATE_PRECISION,
@@ -70,7 +70,11 @@ CONFIRM_WORD = "write"
     type=click.Choice(list(DATE_PRECISIONS)),
     default=DEFAULT_DATE_PRECISION,
     show_default=True,
-    help="Precision of recorded, last-reviewed and variation dates.",
+    help=(
+        "Precision of recorded, last-reviewed and variation dates. The consent date "
+        "(given_at) follows the same precision rule unless --include-export-time is set, "
+        "in which case it is a full timestamp."
+    ),
 )
 @click.option("--no-hash", is_flag=True, help="Leave out the optional SHA-256 integrity hash.")
 @click.option("--overwrite", is_flag=True, help="Allow replacing existing output files.")

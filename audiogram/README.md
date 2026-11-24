@@ -16,7 +16,7 @@ open `openhear-audiogram-v1` JSON format.
 | `export.py`      | Export to CSV, Markdown, or DSP configuration dicts.       |
 | `reader.py`      | Read threshold data from a Noahlink Wireless 2 device.     |
 | `self_assessment.py` | Calibrated, consent-led self-assessment foundation for Iris. |
-| `pip_safe_summary.py` | Local, consent-and-preview communication-needs summary (draft; see [docs/PIP_SAFE_SUMMARY.md](../docs/PIP_SAFE_SUMMARY.md)). |
+| `communication_needs_summary.py` | Local, consent-and-preview communication-needs summary (draft; see [docs/COMMUNICATION_NEEDS_SUMMARY.md](../docs/COMMUNICATION_NEEDS_SUMMARY.md)). |
 | `data/`          | Audiogram data files in openhear-audiogram-v1 format.      |
 
 ## The JSON Format

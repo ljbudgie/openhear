@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/ljbudgie/openhear/blob/main/audiogram/pip_safe_summary.schema.json",
-  "title": "openhear-pip-safe-summary-v1",
+  "$id": "https://github.com/ljbudgie/openhear/blob/main/audiogram/communication_needs_summary.schema.json",
+  "title": "openhear-communication-needs-summary-v1",
   "description": "Self-reported communication-needs summary, held by the person and written to local files only. Not PIP evidence, not endorsed by DWP or the Timms Review, not an official Tell Us Once profile, not a medical or clinical document, not a digital ID. Contains no hearing test results, diagnosis or identifier. additionalProperties is false throughout so no other field can appear. Written files only: consent must be given. Dates may be YYYY-MM-DD, YYYY-MM or YYYY; exported_at is optional and off by default.",
   "type": "object",
   "additionalProperties": false,
@@ -16,7 +16,7 @@
   ],
   "properties": {
     "schema": {
-      "const": "openhear-pip-safe-summary-v1"
+      "const": "openhear-communication-needs-summary-v1"
     },
     "schema_version": {
       "const": 1

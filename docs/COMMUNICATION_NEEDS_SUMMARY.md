@@ -1,4 +1,4 @@
-# Communication needs summary (`openhear-pip-safe-summary-v1`)
+# Communication-needs summary (`openhear-communication-needs-summary-v1`)
 
 > **Status: draft, not released.** Awaiting maintainer review and a hostile-reviewer pass.
 
@@ -20,7 +20,7 @@ default (see [Dates and timestamps](#dates-and-timestamps)).
 
 | Section | Content |
 |---------|---------|
-| `reasonable_adjustments` | Free-text adjustments, each with a category and `is_reasonable_adjustment`. Email-only contact can be recorded as a reasonable adjustment, not a preference. Live speech-to-text or a palantypist goes under `live_communication_support`. |
+| `reasonable_adjustments` | Free-text adjustments, each with a category and a **required** `is_reasonable_adjustment` (`true` or `false`, never assumed). This lets the person mark, for example, a contact channel such as email as a reasonable adjustment rather than a preference, or mark something as a preference. Live speech-to-text or a palantypist goes under `live_communication_support`. The exporter rejects an adjustment without an explicit `true` or `false`. |
 | `channels_that_do_not_work_for_me` | Channels that do not work for this person, optionally in their own words. This is personal, not a general rule. |
 | `functional_impact` | Day-to-day impact in the person's own words, with optional "what helps" and "what does not help" lists. |
 | `variation_over_time` | Dated entries in the person's own words. No automatic better or worse score. |
@@ -41,23 +41,26 @@ default (see [Dates and timestamps](#dates-and-timestamps)).
 The exporter copies fields from an explicit allow-list, so anything else in the source is
 dropped, including a full Living Hearing Profile with a clinical core. An independent key scan
 runs before every write and refuses to write if a forbidden key is present. The JSON Schema
-sets `additionalProperties: false` everywhere. `tests/test_pip_safe_summary.py` fails if a
+sets `additionalProperties: false` everywhere. `tests/test_communication_needs_summary.py` fails if a
 forbidden key reaches the output, including when the source profile holds one.
 
 Free text is the person's own words and is **never edited or removed**. Before the preview, the
 CLI always shows a boxed warning saying so, with examples of what to check for: hearing test
 results or audiogram figures, dB or Hz values, diagnoses and severity words, NHS or National
-Insurance numbers, and date of birth. If the text appears to contain any of these, the box lists
-where, and leaves the text unchanged. The person can cancel, edit their self-report and run it again.
+Insurance numbers, date of birth, addresses, postcodes, phone numbers and email addresses. The
+scanner also looks for raw National Insurance numbers, NHS numbers, UK postcodes, street
+addresses, phone numbers and email addresses. If the text appears to contain any of these, the
+box lists where, and leaves the text unchanged. The scanner is deliberately broad and will
+sometimes flag harmless text; it is a prompt to check, not a filter. The person can cancel, edit their self-report and run it again.
 
 ## How to use it
 
 Write a self-report JSON file (see the fictional
-[`examples/pip_safe_summary/alex_example_self_report.json`](../examples/pip_safe_summary/alex_example_self_report.json)),
+[`examples/communication_needs_summary/alex_example_self_report.json`](../examples/communication_needs_summary/alex_example_self_report.json)),
 or add the same content as a `communication_needs` block in your Living Hearing Profile. Then:
 
 ```bash
-python -m audiogram.pip_safe_summary_cli my_self_report.json --out my_summary
+python -m audiogram.communication_needs_summary_cli my_self_report.json --out my_summary
 ```
 
 1. You choose each section (or pre-select with `--include`). A name is off unless you choose it.
@@ -72,6 +75,11 @@ python -m audiogram.pip_safe_summary_cli my_self_report.json --out my_summary
 
 A written file always says consent was given. The exporter refuses to write a document whose
 consent is still pending.
+
+**Only this CLI flow counts as previewed consent.** Code that calls `confirm_consent()` directly
+records consent as given in the document, but that is not previewed consent: the calling code is
+responsible for showing the person the exact preview and getting their explicit confirmation
+first.
 
 ## Dates and timestamps
 
@@ -133,8 +141,8 @@ Any later path that sends the file anywhere would need a fresh privacy review.
 
 ## Files
 
-- `audiogram/pip_safe_summary.py` — build, render, hash and write.
-- `audiogram/pip_safe_summary_cli.py` — consent-and-preview CLI.
-- `audiogram/pip_safe_summary.schema.json` — JSON Schema for `openhear-pip-safe-summary-v1`.
-- `examples/pip_safe_summary/` — one fictional example ("Alex Example"), input and output.
-- `tests/test_pip_safe_summary.py` — tests.
+- `audiogram/communication_needs_summary.py` — build, render, hash and write.
+- `audiogram/communication_needs_summary_cli.py` — consent-and-preview CLI.
+- `audiogram/communication_needs_summary.schema.json` — JSON Schema for `openhear-communication-needs-summary-v1`.
+- `examples/communication_needs_summary/` — one fictional example ("Alex Example"), input and output.
+- `tests/test_communication_needs_summary.py` — tests.

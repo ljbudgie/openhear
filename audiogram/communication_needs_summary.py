@@ -1,7 +1,7 @@
 """
-pip_safe_summary.py – minimal communication-needs summary export for OpenHear.
+communication_needs_summary.py – minimal communication-needs summary export for OpenHear.
 
-Builds an ``openhear-pip-safe-summary-v1`` document: a short, person-held
+Builds an ``openhear-communication-needs-summary-v1`` document: a short, person-held
 summary of self-reported communication needs that the person can choose to
 keep, print or attach to correspondence themselves.  It is written to local
 files only.
@@ -32,18 +32,25 @@ The optional SHA-256 value is an **integrity hash** over canonical JSON.  It
 lets the holder notice accidental changes.  It is not a signature, not a
 certificate, not cryptographic proof of authorship, and not a digital ID.
 
-See ``docs/PIP_SAFE_SUMMARY.md`` for the do-not-claim list.  OpenHear's
+See ``docs/COMMUNICATION_NEEDS_SUMMARY.md`` for the do-not-claim list.  OpenHear's
 intended purpose is unchanged (``docs/INTENDED_PURPOSE.md``).
 
 Usage::
 
-    from audiogram.pip_safe_summary import build_summary, build_markdown, write_summary
+    from audiogram.communication_needs_summary import build_summary, build_markdown, write_summary
 
     pending = build_summary(source, include=["reasonable_adjustments"])
     print(build_markdown(pending))          # preview: consent shown as PENDING
     # ... only after the person explicitly confirms:
-    final = confirm_consent(pending)        # consent given, timestamp, integrity hash
+    final = confirm_consent(pending)        # consent given, date, integrity hash
     write_summary(final, "my_summary")      # writes my_summary.md and my_summary.json
+
+Previewed consent: only the CLI flow (``communication_needs_summary_cli``),
+which shows the exact preview and requires the person to type ``write``,
+counts as previewed consent.  A programmatic call to :func:`confirm_consent`
+records consent as given in the document, but it is **not** previewed consent:
+code that calls it directly is responsible for showing the person the preview
+and obtaining their explicit confirmation first.
 
 Privacy defaults: no export timestamp (opt in with ``include_export_time``) and
 entry dates coarsened to month (``date_precision="month"``; ``"day"`` and
@@ -60,11 +67,11 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
-SCHEMA_ID = "openhear-pip-safe-summary-v1"
+SCHEMA_ID = "openhear-communication-needs-summary-v1"
 SCHEMA_VERSION = 1
 
 #: Path of the JSON Schema shipped with the package.
-SCHEMA_PATH = Path(__file__).with_name("pip_safe_summary.schema.json")
+SCHEMA_PATH = Path(__file__).with_name("communication_needs_summary.schema.json")
 
 #: Sections the person may choose to include, in display order.
 SECTIONS: tuple[str, ...] = (
@@ -178,14 +185,59 @@ FORBIDDEN_KEY_TOKENS: frozenset[str] = frozenset(
 _TOKEN_SPLIT = re.compile(r"[_\-\s.]+|(?<=[a-z0-9])(?=[A-Z])")
 _ISO_DATE = re.compile(r"^\d{4}(-\d{2}(-\d{2})?)?$")
 
-# Words that, in free text, suggest clinical data is being pasted in.  These
-# only produce a warning for the preview; the person's own words are theirs.
+# Patterns that, in free text, suggest clinical data or personal details have
+# been typed or pasted in.  They only produce a warning for the preview; the
+# person's own words are theirs and are never edited.
 _CLINICAL_TEXT_HINTS = re.compile(
     r"\b(\d{1,3}\s?dB(\s?HL)?|\d+(\.\d+)?\s?k?Hz|PTA|pure[- ]tone|audiogram|audiometr\w*|"
     r"threshold\w*|hearing test|test results?|diagnos\w*|severity|severe|profound|"
     r"NHS number|National Insurance|NI number|date of birth)\b",
     re.IGNORECASE,
 )
+
+#: Personal-detail patterns (label, regex).  Deliberately broad: a false alarm
+#: costs a second look; a miss costs a leaked identifier.
+_PERSONAL_DETAIL_HINTS: tuple[tuple[str, re.Pattern[str]], ...] = (
+    (
+        "National Insurance number",
+        re.compile(
+            r"\b[A-CEGHJ-PR-TW-Z][A-CEGHJ-NPR-TW-Z]\s?\d{2}\s?\d{2}\s?\d{2}\s?[A-D]\b",
+            re.IGNORECASE,
+        ),
+    ),
+    ("email address", re.compile(r"\b[\w.+-]+@[\w-]+(\.[\w-]+)+\b")),
+    (
+        "phone number",
+        re.compile(
+            r"(?<![\w])(\+44\s?\(?0?\)?\s?\d{2,4}|\(?0\d{2,4}\)?)[\s-]?\d{3,4}[\s-]?\d{3,4}\b"
+        ),
+    ),
+    ("NHS number", re.compile(r"\b\d{3}[\s-]?\d{3}[\s-]?\d{4}\b")),
+    (
+        "UK postcode",
+        re.compile(r"\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b", re.IGNORECASE),
+    ),
+    (
+        "street address",
+        re.compile(
+            r"\b\d{1,4}[A-Za-z]?,?\s+(?:[A-Z][\w'-]*\s+){1,3}"
+            r"(?:Street|St|Road|Rd|Avenue|Ave|Lane|Ln|Close|Drive|Dr|Way|Crescent|Cres|"
+            r"Place|Pl|Court|Ct|Terrace|Gardens|Grove|Square|Row|Mews|Walk|Parade)\b"
+        ),
+    ),
+)
+
+
+def _text_hints(text: str) -> list[str]:
+    hints = []
+    match = _CLINICAL_TEXT_HINTS.search(text)
+    if match:
+        hints.append(f"mentions '{match.group(0)}'")
+    for label, pattern in _PERSONAL_DETAIL_HINTS:
+        if pattern.search(text):
+            hints.append(f"may contain a {label}")
+    return hints
+
 
 #: Shown before the free-text preview, every time, whether or not anything is spotted.
 FREE_TEXT_WARNING_LINES: tuple[str, ...] = (
@@ -198,6 +250,7 @@ FREE_TEXT_WARNING_LINES: tuple[str, ...] = (
     "  - dB or Hz values (e.g. '70 dB HL', '4 kHz')",
     "  - diagnoses, severity words (e.g. 'severe', 'profound')",
     "  - NHS or National Insurance numbers, date of birth",
+    "  - addresses, postcodes, phone numbers, email addresses",
     "If you do not want any of that in the file, cancel, edit your",
     "self-report file, and run this again.",
 )
@@ -222,7 +275,7 @@ def _key_tokens(key: str) -> list[str]:
 
 
 def is_forbidden_key(key: str) -> bool:
-    """Return True if *key* names data a PIP-safe summary must never hold."""
+    """Return True if *key* names data a communication-needs summary must never hold."""
     lowered = key.lower()
     if lowered in FORBIDDEN_KEYS:
         return True
@@ -245,7 +298,7 @@ def find_forbidden_keys(obj: Any, _path: str = "$") -> list[str]:
 
 
 def clinical_text_warnings(doc: dict[str, Any]) -> list[str]:
-    """Return free-text snippets that look like pasted clinical data.
+    """Return free-text locations that look like clinical data or personal details.
 
     This is advisory only and shown in the preview.  Nothing is removed from
     the person's own words.
@@ -262,9 +315,8 @@ def clinical_text_warnings(doc: dict[str, Any]) -> list[str]:
             for i, v in enumerate(obj):
                 _walk(v, f"{path}[{i}]")
         elif isinstance(obj, str):
-            match = _CLINICAL_TEXT_HINTS.search(obj)
-            if match:
-                warnings.append(f"{path}: mentions '{match.group(0)}'")
+            for hint in _text_hints(obj):
+                warnings.append(f"{path}: {hint}")
 
     _walk(doc, "$")
     return warnings
@@ -356,9 +408,16 @@ def _adjustments(items: Any, precision: str) -> list[dict[str, Any]]:
         category = item.get("category", "other")
         if category not in ADJUSTMENT_CATEGORIES:
             raise ValueError(f"{where}.category: unknown category {category!r}.")
-        is_ra = item.get("is_reasonable_adjustment", True)
+        if "is_reasonable_adjustment" not in item:
+            raise ValueError(
+                f"{where}.is_reasonable_adjustment is required: say explicitly whether "
+                "this is a reasonable adjustment (true) or a preference (false)."
+            )
+        is_ra = item["is_reasonable_adjustment"]
         if not isinstance(is_ra, bool):
-            raise ValueError(f"{where}.is_reasonable_adjustment must be true or false.")
+            raise ValueError(
+                f"{where}.is_reasonable_adjustment must be true or false, got {is_ra!r}."
+            )
         out.append(
             {
                 "description": _text(item.get("description"), f"{where}.description"),
@@ -468,7 +527,7 @@ def build_summary(
     language: str = "en-GB",
     now: datetime | None = None,
 ) -> dict[str, Any]:
-    """Build a **pending** ``openhear-pip-safe-summary-v1`` document for preview.
+    """Build a **pending** ``openhear-communication-needs-summary-v1`` document for preview.
 
     Only allow-listed, self-reported fields are copied.  Everything else in
     *source* is ignored.  Consent is recorded as pending and there is no
@@ -601,7 +660,7 @@ def _prov_line(prov: dict[str, str]) -> str:
 def build_markdown(doc: dict[str, Any]) -> str:
     """Render the exact Markdown that :func:`write_summary` will write."""
     lines: list[str] = []
-    title = "Communication needs summary"
+    title = "Communication-needs summary"
     if doc.get("display_name"):
         title += f" — {doc['display_name']}"
     lines += [f"# {title}", ""]
@@ -624,7 +683,9 @@ def build_markdown(doc: dict[str, Any]) -> str:
     if doc.get("reasonable_adjustments"):
         lines += [f"## {_SECTION_TITLES['reasonable_adjustments']}", ""]
         for item in doc["reasonable_adjustments"]:
-            tag = " (reasonable adjustment)" if item["is_reasonable_adjustment"] else ""
+            tag = (
+                " (reasonable adjustment)" if item["is_reasonable_adjustment"] else " (preference)"
+            )
             lines.append(f"- {item['description']}{tag}  ")
             lines.append(f"  {_prov_line(item['provenance'])}")
         lines.append("")

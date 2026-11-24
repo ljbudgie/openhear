@@ -1,0 +1,66 @@
+{
+  "_note": "FICTIONAL EXAMPLE. 'Alex Example' is not a real person. No real data. Input dates are exact; the export coarsens them to the month by default.",
+  "display_name": "Alex Example",
+  "reasonable_adjustments": [
+    {
+      "description": "After any meeting or appointment, please send me a short written summary of what was agreed and any next steps.",
+      "category": "written_information",
+      "is_reasonable_adjustment": true,
+      "provenance": { "source_type": "self_reported", "recorded_on": "2026-08-14", "last_reviewed": "2026-11-20" }
+    },
+    {
+      "description": "Please hold meetings in a quiet room with good light on the speaker's face. Face-to-face with lip-reading works for me in that setting; captions or written notes also work.",
+      "category": "other",
+      "is_reasonable_adjustment": true,
+      "provenance": { "source_type": "self_reported", "recorded_on": "2026-08-14", "last_reviewed": "2026-11-20" }
+    },
+    {
+      "description": "Please allow me extra time to read, think and reply before any decision is needed.",
+      "category": "time_and_breaks",
+      "is_reasonable_adjustment": true,
+      "provenance": { "source_type": "self_reported", "recorded_on": "2026-09-03" }
+    },
+    {
+      "description": "Appointment reminders by text message or email.",
+      "category": "contact_channel",
+      "is_reasonable_adjustment": false,
+      "provenance": { "source_type": "self_reported", "recorded_on": "2026-09-03" }
+    }
+  ],
+  "channels_that_do_not_work_for_me": [
+    {
+      "channel": "Automated phone menus",
+      "in_my_own_words": "I cannot pick out the options quickly enough, so I end up in the wrong place.",
+      "provenance": { "source_type": "self_reported", "recorded_on": "2026-08-14" }
+    },
+    {
+      "channel": "Large open-plan rooms for meetings",
+      "provenance": { "source_type": "self_reported", "recorded_on": "2026-08-14" }
+    }
+  ],
+  "functional_impact": {
+    "in_my_own_words": "In a quiet room, facing one person, I follow most of what is said by lip-reading, though it tires me. In groups or with background noise I lose the thread quickly. I often realise afterwards that I misheard a detail, so a written note of what was agreed matters to me.",
+    "what_helps": [
+      "A written summary after a meeting",
+      "A quiet, well-lit room",
+      "Time to read and reply before decisions"
+    ],
+    "what_does_not_help": [
+      "Speakers who turn away or cover their mouths",
+      "Being expected to answer straight away"
+    ],
+    "provenance": { "source_type": "self_reported", "recorded_on": "2026-08-14", "last_reviewed": "2026-11-20" }
+  },
+  "variation_over_time": [
+    {
+      "recorded_on": "2026-10-02",
+      "in_my_own_words": "With a cold, lip-reading in noisy places becomes much harder and I rely more on written notes.",
+      "provenance": { "source_type": "self_reported", "recorded_on": "2026-10-02" }
+    },
+    {
+      "recorded_on": "2026-11-16",
+      "in_my_own_words": "After long days I need noticeably more time to take in what has been said.",
+      "provenance": { "source_type": "self_reported", "recorded_on": "2026-11-16" }
+    }
+  ]
+}

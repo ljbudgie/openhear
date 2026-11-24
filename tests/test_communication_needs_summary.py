@@ -1,4 +1,4 @@
-"""Tests for audiogram.pip_safe_summary (openhear-pip-safe-summary-v1)."""
+"""Tests for audiogram.communication_needs_summary (openhear-communication-needs-summary-v1)."""
 
 from __future__ import annotations
 
@@ -12,8 +12,8 @@ from pathlib import Path
 import pytest
 from click.testing import CliRunner
 
-from audiogram import pip_safe_summary as pss
-from audiogram.pip_safe_summary import (
+from audiogram import communication_needs_summary as cns
+from audiogram.communication_needs_summary import (
     SCHEMA_ID,
     SECTIONS,
     build_json_text,
@@ -28,10 +28,10 @@ from audiogram.pip_safe_summary import (
     verify_integrity,
     write_summary,
 )
-from audiogram.pip_safe_summary_cli import main as cli_main
+from audiogram.communication_needs_summary_cli import main as cli_main
 
 ROOT = Path(__file__).resolve().parent.parent
-EXAMPLE_DIR = ROOT / "examples" / "pip_safe_summary"
+EXAMPLE_DIR = ROOT / "examples" / "communication_needs_summary"
 SELF_REPORT = EXAMPLE_DIR / "alex_example_self_report.json"
 FIXED_NOW = datetime(2026, 11, 24, 20, 0, tzinfo=timezone.utc)
 
@@ -186,7 +186,7 @@ def test_no_forbidden_keys_even_when_source_profile_holds_them():
 
 
 def test_schema_file_cannot_express_forbidden_keys():
-    schema = json.loads(pss.SCHEMA_PATH.read_text(encoding="utf-8"))
+    schema = json.loads(cns.SCHEMA_PATH.read_text(encoding="utf-8"))
 
     def _prop_names(node):
         if isinstance(node, dict):
@@ -221,12 +221,49 @@ def test_every_item_has_self_reported_provenance_and_date():
         assert len(item["provenance"]["recorded_on"]) == 7  # month by default
 
 
-def test_email_only_is_marked_as_reasonable_adjustment():
+def test_reasonable_adjustment_flag_is_kept_and_rendered():
     doc = _build()
-    email = doc["reasonable_adjustments"][0]
-    assert email["category"] == "contact_channel"
-    assert email["is_reasonable_adjustment"] is True
-    assert "(reasonable adjustment)" in build_markdown(doc)
+    flags = [a["is_reasonable_adjustment"] for a in doc["reasonable_adjustments"]]
+    assert flags == [True, True, True, False]
+    md = build_markdown(doc)
+    assert "(reasonable adjustment)" in md
+    assert "(preference)" in md
+
+
+def test_reasonable_adjustment_flag_is_required():
+    src = _self_report()
+    del src["reasonable_adjustments"][0]["is_reasonable_adjustment"]
+    with pytest.raises(ValueError, match="is_reasonable_adjustment is required"):
+        _build(src)
+
+
+@pytest.mark.parametrize("bad", ["yes", "true", 1, 0, None, []])
+def test_reasonable_adjustment_flag_must_be_bool(bad):
+    src = _self_report()
+    src["reasonable_adjustments"][1]["is_reasonable_adjustment"] = bad
+    with pytest.raises(ValueError, match="true or false"):
+        _build(src)
+
+
+def test_schema_requires_boolean_reasonable_adjustment_flag():
+    schema = json.loads(cns.SCHEMA_PATH.read_text(encoding="utf-8"))
+    item = schema["properties"]["reasonable_adjustments"]["items"]
+    assert "is_reasonable_adjustment" in item["required"]
+    assert item["properties"]["is_reasonable_adjustment"] == {"type": "boolean"}
+    committed = json.loads(
+        (EXAMPLE_DIR / "alex_example_communication_needs_summary.json").read_text("utf-8")
+    )
+    missing = copy.deepcopy(committed)
+    del missing["reasonable_adjustments"][0]["is_reasonable_adjustment"]
+    assert _mini_validate(missing, schema)
+    wrong = copy.deepcopy(committed)
+    wrong["reasonable_adjustments"][0]["is_reasonable_adjustment"] = "yes"
+    assert _mini_validate(wrong, schema)
+
+
+def test_example_input_states_flag_explicitly_for_every_adjustment():
+    for item in _self_report()["reasonable_adjustments"]:
+        assert isinstance(item["is_reasonable_adjustment"], bool)
 
 
 def test_clinician_section_is_stubbed_off():
@@ -270,7 +307,7 @@ def test_clinical_text_warning_is_advisory_only():
     src = _self_report()
     src["functional_impact"]["in_my_own_words"] = "My PTA is 80 dB HL."
     doc = _build(src)
-    assert pss.clinical_text_warnings(doc)
+    assert cns.clinical_text_warnings(doc)
     assert doc["functional_impact"]["in_my_own_words"] == "My PTA is 80 dB HL."
 
 
@@ -422,9 +459,40 @@ def test_free_text_warning_box_always_shown_and_lists_examples():
     box = free_text_warning_box(_pending())
     assert box.splitlines()[0].startswith("!!!")
     assert "never edits or removes anything you typed" in box
-    for example in ("test results", "dB", "diagnoses", "NHS"):
+    for example in ("test results", "dB", "diagnoses", "NHS", "postcodes", "phone", "email"):
         assert example in box
     assert "Spotted in your text" not in box
+
+
+@pytest.mark.parametrize(
+    "text, label",
+    [
+        ("My NI number is JK 12 34 56 C.", "National Insurance number"),
+        ("Reference AB123456D on the letter.", "National Insurance number"),
+        ("NHS no. 943 476 5919", "NHS number"),
+        ("NHS 9434765919", "NHS number"),
+        ("Post goes to SW1A 1AA.", "UK postcode"),
+        ("Write to me at m1 1ae please.", "UK postcode"),
+        ("I live at 12 Example Road.", "street address"),
+        ("Flat 3, 221B Baker Street", "street address"),
+        ("Call 020 7946 0958 if needed", "phone number"),
+        ("Mobile +44 7700 900123", "phone number"),
+        ("My number is 07700900123.", "phone number"),
+        ("Email alex.example@example.org", "email address"),
+    ],
+)
+def test_free_text_scanner_flags_personal_details_without_editing(text, label):
+    src = _self_report()
+    src["functional_impact"]["in_my_own_words"] = text
+    pending = _pending(src)
+    warnings = cns.clinical_text_warnings(pending)
+    assert any(label in w and "functional_impact.in_my_own_words" in w for w in warnings), warnings
+    assert pending["functional_impact"]["in_my_own_words"] == text
+    assert label in free_text_warning_box(pending)
+
+
+def test_free_text_scanner_is_quiet_on_the_fictional_example():
+    assert cns.clinical_text_warnings(_pending()) == []
 
 
 def test_free_text_warning_box_lists_spotted_snippets_without_editing():
@@ -458,7 +526,7 @@ def test_write_refuses_document_with_forbidden_key(tmp_path):
 
 def test_module_imports_nothing_that_talks_to_the_network():
     banned = {"socket", "urllib", "http", "requests", "httpx", "aiohttp", "ftplib", "smtplib"}
-    for name in ("pip_safe_summary.py", "pip_safe_summary_cli.py"):
+    for name in ("communication_needs_summary.py", "communication_needs_summary_cli.py"):
         tree = ast.parse((ROOT / "audiogram" / name).read_text(encoding="utf-8"))
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
@@ -544,10 +612,12 @@ def test_cli_with_poisoned_profile_source(tmp_path, no_network):
 
 def test_committed_example_is_reproducible_and_clean():
     doc = _build()
-    committed_json = (EXAMPLE_DIR / "alex_example_pip_safe_summary.json").read_text(
+    committed_json = (EXAMPLE_DIR / "alex_example_communication_needs_summary.json").read_text(
         encoding="utf-8"
     )
-    committed_md = (EXAMPLE_DIR / "alex_example_pip_safe_summary.md").read_text(encoding="utf-8")
+    committed_md = (EXAMPLE_DIR / "alex_example_communication_needs_summary.md").read_text(
+        encoding="utf-8"
+    )
     assert committed_json == build_json_text(doc)
     assert committed_md == build_markdown(doc)
     data = json.loads(committed_json)
@@ -575,8 +645,10 @@ def test_cli_opt_in_export_time_and_year_precision(tmp_path, no_network):
 
 def test_written_and_pending_documents_against_schema_without_dependencies():
     """Runs everywhere, including CI, using the small validator below."""
-    schema = json.loads(pss.SCHEMA_PATH.read_text(encoding="utf-8"))
-    committed = json.loads((EXAMPLE_DIR / "alex_example_pip_safe_summary.json").read_text("utf-8"))
+    schema = json.loads(cns.SCHEMA_PATH.read_text(encoding="utf-8"))
+    committed = json.loads(
+        (EXAMPLE_DIR / "alex_example_communication_needs_summary.json").read_text("utf-8")
+    )
     for doc in (
         committed,
         _build(),
@@ -595,7 +667,7 @@ def test_written_and_pending_documents_against_schema_without_dependencies():
 
 
 def _mini_validate(inst, schema, root=None, path="$"):
-    """Validate the JSON Schema subset used by pip_safe_summary.schema.json.
+    """Validate the JSON Schema subset used by communication_needs_summary.schema.json.
 
     Supports $ref (local), type, const, enum, required, properties,
     additionalProperties (false), items, pattern, minLength, minItems,
@@ -664,8 +736,10 @@ def test_committed_example_matches_json_schema():
         reason="jsonschema not installed (CI workflow does not install it); "
         "dependency-free schema test still runs",
     )
-    schema = json.loads(pss.SCHEMA_PATH.read_text(encoding="utf-8"))
-    data = json.loads((EXAMPLE_DIR / "alex_example_pip_safe_summary.json").read_text("utf-8"))
+    schema = json.loads(cns.SCHEMA_PATH.read_text(encoding="utf-8"))
+    data = json.loads(
+        (EXAMPLE_DIR / "alex_example_communication_needs_summary.json").read_text("utf-8")
+    )
     jsonschema.validate(data, schema)
     bad = copy.deepcopy(data)
     bad["functional_impact"]["severity"] = "severe"

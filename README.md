@@ -134,6 +134,7 @@ World → Companion microphone and classifier (phone or laptop) → 3-byte hapti
 
 An optional standalone sketch can classify on the wristband itself. That path is **experimental** and is not the shipped classifier. See [`hardware/wristband/v2-xiao-nrf52840/firmware/STANDALONE.md`](hardware/wristband/v2-xiao-nrf52840/firmware/STANDALONE.md).
 
+To feel the nine wristband patterns on an iPhone and practise naming them, see [OpenHear Haptics for iPhone](ios/OpenHearHaptics/README.md) (in development, not yet built in Xcode).
 ### How it relates to existing devices
 
 Neosensory Buzz was a commercial haptic wristband that converted sound into vibration. OpenHear is open-source, keeps the audiogram with the person, and limits the claim to awareness of recognised environmental classes.

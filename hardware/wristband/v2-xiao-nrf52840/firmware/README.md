@@ -7,12 +7,17 @@ targeting the Seeed Studio **XIAO nRF52840** / **XIAO nRF52840 Sense** using
 the open-source **NimBLE-Arduino** stack and the open-source
 **Adafruit DRV2605 Library** for LRA haptics.
 
+An optional standalone sketch (`openhear_v2_standalone.ino`) is
+**experimental**. It is not the shipped classifier and is not the
+primary v2 path. See `STANDALONE.md`.
+
 A Zephyr alternative is described at the bottom for users who prefer the
 nRF Connect SDK / Zephyr RTOS path. Both implementations honour the same
 **3-byte BLE packet contract** (`[sound_class_id, intensity, pattern_id]`)
 as `wristband/openhear_firmware.py` and
-`hardware/wristband/firmware/openhear_firmware_v1.py`, so the existing YAMNet
-classifier, audiogram JSON, and companion phone app stream into v2 unchanged.
+`hardware/wristband/firmware/openhear_firmware_v1.py`, so a companion running the current OpenHear classifier can drive v2
+with the same packet and the canonical 10-class IDs in
+`stream/haptic_mapper.py`.
 
 ## Toolchain – Arduino IDE (recommended starter)
 
@@ -46,25 +51,31 @@ characteristic UUIDs and packet format are identical.
 | Packet characteristic   | `6f68656172-0001-1000-8000-00805f9b34fb` | Write / Write-No-Response | **3 bytes**: `[sound_class_id, intensity, pattern_id]` |
 | Config characteristic   | `6f68656172-0002-1000-8000-00805f9b34fb` | Write | `[actuator_count, intensity_cap]` |
 
-`sound_class_id` ∈ `0..6` matches the YAMNet 7-class head used everywhere in
-the repo. `pattern_id == 240` (`V0_COMPAT_PATTERN`) triggers the same legacy
+`sound_class_id` ∈ `0..9` matches the canonical class IDs in
+`stream/haptic_mapper.py` (0 is silence and must produce no vibration).
+`pattern_id == 240` (`V0_COMPAT_PATTERN`) triggers the same legacy
 micro:bit v0 shim behaviour as the v1 firmware.
 
 ## Haptic waveform map
 
 The default class → DRV2605 ROM-effect mapping lives in `CLASS_EFFECTS[]`
-inside the sketch. It is intentionally short, readable, and tunable to your
-audiogram JSON:
+inside the sketch. IDs and labels must match `stream/haptic_mapper.py`.
+Intensity is pre-weighted on the companion; this sketch does not load an
+audiogram. The traffic pattern is awareness only and is not a safety
+feature.
 
 | ID | Class      | Primary effect (DRV2605 ROM)      | Notes |
 |----|------------|------------------------------------|-------|
-| 0  | speech     | 14 “Strong Buzz 60%”               | sustained, gentle |
-| 1  | alarm      | 47 “Buzz 1 – 100%” ×3              | urgent, repeated |
-| 2  | doorbell   | 24 + 27 (sharp + double-click)     | knock-like |
-| 3  | baby cry   | 82 long ramp                       | rising attention |
-| 4  | vehicle    | 48 “Buzz 2 – 80%”                  | hard pulse |
-| 5  | appliance  | 26 short double-click              | beep-like |
-| 6  | ambient    | 58 “Long Buzz, No Stop”            | low-priority |
+| 0  | silence    | none                               | no vibration |
+| 1  | voice      | 14 “Strong Buzz 60%”               | sustained, gentle |
+| 2  | doorbell   | 24 + 27 (sharp + double-click)     | two sharp pulses |
+| 3  | alarm      | 47 “Buzz 1 – 100%” ×3              | urgent, repeated |
+| 4  | dog        | 16 “Sharp Click 60%”               | single short pulse |
+| 5  | traffic    | 48 “Buzz 2 – 80%”                  | awareness only, not a safety feature |
+| 6  | media      | 58 “Long Buzz, No Stop” ×2         | slow, low-priority |
+| 7  | knock      | 1 “Strong Click 100%”              | short single pulse |
+| 8  | baby_cry   | 82 long ramp                       | rising attention |
+| 9  | phone      | 26 short double-click ×3           | repeating short pulse |
 
 These are open-source effect IDs baked into the DRV2605 ROM (no proprietary
 firmware download required). Swap freely without touching the BLE contract.

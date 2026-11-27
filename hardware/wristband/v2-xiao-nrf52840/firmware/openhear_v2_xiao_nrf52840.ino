@@ -8,13 +8,17 @@
 //
 // CONTRACT WITH THE REST OF THE OPENHEAR STACK (DO NOT CHANGE):
 //   - Same 3-byte BLE haptic packet  [sound_class_id, intensity, pattern_id]
-//   - Same 7 YAMNet sound classes (IDs 0..6) + audiogram JSON intensity weighting
+//   - Class IDs 0..9 match stream/haptic_mapper.py:
+//     silence, voice, doorbell, alarm, dog, traffic, media, knock,
+//     baby_cry, phone. Silence (0) produces no vibration.
+//   - Intensity is pre-weighted by the companion; this sketch does not
+//     load an audiogram file.
 //   - BLE is companion-only; on-wrist haptics MUST never depend on the radio
-//   - Local-first, Burgess-Principle: no raw audio leaves the device
+//   - Local-first: this sketch does not stream audio.
 //
-// This sketch keeps the high-level architecture identical to
-//   wristband/openhear_firmware.py and hardware/wristband/firmware/openhear_firmware_v1.py
-// so the existing classifier, audiogram, and phone tools stream into it unchanged.
+// This sketch is the haptic endpoint for a companion running the current
+// OpenHear classifier (see wristband/openhear_firmware.py and
+// hardware/wristband/firmware/openhear_firmware_v1.py for the v1 path).
 //
 // Pin map (default XIAO nRF52840 Sense, no-solder via Seeed Expansion Base):
 //   D4 / D5  -> I2C SDA / SCL  (DRV2605L + optional TCA9548A)
@@ -47,7 +51,7 @@
 // ============================================================================
 static const char*   DEVICE_NAME            = "OpenHear-v2";
 static const uint8_t MAX_INTENSITY          = 180;   // matches v1 cap
-static const uint8_t NUM_SOUND_CLASSES      = 7;     // YAMNet 7-class head
+static const uint8_t NUM_SOUND_CLASSES      = 10;    // canonical IDs in stream/haptic_mapper.py
 static const uint8_t V0_COMPAT_PATTERN      = 240;   // matches v1 firmware
 static const uint32_t IDLE_SLEEP_AFTER_MS   = 8000;  // enter low-power after silence
 
@@ -59,34 +63,39 @@ static const uint32_t IDLE_SLEEP_AFTER_MS   = 8000;  // enter low-power after si
 
 // ============================================================================
 // Haptic effect map - one open-source DRV2605 ROM effect per sound class.
-// Index = sound_class_id (0..6). Tune to your audiogram JSON.
-//
-// Class IDs MUST match the YAMNet 7-class head defined in
-// yamnet_classifier.py / audiogram/*.json so the phone and the wrist agree.
+// Index = sound_class_id (0..9). IDs and labels MUST match
+// stream/haptic_mapper.py so the companion and the wrist agree.
+// Traffic is awareness only and is not a safety feature.
 // ============================================================================
 struct ClassEffect {
     const char* label;           // human label, for debug only
-    uint8_t     primary_effect;  // DRV2605 ROM library effect 1..123
+    uint8_t     primary_effect;  // DRV2605 ROM library effect 1..123 (0 = none)
     uint8_t     accent_effect;   // optional second effect played on a 2nd LRA
     uint8_t     repeat;          // number of times to play primary
     uint8_t     min_intensity;   // floor (avoid sub-threshold buzz)
 };
 
 static const ClassEffect CLASS_EFFECTS[NUM_SOUND_CLASSES] = {
-    // id 0: speech            - soft, sustained
-    { "speech",          14, 17, 1,  40 },  // "Strong buzz 60%" + "Strong click 60%"
-    // id 1: alarm/siren       - sharp, urgent, repeated
-    { "alarm",           47,  1, 3,  80 },  // "Buzz 1 - 100%" x3
-    // id 2: doorbell/knock    - double-click feel
+    // id 0: silence           - no vibration
+    { "silence",          0,  0, 0,   0 },
+    // id 1: voice             - soft, sustained
+    { "voice",           14, 17, 1,  40 },  // "Strong buzz 60%" + "Strong click 60%"
+    // id 2: doorbell          - double-click feel
     { "doorbell",        24, 27, 2,  60 },  // "Sharp click 100%" + "Short double click strong"
-    // id 3: baby cry          - long ramp
+    // id 3: alarm             - sharp, urgent, repeated
+    { "alarm",           47,  1, 3,  80 },  // "Buzz 1 - 100%" x3
+    // id 4: dog               - short single pulse
+    { "dog",             16,  0, 1,  40 },  // "Sharp click 60%"
+    // id 5: traffic           - awareness only; not a safety feature
+    { "traffic",         48,  3, 2,  90 },  // "Buzz 2 - 80%"
+    // id 6: media             - slow, low-priority
+    { "media",           58,  0, 2,  30 },  // "Long buzz no stop" x2
+    // id 7: knock             - short single pulse
+    { "knock",            1,  0, 1,  50 },  // "Strong click 100%"
+    // id 8: baby_cry          - long ramp
     { "baby_cry",        82, 70, 2,  70 },  // "Transition ramp up long sharp"
-    // id 4: vehicle/horn      - hard pulse
-    { "vehicle",         48,  3, 2,  90 },  // "Buzz 2 - 80%"
-    // id 5: appliance beep    - triple short tick
-    { "appliance",       26, 27, 3,  40 },  // "Short double click medium"
-    // id 6: ambient/other     - gentle awareness pulse
-    { "ambient",         58,  0, 1,  30 },  // "Long buzz no stop"
+    // id 9: phone             - repeating short pulse
+    { "phone",           26, 27, 3,  40 },  // "Short double click medium" x3
 };
 
 // ============================================================================
@@ -128,8 +137,9 @@ static void drv_set_intensity(uint8_t intensity) {
 static void render_packet(uint8_t sound_class_id, uint8_t intensity, uint8_t pattern_id) {
     g_last_event_ms = millis();
 
-    if (intensity == 0 || pattern_id == 0) {
-        // Explicit silence packet
+    // Silence: class 0, zero intensity, zero pattern, or an unknown class.
+    if (sound_class_id == 0 || sound_class_id >= NUM_SOUND_CLASSES
+        || intensity == 0 || pattern_id == 0) {
         if (g_drv_present) g_drv.stop();
         return;
     }
@@ -143,7 +153,6 @@ static void render_packet(uint8_t sound_class_id, uint8_t intensity, uint8_t pat
         return;
     }
 
-    if (sound_class_id >= NUM_SOUND_CLASSES) sound_class_id = NUM_SOUND_CLASSES - 1;
     const ClassEffect& fx = CLASS_EFFECTS[sound_class_id];
 
     uint8_t effective = (intensity < fx.min_intensity) ? fx.min_intensity : intensity;

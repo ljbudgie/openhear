@@ -1,5 +1,10 @@
 # OpenHear v2 — Standalone Mode (No Phone)
 
+This standalone path is **experimental**. It is not the shipped OpenHear
+classifier and not the primary v2 firmware path. The recommended v2 path
+classifies on a companion device and uses `openhear_v2_xiao_nrf52840.ino`
+as the haptic endpoint.
+
 **Wear it. It listens. It vibrates. Nothing else required.**
 
 This guide gets the wristband running completely on its own — no phone,

@@ -1,5 +1,7 @@
 # OpenHear wristband v1.0.0 prototype
 
+This page documents the frozen v1.0.0 seven-class micro:bit prototype. Current class IDs are in [`stream/haptic_mapper.py`](../stream/haptic_mapper.py).
+
 This is the release-facing home for the first Sharp Hearing clinic prototype.
 The existing implementation stays in `stream/` and `hardware/wristband/`; this
 directory gives the prototype one canonical path for firmware and setup docs.

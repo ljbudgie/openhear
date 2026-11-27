@@ -24,7 +24,7 @@ The foundation is built. These modules are implemented, tested, and working.
 | `hardware/ite-shells/sweatproof.md` | Sweat-proofing guide — nano-coating, lotus-effect microstructures | ✅ Complete |
 | `voice/` | Voice analysis module | ✅ Complete |
 | Noahlink Wireless 2 bridge | USB HID communication with HIMSA protocol for fitting data access | ✅ Complete |
-| Tympan integration | Compatibility with Tympan open-source hearing aid platform | ✅ Complete |
+| Tympan integration | Compatibility with the Tympan open-source audio DSP platform (exploratory research, not intended use) | ✅ Complete |
 
 ---
 

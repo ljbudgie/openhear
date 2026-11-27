@@ -6,7 +6,9 @@
 
 ## What This Is
 
-This module provides a complete guide to designing, printing, and finishing custom **In-The-Ear (ITE)** hearing aid shells for the OpenHear project. These shells house the full electronics package — microphone, Bluetooth streaming module, battery, and receiver — inside a single custom-fitted unit that sits entirely within your ear.
+This module is **exploratory in-ear research**. It is **not** the present intended purpose, **not** a hearing aid or medical device, and **not** a supported product path. See [`docs/INTENDED_PURPOSE.md`](../../docs/INTENDED_PURPOSE.md).
+
+This module provides a complete guide to designing, printing, and finishing custom **In-The-Ear (ITE)** shells for that exploratory research path. These shells house the full electronics package — microphone, Bluetooth streaming module, battery, and receiver — inside a single custom-fitted unit that sits entirely within the ear.
 
 ITE shells are the natural next step beyond the BTE (Behind-The-Ear) moulds documented in [`hardware/shell/`](../shell/README.md). Where BTE moulds are acoustic couplers for an externally worn device, ITE shells *are* the device. Everything lives inside.
 
@@ -150,7 +152,7 @@ An ITE shell is more than a hollow shape. It has specific functional features:
 
 ### Before You Build
 
-1. **Consult an audiologist.** Get a professional hearing assessment. Know your audiogram. Understand your hearing loss type and severity before building any hearing device.
+1. **Consult an audiologist.** Get a professional hearing assessment. Know your audiogram. Understand your hearing loss type and severity before building any exploratory in-ear research hardware. This is not a hearing aid and not intended use.
 
 2. **Understand the risks.** Inserting any object into your ear canal carries risks including irritation, infection, allergic reaction, wax impaction, and in extreme cases, eardrum damage. Read the [safety module](../safety/README.md) completely.
 

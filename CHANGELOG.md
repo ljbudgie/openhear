@@ -13,6 +13,7 @@ release; they will be called out under a **Breaking** subsection.
 
 - Hardware and wristband docs aligned with `docs/INTENDED_PURPOSE.md`: the intended path is haptic environmental sound awareness, not a hearing aid or PSAP. Classification on the current v2 path runs on a companion device; the wristband is the haptic endpoint. The v2 XIAO folder is listed as the recommended daily-wear build. Exploratory Tympan / in-ear amplification docs are labelled research and not intended use.
 - `openhear_v2_xiao_nrf52840.ino` now uses the canonical 10-class IDs from `stream/haptic_mapper.py` (silence produces no vibration). A contract test parses the sketch so the tables cannot drift. The Arduino sketch is source only and is not compiled in CI.
+- Remaining hearing-aid / PSAP / amplification product framing removed from exploratory hardware docs (`ROADMAP.md`, `BOM.md`, `assembly/`, and related READMEs). Technical in-ear and Tympan material is kept and labelled research, not intended use. The micro:bit wristband README now notes the frozen v1.0.0 seven-class prototype.
 
 ### Added
 

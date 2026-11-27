@@ -22,7 +22,7 @@
 
 | Project / Community | Description | Link |
 |--------------------|-------------|------|
-| **Tympan** | Open-source hearing aid development platform (hardware + software). OpenHear builds on this | [tympan.org](https://tympan.org/) |
+| **Tympan** | Open-source audio DSP development platform (hardware + software). Used in this exploratory research path | [tympan.org](https://tympan.org/) |
 | **OpenMHA** | Open Master Hearing Aid — research-grade open hearing aid signal processing | [openmha.org](https://www.openmha.org/) |
 | **OpenScan** | Open-source 3D photogrammetry scanning rig — useful for ear impression scanning | [openscan.eu](https://www.openscan.eu/) |
 | **Meshroom / AliceVision** | Open-source photogrammetry pipeline — best free tool for scan-to-STL | [alicevision.org](https://alicevision.org/) |

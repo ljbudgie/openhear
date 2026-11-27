@@ -26,7 +26,7 @@ openhear/
 │                  fitting dataclasses (core/fitting_data.py), read /
 │                  write / backup CLIs.  See docs/PROTOCOL_NOTES.md.
 │
-├── hardware/    ← Out-of-tree open hearing-aid hardware: Tympan SDK
+├── hardware/    ← Exploratory Tympan / in-ear research hardware (not intended use): Tympan SDK
 │                  integration, shell manufacturing notes, safety docs,
 │                  Phase 5 sovereign-device bundle generation.
 │

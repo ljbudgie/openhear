@@ -1,6 +1,8 @@
 # Hardware Roadmap
 
-From documentation to sovereign device. Five phases, each building on the last.
+This roadmap describes **exploratory Tympan and in-ear research**. It is **not** the present intended purpose, **not** a hearing aid or medical device, and **not** a supported product path. The intended hardware path is the haptic wristband for environmental sound awareness. See [`docs/INTENDED_PURPOSE.md`](../docs/INTENDED_PURPOSE.md) and [`wristband/v2-xiao-nrf52840/`](wristband/v2-xiao-nrf52840/).
+
+From documentation to an exploratory sovereign in-ear research device. Five phases, each building on the last.
 
 ---
 
@@ -85,18 +87,18 @@ Shrink the device. Extend the battery. Add wireless connectivity.
 
 **Status:** Not started
 
-The endgame. A complete, self-contained hearing aid with no external dependencies. You print it, you build it, you upload your audiogram, you hear.
+Exploratory research goal: a self-contained in-ear research device with no external dependencies. You print it, you build it, you upload your audiogram. This is **not** intended use and is **not** a hearing aid.
 
-- [ ] Complete self-contained hearing aid
+- [ ] Complete self-contained exploratory in-ear research device
 - [ ] No proprietary components or firmware
-- [ ] User prints shell, sources commodity components, uploads audiogram, hears
+- [ ] User prints shell, sources commodity components, and uploads an audiogram into the exploratory pipeline
 - [ ] Total cost target: under £100 for a binaural system at scale (quantity 100+)
 - [ ] One-click audiogram-to-device pipeline (web app: upload audiogram → download firmware → flash device)
 - [ ] Community-maintained component database with verified suppliers worldwide
 - [ ] Regulatory pathway explored for CE/FDA classification (if community desires)
-- [ ] Published peer-reviewed paper on open-source hearing aid performance vs. commercial devices
+- [ ] Published peer-reviewed paper on this exploratory in-ear research, compared with commercial devices
 
-**Exit criteria:** 100 devices built by community members worldwide. Cost under £100 per binaural system. Performance within 5 dB of commercial hearing aids at matched price point.
+**Exit criteria (research only, not a product claim):** 100 research devices built by community members worldwide. Cost under £100 per binaural system. Research measurements compared with commercial devices at a matched price point.
 
 ---
 

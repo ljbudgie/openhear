@@ -2,7 +2,9 @@
 
 **This module exists to prevent harm. Every other module in hardware/ is optional. This one is not.**
 
-A hearing aid puts a speaker inside your ear canal. If that speaker plays sound that is too loud, it will damage your hearing permanently. This is not a theoretical risk. It is the primary failure mode of any amplification device, and it is irreversible.
+This document is for **exploratory in-ear research** that can put a receiver in the ear canal. That work is **not** the present intended purpose, **not** a hearing aid or medical device, and **not** a supported product path. The intended hardware path is the haptic wristband, which does not put sound into the ear. See [`docs/INTENDED_PURPOSE.md`](../../docs/INTENDED_PURPOSE.md).
+
+A receiver in an ear canal that plays sound that is too loud can damage hearing permanently. This is not a theoretical risk. It is the primary failure mode of any in-ear amplification experiment, and it is irreversible.
 
 Every design decision in this module prioritises one thing: **making it physically impossible for the device to produce sound loud enough to cause harm.** Software can crash, firmware can have bugs, users can set gain too high. The hardware limiter does not care. It is a circuit that clamps the electrical signal before it reaches the receiver, regardless of what the software is doing.
 
@@ -14,7 +16,7 @@ Read this entire document before building anything in the hardware/ module.
 
 ### What It Is
 
-MPO is the loudest sound the hearing aid can produce, measured in dB SPL (decibels Sound Pressure Level) at the receiver output. Every commercial hearing aid has an MPO limit. OpenHear does too.
+MPO is the loudest sound a receiver can produce, measured in dB SPL (decibels Sound Pressure Level) at the receiver output. Every commercial hearing aid has an MPO limit. This exploratory research path includes one too. That does not make the research a hearing aid.
 
 ### Why It Matters
 
@@ -26,7 +28,7 @@ MPO is the loudest sound the hearing aid can produce, measured in dB SPL (decibe
 | 110 dB SPL | Less than 2 minutes |
 | 120 dB SPL | Pain threshold. Immediate risk |
 
-A hearing aid receiver in an ear canal with a sealed mould can produce 110–120 dB SPL. Without limiting, a software bug or feedback oscillation could drive the receiver to maximum output and cause permanent hearing damage in seconds.
+A receiver in an ear canal with a sealed mould can produce 110–120 dB SPL. Without limiting, a software bug or feedback oscillation could drive the receiver to maximum output and cause permanent hearing damage in seconds.
 
 ### How OpenHear Handles It
 
@@ -158,7 +160,7 @@ Calibration verifies that the actual sound output matches the expected output at
 
 1. **Connect the ear mould to the 2cc coupler.** The coupler simulates the ear canal volume. Place the calibration microphone at the measurement port.
 
-2. **Generate known-level tones.** Play pure tones at each audiometric frequency (250, 500, 1000, 2000, 3000, 4000, 6000, 8000 Hz) through the hearing aid at the programmed gain level.
+2. **Generate known-level tones.** Play pure tones at each audiometric frequency (250, 500, 1000, 2000, 3000, 4000, 6000, 8000 Hz) through the research device at the programmed gain level.
 
 3. **Measure SPL at each frequency.** Record the measured dB SPL. Compare with the expected output (input level + programmed gain at that frequency).
 
@@ -205,11 +207,11 @@ Every identified failure mode, its potential harm, and how OpenHear mitigates it
 
 **You build this device. You use this device. You are responsible for your own hearing health.**
 
-The safety module described in this document is designed to **exceed the safety margins of commercial hearing aids.** The hardware MPO limiter is a passive, unconditional circuit that cannot be overridden by software. The calibration procedure verifies actual output levels. The risk register identifies and mitigates every failure mode we can identify.
+The safety module described in this document is written for that exploratory in-ear research. The hardware MPO limiter is a passive, unconditional circuit that cannot be overridden by software. The calibration procedure verifies actual output levels. The risk register identifies and mitigates every failure mode we can identify. None of this makes the research a hearing aid, or a substitute for clinical care.
 
 But no safety system is perfect. Components can fail. Designs can have flaws we haven't identified. Your hearing is irreplaceable.
 
-**If in doubt, reduce gain.** A hearing aid that is slightly too quiet is inconvenient. A hearing aid that is too loud causes permanent damage. There is no symmetry between these outcomes.
+**If in doubt, reduce gain.** Output that is slightly too quiet is inconvenient. Output that is too loud can cause permanent damage. There is no symmetry between these outcomes.
 
 **If something sounds wrong, remove the device immediately.** Pain, sudden loudness changes, or unusual sounds are all signals to stop using the device and investigate before continuing.
 

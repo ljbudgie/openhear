@@ -1,5 +1,7 @@
 # Bill of Materials
 
+This bill of materials is for **exploratory Tympan and in-ear research**. It is **not** the present intended purpose, **not** a hearing aid or medical device, and **not** a supported product path. For the intended haptic wristband path, see [`wristband/v2-xiao-nrf52840/BOM_v2.csv`](wristband/v2-xiao-nrf52840/BOM_v2.csv) and [`docs/INTENDED_PURPOSE.md`](../docs/INTENDED_PURPOSE.md).
+
 All prices in GBP (£). Prices are approximate and may vary by supplier and region. See [sourcing notes](#sourcing-notes) at the bottom for international alternatives.
 
 ---
@@ -10,7 +12,7 @@ Everything you need to hear your audiogram-tuned audio through headphones. No so
 
 | Component | Part | Supplier | Approx Cost | Notes |
 |-----------|------|----------|-------------|-------|
-| Dev board | [Tympan Rev F](https://shop.tympan.org/) | shop.tympan.org | £250 | Open-source hearing aid dev board. Teensy 4.1 based, 600 MHz ARM Cortex-M7. [Datasheet](https://github.com/Tympan/Docs/wiki) |
+| Dev board | [Tympan Rev F](https://shop.tympan.org/) | shop.tympan.org | £250 | Open-source audio DSP development board. Teensy 4.1 based, 600 MHz ARM Cortex-M7. [Datasheet](https://github.com/Tympan/Docs/wiki) |
 | Headphones | Any wired over-ear headphones, 32Ω impedance | Amazon / local | £30 | 3.5mm jack. Over-ear recommended for comfort during testing. Avoid noise-cancelling models — they add latency |
 | Microphone | 3.5mm lavalier / lapel microphone | Amazon / local | £10 | Omnidirectional. Clip to collar for voice pickup during testing |
 | Cable | USB-C to USB-A cable | Amazon / local | £5 | For programming the Tympan via Arduino IDE. At least 1m length recommended |
@@ -20,7 +22,7 @@ Everything you need to hear your audiogram-tuned audio through headphones. No so
 
 ## Tier 2: Builder (~£450)
 
-Adds BTE earpieces, balanced armature receivers, custom moulds, and the mandatory MPO limiter circuit. This tier produces a wearable hearing aid.
+Adds BTE earpieces, balanced armature receivers, custom moulds, and the mandatory MPO limiter circuit. This tier is an exploratory wearable in-ear research build. It is not a hearing aid and not intended use.
 
 | Component | Part | Supplier | Approx Cost | Notes |
 |-----------|------|----------|-------------|-------|

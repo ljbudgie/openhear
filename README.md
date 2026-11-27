@@ -25,14 +25,14 @@
 
 OpenHear is not designed to treat or manage tinnitus. If you have tinnitus in one ear only, pulsatile tinnitus, or sudden-onset tinnitus with hearing loss, see a healthcare professional promptly (NICE NG155 section 1.2). If tinnitus is linked to thoughts of self-harm or suicide, seek help urgently. If you think amplification is making your tinnitus worse, speak to your audiologist first. Further information: https://tinnitus.org.uk/how-we-can-help/
 
-OpenHear is an open-source research platform for environmental sound awareness. It recognises a small set of everyday sounds and turns each sound class into a short, distinct vibration pattern on the wrist. The patterns are weighted by the wearer's own audiogram. Recognition runs on the device. Nothing is sent to a cloud. The audiogram stays with the person.
+OpenHear is an open-source research platform for environmental sound awareness. It recognises a small set of everyday sounds and turns each sound class into a short, distinct vibration pattern on the wrist. The patterns are weighted by the wearer's own audiogram. On the current path, recognition runs on a companion device (phone or laptop). Nothing is sent to a cloud. The audiogram stays with the person. The wristband (in development) is the haptic endpoint.
 
 It is designed to work alongside existing hearing aids, or when aids are out. It does not amplify sound. The current claim is awareness only.
 
 The repository also contains exploratory architecture notes on longer-term ideas (including wrist-native processing and hardware concepts). Those notes are not the present claim. Any reviewer should start with [docs/INTENDED_PURPOSE.md](docs/INTENDED_PURPOSE.md) and [START_HERE.md](START_HERE.md).
 
 > *Your audiogram is a measurement of your body. It belongs to you.*
-> *OpenHear keeps it on the device and uses it to shape awareness patterns.*
+> *OpenHear keeps it with the person and uses it to shape awareness patterns.*
 
 ---
 
@@ -64,7 +64,7 @@ Many people with severe or profound loss, and people who remove their aids, miss
 
 OpenHear is an open-source research platform for environmental sound awareness through haptic patterns on the wrist. It is not a hearing aid and not a certified medical device. The canonical intended-purpose statement is in [docs/INTENDED_PURPOSE.md](docs/INTENDED_PURPOSE.md).
 
-It can be used alongside aids the person already owns. The wristband (in development) scans for sounds the aids may not deliver and translates recognised classes into vibration. Recognition and the audiogram stay on the device.
+It can be used alongside aids the person already owns. The wristband (in development) delivers vibration patterns for recognised classes the aids may not deliver. Classification runs on a companion device (phone or laptop). The audiogram stays with the person. Nothing is sent to a cloud.
 
 **Tested on:**
 - Phonak Naída M70-SP (Marvel platform)
@@ -99,20 +99,20 @@ The full statement is in [`docs/BURGESS_PRINCIPLE.md`](docs/BURGESS_PRINCIPLE.md
 
 Modern hearing aids are extraordinary pieces of engineering. They are also, deliberately, black boxes for the data they hold and the decisions they make in real time.
 
-The audiogram stored in a hearing aid is a measurement of the person's hearing. In many systems it is not straightforward for the person to hold a plain, portable copy that travels with them and shapes other tools they choose to use. OpenHear keeps that copy on the device and uses it only to weight vibration patterns for environmental awareness.
+The audiogram stored in a hearing aid is a measurement of the person's hearing. In many systems it is not straightforward for the person to hold a plain, portable copy that travels with them and shapes other tools they choose to use. OpenHear keeps that copy with the person and uses it only to weight vibration patterns for environmental awareness.
 
 ---
 
 ## What OpenHear does
 
 ```
-World → On-device classifier → Sound class → Short vibration pattern on the wrist
-         (weighted by the person's audiogram, held on the device)
+World → Companion classifier (phone or laptop) → Sound class → Short vibration pattern on the wristband
+         (weighted by the person's audiogram, held on the companion)
 ```
 
 **Current claim:** detection and identification of everyday environmental sound classes, delivered as distinct haptic patterns. Supported classes: voice, doorbell, alarm, dog, traffic, media, knock, baby_cry, phone. From v1.8.0 the traffic class fires on vehicle warnings only (horns, reversing beeps, skidding, tyre squeal, train horn), not on engines. Bench testing found horn detection weak, so the traffic pattern is not a safety feature and must not be relied on to warn of a vehicle. Measured hit rates and false alerts, including the weak ones, are in [docs/BENCH_RESULTS.md](docs/BENCH_RESULTS.md). One optional rule can be switched on with `OPENHEAR_VOICE_RULE_V3=1`: it reduces voice false alerts at the cost of some missed speech, and is off by default. Not speech recognition. Not amplification. Not a replacement for clinical care.
 
-**Audiogram module** — the person's own thresholds stay on the device and weight the patterns. See the Living Hearing Profile.
+**Audiogram module** — the person's own thresholds stay with the person and weight the patterns. See the Living Hearing Profile.
 
 **Wristband** *(in development)* — continuous-wear haptic delivery of the recognised classes. Designed to work alongside aids or when aids are out.
 
@@ -120,21 +120,23 @@ World → On-device classifier → Sound class → Short vibration pattern on th
 
 ## OpenHear Wristband — Active Environmental Intelligence
 
-The wristband scans the environment on the wrist and delivers short, distinct vibration patterns for recognised sound classes. It is designed to work *alongside* hearing aids, not replace them.
+The wristband is **in development**. On the current path it is the haptic endpoint: a companion device (phone or laptop) classifies environmental sounds, and the wristband delivers short, distinct vibration patterns for recognised classes. It is designed to work *alongside* hearing aids, not replace them.
 
 ```
-World → Wrist microphone → On-device classifier → Haptic pattern → Wrist
+World → Companion microphone and classifier (phone or laptop) → 3-byte haptic packet → Wristband
 ```
 
-**On-device classification** — recognition runs on the device. Nothing is sent to a cloud.
+**Companion classification** — recognition runs on the phone or laptop. Nothing is sent to a cloud.
 
 **Haptic patterns** — different sound classes produce different short vibration signatures, weighted by the person's audiogram.
 
-**Local only** — the audiogram and the recognition stay on the device.
+**Local only** — the audiogram and the recognition stay on the companion device with the person.
+
+An optional standalone sketch can classify on the wristband itself. That path is **experimental** and is not the shipped classifier. See [`hardware/wristband/v2-xiao-nrf52840/firmware/STANDALONE.md`](hardware/wristband/v2-xiao-nrf52840/firmware/STANDALONE.md).
 
 ### How it relates to existing devices
 
-Neosensory Buzz was a commercial haptic wristband that converted sound into vibration. OpenHear is open-source, keeps the audiogram on the device, and limits the claim to awareness of recognised environmental classes.
+Neosensory Buzz was a commercial haptic wristband that converted sound into vibration. OpenHear is open-source, keeps the audiogram with the person, and limits the claim to awareness of recognised environmental classes.
 
 ---
 

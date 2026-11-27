@@ -1,8 +1,10 @@
 # User Complaints Solved
 
-## How OpenHear Addresses Every Major Hearing Aid Complaint
+## Exploratory notes: common commercial-hearing-aid complaints and related research modules
 
 *Data drawn from HearingTracker forums, r/HearingAids, and audiologist community feedback (2025–2026).*
+
+This document is **exploratory**. It maps published complaints about commercial hearing aids to research modules in this repository. It is **not** intended use, **not** a claim that OpenHear is a hearing aid or medical device, and **not** a substitute for clinical care. The intended purpose is haptic environmental sound awareness. See [`INTENDED_PURPOSE.md`](INTENDED_PURPOSE.md).
 
 ---
 
@@ -10,9 +12,7 @@
 
 The hearing aid industry in 2026 charges £3,000–£8,000 for devices that still whistle during hugs, mangle your own voice, die in sweat, and lock you out of your own settings. These are not edge cases. They are the most common complaints on every hearing aid forum, subreddit, and review site.
 
-OpenHear was built to solve them. Every one.
-
-This document maps the real complaints — the ones people actually post about, the ones audiologists hear every day — to specific OpenHear modules and solutions.
+The table below maps those complaints to exploratory modules in this repository. Those modules are research material, not a supported hearing-aid product path.
 
 ---
 

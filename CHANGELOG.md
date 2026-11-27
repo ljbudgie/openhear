@@ -9,6 +9,12 @@ release; they will be called out under a **Breaking** subsection.
 
 ## [Unreleased]
 
+### Changed
+
+- Hardware and wristband docs aligned with `docs/INTENDED_PURPOSE.md`: the intended path is haptic environmental sound awareness, not a hearing aid or PSAP. Classification on the current v2 path runs on a companion device; the wristband is the haptic endpoint. The v2 XIAO folder is listed as the recommended daily-wear build. Exploratory Tympan / in-ear amplification docs are labelled research and not intended use.
+- `openhear_v2_xiao_nrf52840.ino` now uses the canonical 10-class IDs from `stream/haptic_mapper.py` (silence produces no vibration). A contract test parses the sketch so the tables cannot drift. The Arduino sketch is source only and is not compiled in CI.
+- Remaining hearing-aid / PSAP / amplification product framing removed from exploratory hardware docs (`ROADMAP.md`, `BOM.md`, `assembly/`, and related READMEs). Technical in-ear and Tympan material is kept and labelled research, not intended use. The micro:bit wristband README now notes the frozen v1.0.0 seven-class prototype.
+
 ### Added
 
 - **Communication-needs summary, draft, not released** (`audiogram/communication_needs_summary.py`, `docs/COMMUNICATION_NEEDS_SUMMARY.md`) — schema `openhear-communication-needs-summary-v1`. Self-reported adjustments, channels that do not work, impact in the person's own words and dated variation entries, each with provenance. Never includes thresholds, PTA, severity, diagnosis or identifiers. Field choice and a boxed free-text warning; exact preview with consent shown as pending, recorded as given only after typed confirmation; local write, no network. No export timestamp by default; entry dates shown to the month by default (day or year selectable). Optional SHA-256 integrity hash (not a signature). Not PIP evidence, not DWP- or Timms-endorsed, not a digital ID. Fictional example in `examples/communication_needs_summary/`.

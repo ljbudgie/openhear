@@ -1,6 +1,8 @@
 # shell/ — 3D Printed Custom Ear Moulds
 
-This guide walks you through making custom ear moulds for your OpenHear hearing aid. Custom moulds matter because they create an acoustic seal between the receiver (speaker) and your ear canal. A good seal means better bass response, less feedback, and all-day comfort. A bad seal means whistling, tinny sound, and a device you take out after an hour.
+This module is **exploratory in-ear research**. It is **not** the present intended purpose, **not** a hearing aid or medical device, and **not** a supported product path. See [`docs/INTENDED_PURPOSE.md`](../../docs/INTENDED_PURPOSE.md).
+
+This guide walks you through making custom ear moulds for that exploratory research path. Custom moulds matter because they create an acoustic seal between the receiver (speaker) and your ear canal. A good seal means better bass response, less feedback, and all-day comfort. A bad seal means whistling, tinny sound, and a device you take out after an hour.
 
 Every ear is different. That's the whole point of custom moulds.
 

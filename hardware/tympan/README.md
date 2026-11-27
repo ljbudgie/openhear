@@ -1,17 +1,19 @@
 # tympan/ — Tympan Integration
 
-This module connects OpenHear's audiogram-driven software pipeline to the [Tympan](https://tympan.org/) open-source hearing aid development board.
+This module is **exploratory research**. It is **not** the present intended purpose, **not** a hearing aid or medical device, and **not** a supported product path. The intended hardware path is the haptic wristband. See [`docs/INTENDED_PURPOSE.md`](../../docs/INTENDED_PURPOSE.md).
+
+This module connects OpenHear's audiogram-driven software pipeline to the [Tympan](https://tympan.org/) open-source audio DSP development board.
 
 ---
 
 ## Why Tympan?
 
-The Tympan is the only open-source hearing aid hardware platform with validated clinical performance. Here's why OpenHear builds on it:
+Tympan is an open-source audio DSP hardware platform. This research path uses it because:
 
 - **Open source.** Hardware schematics, firmware, and DSP algorithms are all publicly available under open licences. No black boxes.
-- **Clinical validation.** Developed with NIH (National Institutes of Health) funding. The WDRC (Wide Dynamic Range Compression) algorithms have been tested in clinical settings.
+- **Published algorithms.** Tympan documents WDRC (Wide Dynamic Range Compression) algorithms and an open development history. That is Tympan's documentation, not an OpenHear clinical claim.
 - **Active community.** Forum, GitHub issues, and a development team that responds. You are not building alone.
-- **Programmable via Arduino IDE.** If you can upload a sketch, you can program a hearing aid. No proprietary toolchain required.
+- **Programmable via Arduino IDE.** If you can upload a sketch, you can program this research board. No proprietary toolchain required.
 - **Low latency.** Under 3ms input-to-output latency. You will not hear a delay — this is critical for a natural listening experience.
 - **High sample rate.** Supports up to 96 kHz sample rate for full-bandwidth audio processing.
 - **Hardware:** Teensy 4.1 based, 600 MHz ARM Cortex-M7 processor. More than enough power for real-time multi-band compression, noise reduction, and feedback cancellation simultaneously.
@@ -25,7 +27,7 @@ The Tympan is the only open-source hearing aid hardware platform with validated 
 
 ---
 
-## Data Flow: Audiogram to Hearing Aid
+## Data Flow: Audiogram to the Tympan board
 
 ```
 ┌──────────────────┐
@@ -108,7 +110,7 @@ The Tympan Library provides these DSP algorithms out of the box. The generated s
 
 | Algorithm | What It Does | Why It Matters |
 |-----------|-------------|----------------|
-| **WDRC** (Wide Dynamic Range Compression) | Makes quiet sounds louder and loud sounds quieter, per frequency band | Core hearing aid function. Matches amplification to your hearing loss at each frequency |
+| **WDRC** (Wide Dynamic Range Compression) | Makes quiet sounds louder and loud sounds quieter, per frequency band | Exploratory DSP used in this research path: matches gain to the audiogram at each frequency. Not intended use. |
 | **Noise Reduction** | Reduces steady-state background noise (fans, traffic, hum) | Improves speech clarity in noisy environments |
 | **Feedback Cancellation** | Detects and suppresses acoustic feedback (whistling) | Prevents the high-pitched squeal that occurs when amplified sound leaks from the ear canal back to the microphone |
 | **Frequency Shifting** | Shifts high frequencies down to ranges with better hearing | Useful for severe high-frequency loss where amplification alone is not enough |

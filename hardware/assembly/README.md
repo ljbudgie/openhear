@@ -1,6 +1,8 @@
 # assembly/ — Build Guide
 
-A step-by-step guide to building your OpenHear hearing aid. Written for someone who has never soldered before. If you have soldered before, you will move faster, but read every step anyway — the safety-critical steps are marked and must not be skipped.
+This guide is for **exploratory Tympan and in-ear research**. It is **not** the present intended purpose, **not** a hearing aid or medical device, and **not** a supported product path. The intended hardware path is the haptic wristband. See [`docs/INTENDED_PURPOSE.md`](../../docs/INTENDED_PURPOSE.md) and [`../wristband/v2-xiao-nrf52840/`](../wristband/v2-xiao-nrf52840/).
+
+A step-by-step guide to the exploratory research build. Written for someone who has never soldered before. If you have soldered before, you will move faster, but read every step anyway — the safety-critical steps are marked and must not be skipped.
 
 ---
 
@@ -115,13 +117,13 @@ Replace `burgess_2021.json` with your own audiogram file. The script prints a su
 4. Adjust gain, compression, and noise reduction in real time
 5. Find settings that sound best to you
 
-**Tier 1 is complete.** You have a working, audiogram-personalised hearing device.
+**Tier 1 is complete.** You have an exploratory, audiogram-personalised Tympan headphone setup. This is research only, not intended use, and not a hearing aid.
 
 ---
 
 ## 4. Tier 2 Build: Builder (3–4 hours)
 
-**What you're building:** A wearable binaural hearing aid with BTE earpieces, custom ear moulds, balanced armature receivers, and a hardware MPO limiter circuit.
+**What you're building:** An exploratory binaural in-ear research build with BTE earpieces, custom ear moulds, balanced armature receivers, and a hardware MPO limiter circuit. Not a hearing aid, and not intended use.
 
 **Components needed:** Everything from Tier 1, plus Tympan Earpiece Kit, Knowles receivers, 3D printed ear moulds, impression kit, LiPo battery, wire and connectors. See [BOM](../BOM.md) Tier 2.
 
@@ -273,7 +275,7 @@ Use the Dayton Audio iMM-6 calibration microphone and a 2cc coupler:
 
 ## 6. Verification Checklist
 
-Before using your OpenHear device for regular wear, every item on this list must be checked. No exceptions.
+Before wearing this exploratory research build, every item on this list must be checked. No exceptions. This is not intended use.
 
 - [ ] **MPO limiter installed and tested** — hardware limiter circuit is in-line for both ears. Verified with multimeter (resistance reading across limiter matches expected value)
 - [ ] **Calibration completed at all frequencies** — SPL output measured and verified at 250, 500, 1000, 2000, 3000, 4000, 6000, and 8000 Hz. All within ±3 dB of target

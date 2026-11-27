@@ -4,9 +4,10 @@ Licences: hardware **CERN-OHL-S-2.0**, code **MIT OR Apache-2.0**, docs **CC-BY-
 
 > Daily-wear, Apple-Watch-Ultra / Whoop-4.0-style aids-free wristband on
 > the **Seeed Studio XIAO nRF52840 (Sense)** – fully open-source,
-> sovereign, local-first, individually buildable, and 100 % compatible
-> with the existing OpenHear classifier, audiogram JSON, and 3-byte BLE
-> packet contract.
+> sovereign, local-first, and individually buildable. It uses the same
+> 3-byte BLE packet contract and the canonical 10-class IDs in
+> `stream/haptic_mapper.py`. Classification runs on a companion device
+> (phone or laptop); this wristband is the haptic endpoint.
 
 ## Folder layout
 
@@ -73,9 +74,12 @@ binary, cloud service, or vendor-locked tool.
    Apple-Watch-style TPU band from Printables / MakerWorld via the
    standard 20–22 mm quick-release lugs.
 6. **Same software contract** – identical 3-byte BLE packet
-   `[sound_class_id, intensity, pattern_id]`, identical YAMNet 7-class
-   head, identical audiogram JSON, identical `V0_COMPAT_PATTERN = 240`
-   shim for legacy v0 micro:bit packets.
+   `[sound_class_id, intensity, pattern_id]`, canonical 10-class IDs
+   from `stream/haptic_mapper.py` (silence, voice, doorbell, alarm, dog,
+   traffic, media, knock, baby_cry, phone), and the same
+   `V0_COMPAT_PATTERN = 240` shim for legacy v0 micro:bit packets.
+   Intensity is pre-weighted on the companion from the wearer's
+   audiogram; this firmware does not load an audiogram file.
 
 ## Compatibility matrix
 
